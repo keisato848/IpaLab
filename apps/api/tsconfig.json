@@ -1,0 +1,12 @@
+{
+    "extends": "@ipa-lab/config/tsconfig.base.json",
+    "compilerOptions": {
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "target": "es2020",
+        "outDir": "dist",
+        "rootDir": ".",
+        "sourceMap": true,
+        "strict": false
+    }
+}
