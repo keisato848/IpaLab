@@ -13,12 +13,13 @@
         "test": "echo \"No tests yet...\""
     },
     "dependencies": {
+        "@azure/cosmos": "^4.9.0",
         "@azure/functions": "^4.0.0",
         "@ipa-lab/shared": "*"
     },
     "devDependencies": {
         "@ipa-lab/config": "*",
-        "typescript": "^5.0.0",
-        "rimraf": "^5.0.0"
+        "rimraf": "^5.0.0",
+        "typescript": "^5.0.0"
     }
 }

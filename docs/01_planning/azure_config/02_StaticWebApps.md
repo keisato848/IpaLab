@@ -17,6 +17,16 @@
 | **APIの場所**        | (空欄)               | Azure FunctionsをBring Your Own Backendとしてリンクするため |
 | **出力先**           | `.next` または `out` | Next.jsの設定に準拠                                         |
 
+## 環境変数 (Application Settings)
+NextAuth.js 等の動作に必要な環境変数を設定します。
+
+| キー                                       | 備考                |
+| :----------------------------------------- | :------------------ |
+| `NEXTAUTH_URL`                             | 本番URLを設定       |
+| `NEXTAUTH_SECRET`                          | Key Vault参照を推奨 |
+| `GITHUB_ID`, `GITHUB_SECRET`               | OAuth連携用         |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | OAuth連携用         |
+
 ## カスタムドメイン
 - **ドメイン:** `pm-exam-dx.com` (仮)
 - **SSL証明書:** Managed Certificate (無料)
