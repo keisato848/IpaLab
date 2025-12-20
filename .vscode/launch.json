@@ -1,0 +1,36 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug API (Functions)",
+            "type": "node",
+            "request": "attach",
+            "port": 9229,
+            "preLaunchTask": "npm: build - apps/api",
+            "restart": true
+        },
+        {
+            "name": "Debug Web (Next.js - Chrome)",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}/apps/web"
+        },
+        {
+            "name": "Debug Web (Next.js - Edge)",
+            "type": "msedge",
+            "request": "launch",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}/apps/web"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Debug All (Web + API)",
+            "configurations": [
+                "Debug API (Functions)",
+                "Debug Web (Next.js - Chrome)"
+            ]
+        }
+    ]
+}
