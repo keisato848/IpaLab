@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { UserMenu } from '@/components/features/auth/UserMenu';
 import styles from './layout.module.css';
 
 export default function DashboardLayout({
@@ -75,11 +76,7 @@ export default function DashboardLayout({
         </nav>
 
         <div className={styles.userSection}>
-          <div className={styles.userAvatar}>G</div>
-          <div className={styles.userInfo}>
-            <div className={styles.userName}>ゲストユーザー</div>
-            <div className={styles.userRole}>Guest</div>
-          </div>
+          <UserMenu />
         </div>
       </aside>
 

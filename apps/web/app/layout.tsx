@@ -6,6 +6,8 @@ export const metadata: Metadata = {
     description: "Project Manager Exam Learning App",
 };
 
+import { NextAuthProvider } from "@/components/providers/NextAuthProvider";
+
 export default function RootLayout({
     children,
 }: {
@@ -13,7 +15,11 @@ export default function RootLayout({
 }) {
     return (
         <html lang="ja">
-            <body>{children}</body>
+            <body>
+                <NextAuthProvider>
+                    {children}
+                </NextAuthProvider>
+            </body>
         </html>
     );
 }
