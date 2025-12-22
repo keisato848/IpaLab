@@ -60,6 +60,14 @@ stateDiagram-v2
 
 ## 3. 主要画面ワイヤーフレーム要件
 
+### 3.0 ランディングページ (`/`)
+- **Language:** 日本語 (Japanese)
+- **Hero Section:**
+  - キャッチコピー (例: "プロジェクトマネージャ試験を、もっとスマートに。")
+  - **Action:** 「ゲストとして始める」(Link to `/dashboard`)
+  - **Action:** 「ログイン」(Link to `/login`)
+- **Features:** 機能紹介（演習、分析、履歴）
+
 ### 3.1 ダッシュボード (`/dashboard`)
 - **Header:** ロゴ、ユーザーアイコン（未ログイン時は「ログイン」ボタン）
 - **Today's Status:** 本日の学習目標数 vs 実績数 (プログレスバー)

@@ -1,0 +1,28 @@
+{
+    "name": "@ipa-lab/data",
+    "version": "0.0.0",
+    "private": true,
+    "main": "./src/index.ts",
+    "types": "./src/index.ts",
+    "scripts": {
+        "scrape": "ts-node src/scraper/index.ts",
+        "sync": "ts-node src/syncer/index.ts",
+        "lint": "eslint . --ext .ts"
+    },
+    "dependencies": {
+        "@azure/cosmos": "^4.0.0",
+        "@ipa-lab/shared": "*",
+        "axios": "^1.6.0",
+        "cheerio": "^1.0.0-rc.12",
+        "dotenv": "^16.4.0",
+        "front-matter": "^4.0.2",
+        "pdf-parse": "^1.1.1"
+    },
+    "devDependencies": {
+        "@types/cheerio": "^0.22.35",
+        "@types/node": "^20.0.0",
+        "@types/pdf-parse": "^1.1.4",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.3.3"
+    }
+}

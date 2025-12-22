@@ -1,25 +1,40 @@
-import { CosmosClient } from '@azure/cosmos';
+import { CosmosClient, Container } from '@azure/cosmos';
 
 const CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION || "";
 const DATABASE_NAME = "pm-exam-dx-db";
 
-if (!CONNECTION_STRING) {
-    console.warn("COSMOS_DB_CONNECTION is not set. Database operations will fail.");
+let client: CosmosClient | undefined;
+
+try {
+    if (CONNECTION_STRING) {
+        client = new CosmosClient(CONNECTION_STRING);
+    }
+} catch (e) {
+    console.warn("Failed to init Cosmos Client:", e);
 }
 
-const client = new CosmosClient(CONNECTION_STRING);
-const database = client.database(DATABASE_NAME);
+const getDatabase = () => {
+    if (!client) throw new Error("Cosmos DB not initialized (Check COSMOS_DB_CONNECTION)");
+    return client.database(DATABASE_NAME);
+};
+
+const getContainer = (name: string): Container => {
+    return getDatabase().container(name);
+};
 
 export const containers = {
-    questions: database.container("Questions"),
-    users: database.container("Users"),
-    accounts: database.container("Accounts"),
-    sessions: database.container("Sessions"),
-    learningRecords: database.container("LearningRecords"),
+    get questions() { return getContainer("Questions"); },
+    get users() { return getContainer("Users"); },
+    get accounts() { return getContainer("Accounts"); },
+    get sessions() { return getContainer("Sessions"); },
+    get learningRecords() { return getContainer("LearningRecords"); },
 };
 
 export const initDatabase = async () => {
-    // Only for local dev / initialization
+    if (!client) {
+        console.warn("Skipping DB init: No client");
+        return;
+    }
     const { database } = await client.databases.createIfNotExists({ id: DATABASE_NAME });
 
     // Create containers with PKs

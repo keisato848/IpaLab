@@ -1,0 +1,327 @@
+{
+  "examId": "AP-2023-Fall-AM",
+  "scrapedAt": "2025-12-21T13:30:10.958Z",
+  "sourceUrl": "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05a_ap_am_ans.pdf",
+  "answers": [
+    {
+      "qNo": 1,
+      "correct": "c"
+    },
+    {
+      "qNo": 2,
+      "correct": "d"
+    },
+    {
+      "qNo": 3,
+      "correct": "a"
+    },
+    {
+      "qNo": 4,
+      "correct": "a"
+    },
+    {
+      "qNo": 5,
+      "correct": "c"
+    },
+    {
+      "qNo": 6,
+      "correct": "c"
+    },
+    {
+      "qNo": 7,
+      "correct": "b"
+    },
+    {
+      "qNo": 8,
+      "correct": "c"
+    },
+    {
+      "qNo": 9,
+      "correct": "c"
+    },
+    {
+      "qNo": 10,
+      "correct": "a"
+    },
+    {
+      "qNo": 11,
+      "correct": "b"
+    },
+    {
+      "qNo": 12,
+      "correct": "b"
+    },
+    {
+      "qNo": 13,
+      "correct": "b"
+    },
+    {
+      "qNo": 14,
+      "correct": "d"
+    },
+    {
+      "qNo": 15,
+      "correct": "d"
+    },
+    {
+      "qNo": 16,
+      "correct": "d"
+    },
+    {
+      "qNo": 17,
+      "correct": "a"
+    },
+    {
+      "qNo": 18,
+      "correct": "b"
+    },
+    {
+      "qNo": 19,
+      "correct": "d"
+    },
+    {
+      "qNo": 20,
+      "correct": "d"
+    },
+    {
+      "qNo": 21,
+      "correct": "c"
+    },
+    {
+      "qNo": 22,
+      "correct": "c"
+    },
+    {
+      "qNo": 23,
+      "correct": "a"
+    },
+    {
+      "qNo": 24,
+      "correct": "a"
+    },
+    {
+      "qNo": 25,
+      "correct": "b"
+    },
+    {
+      "qNo": 26,
+      "correct": "d"
+    },
+    {
+      "qNo": 27,
+      "correct": "a"
+    },
+    {
+      "qNo": 28,
+      "correct": "a"
+    },
+    {
+      "qNo": 29,
+      "correct": "b"
+    },
+    {
+      "qNo": 30,
+      "correct": "a"
+    },
+    {
+      "qNo": 31,
+      "correct": "c"
+    },
+    {
+      "qNo": 32,
+      "correct": "b"
+    },
+    {
+      "qNo": 33,
+      "correct": "b"
+    },
+    {
+      "qNo": 34,
+      "correct": "b"
+    },
+    {
+      "qNo": 35,
+      "correct": "d"
+    },
+    {
+      "qNo": 36,
+      "correct": "c"
+    },
+    {
+      "qNo": 37,
+      "correct": "a"
+    },
+    {
+      "qNo": 38,
+      "correct": "c"
+    },
+    {
+      "qNo": 39,
+      "correct": "a"
+    },
+    {
+      "qNo": 40,
+      "correct": "a"
+    },
+    {
+      "qNo": 41,
+      "correct": "b"
+    },
+    {
+      "qNo": 42,
+      "correct": "c"
+    },
+    {
+      "qNo": 43,
+      "correct": "a"
+    },
+    {
+      "qNo": 44,
+      "correct": "a"
+    },
+    {
+      "qNo": 45,
+      "correct": "d"
+    },
+    {
+      "qNo": 46,
+      "correct": "c"
+    },
+    {
+      "qNo": 47,
+      "correct": "d"
+    },
+    {
+      "qNo": 48,
+      "correct": "a"
+    },
+    {
+      "qNo": 49,
+      "correct": "a"
+    },
+    {
+      "qNo": 50,
+      "correct": "a"
+    },
+    {
+      "qNo": 51,
+      "correct": "d"
+    },
+    {
+      "qNo": 52,
+      "correct": "c"
+    },
+    {
+      "qNo": 53,
+      "correct": "a"
+    },
+    {
+      "qNo": 54,
+      "correct": "d"
+    },
+    {
+      "qNo": 55,
+      "correct": "a"
+    },
+    {
+      "qNo": 56,
+      "correct": "b"
+    },
+    {
+      "qNo": 57,
+      "correct": "b"
+    },
+    {
+      "qNo": 58,
+      "correct": "c"
+    },
+    {
+      "qNo": 59,
+      "correct": "c"
+    },
+    {
+      "qNo": 60,
+      "correct": "b"
+    },
+    {
+      "qNo": 61,
+      "correct": "b"
+    },
+    {
+      "qNo": 62,
+      "correct": "a"
+    },
+    {
+      "qNo": 63,
+      "correct": "d"
+    },
+    {
+      "qNo": 64,
+      "correct": "c"
+    },
+    {
+      "qNo": 65,
+      "correct": "a"
+    },
+    {
+      "qNo": 66,
+      "correct": "d"
+    },
+    {
+      "qNo": 67,
+      "correct": "a"
+    },
+    {
+      "qNo": 68,
+      "correct": "c"
+    },
+    {
+      "qNo": 69,
+      "correct": "b"
+    },
+    {
+      "qNo": 70,
+      "correct": "c"
+    },
+    {
+      "qNo": 71,
+      "correct": "d"
+    },
+    {
+      "qNo": 72,
+      "correct": "b"
+    },
+    {
+      "qNo": 73,
+      "correct": "b"
+    },
+    {
+      "qNo": 74,
+      "correct": "d"
+    },
+    {
+      "qNo": 75,
+      "correct": "d"
+    },
+    {
+      "qNo": 76,
+      "correct": "b"
+    },
+    {
+      "qNo": 77,
+      "correct": "d"
+    },
+    {
+      "qNo": 78,
+      "correct": "d"
+    },
+    {
+      "qNo": 79,
+      "correct": "a"
+    },
+    {
+      "qNo": 80,
+      "correct": "b"
+    }
+  ]
+}

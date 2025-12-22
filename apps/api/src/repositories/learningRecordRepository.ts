@@ -11,7 +11,10 @@ export const learningRecordRepository = {
         // LearningRecords logic might strictly allow only append (history) or update (current status).
         // For now, we assume simple create/replace based on ID.
         const { resource } = await containers.learningRecords.items.upsert(validated);
-        return resource as LearningRecord;
+        if (!resource) {
+            throw new Error('Failed to save learning record');
+        }
+        return resource as unknown as LearningRecord;
     },
 
     async listByUserId(userId: string): Promise<LearningRecord[]> {
