@@ -90,3 +90,26 @@ export async function getLearningRecords(userId: string, examId?: string): Promi
         return [];
     }
 }
+
+export async function syncLearningRecords(records: LearningRecord[]): Promise<void> {
+    if (records.length === 0) return;
+
+    try {
+        const res = await fetch(`${API_BASE}/learning-records`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(records)
+        });
+
+        if (!res.ok) {
+            const err = await res.text();
+            console.error(`Failed to sync records: ${res.status} ${err}`);
+            throw new Error(`API Sync Error: ${res.status}`);
+        }
+    } catch (error) {
+        console.error("Failed to sync learning records:", error);
+        throw error;
+    }
+}

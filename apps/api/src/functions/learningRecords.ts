@@ -58,25 +58,49 @@ async function createLearningRecord(
     try {
         const body = await request.json();
 
-        // Validate request body
-        const result = LearningRecordSchema.safeParse(body);
+        // Check if body is array
+        if (Array.isArray(body)) {
+            // Bulk Insert
+            const parseResults = z.array(LearningRecordSchema).safeParse(body);
+            if (!parseResults.success) {
+                return {
+                    status: 400,
+                    jsonBody: { error: "Invalid data in array", details: parseResults.error.errors }
+                };
+            }
 
-        if (!result.success) {
+            const records = parseResults.data;
+            const savedRecords = [];
+            // Ideally use transactions or bulk support, but for now simple loop
+            for (const record of records) {
+                const saved = await learningRecordRepository.save(record);
+                savedRecords.push(saved);
+            }
+
             return {
-                status: 400,
-                jsonBody: { error: "Invalid data", details: result.error.errors }
+                status: 201,
+                jsonBody: { count: savedRecords.length, records: savedRecords }
+            }
+
+        } else {
+            // Single Insert (Existing Logic)
+            const result = LearningRecordSchema.safeParse(body);
+
+            if (!result.success) {
+                return {
+                    status: 400,
+                    jsonBody: { error: "Invalid data", details: result.error.errors }
+                };
+            }
+
+            const record = result.data;
+            const saved = await learningRecordRepository.save(record);
+
+            return {
+                status: 201,
+                jsonBody: saved
             };
         }
-
-        const record = result.data;
-
-        // Save to DB
-        const saved = await learningRecordRepository.save(record);
-
-        return {
-            status: 201,
-            jsonBody: saved
-        };
     } catch (error) {
         context.error(`Error saving learning record: ${error}`);
         return {

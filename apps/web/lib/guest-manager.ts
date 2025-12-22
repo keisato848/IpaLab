@@ -39,5 +39,10 @@ export const guestManager = {
         if (typeof window === 'undefined') return;
         localStorage.removeItem(GUEST_ID_KEY);
         localStorage.removeItem(GUEST_HISTORY_KEY);
+    },
+
+    clearHistory: () => {
+        if (typeof window === 'undefined') return;
+        localStorage.removeItem(GUEST_HISTORY_KEY);
     }
 };
