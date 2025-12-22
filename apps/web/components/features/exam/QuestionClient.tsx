@@ -5,47 +5,29 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import styles from './page.module.css';
+import styles from './QuestionClient.module.css';
+import { Question, saveLearningRecord, LearningRecord } from '@/lib/api';
+import { guestManager } from '@/lib/guest-manager';
+import { useSession } from 'next-auth/react';
+import { v4 as uuidv4 } from 'uuid';
 
-// Mock Data (matches standard Question structure)
-const QUESTION_MOCK = {
-    id: "q1",
-    qNo: 1,
-    text: `
-### 問題
+interface QuestionClientProps {
+    question: Question;
+    year: string;
+    type: string;
+    qNo: string; // Current qNo from URL
+    totalQuestions: number;
+}
 
-情報セキュリティマネジメントシステム(ISMS)の適合性評価制度において、認証機関が組織のISMSを認証する際の基準となる規格はどれか。
-
-`,
-    options: [
-        { id: 'a', text: 'JIS Q 20000-1' },
-        { id: 'b', text: 'JIS Q 27000' },
-        { id: 'c', text: 'JIS Q 27001' },
-        { id: 'd', text: 'JIS Q 27002' },
-    ],
-    correctOption: 'c',
-    explanation: `
-### 解説
-
-**正解: ウ (JIS Q 27001)**
-
-- **ア (JIS Q 20000-1):** ITサービスマネジメントシステム(ITSMS)の要求事項を規定した規格です。
-- **イ (JIS Q 27000):** 情報セキュリティマネジメントシステム(ISMS)の用語及び定義を記述した規格です。
-- **ウ (JIS Q 27001):** ISMS認証の基準となる要求事項を規定した規格です。組織がISMSを確立、実施、維持、継続的に改善するための要求事項が記載されています。
-- **エ (JIS Q 27002):** 情報セキュリティ管理策の実践のための規範です。
-
-したがって、認証の基準となる規格は **JIS Q 27001** です。
-    `
-};
-
-export default function ExamQuestionPage({ params }: { params: { year: string; type: string; qNo: string } }) {
-    const { year, type, qNo } = params;
+export default function QuestionClient({ question, year, type, qNo, totalQuestions }: QuestionClientProps) {
     const searchParams = useSearchParams();
     const mode = searchParams.get('mode') || 'practice';
     const router = useRouter();
+    const { data: session } = useSession();
 
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [showExplanation, setShowExplanation] = useState(false);
+    const [startTime, setStartTime] = useState<number>(Date.now());
 
     // Mock Mode Logic
     const isMock = mode === 'mock';
@@ -60,6 +42,13 @@ export default function ExamQuestionPage({ params }: { params: { year: string; t
         return () => clearInterval(timer);
     }, [isMock]);
 
+    // Reset state when question changes
+    useEffect(() => {
+        setSelectedOption(null);
+        setShowExplanation(false);
+        setStartTime(Date.now());
+    }, [question.id]);
+
     const formatTime = (seconds: number) => {
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
@@ -68,24 +57,63 @@ export default function ExamQuestionPage({ params }: { params: { year: string; t
     };
 
     const isPractice = mode === 'practice';
-    const question = QUESTION_MOCK; // In real app, fetch based on qNo
 
-    const handleOptionClick = (optionId: string) => {
+    const handleOptionClick = async (optionId: string) => {
         if (showExplanation && isPractice) return; // Prevent changing answer after showing explanation
+
+        // If already selected in mock mode, just update selection (no save yet? or save immediately?)
+        // For Mock mode, usually we save at the end, but for safety we might save draft.
+        // For Practice mode, we save immediately upon selection/showing answer.
 
         setSelectedOption(optionId);
 
         if (isPractice) {
             setShowExplanation(true);
+            await saveResult(optionId);
         } else {
-            // Mock Mode logic (Answer remains selected, but no feedback until end)
+            // Mock Mode: just select, maybe save provisional answer?
+            // Implementing minimal save for now (or maybe Mock mode saves on 'Next'?)
+        }
+    };
+
+    const saveResult = async (optionId: string) => {
+        const isCorrect = optionId === question.correctOption;
+        const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+
+        const record: LearningRecord = {
+            id: uuidv4(),
+            userId: session?.user?.id || guestManager.getGuestId() || 'anonymous',
+            questionId: question.id,
+            examId: question.examId,
+            category: question.category,
+            subCategory: question.subCategory,
+            isCorrect,
+            answeredAt: new Date().toISOString(),
+            timeTakenSeconds: timeTaken,
+        };
+
+        if (session) {
+            // Logged in user -> API
+            try {
+                await saveLearningRecord(record);
+            } catch (e) {
+                console.error("Failed to save to API", e);
+                // Fallback to local? Or verify queue? For now just log.
+            }
+        } else {
+            // Guest -> LocalStorage
+            guestManager.saveHistory(record);
         }
     };
 
     const handleNext = () => {
-        // Save answer logic would go here
-        const nextQ = parseInt(qNo) + 1;
-        router.push(`/exam/${year}/${type}/${nextQ}?mode=${mode}`);
+        const currentInt = parseInt(qNo);
+        if (currentInt < totalQuestions) {
+            const nextQ = currentInt + 1;
+            router.push(`/exam/${year}/${type}/${nextQ}?mode=${mode}`);
+        } else {
+            router.push(`/exam/${year}/${type}/result?mode=${mode}`);
+        }
     };
 
     return (
@@ -169,7 +197,7 @@ export default function ExamQuestionPage({ params }: { params: { year: string; t
                             </div>
                             <div className={styles.explanationBody}>
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                    {question.explanation}
+                                    {question.explanation || '(解説がありません)'}
                                 </ReactMarkdown>
                             </div>
                         </div>
@@ -183,7 +211,6 @@ export default function ExamQuestionPage({ params }: { params: { year: string; t
                     {isMock ? '回答して次へ' : '次の問題へ'}
                 </button>
             </footer>
-
         </div>
     );
 }

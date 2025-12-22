@@ -3,14 +3,20 @@ import path from 'path';
 import fm from 'front-matter';
 import { Question, ExamTypes, OptionSchema } from '@ipa-lab/shared';
 
-// Relative path from dist/src/repositories/LocalQuestionRepository.js to packages/data/data
-// Structure:
-// dist/
-//   src/
-//     repositories/
-//       LocalQuestionRepository.js
-// ../../../../../packages/data/data
-const DATA_ROOT = path.resolve(__dirname, '../../../../../packages/data/data');
+// Relative path logic relies on built structure in dist, or we use standard path resolution.
+// Assuming we run from dist/src/functions or similar.
+// For local dev with ts-node/func host, __dirname might be src/repositories.
+// Let's protect against path variance.
+
+const findDataRoot = (startPath: string): string => {
+    // Traverse up until we find packages/data
+    // This is a naive implementation, better to use environment variable or fixed relative path if structure is stable.
+    // Given the monorepo structure: root/apps/api/src/repositories
+    // root/packages/data/data
+    return path.resolve(startPath, '../../../../../packages/data/data');
+};
+
+const DATA_ROOT = findDataRoot(__dirname);
 
 interface QuestionFrontMatter {
     id: string;
@@ -28,7 +34,6 @@ export const localQuestionRepository = {
     async getById(id: string, examId: string): Promise<Question | null> {
         // ID format: AP-2023-Fall-AM-1 -> We need qNo 1
         // Assuming ID ends with qNo, or we rely on list logic.
-        // Let's implement listByExamId first and filter, or parse ID.
         const parts = id.split('-');
         const qNo = parseInt(parts[parts.length - 1]);
 
@@ -69,35 +74,28 @@ export const localQuestionRepository = {
             const parsed = fm<QuestionFrontMatter>(content);
             const { attributes, body } = parsed;
 
-            // Simple body parsing logic to extract options if they are in markdown list
-            // For MVP, we might hardcode options or parse them better in Syncer.
-            // Here we assume body contains everything.
-            // Ideally, the Syncer logic (markdown -> object) should be shared or this repo matches it.
-
+            // TODO: Better option parsing
             const q: Question = {
                 id: `${examId}-${attributes.qNo}`,
+                qNo: attributes.qNo,
                 examId: examId,
-                type: 'AM1', // Mock or derive from ExamID
+                type: 'AM1', // Mock
                 category: attributes.category,
                 subCategory: attributes.subCategory,
-                text: body, // TODO: Separate Question / Explanation / Options
+                text: body,
                 options: [
-                    { id: 'a', text: 'Option A' },
-                    { id: 'b', text: 'Option B' },
-                    { id: 'c', text: 'Option C' },
-                    { id: 'd', text: 'Option D' }
-                ], // Mock options if not parsed
+                    { id: 'a', text: '選択肢ア' },
+                    { id: 'b', text: '選択肢イ' },
+                    { id: 'c', text: '選択肢ウ' },
+                    { id: 'd', text: '選択肢エ' }
+                ],
                 correctOption: answersMap[attributes.qNo] || 'a',
-                explanation: 'Explanation text from markdown...'
+                explanation: '解説はまだ実装されていません'
             };
             results.push(q);
         }
 
-        return results.sort((a, b) => {
-            const noA = parseInt(a.id.split('-').pop() || '0');
-            const noB = parseInt(b.id.split('-').pop() || '0');
-            return noA - noB;
-        });
+        return results.sort((a, b) => (a.qNo || 0) - (b.qNo || 0));
     },
 
     async create(question: Question): Promise<Question> {
@@ -105,7 +103,6 @@ export const localQuestionRepository = {
     },
 
     async listBySubCategory(subCategory: string): Promise<Question[]> {
-        // Implement if needed by iterating all folders
         return [];
     }
 };

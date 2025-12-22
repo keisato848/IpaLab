@@ -28,6 +28,7 @@ export const OptionSchema = z.object({
 
 export const QuestionSchema = z.object({
     id: z.string(), // PK: examId-type-number e.g. "AP-2023S-AM1-01"
+    qNo: z.number().int(), // Added for easier lookup
     examId: z.string(), // e.g. "AP-2023S"
     type: z.nativeEnum(ExamTypes),
     category: z.string(), // 大分類

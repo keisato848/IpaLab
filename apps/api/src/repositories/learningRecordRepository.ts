@@ -24,5 +24,17 @@ export const learningRecordRepository = {
         };
         const { resources } = await containers.learningRecords.items.query(querySpec).fetchAll();
         return resources as LearningRecord[];
+    },
+
+    async listByUserAndExamId(userId: string, examId: string): Promise<LearningRecord[]> {
+        const querySpec: SqlQuerySpec = {
+            query: "SELECT * FROM c WHERE c.userId = @userId AND c.examId = @examId",
+            parameters: [
+                { name: "@userId", value: userId },
+                { name: "@examId", value: examId }
+            ]
+        };
+        const { resources } = await containers.learningRecords.items.query(querySpec).fetchAll();
+        return resources as LearningRecord[];
     }
 };

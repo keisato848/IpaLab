@@ -1,0 +1,186 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: sans-serif;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.loading {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.summaryCard {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin-bottom: 2rem;
+}
+
+.scoreCircle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 8px solid #0070f3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #0070f3;
+}
+
+.scoreVal {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.scoreLabel {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.stats {
+    display: flex;
+    gap: 2rem;
+}
+
+.statItem {
+    text-align: center;
+}
+
+.statVal {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.statLabel {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.details {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.details h2 {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.listHeader {
+    display: flex;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    color: #666;
+    background: #f9fafb;
+    border-radius: 4px;
+}
+
+.listBody {
+    display: flex;
+    flex-direction: column;
+}
+
+.listItem {
+    display: flex;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.colNo {
+    width: 60px;
+    font-weight: bold;
+}
+
+.colStatus {
+    width: 80px;
+    font-weight: bold;
+}
+
+.statusCorrect {
+    color: #10b981;
+}
+
+.statusIncorrect {
+    color: #ef4444;
+}
+
+.statusUnanswered {
+    color: #9ca3af;
+}
+
+.colTitle {
+    flex: 1;
+    color: #4b5563;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 1rem;
+}
+
+.colAction {
+    width: 80px;
+    text-align: right;
+}
+
+.reviewLink {
+    color: #0070f3;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.reviewLink:hover {
+    text-decoration: underline;
+}
+
+.footer {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.backBtn,
+.retryBtn {
+    padding: 0.8rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.backBtn {
+    background: white;
+    border: 1px solid #d1d5db;
+    color: #374151;
+}
+
+.backBtn:hover {
+    background: #f3f4f6;
+}
+
+.retryBtn {
+    background: #0070f3;
+    color: white;
+    border: 1px solid #0070f3;
+}
+
+.retryBtn:hover {
+    background: #0060df;
+}
