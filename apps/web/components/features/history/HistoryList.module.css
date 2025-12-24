@@ -1,113 +1,135 @@
+/* Card Based Layout for History List */
 .container {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .loading {
-    padding: 2rem;
+    padding: 3rem;
     text-align: center;
     color: #666;
+    font-size: 1.1rem;
 }
 
 .emptyState {
     text-align: center;
-    padding: 3rem;
+    padding: 4rem;
     color: #666;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.emptyState p {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
 }
 
 .startBtn {
     display: inline-block;
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
+    padding: 0.8rem 1.5rem;
     background: #0070f3;
     color: white;
     text-decoration: none;
-    border-radius: 4px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background 0.2s;
 }
 
-.headerRow {
-    display: flex;
-    background: #f3f4f6;
-    padding: 0.8rem 1rem;
-    font-weight: bold;
-    color: #4b5563;
-    border-bottom: 2px solid #e5e7eb;
+.startBtn:hover {
+    background: #0060df;
 }
 
-.row {
+.historyCard {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    transition: transform 0.2s, box-shadow 0.2s;
     display: flex;
-    padding: 0.8rem 1rem;
-    border-bottom: 1px solid #f3f4f6;
+    justify-content: space-between;
     align-items: center;
+    position: relative;
+    overflow: hidden;
 }
 
-.row:last-child {
-    border-bottom: none;
+.historyCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
-.row:hover {
-    background: #f9fafb;
+/* Main content left side */
+.cardMain {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
-.colDate {
-    width: 180px;
+.examTitle {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #1a202c;
 }
 
-.colExam {
-    width: 120px;
-}
-
-.colQuestion {
-    width: 80px;
-}
-
-.colResult {
-    flex: 1;
+.questionInfo {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: #4a5568;
+    font-size: 0.95rem;
 }
 
 .tagCorrect {
-    display: inline-block;
-    padding: 0.2rem 0.5rem;
-    background: #ecfdf5;
+    background-color: #ecfdf5;
     color: #047857;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: bold;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
 .tagIncorrect {
-    display: inline-block;
-    padding: 0.2rem 0.5rem;
-    background: #fef2f2;
+    background-color: #fef2f2;
     color: #b91c1c;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: bold;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Meta info right side */
+.cardMeta {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.date {
+    font-size: 0.85rem;
+    color: #718096;
+    font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 600px) {
-    .headerRow {
-        display: none;
-    }
-
-    .row {
+    .historyCard {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.5rem;
+        gap: 1rem;
     }
 
-    .colDate,
-    .colExam,
-    .colQuestion,
-    .colResult {
+    .cardMeta {
+        text-align: left;
         width: 100%;
-    }
-
-    .colDate {
-        font-size: 0.8rem;
-        color: #666;
+        border-top: 1px solid #edf2f7;
+        padding-top: 0.8rem;
     }
 }

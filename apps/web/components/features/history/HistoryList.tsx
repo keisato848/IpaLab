@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { LearningRecord, getLearningRecords } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
+import { getExamLabel } from '@/lib/exam-utils';
 import styles from './HistoryList.module.css';
 
 export default function HistoryList() {
@@ -54,36 +55,41 @@ export default function HistoryList() {
 
     return (
         <div className={styles.container}>
-            <div className={styles.headerRow}>
-                <div className={styles.colDate}>日時</div>
-                <div className={styles.colExam}>試験区分</div>
-                <div className={styles.colQuestion}>問題</div>
-                <div className={styles.colResult}>結果</div>
-            </div>
-            <div className={styles.list}>
-                {records.map((r, i) => (
-                    <div key={i} className={styles.row}>
-                        <div className={styles.colDate}>
-                            {new Date(r.answeredAt).toLocaleString('ja-JP')}
+            {records.map((r, i) => (
+                <div key={i} className={styles.historyCard}>
+                    <div className={styles.cardMain}>
+                        <div className={styles.examTitle}>
+                            {getExamLabel(r.examId)}
                         </div>
-                        <div className={styles.colExam}>
-                            {r.examId}
-                        </div>
-                        <div className={styles.colQuestion}>
-                            Q{/* Note: record might not have qNo if older Schema, lookup usually needed or save qNo. 
-                               For now, we rely on QuestionID or add qNo to Record. 
-                               Let's assume QuestionID contains helpful info or link. */}
-                            {/* Assuming questionId format examId-qNo */}
-                            {r.questionId.split('-').pop()}
-                        </div>
-                        <div className={styles.colResult}>
+                        <div className={styles.questionInfo}>
+                            <span>問題 {r.questionId.split('-').pop()}</span>
                             <span className={r.isCorrect ? styles.tagCorrect : styles.tagIncorrect}>
-                                {r.isCorrect ? '正解' : '不正解'}
+                                {r.isCorrect ? (
+                                    <>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                        正解
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                        不正解
+                                    </>
+                                )}
                             </span>
                         </div>
                     </div>
-                ))}
-            </div>
+                    <div className={styles.cardMeta}>
+                        <div className={styles.date}>
+                            {new Date(r.answeredAt).toLocaleString('ja-JP')}
+                        </div>
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }

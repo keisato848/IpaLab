@@ -43,8 +43,6 @@ export const localQuestionRepository = {
 
     async listByExamId(examId: string): Promise<Question[]> {
         const questionsDir = path.join(DATA_ROOT, 'questions', examId);
-        const verifiedDir = path.join(DATA_ROOT, 'verified');
-        const answerFile = path.join(verifiedDir, `${examId}_answers.json`);
 
         try {
             await fs.access(questionsDir);
@@ -53,46 +51,24 @@ export const localQuestionRepository = {
             return [];
         }
 
-        // Read Answers
-        let answersMap: Record<number, string> = {};
-        try {
-            const ansContent = await fs.readFile(answerFile, 'utf-8');
-            const examAnswers: ExamAnswers = JSON.parse(ansContent);
-            examAnswers.answers.forEach(a => answersMap[a.qNo] = a.correct);
-        } catch (e) {
-            console.warn(`LocalQuestionRepository: No verified answers for ${examId}`);
-        }
-
         // Read Questions
         const files = await fs.readdir(questionsDir);
         const results: Question[] = [];
 
         for (const file of files) {
-            if (!file.endsWith('.md')) continue;
+            // Updated to read .json files
+            if (!file.endsWith('.json')) continue;
 
             const content = await fs.readFile(path.join(questionsDir, file), 'utf-8');
-            const parsed = fm<QuestionFrontMatter>(content);
-            const { attributes, body } = parsed;
-
-            // TODO: Better option parsing
-            const q: Question = {
-                id: `${examId}-${attributes.qNo}`,
-                qNo: attributes.qNo,
-                examId: examId,
-                type: 'AM1', // Mock
-                category: attributes.category,
-                subCategory: attributes.subCategory,
-                text: body,
-                options: [
-                    { id: 'a', text: '選択肢ア' },
-                    { id: 'b', text: '選択肢イ' },
-                    { id: 'c', text: '選択肢ウ' },
-                    { id: 'd', text: '選択肢エ' }
-                ],
-                correctOption: answersMap[attributes.qNo] || 'a',
-                explanation: '解説はまだ実装されていません'
-            };
-            results.push(q);
+            try {
+                const q: Question = JSON.parse(content);
+                // Ensure required fields
+                if (q.id && q.text && q.options) {
+                    results.push(q);
+                }
+            } catch (e) {
+                console.error(`Failed to parse ${file}:`, e);
+            }
         }
 
         return results.sort((a, b) => (a.qNo || 0) - (b.qNo || 0));

@@ -1,9 +1,13 @@
+import styles from './page.module.css';
 import HistoryList from '@/components/features/history/HistoryList';
 
 export default function HistoryPage() {
     return (
-        <div style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
-            <h1 style={{ marginBottom: '2rem', fontSize: '1.8rem', fontWeight: 'bold' }}>学習履歴</h1>
+        <div className={styles.container}>
+            <div className={styles.header}>
+                <h1>学習履歴</h1>
+                <span className={styles.subtitle}>過去の回答結果を確認できます</span>
+            </div>
             <HistoryList />
         </div>
     );

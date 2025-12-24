@@ -1,10 +1,54 @@
+:root {
+  /* Light Theme (Default) */
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --text-primary: #1a202c;
+  --text-secondary: #4a5568;
+  --text-tertiary: #718096;
+  --border-color: #e2e8f0;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --accent-color: #0070f3;
+  --accent-hover: #0060df;
+  --success-bg: #ecfdf5;
+  --success-text: #047857;
+  --error-bg: #fef2f2;
+  --error-text: #b91c1c;
+  --header-bg: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme='dark'] {
+  /* Dark Theme */
+  --bg-primary: #0f1117;
+  --bg-secondary: #1a202c;
+  --text-primary: #f7fafc;
+  --text-secondary: #cbd5e0;
+  --text-tertiary: #a0aec0;
+  --border-color: #2d3748;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --accent-color: #3b82f6;
+  --accent-hover: #60a5fa;
+  --success-bg: #064e3b;
+  --success-text: #34d399;
+  --error-bg: #7f1d1d;
+  --error-text: #fca5a5;
+  --header-bg: rgba(26, 32, 44, 0.8);
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 * {
   box_sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }

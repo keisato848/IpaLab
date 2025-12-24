@@ -1,0 +1,20 @@
+.toggleBtn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--card-shadow);
+}
+
+.toggleBtn:hover {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
