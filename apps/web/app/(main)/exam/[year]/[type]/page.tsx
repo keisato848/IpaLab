@@ -8,7 +8,9 @@ export default async function ExamEntrancePage({ params }: { params: { year: str
 
     // Construct Exam ID: e.g. "AP-2023-Fall" + "AM1" -> "AP-2023-Fall-AM"
     // Adjust mapping based on actual data ID
-    const examId = `${year}-${type === 'AM1' ? 'AM' : type}`;
+    // Construct Exam ID
+    const typeSuffix = type === 'AM1' ? 'AM' : type;
+    const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
 
     // Fetch Data
     const questions = await getQuestions(examId);

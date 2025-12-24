@@ -1,0 +1,9 @@
+# Dependencies
+node_modules/
+
+# Local settings
+local.settings.json
+
+# Compiled debug endpoint
+dist/functions/debugInitDb.js
+dist/functions/debugInitDb.js.map

@@ -22,6 +22,11 @@ export async function getQuestions(
         const questions = await repository.listByExamId(examId);
         return {
             status: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET,OPTIONS',
+                'Access-Control-Allow-Headers': '*'
+            },
             jsonBody: questions
         };
     } catch (error) {

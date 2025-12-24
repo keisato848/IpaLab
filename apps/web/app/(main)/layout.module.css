@@ -24,10 +24,47 @@
 }
 
 .logo {
-  font-size: 1.2rem;
-  font-weight: 800;
+  font-size: 1.4rem;
+  font-weight: 900;
   color: #111;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+/* Creative Square Accent */
+.logo::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #0070f3 0%, #00a6ed 100%);
+  border-radius: 6px;
+  transform: rotate(-10deg);
+  box-shadow: 0 4px 12px rgba(0, 118, 243, 0.3);
+}
+
+.mobileLogo {
+  font-weight: 900;
+  font-size: 1.2rem;
+  color: #111;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mobileLogo::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #0070f3 0%, #00a6ed 100%);
+  border-radius: 4px;
+  transform: rotate(-10deg);
 }
 
 .nav {

@@ -29,7 +29,7 @@ export default function DashboardLayout({
           <span className={styles.hamburgerLine}></span>
           <span className={styles.hamburgerLine}></span>
         </button>
-        <div className={styles.mobileLogo}>PM Exam DX</div>
+        <Link href="/" className={styles.mobileLogo}>シカクノ</Link>
       </header>
 
       {/* Overlay for mobile */}
@@ -37,7 +37,7 @@ export default function DashboardLayout({
 
       <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ''}`}>
         <div className={styles.logoArea}>
-          <div className={styles.logo}>PM Exam DX</div>
+          <Link href="/" className={styles.logo}>シカクノ</Link>
         </div>
 
         <nav className={styles.nav}>

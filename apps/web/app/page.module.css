@@ -17,10 +17,25 @@
 }
 
 .logo {
-    font-size: 1.5rem;
-    font-weight: 800;
+    font-size: 1.8rem;
+    font-weight: 900;
     color: #111;
-    letter-spacing: -0.05em;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.logo::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #0070f3 0%, #00c6ff 100%);
+    border-radius: 8px;
+    transform: rotate(-10deg);
+    box-shadow: 0 8px 16px rgba(0, 118, 243, 0.25);
 }
 
 .nav {
@@ -72,6 +87,7 @@
     line-height: 1.2;
     margin-bottom: 1.5rem;
     background: linear-gradient(135deg, #111 0%, #555 100%);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: fadeInUp 0.8s ease-out 0.2s backwards;

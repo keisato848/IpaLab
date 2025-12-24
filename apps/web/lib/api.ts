@@ -1,4 +1,4 @@
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:7071/api';
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:7074/api';
 
 export interface Question {
     id: string;
@@ -25,6 +25,37 @@ export interface LearningRecord {
     nextReviewAt?: string;
     reviewInterval?: number;
     easeFactor?: number;
+}
+
+// Exam Interface
+export interface Exam {
+    id: string;
+    title: string;
+    date: string;
+    category: string;
+    stats: {
+        total: number;
+        completed: number;
+        correctRate: number;
+    };
+}
+
+export async function getExams(): Promise<Exam[]> {
+    try {
+        const res = await fetch(`${API_BASE}/exams`, {
+            cache: 'no-store'
+        });
+
+        if (!res.ok) {
+            console.error(`API Error: ${res.status}`);
+            return [];
+        }
+
+        return await res.json();
+    } catch (error) {
+        console.error("Failed to fetch exams:", error);
+        return [];
+    }
 }
 
 export async function getQuestions(examId: string): Promise<Question[]> {

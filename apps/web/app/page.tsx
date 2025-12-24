@@ -5,7 +5,7 @@ export default function Home() {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <div className={styles.logo}>PM Exam DX</div>
+                <Link href="/" className={styles.logo}>シカクノ</Link>
                 <nav className={styles.nav}>
                     <Link href="/api/auth/signin" className={styles.loginLink}>ログイン</Link>
                 </nav>
@@ -14,12 +14,12 @@ export default function Home() {
             <main className={styles.main}>
                 <section className={styles.hero}>
                     <h1 className={styles.title}>
-                        プロジェクトマネージャ試験を、<br />
+                        情報処理技術者試験を、<br />
                         もっとスマートに。
                     </h1>
                     <p className={styles.description}>
-                        PM Exam DXは、効率的な学習をサポートする<br />
-                        プロジェクトマネージャ試験対策プラットフォームです。
+                        シカクノは、効率的な学習をサポートする<br />
+                        情報処理技術者試験の過去問演習プラットフォームです。
                     </p>
 
                     <div className={styles.actions}>
@@ -50,7 +50,7 @@ export default function Home() {
             </main>
 
             <footer className={styles.footer}>
-                &copy; 2024 PM Exam DX Team
+                &copy; 2024 シカクノ (Shikaku-No) Project
             </footer>
         </div>
     );

@@ -7,7 +7,8 @@ export default async function ExamQuestionPage({ params }: { params: { year: str
     const { year, type, qNo } = params;
 
     // Construct Exam ID
-    const examId = `${year}-${type === 'AM1' ? 'AM' : type}`;
+    const typeSuffix = type === 'AM1' ? 'AM' : type;
+    const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
 
     // Fetch Questions
     const questions = await getQuestions(examId);

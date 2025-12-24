@@ -6,6 +6,9 @@
     "types": "./src/index.ts",
     "scripts": {
         "scrape": "ts-node src/scraper/index.ts",
+        "download": "ts-node src/scraper/download.ts",
+        "parse": "ts-node src/scraper/parse.ts",
+        "generate-samples": "ts-node src/scripts/generate-samples.ts",
         "sync": "ts-node src/syncer/index.ts",
         "lint": "eslint . --ext .ts"
     },
@@ -19,9 +22,11 @@
         "pdf-parse": "^1.1.1"
     },
     "devDependencies": {
+        "@ipa-lab/config": "*",
         "@types/cheerio": "^0.22.35",
         "@types/node": "^20.0.0",
         "@types/pdf-parse": "^1.1.4",
+        "eslint": "^8.0.0",
         "ts-node": "^10.9.2",
         "typescript": "^5.3.3"
     }
