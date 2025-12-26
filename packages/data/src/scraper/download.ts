@@ -14,29 +14,58 @@ async function downloadExams() {
         // Construct ID: AP-YYYY-Term-AM (Spring/Fall -> Spring/Fall)
         // Adjust existing ID convention if needed.
         // Existing: AP-2023-Fall-AM
-        const examId = `AP-${exam.year}-${exam.term}-AM`;
+        // Construct ID: AP-YYYY-Term-Type
+        const examId = `AP-${exam.year}-${exam.term}-${exam.type || 'AM'}`;
         const fileName = `${examId}.pdf`;
         const filePath = path.join(rawDir, fileName);
 
-        // Check availability
+        // Check availability for Question
+        let questionExists = false;
         try {
             await fs.access(filePath);
-            console.log(`[SKIP] ${examId} already exists.`);
-            continue;
+            console.log(`[SKIP] ${examId} (Question) already exists.`);
+            questionExists = true;
         } catch {
-            // File does not exist, download
+            // File does not exist
         }
 
-        console.log(`[DOWNLOAD] ${examId} from ${exam.url}`);
+        if (!questionExists) {
+            // Download Question PDF
+            console.log(`[DOWNLOAD] ${examId} (Question) from ${exam.url}`);
+            try {
+                const response = await axios.get(exam.url, {
+                    responseType: 'arraybuffer',
+                    timeout: 30000
+                });
+                await fs.writeFile(filePath, response.data);
+                console.log(`[SUCCESS] Saved to ${fileName}`);
+            } catch (error) {
+                console.error(`[ERROR] Failed to download ${examId}:`, error instanceof Error ? error.message : error);
+            }
+        }
+
+        // Download Answer PDF
+        // Pattern: ..._qs.pdf -> ..._ans.pdf
+        const answerUrl = exam.url.replace('_qs.pdf', '_ans.pdf');
+        const answerFileName = `${examId}-Ans.pdf`;
+        const answerFilePath = path.join(rawDir, answerFileName);
+
         try {
-            const response = await axios.get(exam.url, {
-                responseType: 'arraybuffer',
-                timeout: 30000 // 30s timeout
-            });
-            await fs.writeFile(filePath, response.data);
-            console.log(`[SUCCESS] Saved to ${fileName}`);
-        } catch (error) {
-            console.error(`[ERROR] Failed to download ${examId}:`, error instanceof Error ? error.message : error);
+            await fs.access(answerFilePath);
+            console.log(`[SKIP] ${examId} (Answer) already exists.`);
+        } catch {
+            console.log(`[DOWNLOAD] ${examId} (Answer) from ${answerUrl}`);
+            try {
+                const response = await axios.get(answerUrl, {
+                    responseType: 'arraybuffer',
+                    timeout: 30000
+                });
+                await fs.writeFile(answerFilePath, response.data);
+                console.log(`[SUCCESS] Saved to ${answerFileName}`);
+            } catch (error) {
+                // Some exams might not have answers in the exact same pattern (should be rare for recent ones)
+                console.warn(`[WARN] Failed to download Answer for ${examId}. URL: ${answerUrl}`);
+            }
         }
 
         // Politeness delay
