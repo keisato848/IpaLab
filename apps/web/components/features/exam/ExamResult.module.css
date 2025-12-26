@@ -6,36 +6,37 @@
     max-width: 1000px;
     margin: 0 auto;
     padding: 2rem;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .loading {
     padding: 3rem;
     text-align: center;
-    color: #666;
+    color: var(--text-secondary);
     font-size: 1.2rem;
 }
 
 .header h1 {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #1a202c;
+    color: var(--text-primary);
     margin: 0;
     text-align: center;
 }
 
 /* Score Card */
 .summaryCard {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: 20px;
     padding: 3rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--card-shadow);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2rem;
     position: relative;
     overflow: hidden;
+    border: 1px solid var(--border-color);
 }
 
 .summaryCard::before {
@@ -53,25 +54,25 @@
     width: 200px;
     height: 200px;
     border-radius: 50%;
-    border: 10px solid #f0f7ff;
+    border: 10px solid var(--bg-primary);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: white;
-    box-shadow: 0 4px 20px rgba(0, 112, 243, 0.1);
+    background: var(--bg-secondary);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .scoreVal {
     font-size: 3.5rem;
     font-weight: 800;
-    color: #0070f3;
+    color: var(--accent-color);
     line-height: 1;
 }
 
 .scoreLabel {
     font-size: 1rem;
-    color: #666;
+    color: var(--text-secondary);
     margin-top: 0.5rem;
     font-weight: 600;
 }
@@ -91,14 +92,14 @@
 
 .statLabel {
     font-size: 0.9rem;
-    color: #718096;
+    color: var(--text-secondary);
     font-weight: 600;
 }
 
 .statVal {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #2d3748;
+    color: var(--text-primary);
 }
 
 /* Details Section */
@@ -111,17 +112,18 @@
 .details h2 {
     font-size: 1.4rem;
     font-weight: 700;
-    color: #2d3748;
+    color: var(--text-primary);
     margin: 0 0 0.5rem 0;
     padding-left: 1rem;
-    border-left: 4px solid #0070f3;
+    border-left: 4px solid var(--accent-color);
 }
 
 .resultList {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--card-shadow);
     overflow: hidden;
+    border: 1px solid var(--border-color);
 }
 
 /* List Item as Row */
@@ -129,7 +131,7 @@
     display: flex;
     align-items: center;
     padding: 1.2rem;
-    border-bottom: 1px solid #edf2f7;
+    border-bottom: 1px solid var(--border-color);
     transition: background 0.1s;
 }
 
@@ -138,12 +140,12 @@
 }
 
 .listItem:hover {
-    background: #f8fafc;
+    background: var(--bg-primary);
 }
 
 .colNo {
     font-weight: 700;
-    color: #718096;
+    color: var(--text-secondary);
     width: 60px;
     text-align: center;
 }
@@ -151,7 +153,7 @@
 .colTitle {
     flex: 1;
     font-size: 1rem;
-    color: #2d3748;
+    color: var(--text-primary);
     padding: 0 1.5rem;
     font-weight: 500;
 }
@@ -169,18 +171,18 @@
 }
 
 .statusCorrect {
-    background-color: #ecfdf5;
-    color: #047857;
+    background-color: var(--success-bg);
+    color: var(--success-text);
 }
 
 .statusIncorrect {
-    background-color: #fef2f2;
-    color: #b91c1c;
+    background-color: var(--error-bg);
+    color: var(--error-text);
 }
 
 .statusUnanswered {
-    background-color: #edf2f7;
-    color: #718096;
+    background-color: var(--bg-primary);
+    color: var(--text-tertiary);
 }
 
 .actionArea {
@@ -189,17 +191,18 @@
 
 .reviewLink {
     text-decoration: none;
-    color: #0070f3;
+    color: var(--accent-color);
     font-weight: 600;
     padding: 0.5rem 1rem;
     border-radius: 6px;
-    background: #edf6ff;
+    background: var(--bg-primary);
     font-size: 0.9rem;
     transition: background 0.2s;
+    border: 1px solid var(--border-color);
 }
 
 .reviewLink:hover {
-    background: #dbeafe;
+    background: var(--border-color);
 }
 
 /* Footer Buttons */
@@ -221,13 +224,13 @@
 }
 
 .backBtn {
-    background: white;
-    color: #4a5568;
-    border: 1px solid #cbd5e0;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
 }
 
 .backBtn:hover {
-    background: #f7fafc;
+    background: var(--bg-primary);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }

@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { LearningRecord, getLearningRecords, getQuestions } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
+import { getExamLabel } from '@/lib/exam-utils';
+import ThemeToggle from '@/components/common/ThemeToggle';
+import HeatmapWidget from './HeatmapWidget';
 import styles from './DashboardClient.module.css';
 
 export default function DashboardClient() {
@@ -93,12 +96,17 @@ export default function DashboardClient() {
     return (
         <div className={styles.page}>
             <header className={styles.header}>
-                <div className={styles.welcomeText}>
-                    <h1>こんにちは、{userName}さん 👋</h1>
-                    <p className={styles.subtitle}>今日も一日、知識を積み重ねましょう。</p>
+                <div className={styles.headerLeft}>
+                    <div className={styles.welcomeText}>
+                        <h1>こんにちは、{userName}さん 👋</h1>
+                        <p className={styles.subtitle}>今日も一日、知識を積み重ねましょう。</p>
+                    </div>
                 </div>
-                <div className={styles.dateDisplay}>
-                    {new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })}
+                <div className={styles.headerRight}>
+                    <div className={styles.dateDisplay}>
+                        {new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })}
+                    </div>
+                    <ThemeToggle />
                 </div>
             </header>
 
@@ -121,24 +129,9 @@ export default function DashboardClient() {
                     <Link href={quickStartUrl} className={styles.quickStartBtn}>{quickStartLabel}</Link>
                 </section>
 
-                {/* Analytics: Radar Chart Stub */}
-                <section className={`${styles.card} ${styles.radarCard}`}>
-                    <h3>弱点分析</h3>
-                    <div className={styles.chartPlaceholder}>
-                        <div className={styles.chartStubCircle}>
-                            <span>分析データ不足</span>
-                        </div>
-                        <p className={styles.chartNote}>問題を解くと、ここに分野別の得意・不得意が表示されます。</p>
-                    </div>
-                </section>
-
-                {/* Analytics: Line Chart Stub */}
-                <section className={`${styles.card} ${styles.lineCard}`}>
-                    <h3>成長推移</h3>
-                    <div className={styles.chartPlaceholder}>
-                        <div className={styles.chartStubGraph}></div>
-                        <p className={styles.chartNote}>日々の正解率の推移がここにグラフ化されます。</p>
-                    </div>
+                {/* Heatmap Widget (Replaces placeholders) */}
+                <section className={`${styles.card} ${styles.heatmapCard}`}>
+                    <HeatmapWidget records={records} />
                 </section>
 
                 {/* Recent History */}
@@ -155,7 +148,7 @@ export default function DashboardClient() {
                                 <li key={i} className={styles.historyItem}>
                                     <div className={styles.historyMain}>
                                         <span className={styles.tag}>{r.category || '未分類'}</span>
-                                        <span className={styles.examName}>{r.examId} Q{r.questionId.split('-').pop()}</span>
+                                        <span className={styles.examName}>{getExamLabel(r.examId)} Q{r.questionId.split('-').pop()}</span>
                                     </div>
                                     <div className={styles.historyMeta}>
                                         <span className={`${styles.result} ${r.isCorrect ? styles.correct : styles.incorrect}`}>

@@ -17,6 +17,23 @@ export default function RootLayout({
     return (
         <html lang="ja">
             <body>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            (function() {
+                                try {
+                                    var savedTheme = localStorage.getItem('theme');
+                                    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                                    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                                        document.documentElement.setAttribute('data-theme', 'dark');
+                                    } else {
+                                        document.documentElement.setAttribute('data-theme', 'light');
+                                    }
+                                } catch (e) {}
+                            })();
+                        `,
+                    }}
+                />
                 <NextAuthProvider>
                     <ThemeProvider>
                         {children}

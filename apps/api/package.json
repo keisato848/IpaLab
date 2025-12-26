@@ -8,7 +8,7 @@
         "watch": "tsc -w",
         "clean": "rimraf dist",
         "prestart": "npm run clean && npm run build",
-        "start": "func start",
+        "start": "func start --port 7074",
         "dev": "npm start",
         "test": "echo \"No tests yet...\"",
         "lint": "eslint ."
