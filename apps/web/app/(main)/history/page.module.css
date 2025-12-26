@@ -3,8 +3,8 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background-color: #f8f9fa;
-    color: #333;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     padding: 2rem;
     gap: 2rem;
 }
@@ -18,12 +18,12 @@
 .header h1 {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #111;
+    color: var(--text-primary);
     margin: 0 0 0.5rem 0;
 }
 
 .subtitle {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 1rem;
 }
 
@@ -35,11 +35,11 @@
 }
 
 .historyCard {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
     transition: transform 0.2s, box-shadow 0.2s;
     display: flex;
     justify-content: space-between;
@@ -60,7 +60,7 @@
 .examTitle {
     font-weight: 600;
     font-size: 1.1rem;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .metaTags {
@@ -69,22 +69,27 @@
 }
 
 .tag {
-    background-color: #f3f3f3;
-    color: #555;
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
     padding: 0.2rem 0.6rem;
     border-radius: 4px;
     font-size: 0.8rem;
     font-weight: 600;
+    border: 1px solid var(--border-color);
 }
 
 .tag.correct {
-    background-color: #ecfdf5;
-    color: #047857;
+    background-color: var(--success-bg);
+    color: var(--success-text);
+    border-color: var(--success-text);
+    /* Optional */
 }
 
 .tag.incorrect {
-    background-color: #fef2f2;
-    color: #b91c1c;
+    background-color: var(--error-bg);
+    color: var(--error-text);
+    border-color: var(--error-text);
+    /* Optional */
 }
 
 .cardMeta {
@@ -93,16 +98,16 @@
     flex-direction: column;
     gap: 0.3rem;
     font-size: 0.9rem;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .date {
     font-size: 0.8rem;
-    color: #999;
+    color: var(--text-tertiary);
 }
 
 .emptyState {
     text-align: center;
     padding: 4rem;
-    color: #888;
+    color: var(--text-secondary);
 }

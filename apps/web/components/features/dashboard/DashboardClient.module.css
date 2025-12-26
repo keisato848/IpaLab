@@ -24,52 +24,53 @@
 .header h1 {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #111;
+    color: var(--text-primary);
     margin: 0 0 0.5rem 0;
 }
 
 .subtitle {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 1rem;
 }
 
 .dateDisplay {
     font-size: 0.9rem;
-    color: #888;
-    background: white;
+    color: var(--text-tertiary);
+    background: var(--bg-secondary);
     padding: 0.5rem 1rem;
     border-radius: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
-    border: 1px solid #f0f0f0;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
 }
 
+/* Grid Layout */
 .grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     grid-template-rows: auto auto;
-    /* 2 rows */
     gap: 1.5rem;
 }
 
 /* Card Common Styles */
 .card {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    /* Slightly stronger shadow on hover is fine, or use variable if preferred */
 }
 
 .card h3 {
     margin: 0;
     font-size: 1.1rem;
-    color: #333;
+    color: var(--text-primary);
     font-weight: 600;
 }
 
@@ -83,16 +84,16 @@
 /* Specific Cards Layout */
 .statusCard {
     grid-column: span 12;
-    background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
-    border: 1px solid #e0eaff;
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+    border: 1px solid var(--border-color);
 }
 
-.radarCard {
-    grid-column: span 6;
-}
-
-.lineCard {
-    grid-column: span 6;
+.heatmapCard {
+    grid-column: span 12;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
 }
 
 .historyCard {
@@ -104,12 +105,8 @@
         grid-column: span 4;
     }
 
-    .radarCard {
-        grid-column: span 4;
-    }
-
-    .lineCard {
-        grid-column: span 4;
+    .heatmapCard {
+        grid-column: span 8;
     }
 }
 
@@ -133,7 +130,7 @@
 
 .progressBar {
     height: 10px;
-    background-color: #e9ecef;
+    background-color: var(--border-color);
     border-radius: 5px;
     overflow: hidden;
     margin-bottom: 0.5rem;
@@ -142,6 +139,7 @@
 .progressFill {
     height: 100%;
     background: linear-gradient(90deg, #0070f3, #00a6ff);
+    /* Keep brand color gradient */
     border-radius: 5px;
     transition: width 1s ease-out;
 }
@@ -150,14 +148,14 @@
     display: flex;
     justify-content: space-between;
     font-size: 0.9rem;
-    color: #555;
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
 .quickStartBtn {
     width: 100%;
     padding: 0.8rem;
-    background: #0070f3;
+    background: var(--accent-color);
     color: white;
     border: none;
     border-radius: 8px;
@@ -167,11 +165,11 @@
     display: inline-block;
     text-align: center;
     transition: background 0.2s;
-    box-shadow: 0 4px 12px rgba(0, 112, 243, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .quickStartBtn:hover {
-    background: #0060df;
+    background: var(--accent-hover);
 }
 
 /* Placeholders */
@@ -181,35 +179,37 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #888;
-    background: #f9f9f9;
+    color: var(--text-tertiary);
+    background: var(--bg-primary);
     border-radius: 12px;
-    border: 2px dashed #eee;
+    border: 2px dashed var(--border-color);
 }
 
 .chartStubCircle {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    border: 4px solid #ddd;
+    border: 4px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.6rem;
     margin-bottom: 0.5rem;
+    color: var(--text-secondary);
 }
 
 .chartNote {
     font-size: 0.8rem;
     text-align: center;
     padding: 0 1rem;
+    color: var(--text-secondary);
 }
 
-/* History List */
+/* History List inside Dashboard */
 .viewAllBtn {
     background: none;
     border: none;
-    color: #0070f3;
+    color: var(--accent-color);
     font-size: 0.9rem;
     cursor: pointer;
     font-weight: 500;
@@ -227,7 +227,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .historyItem:last-child {
@@ -243,18 +243,19 @@
 
 .tag {
     display: inline-block;
-    background-color: #f3f3f3;
-    color: #555;
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
     padding: 0.2rem 0.6rem;
     border-radius: 4px;
     font-size: 0.75rem;
     font-weight: 600;
     align-self: flex-start;
+    border: 1px solid var(--border-color);
 }
 
 .examName {
     font-size: 0.95rem;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .historyMeta {
@@ -270,14 +271,14 @@
 }
 
 .result.correct {
-    color: #10b981;
+    color: var(--success-text);
 }
 
 .result.incorrect {
-    color: #ef4444;
+    color: var(--error-text);
 }
 
 .date {
     font-size: 0.75rem;
-    color: #999;
+    color: var(--text-tertiary);
 }

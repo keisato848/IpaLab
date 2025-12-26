@@ -14,8 +14,7 @@ export default function Home() {
             <main className={styles.main}>
                 <section className={styles.hero}>
                     <h1 className={styles.title}>
-                        情報処理技術者試験を、<br />
-                        もっとスマートに。
+                        情報処理をもっとスマートに。
                     </h1>
                     <p className={styles.description}>
                         シカクノは、効率的な学習をサポートする<br />
