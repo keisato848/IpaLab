@@ -1,0 +1,26 @@
+{
+  "id": "AP-2024-Spring-AM-5",
+  "qNo": 5,
+  "text": "正の整数Mに対して、次の二つの流れ図[図参照]に示すアルゴリズムを実行したとき、結果xの値が等しくなるようにしたい。aに入れる条件として、適切なものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "n < M"
+    },
+    {
+      "id": "b",
+      "text": "n > M-1"
+    },
+    {
+      "id": "c",
+      "text": "n > M"
+    },
+    {
+      "id": "d",
+      "text": "n > M+1"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2024-Spring-AM"
+}

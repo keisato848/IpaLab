@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Fall-AM-27",
+  "qNo": 27,
+  "text": "[図参照]のような関係データベースの“注文”表と“注文明細”表がある。“注文”表の行を削除すると、対応する“注文明細”表の行が、自動的に削除されるようにしたい。SQL文の ON DELETE 句に指定する語句はどれか。ここで、図中の実線の下線は主キーを、破線の下線は外部キーを表す。",
+  "options": [
+    {
+      "id": "a",
+      "text": "CASCADE"
+    },
+    {
+      "id": "b",
+      "text": "INTERSECT"
+    },
+    {
+      "id": "c",
+      "text": "RESTRICT"
+    },
+    {
+      "id": "d",
+      "text": "UNIQUE"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2019-Fall-AM"
+}

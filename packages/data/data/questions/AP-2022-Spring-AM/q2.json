@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Spring-AM-2",
+  "qNo": 2,
+  "text": "全体集合S内に異なる部分集合AとBがあるとき, A∩Bに等しいものはどれか。ここで、A∪BはAとBの和集合, A∩BはAとBの積集合, ĀはSにおけるAの補集合, A-BはAからBを除いた差集合を表す。",
+  "options": [
+    {
+      "id": "a",
+      "text": "A-B"
+    },
+    {
+      "id": "b",
+      "text": "(A∪B) - (A∩B)"
+    },
+    {
+      "id": "c",
+      "text": "(S-A)∪(S-B)"
+    },
+    {
+      "id": "d",
+      "text": "S - (A∩B)"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2022-Spring-AM"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Fall-AM-68",
+  "qNo": 68,
+  "text": "売手側でのマーケティング要素 4Pは、買手側での要素 4C に対応するという考え方がある。4Pの一つであるプロモーションに対応する 4Cの構成要素はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "顧客価値(Customer Value)"
+    },
+    {
+      "id": "b",
+      "text": "顧客コスト (Customer Cost)"
+    },
+    {
+      "id": "c",
+      "text": "コミュニケーション (Communication)"
+    },
+    {
+      "id": "d",
+      "text": "利便性(Convenience)"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2019-Fall-AM"
+}

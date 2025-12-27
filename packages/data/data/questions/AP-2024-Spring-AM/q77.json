@@ -1,0 +1,26 @@
+{
+  "id": "AP-2024-Spring-AM-77",
+  "qNo": 77,
+  "text": "損益計算資料から求められる損益分岐点売上高は、何百万円か。[表参照]",
+  "options": [
+    {
+      "id": "a",
+      "text": "225"
+    },
+    {
+      "id": "b",
+      "text": "300"
+    },
+    {
+      "id": "c",
+      "text": "450"
+    },
+    {
+      "id": "d",
+      "text": "480"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2024-Spring-AM"
+}

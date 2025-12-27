@@ -1,0 +1,26 @@
+{
+  "id": "AP-2024-Spring-AM-42",
+  "qNo": 42,
+  "text": "PC からサーバに対し, IPv6 を利用した通信を行う場合, ネットワーク層で暗号化を行うときに利用するものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "IPsec"
+    },
+    {
+      "id": "b",
+      "text": "PPP"
+    },
+    {
+      "id": "c",
+      "text": "SSH"
+    },
+    {
+      "id": "d",
+      "text": "TLS"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2024-Spring-AM"
+}

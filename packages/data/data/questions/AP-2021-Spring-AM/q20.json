@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Spring-AM-20",
+  "qNo": 20,
+  "text": "Hadoopの説明はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "Java EE 仕様に準拠したアプリケーションサーバ"
+    },
+    {
+      "id": "b",
+      "text": "Linuxや Windows などの様々なプラットフォーム上で動作する Web サーバ"
+    },
+    {
+      "id": "c",
+      "text": "機能の豊富さが特徴のRDBMS"
+    },
+    {
+      "id": "d",
+      "text": "大規模なデータセットを分散処理するためのソフトウェアライブラリ"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "AP-2021-Spring-AM"
+}

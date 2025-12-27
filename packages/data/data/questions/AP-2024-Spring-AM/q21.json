@@ -1,0 +1,26 @@
+{
+  "id": "AP-2024-Spring-AM-21",
+  "qNo": 21,
+  "text": "入力がAとB,出力がYの論理回路を動作させたとき、図のタイムチャートが得られた。この論理回路として、適切なものはどれか。[タイムチャート参照]",
+  "options": [
+    {
+      "id": "a",
+      "text": "XOR gate symbol"
+    },
+    {
+      "id": "b",
+      "text": "NAND gate symbol"
+    },
+    {
+      "id": "c",
+      "text": "NOR gate symbol"
+    },
+    {
+      "id": "d",
+      "text": "OR gate symbol"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2024-Spring-AM"
+}

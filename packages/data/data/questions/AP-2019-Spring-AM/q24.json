@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Spring-AM-24",
+  "qNo": 24,
+  "text": "コードの値からデータの対象物が連想できるものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "シーケンスコード"
+    },
+    {
+      "id": "b",
+      "text": "デシマルコード"
+    },
+    {
+      "id": "c",
+      "text": "ニモニックコード"
+    },
+    {
+      "id": "d",
+      "text": "ブロックコード"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2019-Spring-AM"
+}

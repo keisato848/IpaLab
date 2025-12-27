@@ -1,0 +1,26 @@
+{
+  "id": "AP-2020-Fall-AM-31",
+  "qNo": 31,
+  "text": "無線LANのアクセスポイントやIP電話機などに、LANケーブルを利用して給電も行う仕組みはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "PLC"
+    },
+    {
+      "id": "b",
+      "text": "PoE"
+    },
+    {
+      "id": "c",
+      "text": "UPS"
+    },
+    {
+      "id": "d",
+      "text": "USB"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2020-Fall-AM"
+}

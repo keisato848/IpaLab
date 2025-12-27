@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Fall-AM-18",
+  "qNo": 18,
+  "text": "分散開発環境において,各開発者のローカル環境に全履歴を含んだ中央リポジトリの完全な複製をもつことによって、中央リポジトリにアクセスできないときでも履歴の調査や変更の記録を可能にする、バージョン管理ツールはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "Apache Subversion"
+    },
+    {
+      "id": "b",
+      "text": "CVS"
+    },
+    {
+      "id": "c",
+      "text": "Git"
+    },
+    {
+      "id": "d",
+      "text": "RCS"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2021-Fall-AM"
+}

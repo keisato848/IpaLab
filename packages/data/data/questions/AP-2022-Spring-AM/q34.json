@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Spring-AM-34",
+  "qNo": 34,
+  "text": "IPv4で192.168.30.32/28のネットワークに接続可能なホストの最大数はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "14"
+    },
+    {
+      "id": "b",
+      "text": "16"
+    },
+    {
+      "id": "c",
+      "text": "28"
+    },
+    {
+      "id": "d",
+      "text": "30"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2022-Spring-AM"
+}

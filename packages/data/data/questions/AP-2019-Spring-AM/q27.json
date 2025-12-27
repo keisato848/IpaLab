@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Spring-AM-27",
+  "qNo": 27,
+  "text": "RDBMS において、特定の利用者だけに表を更新する権限を与える方法として、適切なものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "CONNECT 文で接続を許可する。"
+    },
+    {
+      "id": "b",
+      "text": "CREATE ASSERTION 文で表明して制限する。"
+    },
+    {
+      "id": "c",
+      "text": "CREATE TABLE 文の参照制約で制限する。"
+    },
+    {
+      "id": "d",
+      "text": "GRANT 文で許可する。"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "AP-2019-Spring-AM"
+}

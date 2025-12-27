@@ -34,6 +34,19 @@ export const localExamRepository = {
         const exams: Exam[] = [];
 
         for (const dir of dirs) {
+            // Check if it's a real exam (not sample)
+            try {
+                const q1Path = path.join(questionsDir, dir, 'q1.json');
+                const q1Content = await fs.readFile(q1Path, 'utf-8');
+                const q1 = JSON.parse(q1Content);
+                if (q1.text && q1.text.includes('【サンプル問題】')) {
+                    continue; // Skip samples
+                }
+            } catch (e) {
+                // If q1.json is missing or invalid, skip
+                continue;
+            }
+
             // Expected format: AP-YYYY-Term-Type (e.g., AP-2016-Fall-AM)
             const parts = dir.split('-');
             if (parts.length < 3) continue;

@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Fall-AM-7",
+  "qNo": 7,
+  "text": "静的型付けを行うプログラム言語では、コンパイル時に変数名の誤り、誤った値の代入などが発見できる。Webプログラミングで用いられるスクリプト言語のうち、変数の静的型付けができるものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "ECMAScript"
+    },
+    {
+      "id": "b",
+      "text": "JavaScript"
+    },
+    {
+      "id": "c",
+      "text": "TypeScript"
+    },
+    {
+      "id": "d",
+      "text": "VBScript"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2021-Fall-AM"
+}

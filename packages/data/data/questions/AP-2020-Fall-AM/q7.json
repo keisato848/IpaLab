@@ -1,0 +1,26 @@
+{
+  "id": "AP-2020-Fall-AM-7",
+  "qNo": 7,
+  "text": "オブジェクト指向のプログラム言語であり、クラスや関数、条件文などのコードブロックの範囲はインデントの深さによって指定する仕様であるものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "JavaScript"
+    },
+    {
+      "id": "b",
+      "text": "Perl"
+    },
+    {
+      "id": "c",
+      "text": "Python"
+    },
+    {
+      "id": "d",
+      "text": "Ruby"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2020-Fall-AM"
+}

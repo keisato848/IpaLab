@@ -1,0 +1,26 @@
+{
+  "id": "AP-2024-Spring-AM-38",
+  "qNo": 38,
+  "text": "公開鍵暗号方式を使った暗号通信をn人が相互に行う場合,全部で何個の異なる鍵が必要になるか。ここで、一組の公開鍵と秘密鍵は2個と数える。",
+  "options": [
+    {
+      "id": "a",
+      "text": "n+1"
+    },
+    {
+      "id": "b",
+      "text": "2n"
+    },
+    {
+      "id": "c",
+      "text": "n(n-1)/2"
+    },
+    {
+      "id": "d",
+      "text": "n²"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2024-Spring-AM"
+}

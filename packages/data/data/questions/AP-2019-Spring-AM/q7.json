@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Spring-AM-7",
+  "qNo": 7,
+  "text": "JavaScript の言語仕様のうち、オブジェクトの表記法など一部の仕様を基にして規定したものであって、“名前と値の組みの集まり”と“値の順序付きリスト”の二つの構造に基づいてオブジェクトを表現する、データ記述の仕様はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "DOM"
+    },
+    {
+      "id": "b",
+      "text": "JSON"
+    },
+    {
+      "id": "c",
+      "text": "SOAP"
+    },
+    {
+      "id": "d",
+      "text": "XML"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2019-Spring-AM"
+}

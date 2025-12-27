@@ -10,6 +10,7 @@ import { Question, saveLearningRecord, LearningRecord } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
 import { useSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
+import { getExamLabel } from '@/lib/exam-utils';
 
 interface QuestionClientProps {
     question: Question;
@@ -116,12 +117,17 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         }
     };
 
+    // Construct Exam ID safely
+    const typeSuffix = type === 'AM1' ? 'AM' : type;
+    const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
+    const examLabel = getExamLabel(examId);
+
     return (
         <div className={styles.container}>
             <header className={styles.header}>
                 <div className={styles.examInfo}>
                     <span className={styles.examBadge}>{type}</span>
-                    <span className={styles.examTitle}>{year} - Q{qNo}</span>
+                    <span className={styles.examTitle}>{examLabel} - Q{qNo}</span>
                 </div>
                 <div className={styles.meta}>
                     <span className={`${styles.modeBadge} ${isMock ? styles.mockBadge : ''}`}>
@@ -142,6 +148,9 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                             {question.text}
                         </ReactMarkdown>
+                    </div>
+                    <div className={styles.sourceParams}>
+                        出典：{examLabel} 問{qNo}
                     </div>
                 </div>
 

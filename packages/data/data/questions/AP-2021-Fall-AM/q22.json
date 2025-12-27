@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Fall-AM-22",
+  "qNo": 22,
+  "text": "1桁の2進数A, Bを加算し、Xに桁上がり、Yに桁上げなしの和(和の1桁目)が得られる論理回路はどれか。 [図参照]",
+  "options": [
+    {
+      "id": "a",
+      "text": "[AND素子でX, XOR素子でYを生成する回路]"
+    },
+    {
+      "id": "b",
+      "text": "[NOR素子でX, AND素子でYを生成する回路]"
+    },
+    {
+      "id": "c",
+      "text": "[OR素子でX, XOR素子でYを生成する回路]"
+    },
+    {
+      "id": "d",
+      "text": "[AND素子でX, OR素子でYを生成する回路]"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2021-Fall-AM"
+}

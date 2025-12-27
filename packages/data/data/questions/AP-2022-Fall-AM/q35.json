@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Fall-AM-35",
+  "qNo": 35,
+  "text": "次のURLに対し、受理する Web サーバのポート番号 (8080)を指定できる箇所はどれか。 https://www.example.com/member/login?id=user",
+  "options": [
+    {
+      "id": "a",
+      "text": "クエリ文字列(id=user)の直後"
+    },
+    {
+      "id": "b",
+      "text": "スキーム(https)の直後"
+    },
+    {
+      "id": "c",
+      "text": "パス(/member/login)の直後"
+    },
+    {
+      "id": "d",
+      "text": "ホスト名(www.example.com)の直後"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "AP-2022-Fall-AM"
+}

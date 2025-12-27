@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Fall-AM-14",
+  "qNo": 14,
+  "text": "あるシステムにおいて、MTBF と MTTR がともに1.5倍になったとき、アベイラビリティ (稼働率) は何倍になるか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "2/3"
+    },
+    {
+      "id": "b",
+      "text": "1.5"
+    },
+    {
+      "id": "c",
+      "text": "2.25"
+    },
+    {
+      "id": "d",
+      "text": "変わらない"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "AP-2022-Fall-AM"
+}

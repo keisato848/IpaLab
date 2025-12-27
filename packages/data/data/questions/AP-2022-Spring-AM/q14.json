@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Spring-AM-14",
+  "qNo": 14,
+  "text": "MTBF を長くするよりも、MTTRを短くするのに役立つものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "エラーログ取得機能"
+    },
+    {
+      "id": "b",
+      "text": "記憶装置のビット誤り訂正機能"
+    },
+    {
+      "id": "c",
+      "text": "命令再試行機能"
+    },
+    {
+      "id": "d",
+      "text": "予防保全"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2022-Spring-AM"
+}

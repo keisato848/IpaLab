@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Fall-AM-5",
+  "qNo": 5,
+  "text": "自然数をキーとするデータを、ハッシュ表を用いて管理する。キーxのハッシュ関数 h(x)を h(x) = x mod n とすると、任意のキーaとbが衝突する条件はどれか。ここで、nはハッシュ表の大きさであり, x mod nはxをnで割った余りを表す。",
+  "options": [
+    {
+      "id": "a",
+      "text": "a+bがnの倍数"
+    },
+    {
+      "id": "b",
+      "text": "a-bがnの倍数"
+    },
+    {
+      "id": "c",
+      "text": "nがa+bの倍数"
+    },
+    {
+      "id": "d",
+      "text": "nがa-bの倍数"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2022-Fall-AM"
+}

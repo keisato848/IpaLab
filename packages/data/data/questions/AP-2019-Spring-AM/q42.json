@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Spring-AM-42",
+  "qNo": 42,
+  "text": "VPNで使用されるセキュアなプロトコルである IPsec, L2TP, TLS の, OSI 基本参照モデルにおける相対的な位置関係はどれか。[図参照]",
+  "options": [
+    {
+      "id": "a",
+      "text": "A"
+    },
+    {
+      "id": "b",
+      "text": "B"
+    },
+    {
+      "id": "c",
+      "text": "C"
+    },
+    {
+      "id": "d",
+      "text": "D"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2019-Spring-AM"
+}
