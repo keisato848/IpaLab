@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Fall-AM-39",
+  "qNo": 39,
+  "text": "組織的なインシデント対応体制の構築を支援する目的で JPCERT コーディネーションセンターが作成したものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "CSIRT マテリアル"
+    },
+    {
+      "id": "b",
+      "text": "ISMS ユーザーズガイド"
+    },
+    {
+      "id": "c",
+      "text": "証拠保全ガイドライン"
+    },
+    {
+      "id": "d",
+      "text": "組織における内部不正防止ガイドライン"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2022-Fall-AM"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "AP-2020-Fall-AM-19",
+  "qNo": 19,
+  "text": "OSS (Open Source Software) における、ディストリビュータの役割はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "OSSやアプリケーションソフトウェアを組み合わせて、パッケージにして提供する。"
+    },
+    {
+      "id": "b",
+      "text": "OSSを開発し、活動状況をWebで公開する。"
+    },
+    {
+      "id": "c",
+      "text": "OSSを稼働用のコンピュータにインストールし、動作確認を行う。"
+    },
+    {
+      "id": "d",
+      "text": "OSSを含むソフトウェアを利用したシステムの提案を行う。"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2020-Fall-AM"
+}

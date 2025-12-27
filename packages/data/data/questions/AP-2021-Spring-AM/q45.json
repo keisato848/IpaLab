@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Spring-AM-45",
+  "qNo": 45,
+  "text": "TLS のクライアント認証における次の処理 a~cについて、適切な順序はどれか。\n[a: クライアントが、サーバにクライアント証明書を送付する。 b: サーバが、クライアントにサーバ証明書を送付する。 c: サーバが、クライアントを認証する。]",
+  "options": [
+    {
+      "id": "a",
+      "text": "a → b → c"
+    },
+    {
+      "id": "b",
+      "text": "a → c → b"
+    },
+    {
+      "id": "c",
+      "text": "b → a → c"
+    },
+    {
+      "id": "d",
+      "text": "c → a → b"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2021-Spring-AM"
+}

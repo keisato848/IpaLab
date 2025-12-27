@@ -1,0 +1,26 @@
+{
+  "id": "AP-2024-Spring-AM-39",
+  "qNo": 39,
+  "text": "自社製品の脆弱性に起因するリスクに対応するための社内機能として、最も適切なものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "CSIRT"
+    },
+    {
+      "id": "b",
+      "text": "PSIRT"
+    },
+    {
+      "id": "c",
+      "text": "SOC"
+    },
+    {
+      "id": "d",
+      "text": "WHOIS データベースの技術連絡担当"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2024-Spring-AM"
+}

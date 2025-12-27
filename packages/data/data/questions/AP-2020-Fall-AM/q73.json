@@ -1,0 +1,26 @@
+{
+  "id": "AP-2020-Fall-AM-73",
+  "qNo": 73,
+  "text": "EDIを実施するための情報表現規約で規定されるべきものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "企業間の取引の契約内容"
+    },
+    {
+      "id": "b",
+      "text": "システムの運用時間"
+    },
+    {
+      "id": "c",
+      "text": "伝送制御手順"
+    },
+    {
+      "id": "d",
+      "text": "メッセージの形式"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "AP-2020-Fall-AM"
+}

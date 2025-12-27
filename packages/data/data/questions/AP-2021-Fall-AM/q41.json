@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Fall-AM-41",
+  "qNo": 41,
+  "text": "基本評価基準,現状評価基準,環境評価基準の三つの基準で情報システムの脆弱性の深刻度を評価するものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "CVSS"
+    },
+    {
+      "id": "b",
+      "text": "ISMS"
+    },
+    {
+      "id": "c",
+      "text": "PCI DSS"
+    },
+    {
+      "id": "d",
+      "text": "PMS"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2021-Fall-AM"
+}

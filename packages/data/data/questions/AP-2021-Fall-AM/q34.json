@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Fall-AM-34",
+  "qNo": 34,
+  "text": "UDP のヘッダフィールドにはないが、TCP のヘッダフィールドには含まれる情報はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "宛先ポート番号"
+    },
+    {
+      "id": "b",
+      "text": "シーケンス番号"
+    },
+    {
+      "id": "c",
+      "text": "送信元ポート番号"
+    },
+    {
+      "id": "d",
+      "text": "チェックサム"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2021-Fall-AM"
+}

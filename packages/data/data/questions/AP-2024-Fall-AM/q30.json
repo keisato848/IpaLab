@@ -1,0 +1,26 @@
+{
+  "id": "AP-2024-Fall-AM-30",
+  "qNo": 30,
+  "text": "“成績”表に対して、SQL 文 1 と同一の結果を得るために、SQL 文 2 の a に入れる字句はどれか。[表と SQL 文 1, 2 参照]",
+  "options": [
+    {
+      "id": "a",
+      "text": "ORDER BY 学生番号, 実施回"
+    },
+    {
+      "id": "b",
+      "text": "PARTITION BY 学生番号 ORDER BY 実施回"
+    },
+    {
+      "id": "c",
+      "text": "PARTITION BY 学生番号 ORDER BY 得点 ASC"
+    },
+    {
+      "id": "d",
+      "text": "PARTITION BY 学生番号 ORDER BY 得点 DESC"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2024-Fall-AM"
+}

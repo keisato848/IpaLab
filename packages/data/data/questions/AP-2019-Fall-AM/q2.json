@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Fall-AM-2",
+  "qNo": 2,
+  "text": "全体集合S内に異なる部分集合AとBがあるとき, $A \\cap \\overline{B}$に等しいものはどれか。ここで、$A \\cup B$は$A$と$B$の和集合, $A \\cap B$は$A$と$B$の積集合, $\\overline{A}$は$S$における$A$の補集合, $A-B$は$A$から$B$を除いた差集合を表す。",
+  "options": [
+    {
+      "id": "a",
+      "text": "$A-B$"
+    },
+    {
+      "id": "b",
+      "text": "$(\\overline{A \\cup B}) - (\\overline{A \\cap B})$"
+    },
+    {
+      "id": "c",
+      "text": "$(S-A) \\cup (S-B)$"
+    },
+    {
+      "id": "d",
+      "text": "$S-(A \\cap B)$"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2019-Fall-AM"
+}

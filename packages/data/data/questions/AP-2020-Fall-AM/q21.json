@@ -1,0 +1,26 @@
+{
+  "id": "AP-2020-Fall-AM-21",
+  "qNo": 21,
+  "text": "FPGA などに実装するディジタル回路を記述して,直接論理合成するために使用されるものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "DDL"
+    },
+    {
+      "id": "b",
+      "text": "HDL"
+    },
+    {
+      "id": "c",
+      "text": "UML"
+    },
+    {
+      "id": "d",
+      "text": "XML"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2020-Fall-AM"
+}

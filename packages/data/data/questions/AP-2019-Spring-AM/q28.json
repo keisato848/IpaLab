@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Spring-AM-28",
+  "qNo": 28,
+  "text": "過去3年分の記録を保存している“試験結果”表から、2018年度の平均点数が600点以上となったクラスのクラス名と平均点数の一覧を取得する SQL 文はどれか。ここで、実線の下線は主キーを表す。\n試験結果(学生番号, 受験年月日, 点数, クラス名)",
+  "options": [
+    {
+      "id": "a",
+      "text": "SELECT クラス名, AVG(点数) FROM 試験結果 GROUP BY クラス名 HAVING AVG(点数) >= 600"
+    },
+    {
+      "id": "b",
+      "text": "SELECT クラス名, AVG(点数) FROM 試験結果 WHERE 受験年月日 BETWEEN '2018-04-01' AND '2019-03-31' GROUP BY クラス名 HAVING AVG(点数) >= 600"
+    },
+    {
+      "id": "c",
+      "text": "SELECT クラス名, AVG(点数) FROM 試験結果 WHERE 受験年月日 BETWEEN '2018-04-01' AND '2019-03-31' GROUP BY クラス名 HAVING 点数 >= 600"
+    },
+    {
+      "id": "d",
+      "text": "SELECT クラス名, AVG(点数) FROM 試験結果 WHERE 点数 >= 600 GROUP BY クラス名 HAVING (MAX(受験年月日) BETWEEN '2018-04-01' AND '2019-03-31')"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2019-Spring-AM"
+}

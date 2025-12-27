@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Spring-AM-53",
+  "qNo": 53,
+  "text": "ソフトウェア開発プロジェクトにおいて、表の全ての作業を完了させるために必要な期間は最短で何日間か。[表参照]",
+  "options": [
+    {
+      "id": "a",
+      "text": "80"
+    },
+    {
+      "id": "b",
+      "text": "95"
+    },
+    {
+      "id": "c",
+      "text": "100"
+    },
+    {
+      "id": "d",
+      "text": "120"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2022-Spring-AM"
+}

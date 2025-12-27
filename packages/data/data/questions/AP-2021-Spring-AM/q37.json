@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Spring-AM-37",
+  "qNo": 37,
+  "text": "Web サイトにおいて、クリックジャッキング攻撃の対策に該当するものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "HTTP レスポンスヘッダに X-Content-Type-Options を設定する。"
+    },
+    {
+      "id": "b",
+      "text": "HTTP レスポンスヘッダに X-Frame-Options を設定する。"
+    },
+    {
+      "id": "c",
+      "text": "入力に HTML タグが含まれていたら、HTML タグとして解釈されないほかの文字列に置き換える。"
+    },
+    {
+      "id": "d",
+      "text": "入力文字数が制限を超えているときは受け付けない。"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2021-Spring-AM"
+}

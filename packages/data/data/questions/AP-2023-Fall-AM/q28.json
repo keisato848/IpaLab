@@ -1,0 +1,26 @@
+{
+  "id": "AP-2023-Fall-AM-28",
+  "qNo": 28,
+  "text": "更新可能なビューを作成する SQL 文はどれか。ここで、SQL文中に現れる基底表は全て更新可能とする。",
+  "options": [
+    {
+      "id": "a",
+      "text": "CREATE VIEW 高額商品(商品番号,商品名,商品単価) AS SELECT 商品番号,商品名,商品単価 FROM 商品 WHERE 商品単価>1000"
+    },
+    {
+      "id": "b",
+      "text": "CREATE VIEW 受注商品(商品番号) AS SELECT DISTINCT 商品番号 FROM 受注"
+    },
+    {
+      "id": "c",
+      "text": "CREATE VIEW 商品受注(商品番号,受注数量) AS SELECT 商品番号,SUM(受注数量) FROM 受注 GROUP BY 商品番号"
+    },
+    {
+      "id": "d",
+      "text": "CREATE VIEW 商品平均受注数量(平均受注数量) AS SELECT AVG(受注数量) FROM 受注"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2023-Fall-AM"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Spring-AM-32",
+  "qNo": 32,
+  "text": "IoT で用いられる無線通信技術であり,近距離のIT機器同士が通信する無線 PAN (Personal Area Network)と呼ばれるネットワークに利用されるものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "BLE (Bluetooth Low Energy)"
+    },
+    {
+      "id": "b",
+      "text": "LTE (Long Term Evolution)"
+    },
+    {
+      "id": "c",
+      "text": "PLC (Power Line Communication)"
+    },
+    {
+      "id": "d",
+      "text": "PPP (Point-to-Point Protocol)"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2021-Spring-AM"
+}

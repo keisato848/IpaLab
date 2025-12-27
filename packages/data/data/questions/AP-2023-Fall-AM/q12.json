@@ -1,0 +1,26 @@
+{
+  "id": "AP-2023-Fall-AM-12",
+  "qNo": 12,
+  "text": "SAN (Storage Area Network) におけるサーバとストレージの接続形態の説明として、適切なものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "シリアル ATA などの接続方式によって内蔵ストレージとして1対1に接続する。"
+    },
+    {
+      "id": "b",
+      "text": "ファイバチャネルなどによる専用ネットワークで接続する。"
+    },
+    {
+      "id": "c",
+      "text": "プロトコルは CIFS (Common Internet File System) を使用し、LANで接続する。"
+    },
+    {
+      "id": "d",
+      "text": "プロトコルは NFS (Network File System) を使用し、LANで接続する。"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2023-Fall-AM"
+}

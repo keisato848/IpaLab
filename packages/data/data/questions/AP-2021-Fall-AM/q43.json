@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Fall-AM-43",
+  "qNo": 43,
+  "text": "OSI 基本参照モデルのネットワーク層で動作し、“認証ヘッダ (AH)”と“暗号ペイロード (ESP)”の二つのプロトコルを含むものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "IPsec"
+    },
+    {
+      "id": "b",
+      "text": "S/MIME"
+    },
+    {
+      "id": "c",
+      "text": "SSH"
+    },
+    {
+      "id": "d",
+      "text": "XML暗号"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2021-Fall-AM"
+}

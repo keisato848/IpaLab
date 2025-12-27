@@ -45,7 +45,7 @@ body {
 }
 
 * {
-  box_sizing: border-box;
+  box-sizing: border-box;
 }
 
 a {

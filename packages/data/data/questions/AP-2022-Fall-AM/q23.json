@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Fall-AM-23",
+  "qNo": 23,
+  "text": "入力XとYの値が同じときにだけ、出力Zに1を出力する回路はどれか。[回路図参照]",
+  "options": [
+    {
+      "id": "a",
+      "text": "[回路図 ア]"
+    },
+    {
+      "id": "b",
+      "text": "[回路図 イ]"
+    },
+    {
+      "id": "c",
+      "text": "[回路図 ウ]"
+    },
+    {
+      "id": "d",
+      "text": "[回路図 エ]"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2022-Fall-AM"
+}

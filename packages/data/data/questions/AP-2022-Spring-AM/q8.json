@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Spring-AM-8",
+  "qNo": 8,
+  "text": "プロセッサの高速化技法の一つとして、同時に実行可能な複数の動作を、コンパイルの段階でまとめて一つの複合命令とし、高速化を図る方式はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "CISC"
+    },
+    {
+      "id": "b",
+      "text": "MIMD"
+    },
+    {
+      "id": "c",
+      "text": "RISC"
+    },
+    {
+      "id": "d",
+      "text": "VLIW"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "AP-2022-Spring-AM"
+}

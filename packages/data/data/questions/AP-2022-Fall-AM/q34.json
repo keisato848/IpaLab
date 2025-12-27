@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Fall-AM-34",
+  "qNo": 34,
+  "text": "IP の上位階層のプロトコルとして、コネクションレスのデータグラム通信を実現し、信頼性のための確認応答や順序制御などの機能をもたないプロトコルはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "ICMP"
+    },
+    {
+      "id": "b",
+      "text": "PPP"
+    },
+    {
+      "id": "c",
+      "text": "TCP"
+    },
+    {
+      "id": "d",
+      "text": "UDP"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "AP-2022-Fall-AM"
+}
