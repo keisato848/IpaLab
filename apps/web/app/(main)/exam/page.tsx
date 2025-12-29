@@ -70,6 +70,20 @@ export default function ExamListPage() {
                     応用情報 (AP)
                 </button>
                 <button
+                    onClick={() => setFilter('PM')}
+                    style={{
+                        padding: '8px 16px',
+                        borderRadius: '20px',
+                        border: '1px solid #ddd',
+                        backgroundColor: filter === 'PM' ? '#0070f3' : 'white',
+                        color: filter === 'PM' ? 'white' : '#333',
+                        cursor: 'pointer',
+                        fontWeight: 'bold'
+                    }}
+                >
+                    プロジェクトマネージャ (PM)
+                </button>
+                <button
                     onClick={() => setFilter('FE')}
                     style={{
                         padding: '8px 16px',
@@ -91,32 +105,35 @@ export default function ExamListPage() {
                         該当する試験区分は見つかりませんでした。
                     </p>
                 ) : (
-                    filteredExams.map((exam) => (
-                        <Link href={`/exam/${exam.id}/AM1`} key={exam.id} className={styles.cardLink}>
-                            <article className={styles.card}>
-                                <div className={styles.cardHeader}>
-                                    <span className={styles.tag}>{exam.category}</span>
-                                    <span className={styles.date}>{exam.date}</span>
-                                </div>
-                                <h3 className={styles.title}>{exam.title}</h3>
-
-                                <div className={styles.stats}>
-                                    <div className={styles.statItem}>
-                                        <span className={styles.statLabel}>進捗率</span>
-                                        <span className={styles.statValue}>{Math.round((exam.stats.completed / exam.stats.total) * 100)}%</span>
+                    filteredExams.map((exam) => {
+                        const startType = exam.id.endsWith('AM2') ? 'AM2' : 'AM1';
+                        return (
+                            <Link href={`/exam/${exam.id}/${startType}`} key={exam.id} className={styles.cardLink}>
+                                <article className={styles.card}>
+                                    <div className={styles.cardHeader}>
+                                        <span className={styles.tag}>{exam.category}</span>
+                                        <span className={styles.date}>{exam.date}</span>
                                     </div>
-                                    <div className={styles.statItem}>
-                                        <span className={styles.statLabel}>正答率</span>
-                                        <span className={styles.statValue}>{Math.round(exam.stats.correctRate * 100)}%</span>
-                                    </div>
-                                </div>
+                                    <h3 className={styles.title}>{exam.title}</h3>
 
-                                <div className={styles.progressBar}>
-                                    <div className={styles.progressFill} style={{ width: `${(exam.stats.completed / exam.stats.total) * 100}%` }}></div>
-                                </div>
-                            </article>
-                        </Link>
-                    ))
+                                    <div className={styles.stats}>
+                                        <div className={styles.statItem}>
+                                            <span className={styles.statLabel}>進捗率</span>
+                                            <span className={styles.statValue}>{Math.round((exam.stats.completed / exam.stats.total) * 100)}%</span>
+                                        </div>
+                                        <div className={styles.statItem}>
+                                            <span className={styles.statLabel}>正答率</span>
+                                            <span className={styles.statValue}>{Math.round(exam.stats.correctRate * 100)}%</span>
+                                        </div>
+                                    </div>
+
+                                    <div className={styles.progressBar}>
+                                        <div className={styles.progressFill} style={{ width: `${(exam.stats.completed / exam.stats.total) * 100}%` }}></div>
+                                    </div>
+                                </article>
+                            </Link>
+                        );
+                    })
                 )}
             </div>
         </div>

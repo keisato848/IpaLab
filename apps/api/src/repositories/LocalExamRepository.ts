@@ -1,8 +1,17 @@
 import fs from 'fs/promises';
+import { existsSync } from 'fs';
 import path from 'path';
 
 // Duplicate logic from LocalQuestionRepository
 const findDataRoot = (startPath: string): string => {
+    // Priority 1: Production (dist/data)
+    // Structure: dist/src/repositories -> dist/data
+    const prodPath = path.resolve(startPath, '../../../data');
+    if (existsSync(prodPath)) {
+        return prodPath;
+    }
+
+    // Priority 2: Monorepo Dev (packages/data/data)
     return path.resolve(startPath, '../../../../../packages/data/data');
 };
 
@@ -59,9 +68,19 @@ export const localExamRepository = {
             else if (year >= 1989) era = `平成${year - 1988}年`;
 
             const term = parts[2] === 'Spring' ? '春期' : (parts[2] === 'Fall' ? '秋期' : parts[2]);
-            const type = parts[3] ? (parts[3] === 'AM' ? '午前' : parts[3]) : '';
 
-            const title = `応用情報技術者試験 ${era} ${term} ${type}`;
+            let typeLabel = '';
+            if (parts[3] === 'AM') typeLabel = '午前';
+            else if (parts[3] === 'AM1') typeLabel = '午前I';
+            else if (parts[3] === 'AM2') typeLabel = '午前II';
+            else if (parts[3] === 'PM') typeLabel = '午後';
+            else typeLabel = parts[3] || '';
+
+            let categoryLabel = '応用情報技術者試験'; // Default AP
+            if (category === 'PM') categoryLabel = 'プロジェクトマネージャ試験';
+            else if (category === 'FE') categoryLabel = '基本情報技術者試験';
+
+            const title = `${categoryLabel} ${era} ${term} ${typeLabel}`;
 
             exams.push({
                 id: dir,
