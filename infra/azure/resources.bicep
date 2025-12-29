@@ -138,7 +138,7 @@ resource swa 'Microsoft.Web/staticSites@2022-03-01' = {
   }
   properties: {
     provider: 'GitHub'
-    repositoryUrl: 'https://github.com/placeholder/repo' // User will link this later or via CLI
+    repositoryUrl: 'https://github.com/keisato848/IpaLab'
     branch: 'main'
     buildProperties: {
       skipGithubActionWorkflowGeneration: true // We manually created workflows
