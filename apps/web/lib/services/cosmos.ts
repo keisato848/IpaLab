@@ -7,7 +7,17 @@ let client: CosmosClient | undefined;
 
 try {
     if (CONNECTION_STRING) {
+        console.log("Initializing Cosmos Client with string length:", CONNECTION_STRING.length);
+        const options: any = { endpoint: CONNECTION_STRING };
+        if (CONNECTION_STRING.includes("localhost") || CONNECTION_STRING.includes("127.0.0.1") || CONNECTION_STRING.includes("AccountKey")) {
+            // Heuristic for Emulator or key-based connection string handling if needed
+            // Actually, simply passing the connection string to constructor is usually enough, 
+            // but for Emulator we might need to disable SSL verification node-side.
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        }
         client = new CosmosClient(CONNECTION_STRING);
+    } else {
+        console.error("COSMOS_DB_CONNECTION is empty or undefined");
     }
 } catch (e) {
     console.warn("Failed to init Cosmos Client:", e);

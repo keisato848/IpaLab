@@ -1,0 +1,37 @@
+
+import { CosmosClient } from '@azure/cosmos';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+// Load env like Next.js might (but manually here)
+dotenv.config({ path: path.resolve(__dirname, '.env.local') });
+
+const CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION || "";
+const DATABASE_NAME = "pm-exam-dx-db";
+
+console.log(`Connection String Length: ${CONNECTION_STRING.length}`);
+if (CONNECTION_STRING.length > 0) {
+    const endpoint = CONNECTION_STRING.split(';').find(p => p.startsWith('AccountEndpoint='));
+    console.log(`Endpoint: ${endpoint}`);
+}
+
+async function main() {
+    try {
+        const client = new CosmosClient(CONNECTION_STRING);
+        const database = client.database(DATABASE_NAME);
+        const container = database.container("Questions");
+
+        console.log("Querying...");
+        const { resources } = await container.items.query("SELECT TOP 1 * FROM c").fetchAll();
+        console.log(`Success! Found ${resources.length} items.`);
+
+        if (resources.length > 0) {
+            console.log("Sample ID:", resources[0].id);
+        }
+    } catch (e: any) {
+        console.error("Connection Failed:", e?.message);
+        console.error("Full Error:", e);
+    }
+}
+
+main();
