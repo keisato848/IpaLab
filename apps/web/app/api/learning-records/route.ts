@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
             // Bulk Insert
             const parseResults = z.array(LearningRecordSchema).safeParse(body);
             if (!parseResults.success) {
-                return NextResponse.json({ error: "Invalid data", details: parseResults.error.errors }, { status: 400 });
+                return NextResponse.json({ error: "Invalid data", details: parseResults.error.format() }, { status: 400 });
             }
 
             const records = parseResults.data;
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
             // Single Insert
             const result = LearningRecordSchema.safeParse(body);
             if (!result.success) {
-                return NextResponse.json({ error: "Invalid data", details: result.error.errors }, { status: 400 });
+                return NextResponse.json({ error: "Invalid data", details: result.error.format() }, { status: 400 });
             }
 
             const record = result.data;
