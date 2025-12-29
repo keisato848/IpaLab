@@ -1,0 +1,26 @@
+{
+  "id": "AP-2024-Spring-AM-26",
+  "qNo": 26,
+  "text": "“部品”表及び“在庫”表に対し、SQL 文を実行して結果を得た。SQL 文の a に入れる字句はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "COALESCE (MIN(在庫.在庫数), 0)"
+    },
+    {
+      "id": "b",
+      "text": "COALESCE (MIN(在庫.在庫数), NULL)"
+    },
+    {
+      "id": "c",
+      "text": "COALESCE (SUM(在庫.在庫数), 0)"
+    },
+    {
+      "id": "d",
+      "text": "COALESCE (SUM(在庫.在庫数), NULL)"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2024-Spring-AM"
+}

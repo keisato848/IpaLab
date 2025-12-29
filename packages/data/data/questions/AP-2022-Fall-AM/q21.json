@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Fall-AM-21",
+  "qNo": 21,
+  "text": "次の電子部品のうち、整流作用をもつ素子はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "コイル"
+    },
+    {
+      "id": "b",
+      "text": "コンデンサ"
+    },
+    {
+      "id": "c",
+      "text": "ダイオード"
+    },
+    {
+      "id": "d",
+      "text": "抵抗器"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2022-Fall-AM"
+}

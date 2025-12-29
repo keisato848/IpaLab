@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Fall-AM-2",
+  "qNo": 2,
+  "text": "A, B, C, D を論理変数とするとき、次のカルノー図[図参照]と等価な論理式はどれか。ここで、・は論理積,+は論理和、XはXの否定を表す。",
+  "options": [
+    {
+      "id": "a",
+      "text": "~A・B・~C・~D + ~B・~D"
+    },
+    {
+      "id": "b",
+      "text": "~A・~B・~C・~D + ~B・~D"
+    },
+    {
+      "id": "c",
+      "text": "A・B・D + ~B・~D"
+    },
+    {
+      "id": "d",
+      "text": "~A・~B・D + ~B・~D"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "AP-2022-Fall-AM"
+}

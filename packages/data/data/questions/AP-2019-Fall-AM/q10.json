@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Fall-AM-10",
+  "qNo": 10,
+  "text": "容量が$a$ Mバイトでアクセス時間が$x$ナノ秒の命令キャッシュと、容量が$b$ Mバイトでアクセス時間が$y$ナノ秒の主記憶をもつシステムにおいて, CPU からみた、主記憶と命令キャッシュとを合わせた平均アクセス時間を表す式はどれか。ここで、読み込みたい命令コードがキャッシュに存在しない確率を$r$とし、キャッシュ管理に関するオーバヘッドは無視できるものとする。",
+  "options": [
+    {
+      "id": "a",
+      "text": "$ \\frac{(1-r) \\cdot a}{a+b} \\cdot x + \\frac{r \\cdot b}{a+b} \\cdot y $"
+    },
+    {
+      "id": "b",
+      "text": "$(1-r) \\cdot x + r \\cdot y$"
+    },
+    {
+      "id": "c",
+      "text": "$ \\frac{r \\cdot a}{a+b} \\cdot x + \\frac{(1-r) \\cdot b}{a+b} \\cdot y $"
+    },
+    {
+      "id": "d",
+      "text": "$r \\cdot x + (1-r) \\cdot y$"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2019-Fall-AM"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Spring-AM-52",
+  "qNo": 52,
+  "text": "表は、RACI チャートを用いた、ある組織の責任分担マトリックスである。条件を満たすように責任分担を見直すとき、適切なものはどれか。\n[条件] ・各アクティビティにおいて,実行責任者(R)は1人以上とする。 ・各アクティビティにおいて、説明責任者(A)は1人とする。\n[RACI Chart shows Activity 4 having two Accountable roles (A) for 佐藤 and 田中, violating the A=1 rule.]",
+  "options": [
+    {
+      "id": "a",
+      "text": "アクティビティ ①の菊池の責任を Iに変更"
+    },
+    {
+      "id": "b",
+      "text": "アクティビティ ②の佐藤の責任を A に変更"
+    },
+    {
+      "id": "c",
+      "text": "アクティビティ ③の鈴木の責任を C に変更"
+    },
+    {
+      "id": "d",
+      "text": "アクティビティ ④ の田中の責任をRに変更"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "AP-2021-Spring-AM"
+}

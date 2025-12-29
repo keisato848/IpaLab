@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Spring-AM-4",
+  "qNo": 4,
+  "text": "体温を測定するのに適切なセンサはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "サーミスタ"
+    },
+    {
+      "id": "b",
+      "text": "超音波センサ"
+    },
+    {
+      "id": "c",
+      "text": "フォトトランジスタ"
+    },
+    {
+      "id": "d",
+      "text": "ポテンショメータ"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2021-Spring-AM"
+}

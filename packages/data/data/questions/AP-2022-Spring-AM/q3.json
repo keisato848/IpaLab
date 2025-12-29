@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Spring-AM-3",
+  "qNo": 3,
+  "text": "M/M/1 の待ち行列モデルにおいて、窓口の利用率が25%から 40%に増えると、平均待ち時間は何倍になるか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "1.25"
+    },
+    {
+      "id": "b",
+      "text": "1.60"
+    },
+    {
+      "id": "c",
+      "text": "2.00"
+    },
+    {
+      "id": "d",
+      "text": "3.00"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2022-Spring-AM"
+}

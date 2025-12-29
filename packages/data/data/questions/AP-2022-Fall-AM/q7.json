@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Fall-AM-7",
+  "qNo": 7,
+  "text": "XML において, XML 宣言中で符号化宣言を省略できる文字コードはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "EUC-JP"
+    },
+    {
+      "id": "b",
+      "text": "ISO-2022-JP"
+    },
+    {
+      "id": "c",
+      "text": "Shift-JIS"
+    },
+    {
+      "id": "d",
+      "text": "UTF-16"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "AP-2022-Fall-AM"
+}

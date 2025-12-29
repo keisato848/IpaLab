@@ -1,3 +1,6 @@
+// Export Models
+export * from './types/models';
+
 export const sharedTest = () => {
     return "Hello from shared package!";
 };

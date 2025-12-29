@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Fall-AM-34",
+  "qNo": 34,
+  "text": "IPv6アドレスの表記として、適切なものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "2001:db8::3ab::ff01"
+    },
+    {
+      "id": "b",
+      "text": "2001:db8::3ab:ff01"
+    },
+    {
+      "id": "c",
+      "text": "2001:db8.3ab:ff01"
+    },
+    {
+      "id": "d",
+      "text": "2001.db8.3ab.ff01"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2019-Fall-AM"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Spring-AM-20",
+  "qNo": 20,
+  "text": "DRAMのメモリセルにおいて、情報を記憶するために利用されているものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "コイル"
+    },
+    {
+      "id": "b",
+      "text": "コンデンサ"
+    },
+    {
+      "id": "c",
+      "text": "抵抗"
+    },
+    {
+      "id": "d",
+      "text": "フリップフロップ"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2019-Spring-AM"
+}

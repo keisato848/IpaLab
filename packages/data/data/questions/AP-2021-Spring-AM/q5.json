@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Spring-AM-5",
+  "qNo": 5,
+  "text": "A, B, C の順序で入力されるデータがある。各データについてスタックへの挿入と取出しを1回ずつ行うことができる場合、データの出力順序は何通りあるか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "3"
+    },
+    {
+      "id": "b",
+      "text": "4"
+    },
+    {
+      "id": "c",
+      "text": "5"
+    },
+    {
+      "id": "d",
+      "text": "6"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2021-Spring-AM"
+}

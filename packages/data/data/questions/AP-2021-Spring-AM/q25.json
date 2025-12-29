@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Spring-AM-25",
+  "qNo": 25,
+  "text": "図の論理回路において, S=1, R=1, X=0, Y=1のとき, Sを一旦0にした後、再び1に戻した。この操作を行った後のX, Yの値はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "X=0, Y=0"
+    },
+    {
+      "id": "b",
+      "text": "X=0, Y=1"
+    },
+    {
+      "id": "c",
+      "text": "X=1, Y=0"
+    },
+    {
+      "id": "d",
+      "text": "X=1, Y=1"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2021-Spring-AM"
+}

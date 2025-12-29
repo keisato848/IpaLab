@@ -1,0 +1,26 @@
+{
+  "id": "PM-2022-Fall-AM2-16",
+  "qNo": 16,
+  "text": "XP (Extreme Programming) のプラクティスの一つであるものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "構造化プログラミング"
+    },
+    {
+      "id": "b",
+      "text": "コンポーネント指向プログラミング"
+    },
+    {
+      "id": "c",
+      "text": "ビジュアルプログラミング"
+    },
+    {
+      "id": "d",
+      "text": "ペアプログラミング"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "PM-2022-Fall-AM2"
+}

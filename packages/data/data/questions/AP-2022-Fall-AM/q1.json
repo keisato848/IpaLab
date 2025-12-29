@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Fall-AM-1",
+  "qNo": 1,
+  "text": "aを正の整数とし, b = a²とする。aを2進数で表現するとnビットであるとき, bを2進数で表現すると最大で何ビットになるか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "n+1"
+    },
+    {
+      "id": "b",
+      "text": "2n"
+    },
+    {
+      "id": "c",
+      "text": "n²"
+    },
+    {
+      "id": "d",
+      "text": "2ⁿ"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2022-Fall-AM"
+}

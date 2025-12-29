@@ -1,0 +1,284 @@
+.page {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.dateDisplay {
+    font-size: 0.9rem;
+    color: var(--text-tertiary);
+    background: var(--bg-secondary);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
+}
+
+/* Grid Layout */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto auto;
+    gap: 1.5rem;
+}
+
+/* Card Common Styles */
+.card {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    /* Slightly stronger shadow on hover is fine, or use variable if preferred */
+}
+
+.card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+}
+
+/* Specific Cards Layout */
+.statusCard {
+    grid-column: span 12;
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+    border: 1px solid var(--border-color);
+}
+
+.heatmapCard {
+    grid-column: span 12;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+.historyCard {
+    grid-column: span 12;
+}
+
+@media (min-width: 1024px) {
+    .statusCard {
+        grid-column: span 4;
+    }
+
+    .heatmapCard {
+        grid-column: span 8;
+    }
+}
+
+@media (max-width: 768px) {
+    .grid {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}
+
+/* Status Card Internals */
+.progressContainer {
+    margin-bottom: 1.5rem;
+}
+
+.progressBar {
+    height: 10px;
+    background-color: var(--border-color);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, #0070f3, #00a6ff);
+    /* Keep brand color gradient */
+    border-radius: 5px;
+    transition: width 1s ease-out;
+}
+
+.progressStats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.quickStartBtn {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: background 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.quickStartBtn:hover {
+    background: var(--accent-hover);
+}
+
+/* Placeholders */
+.chartPlaceholder {
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    background: var(--bg-primary);
+    border-radius: 12px;
+    border: 2px dashed var(--border-color);
+}
+
+.chartStubCircle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 4px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.chartNote {
+    font-size: 0.8rem;
+    text-align: center;
+    padding: 0 1rem;
+    color: var(--text-secondary);
+}
+
+/* History List inside Dashboard */
+.viewAllBtn {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.historyList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.historyItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.historyItem:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.historyMain {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.tag {
+    display: inline-block;
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    align-self: flex-start;
+    border: 1px solid var(--border-color);
+}
+
+.examName {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.historyMeta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+}
+
+.result {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.result.correct {
+    color: var(--success-text);
+}
+
+.result.incorrect {
+    color: var(--error-text);
+}
+
+.date {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+}

@@ -1,0 +1,26 @@
+{
+  "id": "AP-2024-Fall-AM-78",
+  "qNo": 78,
+  "text": "著作権法で保護されるものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "アルゴリズム"
+    },
+    {
+      "id": "b",
+      "text": "コンパイラのプログラム"
+    },
+    {
+      "id": "c",
+      "text": "プログラム言語"
+    },
+    {
+      "id": "d",
+      "text": "プロトコル"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2024-Fall-AM"
+}

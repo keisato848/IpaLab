@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
+    "postbuild": "npm run sbom",
+    "sbom": "cyclonedx-bom --output-format json --output-file sbom.json",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "test": "turbo run test",

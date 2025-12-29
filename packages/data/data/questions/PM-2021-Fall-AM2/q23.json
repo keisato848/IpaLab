@@ -1,0 +1,26 @@
+{
+  "id": "PM-2021-Fall-AM2-23",
+  "qNo": 23,
+  "text": "暗号技術のうち、共通鍵暗号方式はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "AES"
+    },
+    {
+      "id": "b",
+      "text": "ElGamal 暗号"
+    },
+    {
+      "id": "c",
+      "text": "RSA"
+    },
+    {
+      "id": "d",
+      "text": "楕円曲線暗号"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "PM-2021-Fall-AM2"
+}

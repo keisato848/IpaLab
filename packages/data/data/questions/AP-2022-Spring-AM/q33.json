@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Spring-AM-33",
+  "qNo": 33,
+  "text": "UDP を使用しているものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "FTP"
+    },
+    {
+      "id": "b",
+      "text": "NTP"
+    },
+    {
+      "id": "c",
+      "text": "POP3"
+    },
+    {
+      "id": "d",
+      "text": "TELNET"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2022-Spring-AM"
+}
