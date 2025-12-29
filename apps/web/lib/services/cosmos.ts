@@ -40,7 +40,6 @@ export const containers = {
 
 export const initDatabase = async () => {
     if (!client) {
-        console.warn("Skipping DB init: No client");
         return;
     }
     const { database } = await client.databases.createIfNotExists({ id: DATABASE_NAME });
@@ -52,6 +51,4 @@ export const initDatabase = async () => {
     await database.containers.createIfNotExists({ id: "Sessions", partitionKey: "/sessionToken" });
     await database.containers.createIfNotExists({ id: "LearningRecords", partitionKey: "/userId" });
     await database.containers.createIfNotExists({ id: "Exams", partitionKey: "/id" });
-
-    console.log("Database initialized");
 };
