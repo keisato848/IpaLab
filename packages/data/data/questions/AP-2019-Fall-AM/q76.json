@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Fall-AM-76",
+  "qNo": 76,
+  "text": "国際的な標準として取り決められた会計基準などの総称であり、資本市場の国際化に対し、利害関係者からみた会計情報の比較可能性や均質性を担保するものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "GAAP"
+    },
+    {
+      "id": "b",
+      "text": "IASB"
+    },
+    {
+      "id": "c",
+      "text": "IFRS"
+    },
+    {
+      "id": "d",
+      "text": "SEC"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2019-Fall-AM"
+}

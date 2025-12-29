@@ -1,0 +1,26 @@
+{
+  "id": "AP-2020-Fall-AM-51",
+  "qNo": 51,
+  "text": "PMBOK ガイド第6版によれば、プロジェクト・スコープ記述書に記述する項目はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "WBS"
+    },
+    {
+      "id": "b",
+      "text": "コスト見積額"
+    },
+    {
+      "id": "c",
+      "text": "ステークホルダー分類"
+    },
+    {
+      "id": "d",
+      "text": "プロジェクトからの除外事項"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "AP-2020-Fall-AM"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Spring-AM-30",
+  "qNo": 30,
+  "text": "コストベースのオプティマイザが SQL の実行計画を作成する際に必要なものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "ディメンジョンテーブル"
+    },
+    {
+      "id": "b",
+      "text": "統計情報"
+    },
+    {
+      "id": "c",
+      "text": "待ちグラフ"
+    },
+    {
+      "id": "d",
+      "text": "ログファイル"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2021-Spring-AM"
+}

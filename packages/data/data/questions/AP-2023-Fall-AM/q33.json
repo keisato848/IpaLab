@@ -1,0 +1,26 @@
+{
+  "id": "AP-2023-Fall-AM-33",
+  "qNo": 33,
+  "text": "TCP/IP 環境において, ping によってホストの接続確認をするときに使用されるプロトコルはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "CHAP"
+    },
+    {
+      "id": "b",
+      "text": "ICMP"
+    },
+    {
+      "id": "c",
+      "text": "SMTP"
+    },
+    {
+      "id": "d",
+      "text": "SNMP"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2023-Fall-AM"
+}

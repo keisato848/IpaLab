@@ -1,0 +1,26 @@
+{
+  "id": "AP-2020-Fall-AM-54",
+  "qNo": 54,
+  "text": "PMBOK ガイド 第6版によれば、脅威と好機の、どちらに対しても採用されるリスク対応戦略として、適切なものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "回避"
+    },
+    {
+      "id": "b",
+      "text": "共有"
+    },
+    {
+      "id": "c",
+      "text": "受容"
+    },
+    {
+      "id": "d",
+      "text": "転嫁"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2020-Fall-AM"
+}

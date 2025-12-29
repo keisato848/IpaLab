@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Fall-AM-38",
+  "qNo": 38,
+  "text": "デジタル証明書が失効しているかどうかをオンラインで確認するためのプロトコルはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "CHAP"
+    },
+    {
+      "id": "b",
+      "text": "LDAP"
+    },
+    {
+      "id": "c",
+      "text": "OCSP"
+    },
+    {
+      "id": "d",
+      "text": "SNMP"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2022-Fall-AM"
+}

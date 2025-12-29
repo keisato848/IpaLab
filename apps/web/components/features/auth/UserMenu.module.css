@@ -1,0 +1,77 @@
+.loading {
+    padding: 1rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.guest,
+.user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: #e5e7eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.avatarImage {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 2px solid #e5e7eb;
+}
+
+.avatarIcon {
+    width: 2.5rem;
+    height: 2.5rem;
+    color: #9ca3af;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+}
+
+.name {
+    font-weight: 500;
+    color: #1f2937;
+    font-size: 0.875rem;
+}
+
+.loginLink {
+    font-size: 0.75rem;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.loginLink:hover {
+    text-decoration: underline;
+}
+
+.logout {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.75rem;
+    color: #6b7280;
+    cursor: pointer;
+    margin-top: 0.125rem;
+}
+
+.logout:hover {
+    color: #ef4444;
+}

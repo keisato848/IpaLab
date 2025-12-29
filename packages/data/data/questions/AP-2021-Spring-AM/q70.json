@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Spring-AM-70",
+  "qNo": 70,
+  "text": "バランススコアカードの四つの視点とは、財務、学習と成長,内部ビジネスプロセスと,もう一つはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "ガバナンス"
+    },
+    {
+      "id": "b",
+      "text": "顧客"
+    },
+    {
+      "id": "c",
+      "text": "自社の強み"
+    },
+    {
+      "id": "d",
+      "text": "遵法"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2021-Spring-AM"
+}

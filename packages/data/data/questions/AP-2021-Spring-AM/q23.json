@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Spring-AM-23",
+  "qNo": 23,
+  "text": "図はDC モータの正転逆転制御の動作原理を示す回路である。A1から A4の四つの制御信号の組合せの中で、モータが逆転するものはどれか。ここで、モータの+端子から-端子に電流が流れるときモータは正転し、S1から S4のそれぞれのスイッチ素子は、対応する A1から A4の制御信号がそれぞれ High のとき導通するものとする。",
+  "options": [
+    {
+      "id": "a",
+      "text": "A1: Low, A2: Low, A3: Low, A4: Low"
+    },
+    {
+      "id": "b",
+      "text": "A1: Low, A2: High, A3: Low, A4: High"
+    },
+    {
+      "id": "c",
+      "text": "A1: Low, A2: High, A3: High, A4: Low"
+    },
+    {
+      "id": "d",
+      "text": "A1: High, A2: Low, A3: Low, A4: High"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2021-Spring-AM"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Spring-AM-64",
+  "qNo": 64,
+  "text": "IT 投資効果の評価方法において、キャッシュフローベースで初年度の投資によるキャッシュアウトを何年後に回収できるかという指標はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "IRR (Internal Rate of Return)"
+    },
+    {
+      "id": "b",
+      "text": "NPV (Net Present Value)"
+    },
+    {
+      "id": "c",
+      "text": "PBP (Pay Back Period)"
+    },
+    {
+      "id": "d",
+      "text": "ROI (Return On Investment)"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2022-Spring-AM"
+}

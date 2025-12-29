@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Spring-AM-1",
+  "qNo": 1,
+  "text": "0以上255以下の整数nに対して、next(n) = { n+1 (0≦n<255), 0 (n=255) と定義する。next (n) と等しい式はどれか。ここで、x AND y及びx OR yは、それぞれxとyを2進数表現にして、桁ごとの論理積及び論理和をとったものとする。",
+  "options": [
+    {
+      "id": "a",
+      "text": "(n+1) AND 255"
+    },
+    {
+      "id": "b",
+      "text": "(n+1) AND 256"
+    },
+    {
+      "id": "c",
+      "text": "(n+1) OR 255"
+    },
+    {
+      "id": "d",
+      "text": "(n+1) OR 256"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2019-Spring-AM"
+}

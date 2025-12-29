@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Fall-AM-32",
+  "qNo": 32,
+  "text": "TCP/IP ネットワークで、データ転送用と制御用とに異なるウェルノウンポート番号が割り当てられているプロトコルはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "FTP"
+    },
+    {
+      "id": "b",
+      "text": "POP3"
+    },
+    {
+      "id": "c",
+      "text": "SMTP"
+    },
+    {
+      "id": "d",
+      "text": "SNMP"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2022-Fall-AM"
+}

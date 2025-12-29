@@ -1,0 +1,26 @@
+{
+  "id": "AP-2020-Fall-AM-45",
+  "qNo": 45,
+  "text": "電子メールをスマートフォンで受信する際のメールサーバとスマートフォンとの間の通信をメール本文を含めて暗号化するプロトコルはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "APOP"
+    },
+    {
+      "id": "b",
+      "text": "IMAPS"
+    },
+    {
+      "id": "c",
+      "text": "POP3"
+    },
+    {
+      "id": "d",
+      "text": "SMTP Submission"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2020-Fall-AM"
+}

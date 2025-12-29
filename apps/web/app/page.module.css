@@ -1,23 +1,197 @@
+.container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.logo::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #0070f3 0%, #00c6ff 100%);
+    border-radius: 8px;
+    transform: rotate(-10deg);
+    box-shadow: 0 8px 16px rgba(0, 118, 243, 0.25);
+}
+
+.nav {
+    display: flex;
+    gap: 1rem;
+}
+
+.loginLink {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.loginLink:hover {
+    color: var(--text-primary);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .main {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 2rem;
-    background-color: #f8f9fa;
+    padding: 4rem 1rem;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.hero {
+    text-align: center;
+    margin-bottom: 5rem;
+    max-width: 800px;
 }
 
 .title {
-    margin: 0;
-    line-height: 1.15;
-    font-size: 3rem;
-    color: #0070f3;
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    /* Use a gradient that works on both or fallback to text color */
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fadeInUp 0.8s ease-out 0.2s backwards;
 }
 
 .description {
-    margin: 2rem 0;
-    line-height: 1.5;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+    animation: fadeInUp 0.8s ease-out 0.4s backwards;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    animation: fadeInUp 0.8s ease-out 0.6s backwards;
+}
+
+.primaryBtn,
+.secondaryBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.primaryBtn {
+    background-color: var(--accent-color);
+    color: white;
+    box-shadow: 0 4px 14px rgba(0, 118, 255, 0.39);
+}
+
+.primaryBtn:hover {
+    transform: translateY(-2px);
+    background-color: var(--accent-hover);
+}
+
+.secondaryBtn {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.secondaryBtn:hover {
+    background-color: var(--bg-primary);
+}
+
+.note {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    width: 100%;
+}
+
+.featureCard {
+    background: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
     text-align: center;
+    box-shadow: var(--card-shadow);
+}
+
+.featureCard h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.featureCard p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-tertiary);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 600px) {
+    .title {
+        font-size: 2rem;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
 }

@@ -1,0 +1,26 @@
+{
+  "id": "AP-2022-Fall-AM-30",
+  "qNo": 30,
+  "text": "ACID 特性の四つの性質に含まれないものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "一貫性"
+    },
+    {
+      "id": "b",
+      "text": "可用性"
+    },
+    {
+      "id": "c",
+      "text": "原子性"
+    },
+    {
+      "id": "d",
+      "text": "耐久性"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2022-Fall-AM"
+}

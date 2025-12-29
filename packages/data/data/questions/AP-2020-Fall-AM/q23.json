@@ -1,0 +1,26 @@
+{
+  "id": "AP-2020-Fall-AM-23",
+  "qNo": 23,
+  "text": "次の表に示す値が格納された LUT (Lookup Table) と等価な回路はどれか。ここで、LUT のアドレス信号A2～A0はA0がLSBで、ア～エの回路の入力信号 a が A2, bがA1, cがA0に対応する。[表および回路図参照]",
+  "options": [
+    {
+      "id": "a",
+      "text": "Y = a OR (b AND c)"
+    },
+    {
+      "id": "b",
+      "text": "Y = a XOR (b OR c)"
+    },
+    {
+      "id": "c",
+      "text": "Y = a AND (b OR c)"
+    },
+    {
+      "id": "d",
+      "text": "Y = a XOR (b XOR c)"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2020-Fall-AM"
+}

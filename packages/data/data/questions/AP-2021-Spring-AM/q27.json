@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Spring-AM-27",
+  "qNo": 27,
+  "text": "W3C で仕様が定義され、矩形や円,直線,文字列などの図形オブジェクトを XML 形式で記述し、Web ページでの図形描画にも使うことができる画像フォーマットはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "OpenGL"
+    },
+    {
+      "id": "b",
+      "text": "PNG"
+    },
+    {
+      "id": "c",
+      "text": "SVG"
+    },
+    {
+      "id": "d",
+      "text": "TIFF"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2021-Spring-AM"
+}

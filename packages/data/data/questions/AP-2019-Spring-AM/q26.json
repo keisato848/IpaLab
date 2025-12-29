@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Spring-AM-26",
+  "qNo": 26,
+  "text": "データベースを記録媒体にどのように格納するかを記述したものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "概念スキーマ"
+    },
+    {
+      "id": "b",
+      "text": "外部スキーマ"
+    },
+    {
+      "id": "c",
+      "text": "サブスキーマ"
+    },
+    {
+      "id": "d",
+      "text": "内部スキーマ"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "AP-2019-Spring-AM"
+}

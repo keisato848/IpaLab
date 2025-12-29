@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Fall-AM-62",
+  "qNo": 62,
+  "text": "物流業務において、10%の物流コストの削減の目標を立てて、図のような業務プロセスの改善活動を実施している。図中のcに相当する活動はどれか。 [図参照]",
+  "options": [
+    {
+      "id": "a",
+      "text": "CSF (Critical Success Factor)の抽出"
+    },
+    {
+      "id": "b",
+      "text": "KGI (Key Goal Indicator)の設定"
+    },
+    {
+      "id": "c",
+      "text": "KPI (Key Performance Indicator)の設定"
+    },
+    {
+      "id": "d",
+      "text": "MBO (Management by Objectives)の導入"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2021-Fall-AM"
+}

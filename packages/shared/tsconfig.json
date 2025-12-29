@@ -1,6 +1,12 @@
 {
     "extends": "@ipa-lab/config/tsconfig.base.json",
     "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "src",
+        "noEmit": false,
+        "declaration": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
         "baseUrl": ".",
         "paths": {
             "@ipa-lab/shared": [

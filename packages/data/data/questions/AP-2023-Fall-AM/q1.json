@@ -1,0 +1,26 @@
+{
+  "id": "AP-2023-Fall-AM-1",
+  "qNo": 1,
+  "text": "2桁の2進数 x1x2 が表す整数を x とする。2進数 x2x1 が表す整数を、x の式で表したものはどれか。ここで、int(r) は非負の実数 r の小数点以下を切り捨てた整数を表す。",
+  "options": [
+    {
+      "id": "a",
+      "text": "2x+4 int(x/2)"
+    },
+    {
+      "id": "b",
+      "text": "2x+5 int(x/2)"
+    },
+    {
+      "id": "c",
+      "text": "2x-3 int(x/2)"
+    },
+    {
+      "id": "d",
+      "text": "2x-4 int(x/2)"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2023-Fall-AM"
+}

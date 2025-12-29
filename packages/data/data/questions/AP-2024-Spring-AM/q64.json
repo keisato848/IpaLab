@@ -1,0 +1,26 @@
+{
+  "id": "AP-2024-Spring-AM-64",
+  "qNo": 64,
+  "text": "IT 投資案件において、投資効果を PBP (Pay Back Period) で評価する。投資額が 500 のとき,期待できるキャッシュインの四つのシナリオ a～d のうち、効果が最も高いものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "a"
+    },
+    {
+      "id": "b",
+      "text": "b"
+    },
+    {
+      "id": "c",
+      "text": "c"
+    },
+    {
+      "id": "d",
+      "text": "d"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "AP-2024-Spring-AM"
+}

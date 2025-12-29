@@ -24,6 +24,5 @@
 | キー                      | 設定値・参照先                             | 用途               |
 | :------------------------ | :----------------------------------------- | :----------------- |
 | `COSMOS_DB_CONNECTION`    | Key Vault参照 (`@Microsoft.KeyVault(...)`) | DB接続文字列       |
-| `ENTRA_ID_B2C_TENANT_ID`  | 設定値                                     | 認証テナントID     |
-| `ENTRA_ID_B2C_CLIENT_ID`  | 設定値                                     | アプリケーションID |
+| `NEXTAUTH_SECRET`         | Key Vault参照                              | 認証トークン検証用 |
 | `BLOB_STORAGE_CONNECTION` | Key Vault参照                              | Blob接続文字列     |

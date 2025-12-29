@@ -1,0 +1,26 @@
+{
+  "id": "AP-2021-Fall-AM-29",
+  "qNo": 29,
+  "text": "“部門別売上”表から、部門コードごと,期ごとの売上を得る SQL 文はどれか。 [表および問合せ結果参照]",
+  "options": [
+    {
+      "id": "a",
+      "text": "SELECT 部門コード、'第1期'AS期,第1期売上 AS 売上 FROM 部門別売上 INTERSECT (SELECT 部門コード、'第2期’AS期,第2期売上 AS 売上 FROM 部門別売上) ORDER BY 部門コード,期"
+    },
+    {
+      "id": "b",
+      "text": "SELECT 部門コード、'第1期’AS期,第1期売上 AS 売上 FROM 部門別売上 UNION (SELECT 部門コード、'第2期’AS期,第2期売上 AS 売上 FROM 部門別売上) ORDER BY 部門コード,期"
+    },
+    {
+      "id": "c",
+      "text": "SELECT A. 部門コード、'第1期'AS期,A.第1期売上 AS 売上 FROM 部門別売上 A CROSS JOIN (SELECT B. 部門コード、'第2期'AS期,B.第2期売上 AS 売上 FROM 部門別売上 B) T ORDER BY 部門コード,期"
+    },
+    {
+      "id": "d",
+      "text": "SELECT A. 部門コード、'第1期'AS期,A.第1期売上 AS 売上 FROM 部門別売上 A INNER JOIN (SELECT B.部門コード,'第2期'AS期,B.第2期売上 AS 売上 FROM 部門別売上 B) T ON A.部門コード = T. 部門コード ORDER BY 部門コード,期"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2021-Fall-AM"
+}

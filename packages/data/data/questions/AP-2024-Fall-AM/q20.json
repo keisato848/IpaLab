@@ -1,0 +1,26 @@
+{
+  "id": "AP-2024-Fall-AM-20",
+  "qNo": 20,
+  "text": "手続型言語のコンパイラがコード生成までに行う処理のうち、最後に行うものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "意味解析"
+    },
+    {
+      "id": "b",
+      "text": "構文解析"
+    },
+    {
+      "id": "c",
+      "text": "最適化"
+    },
+    {
+      "id": "d",
+      "text": "字句解析"
+    }
+  ],
+  "correctOption": "c",
+  "explanation": "",
+  "examId": "AP-2024-Fall-AM"
+}

@@ -4,21 +4,28 @@
     "description": "Azure Functions API",
     "main": "dist/src/functions/*.js",
     "scripts": {
-        "build": "tsc",
+        "build": "tsc && npm run copy-data",
+        "copy-data": "cpx \"../../packages/data/data/questions/**\" dist/data/questions",
         "watch": "tsc -w",
         "clean": "rimraf dist",
         "prestart": "npm run clean && npm run build",
-        "start": "func start",
+        "start": "func start --port 7074",
         "dev": "npm start",
-        "test": "echo \"No tests yet...\""
+        "test": "echo \"No tests yet...\"",
+        "lint": "eslint ."
     },
     "dependencies": {
+        "@azure/cosmos": "^4.9.0",
         "@azure/functions": "^4.0.0",
-        "@ipa-lab/shared": "*"
+        "@ipa-lab/shared": "*",
+        "@types/node": "^25.0.3",
+        "front-matter": "^2.1.0"
     },
     "devDependencies": {
         "@ipa-lab/config": "*",
-        "typescript": "^5.0.0",
-        "rimraf": "^5.0.0"
+        "cpx": "^1.5.0",
+        "eslint": "^8.0.0",
+        "rimraf": "^5.0.0",
+        "typescript": "^5.0.0"
     }
 }

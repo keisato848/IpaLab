@@ -1,0 +1,26 @@
+{
+  "id": "AP-2019-Fall-AM-70",
+  "qNo": 70,
+  "text": "TLO (Technology Licensing Organization)の役割として、適切なものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "TLO自らが研究開発して取得した特許の、企業へのライセンス"
+    },
+    {
+      "id": "b",
+      "text": "企業から大学への委託研究の問合せ及び申込みの受付"
+    },
+    {
+      "id": "c",
+      "text": "新規事業又は市場への参入のための、企業の合併又は買収の支援"
+    },
+    {
+      "id": "d",
+      "text": "大学の研究成果の特許化及び企業への技術移転の促進"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "AP-2019-Fall-AM"
+}
