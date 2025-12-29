@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     transpilePackages: ["@ipa-lab/shared"],
+    output: 'standalone',
     reactStrictMode: true,
     async headers() {
         return [
