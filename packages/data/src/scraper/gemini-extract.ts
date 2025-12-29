@@ -54,6 +54,25 @@ async function waitForActive(file: any) {
     }
 }
 
+
+async function generateWithRetry(promptParts: any[], maxRetries = 5) {
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            return await model.generateContent(promptParts);
+        } catch (error: any) {
+            console.error(`Generation failed (attempt ${i + 1}/${maxRetries}):`, error.message);
+            if (error.status === 429 || error.message?.includes('429')) {
+                console.log("Rate limit hit. Waiting 60s...");
+                await new Promise(r => setTimeout(r, 60000));
+            } else {
+                await new Promise(r => setTimeout(r, 5000));
+            }
+            if (i === maxRetries - 1) throw error;
+        }
+    }
+    throw new Error("Max retries exceeded");
+}
+
 async function extractQuestions(examId: string, rawDir: string, outDir: string) {
     const filePath = path.join(rawDir, `${examId}.pdf`);
     const promptPath = path.resolve(__dirname, '../../../../docs/prompts/gemini_ocr_prompt.md');
@@ -73,7 +92,7 @@ async function extractQuestions(examId: string, rawDir: string, outDir: string) 
         const file = await uploadToGemini(filePath, "application/pdf");
         await waitForActive(file);
 
-        const result = await model.generateContent([
+        const result = await generateWithRetry([
             { fileData: { mimeType: file.mimeType, fileUri: file.uri } },
             { text: promptText }
         ]);
@@ -109,7 +128,7 @@ async function extractAnswers(examId: string, rawDir: string, outDir: string) {
         const file = await uploadToGemini(filePath, "application/pdf");
         await waitForActive(file);
 
-        const result = await model.generateContent([
+        const result = await generateWithRetry([
             { fileData: { mimeType: file.mimeType, fileUri: file.uri } },
             { text: promptText }
         ]);
@@ -142,9 +161,12 @@ async function main() {
 
     const files = await fs.readdir(rawDir);
     // Filter for Question PDFs (exclude -Ans.pdf)
-    const examFiles = files.filter(f => f.endsWith('.pdf') && !f.endsWith('-Ans.pdf'));
+    let examFiles = files.filter(f => f.endsWith('.pdf') && !f.endsWith('-Ans.pdf'));
 
-    console.log(`Found ${examFiles.length} potential exams.`);
+    // Prioritize PM exams (Reverse Alphabetical: PM before AP)
+    examFiles.sort((a, b) => b.localeCompare(a));
+
+    console.log(`Found ${examFiles.length} potential exams. Processing PM first.`);
 
     for (const file of examFiles) {
         const examId = path.basename(file, '.pdf');

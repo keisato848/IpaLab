@@ -28,16 +28,29 @@ async function main() {
                 continue;
             }
 
+
             const questionsRaw = await fs.readFile(questionsPath, 'utf-8');
             const answersRaw = await fs.readFile(answersPath, 'utf-8');
 
             const questions = JSON.parse(questionsRaw);
             const answers = JSON.parse(answersRaw);
 
+            // Load Explanations (Optional)
+            let explanations: any = {};
+            try {
+                const expContent = await fs.readFile(path.join(examDir, 'explanations_raw.json'), 'utf-8');
+                explanations = JSON.parse(expContent);
+            } catch (e) {
+                // Ignore if missing, use empty
+            }
+
             let importedCount = 0;
             for (const q of questions) {
                 const qNo = q.qNo;
                 const correctOption = answers[String(qNo)];
+
+                // Retrieve explanation if available
+                const explanation = explanations[String(qNo)] || "";
 
                 // Construct final object
                 const finalObj = {
@@ -46,8 +59,10 @@ async function main() {
                     text: q.text,
                     options: q.options,
                     correctOption: correctOption || null,
-                    explanation: "",
-                    examId: examId
+                    explanation: explanation,
+                    examId: examId,
+                    category: q.category,
+                    subCategory: q.subCategory
                 };
 
                 // Save as q{No}.json

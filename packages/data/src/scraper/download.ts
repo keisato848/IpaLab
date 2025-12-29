@@ -1,7 +1,7 @@
 import axios from 'axios';
 import fs from 'fs/promises';
 import path from 'path';
-import { AP_EXAM_LIST } from './exam-list';
+import { EXAM_LIST } from './exam-list';
 
 async function downloadExams() {
     console.log("Starting PDF Download...");
@@ -10,12 +10,9 @@ async function downloadExams() {
     const rawDir = path.resolve(__dirname, '../../data/raw_pdfs');
     await fs.mkdir(rawDir, { recursive: true });
 
-    for (const exam of AP_EXAM_LIST) {
-        // Construct ID: AP-YYYY-Term-AM (Spring/Fall -> Spring/Fall)
-        // Adjust existing ID convention if needed.
-        // Existing: AP-2023-Fall-AM
-        // Construct ID: AP-YYYY-Term-Type
-        const examId = `AP-${exam.year}-${exam.term}-${exam.type || 'AM'}`;
+    for (const exam of EXAM_LIST) {
+        // Construct ID: Cat-YYYY-Term-Type (e.g. AP-2023-Fall-AM, PM-2024-Fall-AM2)
+        const examId = `${exam.category}-${exam.year}-${exam.term}-${exam.type}`;
         const fileName = `${examId}.pdf`;
         const filePath = path.join(rawDir, fileName);
 

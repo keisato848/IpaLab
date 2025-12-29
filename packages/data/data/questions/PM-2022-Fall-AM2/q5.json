@@ -1,0 +1,26 @@
+{
+  "id": "PM-2022-Fall-AM2-5",
+  "qNo": 5,
+  "text": "チームの発展段階を五つに区分したタックマンモデルによれば、メンバーの異なる考え方や価値観が明確になり、メンバーがそれぞれの意見を主張し合う段階はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "安定期(Norming)"
+    },
+    {
+      "id": "b",
+      "text": "遂行期 (Performing)"
+    },
+    {
+      "id": "c",
+      "text": "成立期 (Forming)"
+    },
+    {
+      "id": "d",
+      "text": "動乱期(Storming)"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "",
+  "examId": "PM-2022-Fall-AM2"
+}

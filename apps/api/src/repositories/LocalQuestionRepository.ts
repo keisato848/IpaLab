@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { existsSync } from 'fs';
 import path from 'path';
 import fm from 'front-matter';
 import { Question, ExamTypes, OptionSchema } from '@ipa-lab/shared';
@@ -9,10 +10,14 @@ import { Question, ExamTypes, OptionSchema } from '@ipa-lab/shared';
 // Let's protect against path variance.
 
 const findDataRoot = (startPath: string): string => {
-    // Traverse up until we find packages/data
-    // This is a naive implementation, better to use environment variable or fixed relative path if structure is stable.
-    // Given the monorepo structure: root/apps/api/src/repositories
-    // root/packages/data/data
+    // Priority 1: Production (dist/data)
+    // Structure: dist/src/repositories -> dist/data
+    const prodPath = path.resolve(startPath, '../../../data');
+    if (existsSync(prodPath)) {
+        return prodPath;
+    }
+
+    // Priority 2: Monorepo Dev (packages/data/data)
     return path.resolve(startPath, '../../../../../packages/data/data');
 };
 

@@ -33,7 +33,7 @@ jobs:
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: "/apps/web" # App source code path
-          api_location: "" # Api source code path - Optional
+          api_location: "apps/api" # Api source code path - Optional
           output_location: "" # Built app content directory - Optional
           app_build_command: "npx turbo run build --filter=web"
           ###### End of Repository/Build Configurations ######

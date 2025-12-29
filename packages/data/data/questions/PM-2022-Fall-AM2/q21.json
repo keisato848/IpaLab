@@ -1,0 +1,26 @@
+{
+  "id": "PM-2022-Fall-AM2-21",
+  "qNo": 21,
+  "text": "基準値を超える鉛、水銀などの有害物質を電気・電子機器に使用することを制限するために、欧州連合が制定し、施行しているものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "ISO 14001"
+    },
+    {
+      "id": "b",
+      "text": "RoHS指令"
+    },
+    {
+      "id": "c",
+      "text": "WEEE指令"
+    },
+    {
+      "id": "d",
+      "text": "グリーン購入法"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "PM-2022-Fall-AM2"
+}
