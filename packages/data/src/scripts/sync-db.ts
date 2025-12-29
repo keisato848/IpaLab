@@ -23,6 +23,7 @@ for (const envPath of possibleEnvPaths) {
 const CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION || process.env.Values_COSMOS_DB_CONNECTION;
 const DATABASE_NAME = "pm-exam-dx-db";
 const CONTAINER_NAME = "Questions";
+const EXAM_CONTAINER_NAME = "Exams";
 
 const mapOptionToId = (jp: string): string | null => {
     const map: Record<string, string> = { 'ア': 'a', 'イ': 'b', 'ウ': 'c', 'エ': 'd' };
@@ -59,6 +60,7 @@ async function main() {
         console.log("Ensuring Database and Container exist...");
         await client.databases.createIfNotExists({ id: DATABASE_NAME });
         await database.containers.createIfNotExists({ id: CONTAINER_NAME, partitionKey: '/examId' });
+        await database.containers.createIfNotExists({ id: EXAM_CONTAINER_NAME, partitionKey: '/id' });
 
         console.log("Database and Container ensured.");
 
@@ -156,6 +158,38 @@ async function main() {
             for (const item of batch) {
                 await container.items.upsert(item);
             }
+
+            // Sync Exam Metadata
+            // folderName: AP-2024-Spring-AM, etc.
+            // examId (without AM/PM suffix): AP-2024S ? No, user wants Exam List to be "AP-2024-Spring-AM" etc?
+            // LocalExamRepository listed directories as IDs.
+            // Let's create an Exam document for this folder.
+
+            // Re-derive nice title
+            let era = '';
+            const yearNum = parseInt(yearStr);
+            if (yearNum >= 2019) era = `令和${yearNum - 2018}年`;
+            else if (yearNum >= 1989) era = `平成${yearNum - 1988}年`;
+
+            const term = seasonStr === 'S' ? '春期' : '秋期';
+            const typeLabel = type === 'AM1' ? '午前I' : (type === 'AM2' ? '午前II' : (type.startsWith('PM') ? '午後' : type));
+
+            let categoryLabel = '応用情報技術者試験';
+            if (examPrefix === 'PM') categoryLabel = 'プロジェクトマネージャ試験';
+            else if (examPrefix === 'FE') categoryLabel = '基本情報技術者試験';
+
+            const title = `${categoryLabel} ${era} ${term} ${typeLabel}`;
+
+            const examDoc = {
+                id: folderName, // Use folder name as ID to match LocalExamRepository logic
+                title: title,
+                date: `${yearStr}-01-01`, // Approximation
+                category: examPrefix,
+                stats: { total: batch.length, completed: 0, correctRate: 0 }
+            };
+
+            console.log(`Upserting Exam Metadata: ${folderName}`);
+            await database.container(EXAM_CONTAINER_NAME).items.upsert(examDoc);
         }
 
         console.log("Done.");

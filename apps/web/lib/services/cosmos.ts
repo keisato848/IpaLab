@@ -7,7 +7,6 @@ let client: CosmosClient | undefined;
 
 try {
     if (CONNECTION_STRING) {
-        console.log("Initializing Cosmos Client with string length:", CONNECTION_STRING.length);
         const options: any = { endpoint: CONNECTION_STRING };
         if (CONNECTION_STRING.includes("localhost") || CONNECTION_STRING.includes("127.0.0.1") || CONNECTION_STRING.includes("AccountKey")) {
             // Heuristic for Emulator or key-based connection string handling if needed
@@ -16,11 +15,9 @@ try {
             process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
         }
         client = new CosmosClient(CONNECTION_STRING);
-    } else {
-        console.error("COSMOS_DB_CONNECTION is empty or undefined");
     }
 } catch (e) {
-    console.warn("Failed to init Cosmos Client:", e);
+    // console.warn("Failed to init Cosmos Client:", e);
 }
 
 const getDatabase = () => {
@@ -38,6 +35,7 @@ export const containers = {
     get accounts() { return getContainer("Accounts"); },
     get sessions() { return getContainer("Sessions"); },
     get learningRecords() { return getContainer("LearningRecords"); },
+    get exams() { return getContainer("Exams"); },
 };
 
 export const initDatabase = async () => {
@@ -53,6 +51,7 @@ export const initDatabase = async () => {
     await database.containers.createIfNotExists({ id: "Accounts", partitionKey: "/userId" });
     await database.containers.createIfNotExists({ id: "Sessions", partitionKey: "/sessionToken" });
     await database.containers.createIfNotExists({ id: "LearningRecords", partitionKey: "/userId" });
+    await database.containers.createIfNotExists({ id: "Exams", partitionKey: "/id" });
 
     console.log("Database initialized");
 };
