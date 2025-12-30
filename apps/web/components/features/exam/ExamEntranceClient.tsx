@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { guestManager } from '@/lib/guest-manager';
 import { getLearningRecords, LearningRecord, Question } from '@/lib/api';
-import styles from '@/app/(main)/exam/[year]/[type]/page.module.css'; // Import from parent page styles or duplicate/move
+import styles from './ExamEntranceClient.module.css';
 
 interface ExamEntranceClientProps {
     year: string;

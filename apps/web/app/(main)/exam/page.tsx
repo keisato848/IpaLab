@@ -11,14 +11,20 @@ export default function ExamListPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [filter, setFilter] = useState('ALL');
     const [timeFilter, setTimeFilter] = useState('ALL');
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     useEffect(() => {
         async function fetchExams() {
             try {
                 const data = await getExams();
+                console.log('Fetched exams:', data);
+                if (data.length === 0) {
+                    setErrorMsg('データが取得できませんでした (0件)。APIサーバが起動しているか確認してください。');
+                }
                 setExams(data);
             } catch (error) {
                 console.error("Failed to load exams", error);
+                setErrorMsg('取得エラーが発生しました。');
             } finally {
                 setIsLoading(false);
             }
@@ -31,26 +37,13 @@ export default function ExamListPage() {
         let timeMatch = true;
 
         if (timeFilter === 'AM') {
-            timeMatch = e.id.includes('AM') || e.title.includes('午前');
+            timeMatch = e.id.includes('AM') || e.title.includes('\u5348\u524d'); // 午前
         } else if (timeFilter === 'PM') {
-            // Must handle "PM" category prefix vs "PM" time suffix
-            // If it is explicitly AM session, it is not PM time.
-            const isAM = e.id.includes('AM') || e.title.includes('午前');
-            // If it's not AM, and has PM indicator (title or ID suffix)
-            // Note: PM category starts with PM-. We want to avoid matching that prefix as "Time=PM".
-            // We check if it HAS 'PM' but NOT just at start, or if Title has '午後'.
-            const hasPMSign = e.id.includes('PM') || e.title.includes('午後');
-
-            // Refined: 
-            // 1. Must NOT be AM.
-            // 2. Must HAVE '午後' in title OR end with PM/PM1/PM2.
-            // Logic: PM exams usually end with -PM, -PM1, -PM2.
-            // Project Manager exams start with PM-.
-
+            const isAM = e.id.includes('AM') || e.title.includes('\u5348\u524d'); // 午前
             if (isAM) {
                 timeMatch = false;
             } else {
-                timeMatch = e.title.includes('午後') || e.id.endsWith('PM') || e.id.includes('-PM');
+                timeMatch = e.title.includes('\u5348\u5f8c') || e.id.endsWith('PM') || e.id.includes('-PM'); // 午後
             }
         }
         return catMatch && timeMatch;
@@ -93,9 +86,20 @@ export default function ExamListPage() {
             </div>
 
             <div className={styles.grid}>
-                {filteredExams.length === 0 ? (
+                {errorMsg && (
+                    <div style={{ gridColumn: '1/-1', padding: '20px', backgroundColor: '#fee2e2', color: '#dc2626', borderRadius: '8px', marginBottom: '20px' }}>
+                        <strong>エラー:</strong> {errorMsg}<br />
+                        <small>Debug: Loaded {exams.length} exams. Filtered matches: {filteredExams.length}</small>
+                    </div>
+                )}
+
+                {filteredExams.length === 0 && !errorMsg ? (
                     <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
-                        該当する試験区分は見つかりませんでした。
+                        該当する試験区分は見つかりませんでした。<br />
+                        <small>
+                            Loaded: {exams.length} exams. Current Filter: {filter} / {timeFilter} <br />
+                            IDs: {exams.map(e => e.id).join(', ')}
+                        </small>
                     </p>
                 ) : (
                     filteredExams.map((exam) => {
