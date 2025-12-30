@@ -107,10 +107,11 @@ export async function saveLearningRecord(record: LearningRecord): Promise<void> 
     }
 }
 
-export async function getLearningRecords(userId: string, examId?: string): Promise<LearningRecord[]> {
+export async function getLearningRecords(userId: string, examId?: string, questionId?: string): Promise<LearningRecord[]> {
     try {
         const params = new URLSearchParams({ userId });
         if (examId) params.append('examId', examId);
+        if (questionId) params.append('questionId', questionId);
 
         const res = await fetch(`${API_BASE}/learning-records?${params.toString()}`, {
             cache: 'no-store'

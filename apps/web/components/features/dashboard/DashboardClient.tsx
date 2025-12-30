@@ -104,7 +104,7 @@ export default function DashboardClient() {
                 </div>
                 <div className={styles.headerRight}>
                     <div className={styles.dateDisplay}>
-                        {new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })}
+                        {new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' })}
                     </div>
                     <ThemeToggle />
                 </div>
@@ -127,6 +127,22 @@ export default function DashboardClient() {
                         </div>
                     </div>
                     <Link href={quickStartUrl} className={styles.quickStartBtn}>{quickStartLabel}</Link>
+                </section>
+
+                {/* Overall Accuracy Card */}
+                <section className={`${styles.card} ${styles.statusCard}`} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white' }}>
+                    <div className={styles.cardHeader}>
+                        <h3 style={{ color: 'white' }}>通算正答率</h3>
+                        <span className={styles.cardIcon}>📊</span>
+                    </div>
+                    <div className={styles.progressContainer}>
+                        <div style={{ fontSize: '2.5rem', fontWeight: 'bold', textAlign: 'center', margin: '1rem 0' }}>
+                            {records.length > 0 ? Math.round((records.filter(r => r.isCorrect).length / records.length) * 100) : 0}%
+                        </div>
+                        <div style={{ textAlign: 'center', opacity: 0.9 }}>
+                            正解: {records.filter(r => r.isCorrect).length} / 全 {records.length} 問
+                        </div>
+                    </div>
                 </section>
 
                 {/* Heatmap Widget (Replaces placeholders) */}
