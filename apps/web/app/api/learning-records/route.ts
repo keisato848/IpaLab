@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
         const userId = searchParams.get('userId');
         const examId = searchParams.get('examId');
+        const questionId = searchParams.get('questionId');
 
         if (!userId) {
             return NextResponse.json({ error: "userId is required" }, { status: 400 });
@@ -38,6 +39,11 @@ export async function GET(request: NextRequest) {
         if (examId) {
             query += " AND c.examId = @examId";
             parameters.push({ name: "@examId", value: examId });
+        }
+
+        if (questionId) {
+            query += " AND c.questionId = @questionId";
+            parameters.push({ name: "@questionId", value: questionId });
         }
 
         const { resources: records } = await container.items.query({
