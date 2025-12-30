@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { guestManager } from '@/lib/guest-manager';
 import { getLearningRecords, LearningRecord, Question } from '@/lib/api';
-import styles from '@/app/(main)/exam/[year]/[type]/page.module.css'; // Import from parent page styles or duplicate/move
+import styles from './ExamEntranceClient.module.css';
 
 interface ExamEntranceClientProps {
     year: string;
@@ -85,6 +85,14 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
 
     const linkHref = `/exam/${year}/${type}/${nextQNo}?mode=practice`;
 
+    const mockSettings = (() => {
+        if (type === 'AM2') return { time: 40, count: questions.length }; // AM2 is usually 25q, 40min
+        if (type.includes('PM')) return { time: 150, count: questions.length }; // PM is 150min
+        return { time: 150, count: 80 }; // Default AM1
+    })();
+
+    const displayCount = questions.length > 0 ? questions.length : mockSettings.count;
+
     return (
         <div className={styles.container}>
             <div className={styles.breadcrumb}>
@@ -105,7 +113,7 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                     </Link>
                     <Link href={`/exam/${year}/${type}/1?mode=mock`} className={`${styles.btn} ${styles.btnMock}`}>
                         模擬試験モードで開始
-                        <span className={styles.btnSub}>150分 / 80問</span>
+                        <span className={styles.btnSub}>{mockSettings.time}分 / {displayCount}問</span>
                     </Link>
                 </div>
             </header>

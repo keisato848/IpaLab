@@ -1,4 +1,6 @@
+
 import { CosmosClient, Container } from '@azure/cosmos';
+import * as https from 'https';
 
 const CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION || "";
 const DATABASE_NAME = "pm-exam-dx-db";
@@ -7,14 +9,16 @@ let client: CosmosClient | undefined;
 
 try {
     if (CONNECTION_STRING) {
-        const options: any = { endpoint: CONNECTION_STRING };
-        if (CONNECTION_STRING.includes("localhost") || CONNECTION_STRING.includes("127.0.0.1") || CONNECTION_STRING.includes("AccountKey")) {
-            // Heuristic for Emulator or key-based connection string handling if needed
-            // Actually, simply passing the connection string to constructor is usually enough, 
-            // but for Emulator we might need to disable SSL verification node-side.
+        let connStr = CONNECTION_STRING;
+        if (connStr.includes("localhost")) {
+            connStr = connStr.replace("localhost", "127.0.0.1");
             process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
         }
-        client = new CosmosClient(CONNECTION_STRING);
+
+        client = new CosmosClient({
+            connectionString: connStr,
+            agent: new https.Agent({ rejectUnauthorized: false })
+        });
     }
 } catch (e) {
     // console.warn("Failed to init Cosmos Client:", e);

@@ -20,6 +20,61 @@
     color: var(--text-secondary);
 }
 
+.filterContainer {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: var(--bg-secondary);
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.filterSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.filterGroup {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filterLabel {
+    font-weight: bold;
+    color: var(--text-secondary);
+    min-width: 60px;
+}
+
+.filterButtons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filterBtn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-primary); /* Default button bg */
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.filterBtn:hover {
+    background-color: var(--bg-hover, rgba(0,0,0,0.05));
+}
+
+.filterBtnSelected {
+    background-color: var(--accent-color, #0070f3);
+    color: white;
+    border-color: var(--accent-color, #0070f3);
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

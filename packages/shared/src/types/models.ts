@@ -26,6 +26,16 @@ export const OptionSchema = z.object({
     text: z.string(),
 });
 
+export const SubQuestionSchema = z.object({
+    subQNo: z.string(), // "設問1"
+    text: z.string(),
+    subQuestions: z.array(z.object({
+        label: z.string(), // "(1)"
+        text: z.string()
+    })).optional(),
+    choices: z.record(z.string()).optional(),
+});
+
 export const QuestionSchema = z.object({
     id: z.string(), // PK: examId-type-number e.g. "AP-2023S-AM1-01"
     qNo: z.number().int(), // Added for easier lookup
@@ -33,12 +43,16 @@ export const QuestionSchema = z.object({
     type: z.nativeEnum(ExamTypes),
     category: z.string(), // 大分類
     subCategory: z.string().optional(), // 中分類 (Security, Database, etc.)
-    text: z.string(), // Markdown
-    options: z.array(OptionSchema),
-    correctOption: z.string(),
-    explanation: z.string(), // Markdown
+    text: z.string(), // Markdown (Description for PM)
+    options: z.array(OptionSchema).optional(), // Changed to optional
+    correctOption: z.string().optional().nullable(), // Changed to optional/nullable
+    explanation: z.string().optional(), // Markdown
     transcription: z.string().optional(), // 音声読み上げ用テキスト(Future)
     createdAt: z.string().datetime().optional(),
+
+    // PM specific
+    isPM: z.boolean().optional(),
+    subQuestions: z.array(SubQuestionSchema).optional(),
 });
 
 export type Question = z.infer<typeof QuestionSchema>;
