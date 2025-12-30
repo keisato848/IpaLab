@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as glob from 'glob';
 import { CosmosClient } from '@azure/cosmos';
 import * as dotenv from 'dotenv';
+import * as https from 'https';
 
 // Load env vars
 // Try loading from web/api local.settings.json or .env.local
@@ -20,7 +21,9 @@ for (const envPath of possibleEnvPaths) {
     }
 }
 
-const CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION || process.env.Values_COSMOS_DB_CONNECTION;
+let CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION || process.env.Values_COSMOS_DB_CONNECTION;
+// Logic moved inside main()
+
 const DATABASE_NAME = "pm-exam-dx-db";
 const CONTAINER_NAME = "Questions";
 const EXAM_CONTAINER_NAME = "Exams";
@@ -41,6 +44,13 @@ interface ExplanationMap {
     [key: string]: string;
 }
 
+interface RawPMQuestion {
+    qNo: number;
+    theme?: string;
+    description: string;
+    questions: any[];
+}
+
 async function main() {
     if (!CONNECTION_STRING) {
         console.error("Error: COSMOS_DB_CONNECTION environment variable is not set.");
@@ -49,10 +59,32 @@ async function main() {
         process.exit(1);
     }
 
-    console.log(`Connection string found. Length: ${CONNECTION_STRING.length}`);
+    // Determine if we are using Local Emulator
+    const isLocal = CONNECTION_STRING.includes('localhost') || CONNECTION_STRING.includes('127.0.0.1');
+    let finalConnectionString = CONNECTION_STRING;
+    let clientOptions: any = {};
+
+    if (isLocal) {
+        console.log("Detected Local Cosmos DB Emulator.");
+        if (CONNECTION_STRING.includes('localhost')) {
+            finalConnectionString = CONNECTION_STRING.replace('localhost', '127.0.0.1');
+        }
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        clientOptions = {
+            connectionString: finalConnectionString,
+            agent: new https.Agent({ rejectUnauthorized: false })
+        };
+    } else {
+        console.log("Detected Cloud Cosmos DB connection.");
+        clientOptions = {
+            connectionString: finalConnectionString
+        };
+    }
+
+    console.log(`Using Connection String Endpoint: ${finalConnectionString.split(';')[0]}`);
 
     try {
-        const client = new CosmosClient(CONNECTION_STRING);
+        const client = new CosmosClient(clientOptions);
         const database = client.database(DATABASE_NAME);
         const container = database.container(CONTAINER_NAME);
 
@@ -72,11 +104,6 @@ async function main() {
         for (const file of questionFiles) {
             const dir = path.dirname(file);
             const folderName = dir.split(path.sep).pop()!;
-            // Expected format: AP-2024-Spring-AM, PM-2024-Fall-AM2
-
-            // Parse ID
-            // Example: AP-2024-Spring-AM => examId: AP-2024S (System convention?), type: AM1
-            // Example: PM-2024-Fall-AM2 => examId: PM-2024F, type: AM2
 
             let yearStr = "2024";
             let seasonStr = "S";
@@ -94,11 +121,14 @@ async function main() {
                 }
             }
 
-            const examId = `${examPrefix}-${yearStr}${seasonStr}`;
+            const examId = folderName; // Use full folder name (e.g. AP-2024-Spring-PM) as logic ID
+            // const abbreviatedId = `${examPrefix}-${yearStr}${seasonStr}`; // OLD logic
+
             let type = 'AM1';
             if (examTypeRaw.includes('AM2')) type = 'AM2';
             else if (examTypeRaw.includes('PM1')) type = 'PM1';
             else if (examTypeRaw.includes('PM2')) type = 'PM2';
+            else if (folderName.includes('PM')) type = 'PM'; // Fallback for PM folders without numerical suffix
             else type = 'AM1'; // Default
 
             console.log(`Processing ${folderName} -> ExamID: ${examId}, Type: ${type}`);
@@ -106,50 +136,71 @@ async function main() {
             const questionsPath = path.join(dataDir, file);
             const explanationPath = path.join(dataDir, dir, 'explanations_raw.json');
 
-            const questions: RawQuestion[] = JSON.parse(fs.readFileSync(questionsPath, 'utf8'));
+            const fileContent = JSON.parse(fs.readFileSync(questionsPath, 'utf8'));
             let explanations: ExplanationMap = {};
             if (fs.existsSync(explanationPath)) {
                 explanations = JSON.parse(fs.readFileSync(explanationPath, 'utf8'));
             }
+            const batch: any[] = []; // Explicitly typed as any[] for flexibility
 
-            const batch = [];
+            if (Array.isArray(fileContent)) {
+                // AM Logic
+                const questions: RawQuestion[] = fileContent;
+                for (const q of questions) {
+                    const explanation = explanations[q.qNo.toString()] || "";
+                    let correctOption = q.correctOption;
 
-            for (const q of questions) {
-                const explanation = explanations[q.qNo.toString()] || "";
-                let correctOption = q.correctOption;
-
-                // Try to extract correct option from explanation if null
-                if (!correctOption && explanation) {
-                    // Look for patterns like "**正解は「ア：...」" or "**正解は「ア」"
-                    const match = explanation.match(/正解は.*?[「『]([ア-ン])[：』]/);
-                    if (match && match[1]) {
-                        correctOption = mapOptionToId(match[1]);
+                    if (!correctOption && explanation) {
+                        const match = explanation.match(/正解は.*?[「『]([ア-ン])[：』]/);
+                        if (match && match[1]) {
+                            correctOption = mapOptionToId(match[1]);
+                        }
                     }
+
+                    if (!correctOption) {
+                        console.warn(`Warning: No correct option found for ${examId}-${type}-${q.qNo}. Using 'a' as placeholder.`);
+                        correctOption = 'a';
+                    }
+
+                    const id = `${examId}-${type}-${String(q.qNo).padStart(2, '0')}`;
+
+                    const doc = {
+                        id: id,
+                        qNo: q.qNo,
+                        examId: examId,
+                        type: type,
+                        category: 'Technology',
+                        subCategory: 'General',
+                        text: q.text,
+                        options: q.options,
+                        correctOption: correctOption,
+                        explanation: explanation,
+                        createdAt: new Date().toISOString()
+                    };
+                    batch.push(doc);
                 }
+            } else {
+                // PM Logic (Single Object)
+                const pmQ: RawPMQuestion = fileContent;
+                console.log(`Processing PM Question ${pmQ.qNo}...`);
 
-                // Fallback if still null, default to 'a' but mark in log (or skip?)
-                // Schema says string, not nullable. 
-                if (!correctOption) {
-                    console.warn(`Warning: No correct option found for ${examId}-${type}-${q.qNo}. Using 'a' as placeholder.`);
-                    correctOption = 'a';
-                }
-
-                const id = `${examId}-${type}-${String(q.qNo).padStart(2, '0')}`;
-
+                const id = `${examId}-${type}-${String(pmQ.qNo).padStart(2, '0')}`;
                 const doc = {
                     id: id,
-                    qNo: q.qNo,
+                    qNo: pmQ.qNo,
                     examId: examId,
-                    type: type,
+                    type: type, // e.g. PM1
                     category: 'Technology', // Default
-                    subCategory: 'General',
-                    text: q.text,
-                    options: q.options,
-                    correctOption: correctOption,
-                    explanation: explanation,
+                    subCategory: pmQ.theme || 'General',
+                    text: pmQ.description, // Case Study Description
+                    isPM: true,
+                    subQuestions: pmQ.questions,
+                    // Optional/Nulls for AM fields
+                    options: [],
+                    correctOption: null,
+                    explanation: "",
                     createdAt: new Date().toISOString()
                 };
-
                 batch.push(doc);
             }
 
@@ -160,12 +211,6 @@ async function main() {
             }
 
             // Sync Exam Metadata
-            // folderName: AP-2024-Spring-AM, etc.
-            // examId (without AM/PM suffix): AP-2024S ? No, user wants Exam List to be "AP-2024-Spring-AM" etc?
-            // LocalExamRepository listed directories as IDs.
-            // Let's create an Exam document for this folder.
-
-            // Re-derive nice title
             let era = '';
             const yearNum = parseInt(yearStr);
             if (yearNum >= 2019) era = `令和${yearNum - 2018}年`;
@@ -181,9 +226,9 @@ async function main() {
             const title = `${categoryLabel} ${era} ${term} ${typeLabel}`;
 
             const examDoc = {
-                id: folderName, // Use folder name as ID to match LocalExamRepository logic
+                id: folderName,
                 title: title,
-                date: `${yearStr}-01-01`, // Approximation
+                date: `${yearStr}-01-01`,
                 category: examPrefix,
                 stats: { total: batch.length, completed: 0, correctRate: 0 }
             };

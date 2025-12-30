@@ -75,7 +75,10 @@ async function generateWithRetry(promptParts: any[], maxRetries = 5) {
 
 async function extractQuestions(examId: string, rawDir: string, outDir: string) {
     const filePath = path.join(rawDir, `${examId}.pdf`);
-    const promptPath = path.resolve(__dirname, '../../../../docs/prompts/gemini_ocr_prompt.md');
+    const isAfternoon = examId.includes('-PM');
+    const promptPath = isAfternoon
+        ? path.resolve(__dirname, '../../../../docs/prompts/gemini_pm_ocr_prompt.md')
+        : path.resolve(__dirname, '../../../../docs/prompts/gemini_ocr_prompt.md');
 
     try {
         await fs.access(filePath);
@@ -102,6 +105,10 @@ async function extractQuestions(examId: string, rawDir: string, outDir: string) 
         await fs.mkdir(examDir, { recursive: true });
 
         let jsonStr = formatJson(responseText);
+        // PM returns a single object usually, but AM returns an array.
+        // The implementation_plan expects questions_raw.json to be an array for synchronization.
+        // If PM returns a single object (Concept), we might need to wrap it or adapt sync-db.
+        // For now, save raw as returned.
         await fs.writeFile(path.join(examDir, 'questions_raw.json'), jsonStr);
         console.log(`Saved raw Questions to ${path.join(examDir, 'questions_raw.json')}`);
     } catch (e) {
@@ -171,11 +178,8 @@ async function main() {
     for (const file of examFiles) {
         const examId = path.basename(file, '.pdf');
 
-        // Skip if not AM
-        if (!examId.includes('AM')) {
-            // console.log(`Skipping ${examId} (Not AM)`);
-            continue;
-        }
+        // Allow both AM and PM
+        // if (!examId.includes('AM')) { ... } 
 
         console.log(`--- Processing ${examId} ---`);
 

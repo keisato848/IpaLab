@@ -1,32 +1,33 @@
 .container {
     max-width: 1000px;
     margin: 0 auto;
+    color: var(--text-primary);
 }
 
 .breadcrumb {
-    color: #888;
+    color: var(--text-secondary);
     margin-bottom: 1rem;
     font-size: 0.9rem;
 }
 
 .breadcrumb a {
-    color: #555;
+    color: var(--text-secondary);
     text-decoration: none;
 }
 
 .header {
-    background: white;
+    background: var(--bg-secondary);
     padding: 2rem;
     border-radius: 12px;
     margin-bottom: 2rem;
-    border: 1px solid #e1e4e8;
+    border: 1px solid var(--border-color);
     text-align: center;
 }
 
 .header h1 {
     margin-top: 0;
     margin-bottom: 2rem;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .actions {
@@ -60,20 +61,23 @@
 }
 
 .btnPractice {
-    background-color: #0070f3;
+    background-color: var(--accent-color, #0070f3);
     color: white;
 }
 
 .btnMock {
+    background-color: var(--text-primary);
+    /* Use text color for inverse/dark button? Or specific dark color */
     background-color: #333;
-    color: white;
+    /* Keep dark for contrast usually, but specialized */
+    background-color: var(--bg-inverse, #333);
+    color: var(--text-inverse, white);
 }
 
-/* Question List Grid */
 .questionList h2 {
     font-size: 1.2rem;
     margin-bottom: 1rem;
-    color: #444;
+    color: var(--text-secondary);
 }
 
 .grid {
@@ -87,18 +91,18 @@
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    background: white;
-    border: 1px solid #e1e4e8;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     padding: 1rem;
     border-radius: 8px;
     text-decoration: none;
-    color: #555;
+    color: var(--text-secondary);
     min-height: 100px;
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .qItem:hover {
-    border-color: #0070f3;
+    border-color: var(--accent-color, #0070f3);
     color: inherit;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -115,20 +119,22 @@
 .qNo {
     font-weight: 700;
     font-size: 1.1rem;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .qCat {
     font-size: 0.8rem;
-    color: #666;
-    background: #f3f4f6;
+    color: var(--text-secondary);
+    background: var(--bg-primary);
+    /* Light contrast */
     padding: 0.2rem 0.6rem;
     border-radius: 4px;
+    border: 1px solid var(--border-color);
 }
 
 .qSummary {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--text-secondary);
     line-height: 1.5;
     margin: 0;
     display: -webkit-box;
@@ -137,15 +143,15 @@
     overflow: hidden;
 }
 
-/* Status Colors */
+/* Status Colors used? */
 .correct {
-    background-color: #f0fdf4;
-    border-color: #bbf7d0;
-    color: #166534;
+    background-color: rgba(22, 101, 52, 0.1);
+    border-color: rgba(22, 101, 52, 0.2);
+    color: var(--success-color, #166534);
 }
 
 .incorrect {
-    background-color: #fef2f2;
-    border-color: #fecaca;
-    color: #991b1b;
+    background-color: rgba(153, 27, 27, 0.1);
+    border-color: rgba(153, 27, 27, 0.2);
+    color: var(--error-color, #991b1b);
 }
