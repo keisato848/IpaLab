@@ -11,6 +11,9 @@ import { guestManager } from '@/lib/guest-manager';
 import { useSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
 import { getExamLabel } from '@/lib/exam-utils';
+import dynamic from 'next/dynamic';
+
+const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false });
 
 interface QuestionClientProps {
     question: Question;
@@ -61,19 +64,10 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
     const handleOptionClick = async (optionId: string) => {
         if (showExplanation && isPractice) return; // Prevent changing answer after showing explanation
-
-        // If already selected in mock mode, just update selection (no save yet? or save immediately?)
-        // For Mock mode, usually we save at the end, but for safety we might save draft.
-        // For Practice mode, we save immediately upon selection/showing answer.
-
         setSelectedOption(optionId);
-
         if (isPractice) {
             setShowExplanation(true);
             await saveResult(optionId);
-        } else {
-            // Mock Mode: just select, maybe save provisional answer?
-            // Implementing minimal save for now (or maybe Mock mode saves on 'Next'?)
         }
     };
 
@@ -99,7 +93,6 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 await saveLearningRecord(record);
             } catch (e) {
                 console.error("Failed to save to API", e);
-                // Fallback to local? Or verify queue? For now just log.
             }
         } else {
             // Guest -> LocalStorage
@@ -121,6 +114,76 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const typeSuffix = type === 'AM1' ? 'AM' : type;
     const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
     const examLabel = getExamLabel(examId);
+
+    const isPM = question.isPM || type.includes('PM') || (type === 'AM2' && (question.text && question.text.length > 1000 || question.subQuestions && question.subQuestions.length > 0));
+
+    // Custom renderer for ReactMarkdown to handle Mermaid
+    const components = {
+        code({ node, inline, className, children, ...props }: any) {
+            const match = /language-(\w+)/.exec(className || '');
+            if (!inline && match && match[1] === 'mermaid') {
+                return <Mermaid chart={String(children).replace(/\n$/, '')} />;
+            }
+            return !inline && match ? (
+                <code className={className} {...props}>
+                    {children}
+                </code>
+            ) : (
+                <code className={className} {...props}>
+                    {children}
+                </code>
+            );
+        }
+    };
+
+    if (isPM) {
+        return (
+            <div className={styles.container}>
+                <header className={styles.header}>
+                    <div className={styles.examInfo}>
+                        <span className={styles.examBadge}>{type}</span>
+                        <span className={styles.examTitle}>{getExamLabel(year + (type.startsWith('PM') ? '-PM' : '-AM'))} - Q{qNo} (記述式)</span>
+                    </div>
+                    <div className={styles.meta}>
+                        <Link href={`/exam/${year}/${type}`} className={styles.navBtn}>一覧へ戻る</Link>
+                    </div>
+                </header>
+
+                <div className={`${styles.content} flex flex-col lg:flex-row gap-6 p-4`}>
+                    {/* Top/Left: Case Study Description */}
+                    <div className="flex-1 bg-white p-6 rounded shadow overflow-y-auto max-h-[80vh]">
+                        <h2 className="text-xl font-bold mb-4">{question.subCategory || '問題文'}</h2>
+                        <div className={styles.markdownBody}>
+                            <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+                                {question.text}
+                            </ReactMarkdown>
+                        </div>
+                    </div>
+
+                    {/* Bottom/Right: Sub Questions */}
+                    <div className="flex-1 bg-gray-50 p-6 rounded shadow overflow-y-auto max-h-[80vh]">
+                        <h3 className="text-lg font-bold mb-4">設問</h3>
+                        {question.subQuestions?.map((subQ: any, index: number) => (
+                            <div key={index} className="mb-6 border-b pb-4 last:border-0">
+                                <h4 className="font-bold text-md mb-2">{subQ.subQNo}</h4>
+                                <div className="mb-2 text-gray-800">{subQ.text}</div>
+                                {subQ.subQuestions?.map((sq: any, sIdx: number) => (
+                                    <div key={sIdx} className="ml-4 mt-2 p-2 bg-white rounded border">
+                                        <span className="font-semibold mr-2">{sq.label}</span>
+                                        <span>{sq.text}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+
+                        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                            ※ 午後試験は記述式のため、現在は閲覧のみ対応しています。ノート機能などを今後追加予定です。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.container}>
@@ -145,7 +208,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 {/* Left: Question Body */}
                 <div className={styles.questionPanel}>
                     <div className={styles.markdownBody}>
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
                             {question.text}
                         </ReactMarkdown>
                     </div>
@@ -157,7 +220,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 {/* Right: Options & Interaction */}
                 <div className={styles.interactionPanel}>
                     <div className={styles.optionsList}>
-                        {question.options.map((opt) => {
+                        {question.options?.map((opt) => {
                             const isSelected = selectedOption === opt.id;
                             const isCorrect = opt.id === question.correctOption;
 
@@ -189,7 +252,6 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                 >
                                     <span className={styles.optId}>{opt.id}</span>
                                     <span className={styles.optText}>{opt.text}</span>
-                                    {/* Show Icon ONLY in Practice Mode after answer */}
                                     {showExplanation && isPractice && isSelected && (
                                         <span className={styles.resultIcon}>{isCorrect ? '⭕' : '❌'}</span>
                                     )}
@@ -205,7 +267,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                 {selectedOption === question.correctOption ? '正解！' : '不正解...'}
                             </div>
                             <div className={styles.explanationBody}>
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
                                     {question.explanation || '(解説がありません)'}
                                 </ReactMarkdown>
                             </div>
