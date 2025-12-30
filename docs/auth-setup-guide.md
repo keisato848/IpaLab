@@ -10,9 +10,12 @@ Azure Static Web Apps 環境変数に以下の値を設定する必要があり�
 
 **生成コマンド (ターミナルで実行):**
 ```bash
+# Node.js があればどこでも実行可能
+node -e "console.log(require('crypto').randomBytes(33).toString('base64'))"
+
+# または (apps/web ディレクトリに移動してから)
+cd apps/web
 npx auth secret
-# または
-openssl rand -base64 33
 ```
 表示された文字列を `AUTH_SECRET` の値として使用します。
 
@@ -62,4 +65,15 @@ Azure Static Web Apps では自動解決されることが多いですが、明�
 3. 上記で取得したキーと値を全て追加します。
 4. **「保存 (Save)」** をクリックします。
 
+
 設定反映後、ログイン機能が利用可能になります。
+
+## トラブルシューティング
+
+### Q. GitHub で "The redirect_uri is not associated with this application" と表示される
+**原因**: Azure Portal の `AUTH_URL` の設定が誤っている可能性があります。
+**確認**:
+- 誤: `https://cosmos-pm-exam-...documents.azure.com` (Cosmos DBのアドレス)
+- 正: `https://victorious-smoke-...?azurestaticapps.net` (Webアプリのアドレス)
+
+`AUTH_URL` はアプリケーションのトップページのURLを設定してください。
