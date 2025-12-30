@@ -1,7 +1,7 @@
 const isClient = typeof window !== 'undefined';
 // Force relative path to avoid stagnant .env pointing to 3000
-export const API_BASE = isClient ? '/api' : 'http://localhost:3001/api';
-// export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || (isClient ? '/api' : 'http://localhost:3001/api');
+// Use environment variable for API base, fallback to localhost for dev
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || (isClient ? '/api' : 'http://localhost:3001/api');
 
 export interface Question {
     id: string;
