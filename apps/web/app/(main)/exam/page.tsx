@@ -10,14 +10,21 @@ export default function ExamListPage() {
     const [exams, setExams] = useState<Exam[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [filter, setFilter] = useState('ALL');
+    const [timeFilter, setTimeFilter] = useState('ALL');
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     useEffect(() => {
         async function fetchExams() {
             try {
                 const data = await getExams();
+                console.log('Fetched exams:', data);
+                if (data.length === 0) {
+                    setErrorMsg('データが取得できませんでした (0件)。APIサーバが起動しているか確認してください。');
+                }
                 setExams(data);
             } catch (error) {
                 console.error("Failed to load exams", error);
+                setErrorMsg('取得エラーが発生しました。');
             } finally {
                 setIsLoading(false);
             }
@@ -25,9 +32,22 @@ export default function ExamListPage() {
         fetchExams();
     }, []);
 
-    const filteredExams = filter === 'ALL'
-        ? exams
-        : exams.filter(e => e.category === filter);
+    const filteredExams = exams.filter(e => {
+        const catMatch = filter === 'ALL' || e.category === filter;
+        let timeMatch = true;
+
+        if (timeFilter === 'AM') {
+            timeMatch = e.id.includes('AM') || e.title.includes('\u5348\u524d'); // 午前
+        } else if (timeFilter === 'PM') {
+            const isAM = e.id.includes('AM') || e.title.includes('\u5348\u524d'); // 午前
+            if (isAM) {
+                timeMatch = false;
+            } else {
+                timeMatch = e.title.includes('\u5348\u5f8c') || e.id.endsWith('PM') || e.id.includes('-PM'); // 午後
+            }
+        }
+        return catMatch && timeMatch;
+    });
 
     if (isLoading) {
         return <div className={styles.container}><p>読み込み中...</p></div>;
@@ -40,73 +60,53 @@ export default function ExamListPage() {
                 <p className={styles.subtitle}>過去問題を選択して学習を開始しましょう。</p>
             </header>
 
-            <div className={styles.filters} style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
-                <button
-                    onClick={() => setFilter('ALL')}
-                    style={{
-                        padding: '8px 16px',
-                        borderRadius: '20px',
-                        border: '1px solid #ddd',
-                        backgroundColor: filter === 'ALL' ? '#0070f3' : 'white',
-                        color: filter === 'ALL' ? 'white' : '#333',
-                        cursor: 'pointer',
-                        fontWeight: 'bold'
-                    }}
-                >
-                    すべて
-                </button>
-                <button
-                    onClick={() => setFilter('AP')}
-                    style={{
-                        padding: '8px 16px',
-                        borderRadius: '20px',
-                        border: '1px solid #ddd',
-                        backgroundColor: filter === 'AP' ? '#0070f3' : 'white',
-                        color: filter === 'AP' ? 'white' : '#333',
-                        cursor: 'pointer',
-                        fontWeight: 'bold'
-                    }}
-                >
-                    応用情報 (AP)
-                </button>
-                <button
-                    onClick={() => setFilter('PM')}
-                    style={{
-                        padding: '8px 16px',
-                        borderRadius: '20px',
-                        border: '1px solid #ddd',
-                        backgroundColor: filter === 'PM' ? '#0070f3' : 'white',
-                        color: filter === 'PM' ? 'white' : '#333',
-                        cursor: 'pointer',
-                        fontWeight: 'bold'
-                    }}
-                >
-                    プロジェクトマネージャ (PM)
-                </button>
-                <button
-                    onClick={() => setFilter('FE')}
-                    style={{
-                        padding: '8px 16px',
-                        borderRadius: '20px',
-                        border: '1px solid #ddd',
-                        backgroundColor: filter === 'FE' ? '#0070f3' : 'white',
-                        color: filter === 'FE' ? 'white' : '#333',
-                        cursor: 'pointer',
-                        fontWeight: 'bold'
-                    }}
-                >
-                    基本情報 (FE)
-                </button>
+            <div className={styles.filterContainer}>
+                <div className={styles.filterSection}>
+                    {/* Category Filters */}
+                    <div className={styles.filterGroup}>
+                        <span className={styles.filterLabel}>区分:</span>
+                        <div className={styles.filterButtons}>
+                            <button onClick={() => setFilter('ALL')} className={`${styles.filterBtn} ${filter === 'ALL' ? styles.filterBtnSelected : ''}`}>すべて</button>
+                            <button onClick={() => setFilter('AP')} className={`${styles.filterBtn} ${filter === 'AP' ? styles.filterBtnSelected : ''}`}>応用情報 (AP)</button>
+                            <button onClick={() => setFilter('FE')} className={`${styles.filterBtn} ${filter === 'FE' ? styles.filterBtnSelected : ''}`}>基本情報 (FE)</button>
+                            <button onClick={() => setFilter('PM')} className={`${styles.filterBtn} ${filter === 'PM' ? styles.filterBtnSelected : ''}`}>プロマネ (PM)</button>
+                        </div>
+                    </div>
+
+                    {/* Time Filters */}
+                    <div className={styles.filterGroup}>
+                        <span className={styles.filterLabel}>時間帯:</span>
+                        <div className={styles.filterButtons}>
+                            <button onClick={() => setTimeFilter('ALL')} className={`${styles.filterBtn} ${timeFilter === 'ALL' ? styles.filterBtnSelected : ''}`}>すべて</button>
+                            <button onClick={() => setTimeFilter('AM')} className={`${styles.filterBtn} ${timeFilter === 'AM' ? styles.filterBtnSelected : ''}`}>午前 (AM)</button>
+                            <button onClick={() => setTimeFilter('PM')} className={`${styles.filterBtn} ${timeFilter === 'PM' ? styles.filterBtnSelected : ''}`}>午後 (PM)</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div className={styles.grid}>
-                {filteredExams.length === 0 ? (
-                    <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: '#666' }}>
-                        該当する試験区分は見つかりませんでした。
+                {errorMsg && (
+                    <div style={{ gridColumn: '1/-1', padding: '20px', backgroundColor: '#fee2e2', color: '#dc2626', borderRadius: '8px', marginBottom: '20px' }}>
+                        <strong>エラー:</strong> {errorMsg}<br />
+                        <small>Debug: Loaded {exams.length} exams. Filtered matches: {filteredExams.length}</small>
+                    </div>
+                )}
+
+                {filteredExams.length === 0 && !errorMsg ? (
+                    <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+                        該当する試験区分は見つかりませんでした。<br />
+                        <small>
+                            Loaded: {exams.length} exams. Current Filter: {filter} / {timeFilter} <br />
+                            IDs: {exams.map(e => e.id).join(', ')}
+                        </small>
                     </p>
                 ) : (
                     filteredExams.map((exam) => {
-                        const startType = exam.id.endsWith('AM2') ? 'AM2' : 'AM1';
+                        let startType = 'AM1';
+                        if (exam.id.includes('AM2')) startType = 'AM2';
+                        else if (exam.id.includes('PM') && !exam.id.startsWith('PM-')) startType = 'PM';
+
                         return (
                             <Link href={`/exam/${exam.id}/${startType}`} key={exam.id} className={styles.cardLink}>
                                 <article className={styles.card}>

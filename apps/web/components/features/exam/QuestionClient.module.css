@@ -327,3 +327,105 @@
     font-size: 0.85rem;
     color: var(--text-tertiary);
 }
+
+/* PM Mode Styles */
+.pmContainer {
+    height: calc(100vh - 80px);
+    /* Adjust based on navbar/header */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--bg-primary, #f9fafb);
+}
+
+.pmHeader {
+    flex-shrink: 0;
+    margin-bottom: 0;
+    padding: 1.5rem 2rem;
+    background: var(--bg-secondary, #ffffff);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.pmContent {
+    flex: 1;
+    overflow: hidden;
+    padding: 2rem;
+    gap: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+    .pmContent {
+        flex-direction: row;
+    }
+}
+
+.pmPanel {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--bg-secondary, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.pmPanelTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: -2rem;
+    /* Compensate for padding */
+    background: var(--bg-secondary);
+    padding-top: 0.5rem;
+    z-index: 10;
+}
+
+.subQBox {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.subQLabel {
+    font-weight: 600;
+    color: var(--accent-color, #0070f3);
+    margin-bottom: 0.5rem;
+}
+
+.subQText {
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+.memoArea {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    min-height: 80px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.navBtnGroup {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.navBtnDisabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
+}

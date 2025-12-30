@@ -1,4 +1,7 @@
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3000/api';
+const isClient = typeof window !== 'undefined';
+// Force relative path to avoid stagnant .env pointing to 3000
+export const API_BASE = isClient ? '/api' : 'http://localhost:3001/api';
+// export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || (isClient ? '/api' : 'http://localhost:3001/api');
 
 export interface Question {
     id: string;
@@ -10,6 +13,9 @@ export interface Question {
     options: { id: string; text: string }[];
     correctOption: string;
     explanation?: string;
+    // PM specific fields
+    isPM?: boolean;
+    subQuestions?: any[]; // Detailed type can be added if needed
 }
 
 export interface LearningRecord {
