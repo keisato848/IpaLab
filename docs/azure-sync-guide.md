@@ -52,4 +52,21 @@ npm run sync
 
 1. Azure Portal の **Data Explorer** を開きます。
 2. `IpaLabDb` (または設定したDB名) > `Questions` コンテナを選択します。
-3. クエリ `SELECT * FROM c WHERE c.examId = 'AP-2024-Spring-PM'` 等を実行し、データが登録されているか確認します。
+
+## デプロイ後の環境設定 (Azure Static Web Apps)
+
+デプロイされたアプリケーションが Azure Cosmos DB に接続するためには、**Azure Portal 上で環境変数の設定が必要**です。
+設定を行わない場合、APIは `500 Internal Server Error (Cosmos DB not initialized)` を返します。
+
+### 手順
+
+1. [Azure Portal](https://portal.azure.com) にログインします。
+2. デプロイした **Static Web App** リソースを開きます。
+3. サイドメニューの **「設定 (Settings)」** > **「構成 (Configuration)」** を選択します。
+4. **「アプリケーション設定 (Application settings)」** タブで **「+ 追加 (+ Add)」** をクリックします。
+5. 以下の値を入力して追加します：
+    - **Name**: `COSMOS_DB_CONNECTION`
+    - **Value**: (Cosmos DB の接続文字列 - `AccountEndpoint=...` から始まるもの)
+6. **「保存 (Save)」** をクリックして設定を反映させます。
+
+設定反映後、数分待ってからアプリケーションをリロードしてください。
