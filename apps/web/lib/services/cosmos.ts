@@ -7,10 +7,17 @@ let client: CosmosClient | undefined;
 
 try {
     if (CONNECTION_STRING) {
+        const options: any = { endpoint: CONNECTION_STRING };
+        if (CONNECTION_STRING.includes("localhost") || CONNECTION_STRING.includes("127.0.0.1") || CONNECTION_STRING.includes("AccountKey")) {
+            // Heuristic for Emulator or key-based connection string handling if needed
+            // Actually, simply passing the connection string to constructor is usually enough, 
+            // but for Emulator we might need to disable SSL verification node-side.
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        }
         client = new CosmosClient(CONNECTION_STRING);
     }
 } catch (e) {
-    console.warn("Failed to init Cosmos Client:", e);
+    // console.warn("Failed to init Cosmos Client:", e);
 }
 
 const getDatabase = () => {
@@ -28,11 +35,11 @@ export const containers = {
     get accounts() { return getContainer("Accounts"); },
     get sessions() { return getContainer("Sessions"); },
     get learningRecords() { return getContainer("LearningRecords"); },
+    get exams() { return getContainer("Exams"); },
 };
 
 export const initDatabase = async () => {
     if (!client) {
-        console.warn("Skipping DB init: No client");
         return;
     }
     const { database } = await client.databases.createIfNotExists({ id: DATABASE_NAME });
@@ -43,6 +50,5 @@ export const initDatabase = async () => {
     await database.containers.createIfNotExists({ id: "Accounts", partitionKey: "/userId" });
     await database.containers.createIfNotExists({ id: "Sessions", partitionKey: "/sessionToken" });
     await database.containers.createIfNotExists({ id: "LearningRecords", partitionKey: "/userId" });
-
-    console.log("Database initialized");
+    await database.containers.createIfNotExists({ id: "Exams", partitionKey: "/id" });
 };

@@ -1,4 +1,4 @@
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:7074/api';
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3000/api';
 
 export interface Question {
     id: string;
