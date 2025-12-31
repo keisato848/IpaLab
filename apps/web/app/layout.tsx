@@ -12,7 +12,7 @@ export const metadata: Metadata = {
         default: "シカクノ | 情報処理技術者試験 過去問演習プラットフォーム",
         template: "%s | シカクノ"
     },
-    description: "シカクノは、基本情報(FE)、応用情報(AP)、プロジェクトマネージャ(PM)などの情報処理技術者試験の過去問演習を効率化する学習プラットフォームです。学習履歴の分析や模擬試験モードで合格をサポートします。",
+    description: "忙しいエンジニアのための情報処理技術者試験（基本情報・応用情報・PM）最短合格プラットフォーム。学習データを分析し、あなただけの効率的な学習戦略を提供します。",
     authors: [{ name: "Shikaku-No Project" }],
     creator: "Shikaku-No Project",
     openGraph: {
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
         locale: "ja_JP",
         url: siteUrl,
         title: "シカクノ | 情報処理技術者試験 過去問演習プラットフォーム",
-        description: "情報処理技術者試験の過去問演習を効率化。学習履歴分析機能付き。",
+        description: "忙しいエンジニアのための情報処理技術者試験（基本情報・応用情報・PM）最短合格プラットフォーム。",
         siteName: "シカクノ",
         images: [
             {
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     twitter: {
         card: "summary_large_image",
         title: "シカクノ | 情報処理技術者試験 過去問演習プラットフォーム",
-        description: "情報処理技術者試験の過去問演習を効率化。学習履歴分析機能付き。",
+        description: "忙しいエンジニアのための情報処理技術者試験（基本情報・応用情報・PM）最短合格プラットフォーム。",
         // creator: "@twitter_handle", // Optional
     },
     robots: {
