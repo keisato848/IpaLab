@@ -10,6 +10,8 @@
         "parse": "ts-node src/scraper/parse.ts",
         "generate-samples": "ts-node src/scripts/generate-samples.ts",
         "sync": "ts-node src/syncer/index.ts",
+        "sync-db": "ts-node src/scripts/sync-db.ts",
+        "extract": "ts-node src/scripts/run-extract.ts",
         "lint": "eslint . --ext .ts"
     },
     "dependencies": {
