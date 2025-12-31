@@ -1,7 +1,9 @@
 .container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: calc(100dvh - 4rem);
+    /* Subtract PC layout padding (2rem top + 2rem bottom) */
+    /* Better mobile support */
     background-color: var(--bg-primary);
     color: var(--text-primary);
 }
@@ -13,8 +15,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 1.5rem;
+    padding: 0 1rem;
+    /* Reduced padding for mobile */
     flex-shrink: 0;
+}
+
+/* Mobile Helper */
+@media (max-width: 600px) {
+    .mobileHidden {
+        display: none !important;
+    }
 }
 
 .examInfo {
@@ -109,6 +119,11 @@
 }
 
 @media (max-width: 768px) {
+    .container {
+        height: calc(100dvh - 6rem);
+        /* Mobile padding: 5rem top + 1rem bottom */
+    }
+
     .content {
         flex-direction: column;
         overflow-y: auto;
@@ -428,4 +443,97 @@
     cursor: not-allowed;
     background-color: var(--bg-primary);
     color: var(--text-secondary);
+}
+
+/* Header Controls */
+.headerControls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    /* For popup positioning */
+}
+
+.statsContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.statItem {
+    background-color: var(--bg-primary);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+.settingsBtn {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.2rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.settingsBtn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.settingsPopup {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 1rem;
+    min-width: 250px;
+    z-index: 1000;
+    color: var(--text-primary);
+}
+
+.popupHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    font-weight: bold;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.settingRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+    user-select: none;
+}
+
+.popupStats {
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.popupStatRow {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+
+.mobileOnlyStat {
+    display: none;
 }

@@ -1,18 +1,21 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type Theme = 'light' | 'dark';
 
 interface ThemeContextType {
     theme: Theme;
     toggleTheme: () => void;
+    showExamStats: boolean;
+    toggleShowExamStats: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const [theme, setTheme] = useState<Theme>('light');
+    const [showExamStats, setShowExamStats] = useState(true);
 
     useEffect(() => {
         // Init theme from localStorage or system preference
@@ -24,6 +27,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
             setTheme('dark');
             document.documentElement.setAttribute('data-theme', 'dark');
         }
+
+        // Init stats visibility
+        const savedStats = localStorage.getItem('showExamStats');
+        if (savedStats !== null) {
+            setShowExamStats(savedStats === 'true');
+        }
     }, []);
 
     const toggleTheme = () => {
@@ -33,8 +42,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         document.documentElement.setAttribute('data-theme', newTheme);
     };
 
+    const toggleShowExamStats = () => {
+        const newValue = !showExamStats;
+        setShowExamStats(newValue);
+        localStorage.setItem('showExamStats', String(newValue));
+    };
+
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <ThemeContext.Provider value={{ theme, toggleTheme, showExamStats, toggleShowExamStats }}>
             {children}
         </ThemeContext.Provider>
     );
