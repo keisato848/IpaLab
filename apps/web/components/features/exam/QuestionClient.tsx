@@ -9,7 +9,7 @@ import rehypeRaw from 'rehype-raw';
 // @ts-ignore
 import he from 'he';
 import styles from './QuestionClient.module.css';
-import { Question, saveLearningRecord, LearningRecord } from '@/lib/api';
+import { Question, saveLearningRecord, LearningRecord, getLearningRecords } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
 import { useSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
@@ -36,6 +36,11 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const [showExplanation, setShowExplanation] = useState(false);
     const [startTime, setStartTime] = useState<number>(Date.now());
 
+    // Stats State
+    const [sessionStats, setSessionStats] = useState({ total: 0, correct: 0 });
+    const [pastStats, setPastStats] = useState<{ total: number; correct: number } | null>(null);
+    const [examStats, setExamStats] = useState<{ total: number; correct: number } | null>(null);
+
     // Mock Mode Logic
     const isMock = mode === 'mock';
     const [timeLeft, setTimeLeft] = useState(150 * 60); // 150 minutes in seconds
@@ -54,7 +59,38 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         setSelectedOption(null);
         setShowExplanation(false);
         setStartTime(Date.now());
-    }, [question.id]);
+
+        // Fetch Past Stats (Current Question) & Exam Stats (Current Exam)
+        async function fetchStats() {
+            try {
+                const userId = session?.user?.id || guestManager.getGuestId();
+                if (!userId) return;
+
+                // 1. Past Stats for this Question
+                const qRecords = await getLearningRecords(userId, undefined, question.id);
+                if (qRecords.length > 0) {
+                    const correctCount = qRecords.filter(r => r.isCorrect).length;
+                    setPastStats({ total: qRecords.length, correct: correctCount });
+                } else {
+                    setPastStats(null);
+                }
+
+                // 2. Cumulative Stats for this Exam (All records for this examId)
+                const eRecords = await getLearningRecords(userId, question.examId);
+                // Note: If backend limits to 10, this is "Recent 10 Stats"
+                if (eRecords.length > 0) {
+                    const eCorrect = eRecords.filter(r => r.isCorrect).length;
+                    setExamStats({ total: eRecords.length, correct: eCorrect });
+                } else {
+                    setExamStats(null);
+                }
+
+            } catch (e) {
+                console.error("Failed to fetch stats", e);
+            }
+        }
+        fetchStats();
+    }, [question.id, question.examId, session]);
 
     const formatTime = (seconds: number) => {
         const h = Math.floor(seconds / 3600);
@@ -101,6 +137,22 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             // Guest -> LocalStorage
             guestManager.saveHistory(record);
         }
+
+        // Update Session Stats
+        setSessionStats(prev => ({
+            total: prev.total + 1,
+            correct: prev.correct + (isCorrect ? 1 : 0)
+        }));
+
+        // Update Exam Stats (Optimistic)
+        setExamStats(prev => {
+            const currentTotal = prev?.total || 0;
+            const currentCorrect = prev?.correct || 0;
+            return {
+                total: currentTotal + 1,
+                correct: currentCorrect + (isCorrect ? 1 : 0)
+            };
+        });
     };
 
     const handleNext = () => {
@@ -248,10 +300,41 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     <span className={styles.examBadge}>{type}</span>
                     <span className={styles.examTitle}>{examLabel} - Q{qNo}</span>
                 </div>
+
+                {/* Progress Bar for Practice Mode */}
+                {isPractice && (
+                    <div style={{ flex: 1, margin: '0 2rem', maxWidth: '300px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#64748b', marginBottom: '4px' }}>
+                            <span>Progress</span>
+                            <span>{qNo} / {totalQuestions}</span>
+                        </div>
+                        <div style={{ width: '100%', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div
+                                style={{
+                                    width: `${(parseInt(qNo) / totalQuestions) * 100}%`,
+                                    height: '100%',
+                                    background: '#3b82f6',
+                                    transition: 'width 0.3s ease'
+                                }}
+                            />
+                        </div>
+                    </div>
+                )}
+
                 <div className={styles.meta}>
                     <span className={`${styles.modeBadge} ${isMock ? styles.mockBadge : ''}`}>
                         {isPractice ? '練習モード' : '模擬試験モード'}
                     </span>
+                    {isPractice && sessionStats.total > 0 && (
+                        <span className={styles.modeBadge} style={{ background: '#e0f2fe', color: '#0369a1', marginLeft: '0.5rem' }}>
+                            今回: {Math.round((sessionStats.correct / sessionStats.total) * 100)}% ({sessionStats.correct}/{sessionStats.total})
+                        </span>
+                    )}
+                    {isPractice && examStats && examStats.total > 0 && (
+                        <span className={styles.modeBadge} style={{ background: '#f0fdf4', color: '#166534', marginLeft: '0.5rem' }}>
+                            通算: {Math.round((examStats.correct / examStats.total) * 100)}% ({examStats.correct}/{examStats.total})
+                        </span>
+                    )}
                     {isMock && (
                         <span className={styles.timer}>
                             ⏳ {formatTime(timeLeft)}
@@ -270,6 +353,11 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     </div>
                     <div className={styles.sourceParams}>
                         出典：{examLabel} 問{qNo}
+                        {pastStats && (
+                            <span style={{ marginLeft: '1rem', color: '#666', fontSize: '0.9em' }}>
+                                (過去の正答率: {Math.round((pastStats.correct / pastStats.total) * 100)}% - {pastStats.correct}/{pastStats.total}回)
+                            </span>
+                        )}
                     </div>
                 </div>
 

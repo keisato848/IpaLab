@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
         const userId = searchParams.get('userId');
         const examId = searchParams.get('examId');
+        const questionId = searchParams.get('questionId');
 
         if (!userId) {
             return NextResponse.json({ error: "userId is required" }, { status: 400 });
@@ -38,6 +39,11 @@ export async function GET(request: NextRequest) {
         if (examId) {
             query += " AND c.examId = @examId";
             parameters.push({ name: "@examId", value: examId });
+        }
+
+        if (questionId) {
+            query += " AND c.questionId = @questionId";
+            parameters.push({ name: "@questionId", value: questionId });
         }
 
         const { resources: records } = await container.items.query({
@@ -95,6 +101,30 @@ export async function POST(request: NextRequest) {
             if (!record.answeredAt) record.answeredAt = new Date().toISOString();
 
             const { resource } = await container.items.create(record);
+
+            // Cleanup: Keep only last 10 records per exam
+            try {
+                const query = "SELECT c.id, c.userId FROM c WHERE c.userId = @userId AND c.examId = @examId ORDER BY c.answeredAt DESC";
+                const { resources: allRecords } = await container.items.query({
+                    query,
+                    parameters: [
+                        { name: "@userId", value: record.userId },
+                        { name: "@examId", value: record.examId }
+                    ]
+                }).fetchAll();
+
+                if (allRecords.length > 10) {
+                    const recordsToDelete = allRecords.slice(10);
+                    // Use Promise.all for faster deletion
+                    await Promise.all(recordsToDelete.map(r =>
+                        container.item(r.id, r.userId).delete()
+                    ));
+                    // console.log(`Cleaned up ${recordsToDelete.length} old records for ${record.examId}`);
+                }
+            } catch (cleanupError) {
+                console.error("Failed to cleanup old records:", cleanupError);
+            }
+
             return NextResponse.json(resource, { status: 201 });
         }
 

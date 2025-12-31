@@ -104,7 +104,7 @@ export default function DashboardClient() {
                 </div>
                 <div className={styles.headerRight}>
                     <div className={styles.dateDisplay}>
-                        {new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })}
+                        {new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' })}
                     </div>
                     <ThemeToggle />
                 </div>
@@ -127,6 +127,51 @@ export default function DashboardClient() {
                         </div>
                     </div>
                     <Link href={quickStartUrl} className={styles.quickStartBtn}>{quickStartLabel}</Link>
+                </section>
+
+                {/* Overall Accuracy Card */}
+                <section className={`${styles.card} ${styles.statusCard}`} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white' }}>
+                    <div className={styles.cardHeader}>
+                        <h3 style={{ color: 'white' }}>通算正答率</h3>
+                        <span className={styles.cardIcon}>📊</span>
+                    </div>
+                    <div className={styles.progressContainer} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2rem', padding: '0.5rem 0' }}>
+                        {/* Donut Chart - Compact Size */}
+                        <div style={{ position: 'relative', width: '80px', height: '80px' }}>
+                            <svg width="80" height="80" viewBox="0 0 100 100">
+                                <circle
+                                    cx="50"
+                                    cy="50"
+                                    r="40"
+                                    fill="transparent"
+                                    stroke="rgba(255,255,255,0.2)"
+                                    strokeWidth="12"
+                                />
+                                <circle
+                                    cx="50"
+                                    cy="50"
+                                    r="40"
+                                    fill="transparent"
+                                    stroke="white"
+                                    strokeWidth="12"
+                                    strokeDasharray={`${2 * Math.PI * 40}`}
+                                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - (records.length > 0 ? (records.filter(r => r.isCorrect).length / records.length) : 0))}`}
+                                    strokeLinecap="round"
+                                    transform="rotate(-90 50 50)"
+                                />
+                            </svg>
+                            <div style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                {records.length > 0 ? Math.round((records.filter(r => r.isCorrect).length / records.length) * 100) : 0}%
+                            </div>
+                        </div>
+
+                        <div style={{ textAlign: 'left' }}>
+                            <div style={{ fontSize: '0.85rem', opacity: 0.9, marginBottom: '0.2rem' }}>正解数</div>
+                            <div style={{ fontSize: '1.4rem', fontWeight: 'bold', lineHeight: 1 }}>
+                                {records.filter(r => r.isCorrect).length} <span style={{ fontSize: '0.9rem', fontWeight: 'normal', opacity: 0.8 }}>/ {records.length}</span>
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 {/* Heatmap Widget (Replaces placeholders) */}
