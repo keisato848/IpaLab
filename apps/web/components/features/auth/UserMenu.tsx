@@ -2,6 +2,7 @@
 
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 import styles from './UserMenu.module.css';
 
@@ -27,7 +28,13 @@ export function UserMenu() {
     return (
         <div className={styles.user}>
             {session.user?.image ? (
-                <img src={session.user.image} alt="User Avatar" className={styles.avatarImage} />
+                <Image
+                    src={session.user.image}
+                    alt="User Avatar"
+                    width={40}
+                    height={40}
+                    className={styles.avatarImage}
+                />
             ) : (
                 <FaUserCircle className={styles.avatarIcon} />
             )}

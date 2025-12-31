@@ -2,6 +2,18 @@
 const nextConfig = {
     transpilePackages: ["@ipa-lab/shared"],
     reactStrictMode: true,
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'lh3.googleusercontent.com', // Google
+            },
+            {
+                protocol: 'https',
+                hostname: 'avatars.githubusercontent.com', // GitHub
+            },
+        ],
+    },
     async headers() {
         return [
             {
