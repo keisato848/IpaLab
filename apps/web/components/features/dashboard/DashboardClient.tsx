@@ -135,12 +135,41 @@ export default function DashboardClient() {
                         <h3 style={{ color: 'white' }}>通算正答率</h3>
                         <span className={styles.cardIcon}>📊</span>
                     </div>
-                    <div className={styles.progressContainer}>
-                        <div style={{ fontSize: '2.5rem', fontWeight: 'bold', textAlign: 'center', margin: '1rem 0' }}>
-                            {records.length > 0 ? Math.round((records.filter(r => r.isCorrect).length / records.length) * 100) : 0}%
+                    <div className={styles.progressContainer} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}>
+                        {/* Donut Chart */}
+                        <div style={{ position: 'relative', width: '100px', height: '100px' }}>
+                            <svg width="100" height="100" viewBox="0 0 100 100">
+                                <circle
+                                    cx="50"
+                                    cy="50"
+                                    r="40"
+                                    fill="transparent"
+                                    stroke="rgba(255,255,255,0.2)"
+                                    strokeWidth="10"
+                                />
+                                <circle
+                                    cx="50"
+                                    cy="50"
+                                    r="40"
+                                    fill="transparent"
+                                    stroke="white"
+                                    strokeWidth="10"
+                                    strokeDasharray={`${2 * Math.PI * 40}`}
+                                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - (records.length > 0 ? (records.filter(r => r.isCorrect).length / records.length) : 0))}`}
+                                    strokeLinecap="round"
+                                    transform="rotate(-90 50 50)"
+                                />
+                            </svg>
+                            <div style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 'bold' }}>
+                                {records.length > 0 ? Math.round((records.filter(r => r.isCorrect).length / records.length) * 100) : 0}%
+                            </div>
                         </div>
-                        <div style={{ textAlign: 'center', opacity: 0.9 }}>
-                            正解: {records.filter(r => r.isCorrect).length} / 全 {records.length} 問
+
+                        <div style={{ textAlign: 'left' }}>
+                            <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>正解数</div>
+                            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>
+                                {records.filter(r => r.isCorrect).length} <span style={{ fontSize: '1rem', fontWeight: 'normal' }}>/ {records.length}</span>
+                            </div>
                         </div>
                     </div>
                 </section>
