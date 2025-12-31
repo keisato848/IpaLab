@@ -18,6 +18,11 @@ import { getExamLabel } from '@/lib/exam-utils';
 import dynamic from 'next/dynamic';
 
 const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false });
+// ... imports
+import ExamSummary from './ExamSummary';
+import AIAnswerBox from './AIAnswerBox';
+
+
 
 interface QuestionClientProps {
     question: Question;
@@ -44,6 +49,8 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const [sessionStats, setSessionStats] = useState({ total: 0, correct: 0 });
     const [pastStats, setPastStats] = useState<{ total: number; correct: number } | null>(null);
     const [examStats, setExamStats] = useState<{ total: number; correct: number } | null>(null);
+    const [allExamRecords, setAllExamRecords] = useState<LearningRecord[]>([]);
+
 
     // Mock Mode Logic
     const isMock = mode === 'mock';
@@ -57,6 +64,55 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         }, 1000);
         return () => clearInterval(timer);
     }, [isMock]);
+
+    // AI Score Persistence State
+    const [descriptiveHistory, setDescriptiveHistory] = useState<Record<string, { answer: string; result: any }>>({});
+
+    // Load history on mount or question change
+    useEffect(() => {
+        if (!session?.user?.id) return;
+
+        // Fetch records for this exam to populate history
+        async function fetchHistory() {
+            try {
+                const userId = session?.user?.id || guestManager.getGuestId();
+                if (!userId) return;
+
+                const records = await getLearningRecords(userId, question.examId);
+                const historyMap: Record<string, { answer: string; result: any }> = {};
+
+                records.forEach(r => {
+                    if (r.isDescriptive && r.userAnswer && r.questionId) {
+                        // Map by questionId (need to ensure questionId matches sub-question ID generation logic)
+                        // Current logic uses constructed IDs for sub-questions? 
+                        // Wait, sub-questions don't have unique IDs in the raw data usually, unless we construct them.
+                        // For saving, we need a consistent ID strategy.
+                        // Let's assume we construct ID as `${question.id}-${subQIndex}-${sqIndex}` if needed, or just match by exact logic?
+                        // The API expects `questionId`.
+                        // Using the unique ID stored in record.
+                        historyMap[r.questionId] = {
+                            answer: r.userAnswer,
+                            result: {
+                                score: r.aiScore || 0,
+                                radarChartData: r.aiRadarData || [],
+                                feedback: r.aiFeedback || '',
+                                mermaidDiagram: undefined, // Not typically saved/needed to restore immediately? Or save it? Schema has no mermaid field yet?
+                                // Wait, schema didn't have mermaidDiagram string.
+                                // If we want to restore mermaid, we need to save it or regenerate it?
+                                // User req didn't explicitly ask for mermaid persistence, but "CLKS data structure".
+                                // I'll skip mermaid restoration for now or mock it if needed.
+                                // Update: I can add mermaid to schema if I want, but I'll stick to requested fields.
+                            }
+                        };
+                    }
+                });
+                setDescriptiveHistory(historyMap);
+            } catch (e) {
+                console.error("Failed to load history", e);
+            }
+        }
+        fetchHistory();
+    }, [question.id, session?.user?.id, question.examId]);
 
     // Reset state when question changes
     useEffect(() => {
@@ -81,29 +137,21 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
                 // 2. Cumulative Stats for this Exam (All records for this examId)
                 const eRecords = await getLearningRecords(userId, question.examId);
-                // Note: If backend limits to 10, this is "Recent 10 Stats"
                 if (eRecords.length > 0) {
-                    const eCorrect = eRecords.filter(r => r.isCorrect).length;
-                    setExamStats({ total: eRecords.length, correct: eCorrect });
-
-                    // 3. Session Stats (Approximate for now: records answered TODAY or very recently for this exam)
-                    // Since we don't have a session ID, we can filter by "answeredAt" > session start time?
-                    // Or, simpler: Just show the Total Correct Rate as "Session" isn't strictly tracked across pages yet.
-                    // A better proxy for "Session" in this context might be "This attempt" if we had one.
-                    // For now, let's treat "Session Stats" as "Stats for this Exam ID" but only from the *current sequence*?
-                    // Actually, the user expects "Progress 6/25" (question count) vs "Correct 5/6" (accuracy).
-                    // If we can't persist session state across router.push, we need to re-fetch "today's records for this exam".
-
+                    setAllExamRecords(eRecords);
+                    // Session Stats (Today's records)
                     const today = new Date().toISOString().split('T')[0];
                     const todaysRecords = eRecords.filter(r => r.answeredAt.startsWith(today));
                     if (todaysRecords.length > 0) {
                         const sCorrect = todaysRecords.filter(r => r.isCorrect).length;
                         setSessionStats({ total: todaysRecords.length, correct: sCorrect });
                     }
+
+                    const eCorrect = eRecords.filter(r => r.isCorrect).length;
+                    setExamStats({ total: eRecords.length, correct: eCorrect });
                 } else {
                     setExamStats(null);
                 }
-
             } catch (e) {
                 console.error("Failed to fetch stats", e);
             }
@@ -119,6 +167,53 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     };
 
     const isPractice = mode === 'practice';
+
+    const getSubQId = (baseId: string, idx: number, subIdx?: number) => {
+        return `${baseId}-${idx}${subIdx !== undefined ? `-${subIdx}` : ''}`;
+    };
+
+    const handleSaveAIScore = async (data: { answer: string; result: any }, subQIdx: number, subSubIdx?: number) => {
+        const qId = getSubQId(question.id, subQIdx, subSubIdx);
+        const record: LearningRecord = {
+            id: uuidv4(),
+            userId: session?.user?.id || guestManager.getGuestId() || 'anonymous',
+            questionId: qId,
+            examId: question.examId,
+            category: question.category,
+            subCategory: question.subCategory,
+            isDescriptive: true,
+            userAnswer: data.answer,
+            aiScore: data.result.score,
+            aiFeedback: data.result.feedback,
+            aiRadarData: data.result.radarChartData,
+            isCorrect: (data.result.score || 0) >= 60,
+            answeredAt: new Date().toISOString(),
+            timeTakenSeconds: 0,
+        };
+
+        try {
+            if (session?.user?.id) {
+                await saveLearningRecord(record);
+            } else {
+                guestManager.saveHistory(record);
+            }
+
+            // Update History State
+            setDescriptiveHistory(prev => ({
+                ...prev,
+                [qId]: { answer: data.answer, result: data.result }
+            }));
+
+            // Update All Records for Summary
+            setAllExamRecords(prev => {
+                const filtered = prev.filter(r => r.questionId !== qId);
+                return [...filtered, record];
+            });
+
+        } catch (e) {
+            console.error("Failed to save AI score", e);
+        }
+    };
 
     const handleOptionClick = async (optionId: string) => {
         if (showExplanation && isPractice) return; // Prevent changing answer after showing explanation
@@ -146,14 +241,12 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         };
 
         if (session) {
-            // Logged in user -> API
             try {
                 await saveLearningRecord(record);
             } catch (e) {
                 console.error("Failed to save to API", e);
             }
         } else {
-            // Guest -> LocalStorage
             guestManager.saveHistory(record);
         }
 
@@ -196,11 +289,11 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         code({ node, inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || '');
             if (!inline && match && match[1] === 'mermaid') {
-                // Decode HTML entities that might have been escaped by rehype-raw
-                // Mermaid needs raw characters like (>), (<), (&)
                 const rawChildren = String(children);
-                const chartContent = he.decode(rawChildren).replace(/\n$/, '');
-
+                let chartContent = he.decode(rawChildren).replace(/\n$/, '');
+                // Hotfix for common invalid mermaid syntax in datasets
+                // 1. Comment out "note:" lines that aren't valid formatting
+                chartContent = chartContent.replace(/(\n\s*)note:/gi, '$1%% note:');
                 return <Mermaid chart={chartContent} />;
             }
             return !inline && match ? (
@@ -218,121 +311,96 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     // PM Mode State
     const [currentSubQIndex, setCurrentSubQIndex] = useState(0);
 
+    // Flatten subQuestions if nested, or use direct list.
+    const subQs = question.subQuestions || [];
+    const currentSubQ = subQs[currentSubQIndex];
+
+    const handleSubNext = () => {
+        if (currentSubQIndex < subQs.length - 1) {
+            setCurrentSubQIndex(prev => prev + 1);
+        }
+    };
+
+    const handleSubPrev = () => {
+        if (currentSubQIndex > 0) {
+            setCurrentSubQIndex(prev => prev - 1);
+        }
+    };
+
     if (isPM) {
-        // Flatten subQuestions if nested, or use direct list.
-        // Data structure seems to be: question.subQuestions = [ { subQNo: '設問1', text: '...', subQuestions: [...] }, ... ]
-        const subQs = question.subQuestions || [];
-        const currentSubQ = subQs[currentSubQIndex];
-
-        const handleSubNext = () => {
-            if (currentSubQIndex < subQs.length - 1) {
-                setCurrentSubQIndex(prev => prev + 1);
-            }
-        };
-
-        const handleSubPrev = () => {
-            if (currentSubQIndex > 0) {
-                setCurrentSubQIndex(prev => prev - 1);
-            }
-        };
-
         return (
-            <div className={styles.pmContainer}>
-                <header className={styles.pmHeader}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                        <div className={styles.examInfo}>
-                            <span className={`${styles.examBadge} ${styles.mobileHidden}`}>{type}</span>
-                            <span className={styles.examTitle}>
-                                <span className={styles.mobileHidden}>{getExamLabel(year + (type.startsWith('PM') ? '-PM' : '-AM'))} - </span>
-                                Q{qNo} (記述)
-                            </span>
-                        </div>
-                        {/* Progress Bar for PM Mode (Reused logic or simplified) */}
-                        <div style={{ flex: 1, margin: '0 1rem', maxWidth: '150px' }} className={styles.mobileHidden}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#64748b' }}>
-                                <span>設問 {currentSubQIndex + 1}/{subQs.length}</span>
-                            </div>
-                            <div style={{ width: '100%', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
-                                <div
-                                    style={{
-                                        width: `${((currentSubQIndex + 1) / subQs.length) * 100}%`,
-                                        height: '100%',
-                                        background: '#3b82f6',
-                                        transition: 'width 0.3s ease'
-                                    }}
-                                />
-                            </div>
-                        </div>
+            <div className={styles.container}>
+                <ExamSummary
+                    records={allExamRecords}
+                    questions={[question]}
+                    title="現在の設問（ケーススタディ）のスコア状況"
+                />
+
+                <header className={styles.header}>
+                    <div className={styles.examInfo}>
+                        <span className={styles.examBadge}>{type}</span>
+                        <span className={styles.examTitle}>{examLabel} - Q{qNo} (記述)</span>
                     </div>
                 </header>
 
-                <div className={styles.pmContent}>
-                    {/* Top/Left: Case Study Description */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginTop: '1rem' }}>
+                    {/* Left Panel: Question Text */}
                     <div className={styles.pmPanel}>
-                        <h2 className={styles.pmPanelTitle}>{question.subCategory || '問題文'}</h2>
+                        <h2 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '1rem', borderBottom: '2px solid #eee', paddingBottom: '0.5rem' }}>
+                            {question.subCategory || '問題文'}
+                        </h2>
                         <div className={styles.markdownBody}>
-                            {/* @ts-ignore */}
-                            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
+                            <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
                                 {question.text}
                             </ReactMarkdown>
                         </div>
                     </div>
 
-                    {/* Bottom/Right: Sub Questions (Stepper View) */}
+                    {/* Right Panel: Sub Questions */}
                     <div className={styles.pmPanel}>
                         {currentSubQ ? (
                             <div>
-                                <h3 className={styles.pmPanelTitle}>
+                                <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
                                     {currentSubQ.subQNo || `設問 ${currentSubQIndex + 1}`}
                                 </h3>
-                                <div className={styles.subQText} style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>
+                                <div style={{ marginBottom: '1.5rem', fontSize: '1rem', lineHeight: '1.6' }}>
                                     {currentSubQ.text}
                                 </div>
-                                {currentSubQ.subQuestions?.map((sq: any, sIdx: number) => (
-                                    <div key={sIdx} className={styles.subQBox}>
-                                        <div className={styles.subQLabel}>{sq.label}</div>
-                                        <div className={styles.subQText}>{sq.text}</div>
-                                        <textarea
-                                            className={styles.memoArea}
-                                            rows={3}
-                                            placeholder="回答メモ（一時保存用）"
-                                        />
-                                    </div>
-                                ))}
+                                <AIAnswerBox
+                                    questionText={`${question.text}\n\n${currentSubQ.text}`}
+                                    modelAnswer=""
+                                    initialAnswer={descriptiveHistory[getSubQId(question.id, currentSubQIndex)]?.answer}
+                                    initialResult={descriptiveHistory[getSubQId(question.id, currentSubQIndex)]?.result}
+                                    onSave={(data) => handleSaveAIScore(data, currentSubQIndex)}
+                                />
                             </div>
                         ) : (
-                            <div className="text-center text-gray-500 mt-10">設問データがありません</div>
+                            <div>設問データがありません</div>
                         )}
-
-                        <div style={{ marginTop: '2rem', padding: '1rem', background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '8px', color: '#92400e', fontSize: '0.9rem' }}>
-                            ※ 午後試験モード: 現在は閲覧とメモ書きのみ対応しています。
-                        </div>
                     </div>
                 </div>
 
-                {/* PM Mode Footer */}
-                <footer className={styles.footer}>
-                    <Link href={`/exam/${year}/${type}`} className={styles.navBtn}>一覧へ戻る</Link>
-                    <div className={styles.navBtnGroup}>
-                        <button
-                            onClick={handleSubPrev}
-                            disabled={currentSubQIndex === 0}
-                            className={`${styles.navBtn} ${currentSubQIndex === 0 ? styles.navBtnDisabled : ''}`}
-                            style={{ marginRight: '0.5rem' }}
-                        >
-                            &larr; 前の設問
-                        </button>
-                        <span style={{ fontWeight: 'bold', minWidth: '60px', textAlign: 'center', fontSize: '0.9rem' }} className={styles.mobileHidden}>
-                            {currentSubQIndex + 1} / {subQs.length}
-                        </span>
-                        <button
-                            onClick={handleSubNext}
-                            disabled={currentSubQIndex === subQs.length - 1}
-                            className={`${styles.navBtn} ${currentSubQIndex === subQs.length - 1 ? styles.navBtnDisabled : ''}`}
-                        >
-                            次の設問 &rarr;
-                        </button>
-                    </div>
+                <footer className={styles.footer} style={{ marginTop: '2rem' }}>
+                    <button
+                        className={styles.navBtn}
+                        onClick={handleSubPrev}
+                        disabled={currentSubQIndex === 0}
+                    >
+                        前の設問
+                    </button>
+                    <span style={{ margin: '0 1rem', fontWeight: 'bold' }}>
+                        {currentSubQIndex + 1} / {subQs.length}
+                    </span>
+                    <button
+                        className={styles.navBtn}
+                        onClick={handleSubNext}
+                        disabled={currentSubQIndex === subQs.length - 1}
+                    >
+                        次の設問
+                    </button>
+                    <Link href={`/exam/${year}/${type}`} className={styles.navBtn} style={{ marginLeft: 'auto' }}>
+                        一覧へ戻る
+                    </Link>
                 </footer>
             </div >
         );
@@ -529,3 +597,5 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         </div>
     );
 }
+
+

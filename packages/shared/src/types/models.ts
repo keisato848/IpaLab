@@ -31,7 +31,8 @@ export const SubQuestionSchema = z.object({
     text: z.string(),
     subQuestions: z.array(z.object({
         label: z.string(), // "(1)"
-        text: z.string()
+        text: z.string(),
+        point: z.number().optional(), // Added for Scoring
     })).optional(),
     choices: z.record(z.string()).optional(),
 });
