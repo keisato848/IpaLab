@@ -14,6 +14,12 @@ The exam text is rich in diagrams (Flowcharts, ER Diagrams, Sequence Diagrams, N
 - **Class Diagrams**: Use `classDiagram`.
 - **State Diagrams**: Use `stateDiagram-v2`.
 
+## Key Requirement: Explanations
+For each sub-question, you MUST generate a **beginner-friendly explanation** ("解説").
+- **Visuals**: Use **Mermaid diagrams** in the explanation to illustrate complex logic, processes, or data flows found in the problem.
+- **Tone**: Helpful, encouraging, and easy to understand.
+- **Content**: Explain *why* the answer is derived from the case study text.
+
 ## Task
 Extract the content from the provided PDF/Images and output a structured **JSON Object**.
 
@@ -35,6 +41,7 @@ Output a SINGLE JSON object.
     {
       "subQNo": "設問1",
       "text": "The text of sub-question 1",
+      "explanation": "Detailed explanation here. \n\n ### 処理の流れ \n ```mermaid\n sequenceDiagram\n ...\n ``` \n\n Explain why the answer is X...",
       "subQuestions": [ // If the sub-question has (1), (2)...
         { "label": "(1)", "text": "..." },
         { "label": "(2)", "text": "..." }
@@ -42,7 +49,8 @@ Output a SINGLE JSON object.
     },
      {
       "subQNo": "設問2",
-      "text": "..."
+      "text": "...",
+      "explanation": "..."
     }
   ]
 }
