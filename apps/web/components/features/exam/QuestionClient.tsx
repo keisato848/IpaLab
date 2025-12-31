@@ -39,6 +39,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     // Stats State
     const [sessionStats, setSessionStats] = useState({ total: 0, correct: 0 });
     const [pastStats, setPastStats] = useState<{ total: number; correct: number } | null>(null);
+    const [examStats, setExamStats] = useState<{ total: number; correct: number } | null>(null);
 
     // Mock Mode Logic
     const isMock = mode === 'mock';
@@ -59,26 +60,37 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         setShowExplanation(false);
         setStartTime(Date.now());
 
-        // Fetch Past Stats
-        async function fetchPastStats() {
+        // Fetch Past Stats (Current Question) & Exam Stats (Current Exam)
+        async function fetchStats() {
             try {
                 const userId = session?.user?.id || guestManager.getGuestId();
                 if (!userId) return;
 
-                // Use the updated API that filters by questionId
-                const records = await getLearningRecords(userId, undefined, question.id);
-                if (records.length > 0) {
-                    const correctCount = records.filter(r => r.isCorrect).length;
-                    setPastStats({ total: records.length, correct: correctCount });
+                // 1. Past Stats for this Question
+                const qRecords = await getLearningRecords(userId, undefined, question.id);
+                if (qRecords.length > 0) {
+                    const correctCount = qRecords.filter(r => r.isCorrect).length;
+                    setPastStats({ total: qRecords.length, correct: correctCount });
                 } else {
                     setPastStats(null);
                 }
+
+                // 2. Cumulative Stats for this Exam (All records for this examId)
+                const eRecords = await getLearningRecords(userId, question.examId);
+                // Note: If backend limits to 10, this is "Recent 10 Stats"
+                if (eRecords.length > 0) {
+                    const eCorrect = eRecords.filter(r => r.isCorrect).length;
+                    setExamStats({ total: eRecords.length, correct: eCorrect });
+                } else {
+                    setExamStats(null);
+                }
+
             } catch (e) {
-                console.error("Failed to fetch past stats", e);
+                console.error("Failed to fetch stats", e);
             }
         }
-        fetchPastStats();
-    }, [question.id, session]);
+        fetchStats();
+    }, [question.id, question.examId, session]);
 
     const formatTime = (seconds: number) => {
         const h = Math.floor(seconds / 3600);
@@ -131,6 +143,16 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             total: prev.total + 1,
             correct: prev.correct + (isCorrect ? 1 : 0)
         }));
+
+        // Update Exam Stats (Optimistic)
+        setExamStats(prev => {
+            const currentTotal = prev?.total || 0;
+            const currentCorrect = prev?.correct || 0;
+            return {
+                total: currentTotal + 1,
+                correct: currentCorrect + (isCorrect ? 1 : 0)
+            };
+        });
     };
 
     const handleNext = () => {
@@ -305,7 +327,12 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     </span>
                     {isPractice && sessionStats.total > 0 && (
                         <span className={styles.modeBadge} style={{ background: '#e0f2fe', color: '#0369a1', marginLeft: '0.5rem' }}>
-                            正答率: {Math.round((sessionStats.correct / sessionStats.total) * 100)}% ({sessionStats.correct}/{sessionStats.total})
+                            今回: {Math.round((sessionStats.correct / sessionStats.total) * 100)}% ({sessionStats.correct}/{sessionStats.total})
+                        </span>
+                    )}
+                    {isPractice && examStats && examStats.total > 0 && (
+                        <span className={styles.modeBadge} style={{ background: '#f0fdf4', color: '#166534', marginLeft: '0.5rem' }}>
+                            通算: {Math.round((examStats.correct / examStats.total) * 100)}% ({examStats.correct}/{examStats.total})
                         </span>
                     )}
                     {isMock && (
