@@ -166,7 +166,7 @@
     box-shadow: var(--card-shadow);
 }
 
-.featureCard h3 {
+.featureCard h2 {
     font-size: 1.25rem;
     margin-bottom: 0.5rem;
     color: var(--text-primary);
@@ -186,6 +186,11 @@
     border-top: 1px solid var(--border-color);
 }
 
+.mobileBr,
+.mobileOnly {
+    display: none;
+}
+
 @media (max-width: 600px) {
     .title {
         font-size: 2rem;
@@ -193,5 +198,16 @@
 
     .actions {
         flex-direction: column;
+    }
+
+    .mobileBr,
+    .mobileOnly {
+        display: inline;
+    }
+
+    .mobileBr {
+        display: block;
+        height: 0.5em;
+        content: "";
     }
 }

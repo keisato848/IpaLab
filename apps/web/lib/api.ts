@@ -14,8 +14,10 @@ export interface Question {
     correctOption: string;
     explanation?: string;
     // PM specific fields
+    // PM specific fields
     isPM?: boolean;
     subQuestions?: any[]; // Detailed type can be added if needed
+    point?: number;
 }
 
 export interface LearningRecord {
@@ -31,6 +33,12 @@ export interface LearningRecord {
     nextReviewAt?: string;
     reviewInterval?: number;
     easeFactor?: number;
+    // AI Score Extension
+    isDescriptive?: boolean;
+    userAnswer?: string;
+    aiScore?: number;
+    aiFeedback?: string;
+    aiRadarData?: any[]; // Ideally Typed, but using any for now or specific type if defined
 }
 
 // Exam Interface

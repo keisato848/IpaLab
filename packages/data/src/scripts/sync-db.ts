@@ -184,7 +184,23 @@ async function main() {
                 const pmQ: RawPMQuestion = fileContent;
                 console.log(`Processing PM Question ${pmQ.qNo}...`);
 
+                // Map Point to subQuestions if present in source, otherwise keep undefined (or set default via cleanse)
+                // The source JSON structure for questions array items needs to be flexible
+
                 const id = `${examId}-${type}-${String(pmQ.qNo).padStart(2, '0')}`;
+
+                // Ensure subQuestions have point if exists
+                if (pmQ.questions) {
+                    pmQ.questions.forEach(sq => {
+                        if (sq.subQuestions) {
+                            sq.subQuestions.forEach((nested: any) => {
+                                // Just ensure we pass through whatever is in JSON
+                                // If cleanse added 'point', it will be here.
+                            });
+                        }
+                    });
+                }
+
                 const doc = {
                     id: id,
                     qNo: pmQ.qNo,
@@ -194,7 +210,7 @@ async function main() {
                     subCategory: pmQ.theme || 'General',
                     text: pmQ.description, // Case Study Description
                     isPM: true,
-                    subQuestions: pmQ.questions,
+                    subQuestions: pmQ.questions, // Direct pass-through of array updates
                     // Optional/Nulls for AM fields
                     options: [],
                     correctOption: null,

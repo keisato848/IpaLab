@@ -13,12 +13,24 @@ const LearningRecordSchema = z.object({
     examId: z.string(),
     category: z.string(),
     subCategory: z.string().optional(),
-    isCorrect: z.boolean(),
+    isCorrect: z.boolean().optional(), // Now optional
     answeredAt: z.string().datetime().optional(), // ISO String
     timeTakenSeconds: z.number().optional(),
     nextReviewAt: z.string().datetime().optional(),
     reviewInterval: z.number().optional(),
-    easeFactor: z.number().optional()
+    easeFactor: z.number().optional(),
+
+    // New fields for Descriptive Answers (AI Scoring)
+    isDescriptive: z.boolean().optional(),
+    aiScore: z.number().min(0).max(100).optional(),
+    aiFeedback: z.string().optional(),
+    aiRadarData: z.array(z.object({
+        subject: z.string(),
+        A: z.number(),
+        fullMark: z.number()
+    })).optional(),
+    userAnswer: z.string().optional(),
+    modelVersion: z.string().optional()
 });
 
 export async function GET(request: NextRequest) {
@@ -76,12 +88,23 @@ export async function POST(request: NextRequest) {
             const records = parseResults.data;
             const savedRecords = [];
 
-            // Note: Parallel execution might hit RU limits but simple for now. 
-            // Consider bulk operations for large sets.
             for (const record of records) {
                 // Ensure ID
                 if (!record.id) record.id = crypto.randomUUID();
                 if (!record.answeredAt) record.answeredAt = new Date().toISOString();
+
+                // Auto-determine isCorrect for descriptive
+                if (record.isDescriptive) {
+                    // Default logic: Score >= 60 is "Correct" (Passing)
+                    if (record.aiScore !== undefined) {
+                        record.isCorrect = record.aiScore >= 60;
+                    }
+                }
+
+                // Fallback for isCorrect if still undefined (should be provided for non-descriptive)
+                if (record.isCorrect === undefined) {
+                    record.isCorrect = false;
+                }
 
                 const { resource } = await container.items.create(record);
                 savedRecords.push(resource);
@@ -99,6 +122,18 @@ export async function POST(request: NextRequest) {
             const record = result.data;
             if (!record.id) record.id = crypto.randomUUID();
             if (!record.answeredAt) record.answeredAt = new Date().toISOString();
+
+            // Auto-determine isCorrect for descriptive
+            if (record.isDescriptive) {
+                if (record.aiScore !== undefined) {
+                    record.isCorrect = record.aiScore >= 60;
+                }
+            }
+
+            // Fallback for isCorrect
+            if (record.isCorrect === undefined) {
+                record.isCorrect = false;
+            }
 
             const { resource } = await container.items.create(record);
 
