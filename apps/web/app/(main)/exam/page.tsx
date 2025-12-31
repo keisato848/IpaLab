@@ -4,7 +4,9 @@ import styles from './page.module.css';
 import Link from 'next/link';
 
 import { useEffect, useState } from 'react';
-import { getExams, Exam } from '@/lib/api';
+import { getExams, Exam, getLearningRecords } from '@/lib/api';
+import { useSession } from 'next-auth/react';
+import { guestManager } from '@/lib/guest-manager';
 
 export default function ExamListPage() {
     const [exams, setExams] = useState<Exam[]>([]);
@@ -13,15 +15,49 @@ export default function ExamListPage() {
     const [timeFilter, setTimeFilter] = useState('ALL');
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+    const { data: session } = useSession();
+
     useEffect(() => {
-        async function fetchExams() {
+        async function fetchExamsAndStats() {
             try {
-                const data = await getExams();
-                console.log('Fetched exams:', data);
-                if (data.length === 0) {
+                // Parallel fetch
+                const [examsData, recordsData] = await Promise.all([
+                    getExams(),
+                    (async () => {
+                        const userId = session?.user?.id || guestManager.getGuestId();
+                        if (userId) return await getLearningRecords(userId);
+                        return [];
+                    })()
+                ]);
+
+                if (examsData.length === 0) {
                     setErrorMsg('データが取得できませんでした (0件)。APIサーバが起動しているか確認してください。');
                 }
-                setExams(data);
+
+                // Merge Stats
+                const examsWithStats = examsData.map(exam => {
+                    const examRecords = recordsData.filter(r => r.examId === exam.id);
+                    const uniqueAnswered = new Set(examRecords.map(r => r.questionId)).size;
+                    const correctCount = examRecords.filter(r => r.isCorrect).length;
+
+                    // Simple logic: correctness based on total ATTEMPTS or distinct questions?
+                    // Usually correct rate is (Total Correct / Total Attempts). 
+                    // Let's use Total Attempts for correct rate, but Completed for Progress.
+
+                    const totalAttempts = examRecords.length;
+                    const correctRate = totalAttempts > 0 ? correctCount / totalAttempts : 0;
+
+                    return {
+                        ...exam,
+                        stats: {
+                            total: exam.stats.total || 80, // Fallback if 0
+                            completed: uniqueAnswered,
+                            correctRate: correctRate
+                        }
+                    };
+                });
+
+                setExams(examsWithStats);
             } catch (error) {
                 console.error("Failed to load exams", error);
                 setErrorMsg('取得エラーが発生しました。');
@@ -29,8 +65,8 @@ export default function ExamListPage() {
                 setIsLoading(false);
             }
         }
-        fetchExams();
-    }, []);
+        fetchExamsAndStats();
+    }, [session]);
 
     const filteredExams = exams.filter(e => {
         const catMatch = filter === 'ALL' || e.category === filter;
