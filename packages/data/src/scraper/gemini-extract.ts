@@ -167,11 +167,21 @@ async function main() {
     const outDir = path.resolve(__dirname, '../../data/questions');
 
     const files = await fs.readdir(rawDir);
-    // Filter for Question PDFs (exclude -Ans.pdf)
-    let examFiles = files.filter(f => f.endsWith('.pdf') && !f.endsWith('-Ans.pdf'));
+    // Filter for Question PDFs (exclude -Ans.pdf) AND specific target: AP Afternoon Exams
+    let examFiles = files.filter(f =>
+        f.endsWith('.pdf') &&
+        !f.endsWith('-Ans.pdf') &&
+        (
+            f.includes('2025') ||
+            f.startsWith('FE-') ||
+            (f.startsWith('AP-') && f.includes('-PM')) // Keep existing AP PM logic if needed
+        )
+    );
 
-    // Prioritize PM exams (Reverse Alphabetical: PM before AP)
+    // Sort Newest First (2024 -> 2016)
     examFiles.sort((a, b) => b.localeCompare(a));
+
+    console.log(`Found ${examFiles.length} AP PM exams.`);
 
     console.log(`Found ${examFiles.length} potential exams. Processing PM first.`);
 
@@ -186,33 +196,41 @@ async function main() {
         const examOutDir = path.join(outDir, examId);
         await fs.mkdir(examOutDir, { recursive: true });
 
-        // Questions
-        const qOut = path.join(examOutDir, 'questions_raw.json');
-        let skipQ = false;
-        try {
-            await fs.access(qOut);
-            console.log(`[SKIP] Questions for ${examId} already exist.`);
-            skipQ = true;
-        } catch { }
+        // Process Questions and Answers in parallel
+        await Promise.all([
+            (async () => {
+                // Questions
+                const qOut = path.join(examOutDir, 'questions_raw.json');
+                let skipQ = false;
+                try {
+                    await fs.access(qOut);
+                    console.log(`[SKIP] Questions for ${examId} already exist.`);
+                    skipQ = true;
+                } catch { }
 
-        if (!skipQ) {
-            await extractQuestions(examId, rawDir, outDir);
-            await new Promise(r => setTimeout(r, 2000));
-        }
+                if (!skipQ) {
+                    await extractQuestions(examId, rawDir, outDir);
+                    // Minimal delay between internal operations not needed if Q/A are independent
+                }
+            })(),
+            (async () => {
+                // Answers
+                const aOut = path.join(examOutDir, 'answers_raw.json');
+                let skipA = false;
+                try {
+                    await fs.access(aOut);
+                    console.log(`[SKIP] Answers for ${examId} already exist.`);
+                    skipA = true;
+                } catch { }
 
-        // Answers
-        const aOut = path.join(examOutDir, 'answers_raw.json');
-        let skipA = false;
-        try {
-            await fs.access(aOut);
-            console.log(`[SKIP] Answers for ${examId} already exist.`);
-            skipA = true;
-        } catch { }
+                if (!skipA) {
+                    await extractAnswers(examId, rawDir, outDir);
+                }
+            })()
+        ]);
 
-        if (!skipA) {
-            await extractAnswers(examId, rawDir, outDir);
-            await new Promise(r => setTimeout(r, 2000));
-        }
+        // Small buffer between exams to avoid instant burst
+        await new Promise(r => setTimeout(r, 1000));
     }
 }
 
