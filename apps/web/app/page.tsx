@@ -2,8 +2,38 @@ import Link from 'next/link';
 import styles from './page.module.css';
 
 export default function Home() {
+    // Structured Data (JSON-LD)
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "シカクノ",
+        "url": "https://shikakuno.vercel.app",
+        "description": "情報処理技術者試験（基本情報・応用情報・PMなど）の過去問演習プラットフォーム。学習履歴分析機能で効率的な合格をサポートします。",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+        },
+        "featureList": [
+            "過去問演習",
+            "弱点分析",
+            "模擬試験モード",
+            "レスポンシブデザイン"
+        ],
+        "author": {
+            "@type": "Organization",
+            "name": "Shikaku-No Project"
+        }
+    };
+
     return (
         <div className={styles.container}>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             <header className={styles.header}>
                 <Link href="/" className={styles.logo}>シカクノ</Link>
                 <nav className={styles.nav}>
@@ -34,15 +64,15 @@ export default function Home() {
 
                 <section className={styles.features}>
                     <div className={styles.featureCard}>
-                        <h3>🎯 効率的な演習</h3>
+                        <h2>🎯 効率的な演習</h2>
                         <p>過去問を厳選。隙間時間にサクサク学習できます。</p>
                     </div>
                     <div className={styles.featureCard}>
-                        <h3>📊 弱点分析</h3>
+                        <h2>📊 弱点分析</h2>
                         <p>学習データを分析し、あなたの苦手分野を可視化します。</p>
                     </div>
                     <div className={styles.featureCard}>
-                        <h3>📝 模擬試験モード</h3>
+                        <h2>📝 模擬試験モード</h2>
                         <p>本番形式の時間制限付きモードで実力を試せます。</p>
                     </div>
                 </section>
