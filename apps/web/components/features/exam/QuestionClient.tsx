@@ -12,6 +12,7 @@ import styles from './QuestionClient.module.css';
 import { Question, saveLearningRecord, LearningRecord, getLearningRecords } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
 import { useSession } from 'next-auth/react';
+import { useTheme } from '@/components/providers/ThemeProvider';
 import { v4 as uuidv4 } from 'uuid';
 import { getExamLabel } from '@/lib/exam-utils';
 import dynamic from 'next/dynamic';
@@ -31,7 +32,10 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const mode = searchParams.get('mode') || 'practice';
     const router = useRouter();
     const { data: session } = useSession();
+    const { showExamStats, toggleShowExamStats } = useTheme();
 
+    // Local state for settings popup
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [showExplanation, setShowExplanation] = useState(false);
     const [startTime, setStartTime] = useState<number>(Date.now());
@@ -81,6 +85,21 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 if (eRecords.length > 0) {
                     const eCorrect = eRecords.filter(r => r.isCorrect).length;
                     setExamStats({ total: eRecords.length, correct: eCorrect });
+
+                    // 3. Session Stats (Approximate for now: records answered TODAY or very recently for this exam)
+                    // Since we don't have a session ID, we can filter by "answeredAt" > session start time?
+                    // Or, simpler: Just show the Total Correct Rate as "Session" isn't strictly tracked across pages yet.
+                    // A better proxy for "Session" in this context might be "This attempt" if we had one.
+                    // For now, let's treat "Session Stats" as "Stats for this Exam ID" but only from the *current sequence*?
+                    // Actually, the user expects "Progress 6/25" (question count) vs "Correct 5/6" (accuracy).
+                    // If we can't persist session state across router.push, we need to re-fetch "today's records for this exam".
+
+                    const today = new Date().toISOString().split('T')[0];
+                    const todaysRecords = eRecords.filter(r => r.answeredAt.startsWith(today));
+                    if (todaysRecords.length > 0) {
+                        const sCorrect = todaysRecords.filter(r => r.isCorrect).length;
+                        setSessionStats({ total: todaysRecords.length, correct: sCorrect });
+                    }
                 } else {
                     setExamStats(null);
                 }
@@ -220,28 +239,29 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         return (
             <div className={styles.pmContainer}>
                 <header className={styles.pmHeader}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                         <div className={styles.examInfo}>
-                            <span className={styles.examBadge}>{type}</span>
-                            <span className={styles.examTitle}>{getExamLabel(year + (type.startsWith('PM') ? '-PM' : '-AM'))} - Q{qNo} (記述式)</span>
+                            <span className={`${styles.examBadge} ${styles.mobileHidden}`}>{type}</span>
+                            <span className={styles.examTitle}>
+                                <span className={styles.mobileHidden}>{getExamLabel(year + (type.startsWith('PM') ? '-PM' : '-AM'))} - </span>
+                                Q{qNo} (記述)
+                            </span>
                         </div>
-                        <div className={styles.navBtnGroup}>
-                            <button
-                                onClick={handleSubPrev}
-                                disabled={currentSubQIndex === 0}
-                                className={`${styles.navBtn} ${currentSubQIndex === 0 ? styles.navBtnDisabled : ''}`}
-                            >
-                                &larr; 前の設問
-                            </button>
-                            <span style={{ fontWeight: 'bold', minWidth: '80px', textAlign: 'center' }}>設問 {currentSubQIndex + 1} / {subQs.length}</span>
-                            <button
-                                onClick={handleSubNext}
-                                disabled={currentSubQIndex === subQs.length - 1}
-                                className={`${styles.navBtn} ${currentSubQIndex === subQs.length - 1 ? styles.navBtnDisabled : ''}`}
-                            >
-                                次の設問 &rarr;
-                            </button>
-                            <Link href={`/exam/${year}/${type}`} className={styles.navBtn} style={{ marginLeft: '1rem' }}>一覧へ戻る</Link>
+                        {/* Progress Bar for PM Mode (Reused logic or simplified) */}
+                        <div style={{ flex: 1, margin: '0 1rem', maxWidth: '150px' }} className={styles.mobileHidden}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#64748b' }}>
+                                <span>設問 {currentSubQIndex + 1}/{subQs.length}</span>
+                            </div>
+                            <div style={{ width: '100%', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                                <div
+                                    style={{
+                                        width: `${((currentSubQIndex + 1) / subQs.length) * 100}%`,
+                                        height: '100%',
+                                        background: '#3b82f6',
+                                        transition: 'width 0.3s ease'
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
                 </header>
@@ -289,7 +309,32 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                         </div>
                     </div>
                 </div>
-            </div>
+
+                {/* PM Mode Footer */}
+                <footer className={styles.footer}>
+                    <Link href={`/exam/${year}/${type}`} className={styles.navBtn}>一覧へ戻る</Link>
+                    <div className={styles.navBtnGroup}>
+                        <button
+                            onClick={handleSubPrev}
+                            disabled={currentSubQIndex === 0}
+                            className={`${styles.navBtn} ${currentSubQIndex === 0 ? styles.navBtnDisabled : ''}`}
+                            style={{ marginRight: '0.5rem' }}
+                        >
+                            &larr; 前の設問
+                        </button>
+                        <span style={{ fontWeight: 'bold', minWidth: '60px', textAlign: 'center', fontSize: '0.9rem' }} className={styles.mobileHidden}>
+                            {currentSubQIndex + 1} / {subQs.length}
+                        </span>
+                        <button
+                            onClick={handleSubNext}
+                            disabled={currentSubQIndex === subQs.length - 1}
+                            className={`${styles.navBtn} ${currentSubQIndex === subQs.length - 1 ? styles.navBtnDisabled : ''}`}
+                        >
+                            次の設問 &rarr;
+                        </button>
+                    </div>
+                </footer>
+            </div >
         );
     }
 
@@ -297,8 +342,11 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         <div className={styles.container}>
             <header className={styles.header}>
                 <div className={styles.examInfo}>
-                    <span className={styles.examBadge}>{type}</span>
-                    <span className={styles.examTitle}>{examLabel} - Q{qNo}</span>
+                    <span className={`${styles.examBadge} ${styles.mobileHidden}`}>{type}</span>
+                    <span className={styles.examTitle}>
+                        <span className={styles.mobileHidden}>{examLabel} - </span>
+                        Q{qNo}
+                    </span>
                 </div>
 
                 {/* Progress Bar for Practice Mode */}
@@ -322,19 +370,71 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 )}
 
                 <div className={styles.meta}>
-                    <span className={`${styles.modeBadge} ${isMock ? styles.mockBadge : ''}`}>
+                    <span className={`${styles.modeBadge} ${isMock ? styles.mockBadge : ''} ${styles.mobileHidden}`}>
                         {isPractice ? '練習モード' : '模擬試験モード'}
                     </span>
-                    {isPractice && sessionStats.total > 0 && (
-                        <span className={styles.modeBadge} style={{ background: '#e0f2fe', color: '#0369a1', marginLeft: '0.5rem' }}>
-                            今回: {Math.round((sessionStats.correct / sessionStats.total) * 100)}% ({sessionStats.correct}/{sessionStats.total})
-                        </span>
-                    )}
-                    {isPractice && examStats && examStats.total > 0 && (
-                        <span className={styles.modeBadge} style={{ background: '#f0fdf4', color: '#166534', marginLeft: '0.5rem' }}>
-                            通算: {Math.round((examStats.correct / examStats.total) * 100)}% ({examStats.correct}/{examStats.total})
-                        </span>
-                    )}
+                    {/* Header Stats / Settings Toggle */}
+                    <div className={styles.headerControls}>
+                        {/* Desktop: Show Stats inline if enabled */}
+                        <div className={`${styles.statsContainer} ${styles.mobileHidden}`}>
+                            {showExamStats && (
+                                <>
+                                    {isPractice && sessionStats.total > 0 && (
+                                        <span className={styles.statItem} title="今回の正答率">
+                                            今回: {Math.round((sessionStats.correct / sessionStats.total) * 100)}% ({sessionStats.correct}/{sessionStats.total})
+                                        </span>
+                                    )}
+                                    {examStats && examStats.total > 0 && (
+                                        <span className={styles.statItem} title="この試験の通算正答率">
+                                            通算: {Math.round((examStats.correct / examStats.total) * 100)}% ({examStats.correct}/{examStats.total})
+                                        </span>
+                                    )}
+                                </>
+                            )}
+                        </div>
+
+                        {/* Mobile/Global: Settings Button */}
+                        <button
+                            className={styles.settingsBtn}
+                            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                            aria-label="表示設定"
+                        >
+                            ⚙️
+                        </button>
+
+                        {/* Settings Popup */}
+                        {isSettingsOpen && (
+                            <div className={styles.settingsPopup}>
+                                <div className={styles.popupHeader}>
+                                    <span>表示設定</span>
+                                    <button onClick={() => setIsSettingsOpen(false)}>×</button>
+                                </div>
+                                <label className={styles.settingRow}>
+                                    <span>統計情報を表示</span>
+                                    <input
+                                        type="checkbox"
+                                        checked={showExamStats}
+                                        onChange={toggleShowExamStats}
+                                    />
+                                </label>
+
+                                {/* Mobile Only Stats in Popup */}
+                                {showExamStats && (
+                                    <div className={styles.popupStats}>
+                                        <div className={styles.popupStatRow}>
+                                            <span>今回:</span>
+                                            <span>{sessionStats.total > 0 ? `${Math.round((sessionStats.correct / sessionStats.total) * 100)}%` : '-'}</span>
+                                        </div>
+                                        <div className={styles.popupStatRow}>
+                                            <span>通算:</span>
+                                            <span>{examStats && examStats.total > 0 ? `${Math.round((examStats.correct / examStats.total) * 100)}%` : '-'}</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
                     {isMock && (
                         <span className={styles.timer}>
                             ⏳ {formatTime(timeLeft)}
