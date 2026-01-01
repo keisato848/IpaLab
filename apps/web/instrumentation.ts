@@ -1,8 +1,15 @@
 
 export async function register() {
     if (process.env.NEXT_RUNTIME === 'nodejs') {
-        const { initDatabase } = await import('./lib/services/cosmos');
-        await initDatabase();
-        console.log('Cosmos DB initialized');
+        import('./lib/services/cosmos').then(async (mod) => {
+            try {
+                await mod.initDatabase();
+                console.log('Cosmos DB initialized');
+            } catch (e) {
+                console.error('Failed to initialize Cosmos DB during startup', e);
+            }
+        }).catch(err => {
+            console.error('Failed to import cosmos service', err);
+        });
     }
 }
