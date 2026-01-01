@@ -38,6 +38,8 @@ interface RawQuestion {
     text: string;
     options: { id: string, text: string }[];
     correctOption: string | null;
+    category?: string;
+    subCategory?: string;
 }
 
 interface ExplanationMap {
@@ -169,8 +171,8 @@ async function main() {
                         qNo: q.qNo,
                         examId: examId,
                         type: type,
-                        category: 'Technology',
-                        subCategory: 'General',
+                        category: q.category || 'Technology',
+                        subCategory: q.subCategory || 'General',
                         text: q.text,
                         options: q.options,
                         correctOption: correctOption,
