@@ -175,7 +175,8 @@ async function main() {
             f.includes('2025') ||
             f.startsWith('FE-') ||
             (f.startsWith('AP-') && f.includes('-PM')) ||
-            (f.startsWith('PM-') && f.includes('-PM1')) // Include PM Afternoon I
+            (f.startsWith('PM-') && (f.includes('-PM1') || f.includes('-PM2'))) || // Include PM Afternoon I & II
+            (f.startsWith('SC-') && (f.includes('-AM2') || f.includes('-PM') || f.includes('-PM1') || f.includes('-PM2'))) // Include SC
         )
     );
 
