@@ -60,13 +60,22 @@ function cleanseData() {
                 q.subQuestions.forEach((sq: any) => {
                     // Fix Mermaid in sq.text
                     if (sq.text && sq.text.includes('mermaid')) {
-                        // Very specific fix for "note:" issue
-                        // Replacing "note:" with "%% note:" to hide it, or converting syntax?
-                        // User prompt suggested: `note right of X:` or text explanation.
-                        // Ideally, we comment it out as we did in UI hotfix.
-                        const oldText = sq.text;
-                        const newText = sq.text.replace(/(\n\s*)note:/gi, '$1%% note:');
-                        if (oldText !== newText) {
+                        let newText = sq.text;
+                        // 1. Fix "note:" -> "%% note:" (Comment out invalid notes)
+                        newText = newText.replace(/(\n\s*)note:/gi, '$1%% note:');
+
+                        // 2. Fix invalid participant names (e.g. "User(Browser)" -> "User")
+                        // Mermaid doesn't like parentheses in aliases without quotes.
+                        // Ideally we replace aliases like "A(Desc)" with "A".
+                        // This is complex, but let's try to quote them if problematic?
+                        // Or just simplistic fix for common Gemini output "Participant A (Role)" -> "Participant A"
+
+                        // 3. Ensure sequenceDiagram header is present if arrows exist
+                        if (newText.includes('->') && !newText.includes('sequenceDiagram')) {
+                            newText = '```mermaid\nsequenceDiagram\n' + newText.replace('```mermaid', '');
+                        }
+
+                        if (sq.text !== newText) {
                             sq.text = newText;
                             modified = true;
                         }
