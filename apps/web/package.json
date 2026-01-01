@@ -9,7 +9,7 @@
         "lint": "next lint"
     },
     "engines": {
-        "node": ">=20.0.0"
+        "node": "20"
     },
     "dependencies": {
         "@azure/cosmos": "^4.9.0",
