@@ -20,7 +20,9 @@
         "text": "2x-4 int(x/2)"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 2,
@@ -43,7 +45,9 @@
         "text": "変数を統合した新たな変数を使用して、データがもつ変数の数を減らす方法"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 3,
@@ -66,7 +70,9 @@
         "text": "94"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 4,
@@ -89,7 +95,9 @@
         "text": "4"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 5,
@@ -112,7 +120,9 @@
         "text": "next[6]: 5, prev[6]: 4"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 6,
@@ -135,7 +145,9 @@
         "text": "ヒープソート"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 7,
@@ -158,7 +170,9 @@
         "text": "XML"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 8,
@@ -181,7 +195,9 @@
         "text": "ホモジニアスマルチコアプロセッサ"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 9,
@@ -204,7 +220,9 @@
         "text": "レジスタリネーミング"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 10,
@@ -227,7 +245,9 @@
         "text": "ライトアンプリフィケーション"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 11,
@@ -250,7 +270,9 @@
         "text": "表示リフレッシュが不要である。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 12,
@@ -273,7 +295,9 @@
         "text": "プロトコルは NFS (Network File System) を使用し、LANで接続する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 13,
@@ -296,7 +320,9 @@
         "text": "同一のマスターデータベースがシステム内に複数配置されているので、マスターを更新する際にはデータベース間で整合性を保持しなければならないシステム"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 14,
@@ -319,7 +345,9 @@
         "text": "ソフトウェアによる自動実行を可能にするために、システムの構成や状態をコードに定義すること"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 15,
@@ -342,7 +370,9 @@
         "text": "0.98"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 16,
@@ -365,7 +395,9 @@
         "text": "0.75"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 17,
@@ -388,7 +420,9 @@
         "text": "タスクA: 最大実行時間 4, 周期 6; タスクB: 最大実行時間 5, 周期 15"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 18,
@@ -411,7 +445,9 @@
         "text": "プログラムジェネレーター"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 19,
@@ -434,7 +470,9 @@
         "text": "プロセス管理やメモリ管理などの、アプリケーションソフトウェアが動作するための基本機能を提供する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 20,
@@ -457,7 +495,9 @@
         "text": "論理回路を基板上に実装した後で再プログラムできる集積回路"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 21,
@@ -480,7 +520,9 @@
         "text": "逆方向電圧をある電圧以上印加すると、電流だけが増加し電圧がほぼ一定に保たれるという特性をもつ半導体素子"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 22,
@@ -503,7 +545,9 @@
         "text": "X=1, Y=1"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 23,
@@ -526,7 +570,9 @@
         "text": "[回路図 エ 参照]"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 24,
@@ -549,7 +595,9 @@
         "text": "空間的,時間的又は文脈的に近くに表示された別のアイコンから、与えられたアイコンをどれだけ容易に区別できるかを示す。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 25,
@@ -572,7 +620,9 @@
         "text": "時間経過とともに生じる物の移動などの変化について、モデル化したものを物理法則などに当てはめて変化させる処理"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 26,
@@ -595,7 +645,9 @@
         "text": "利用者ID が '1001' の売上を検索する。<利用者 ID>"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 27,
@@ -618,7 +670,9 @@
         "text": "タプルを一意に識別できる属性,又は属性の組を含む集合"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 28,
@@ -641,7 +695,9 @@
         "text": "CREATE VIEW 商品平均受注数量(平均受注数量) AS SELECT AVG(受注数量) FROM 受注"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 29,
@@ -664,7 +720,9 @@
         "text": "4"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 30,
@@ -687,7 +745,9 @@
         "text": "ロールフォワード: T1, T2, T5, ロールバック: T3, T6"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 31,
@@ -710,7 +770,9 @@
         "text": "1.6"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 32,
@@ -733,7 +795,9 @@
         "text": "宛先IPアドレス: -, 送信元 IPアドレス: -, 宛先ポート番号: O, 送信元ポート番号: O"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 33,
@@ -756,7 +820,9 @@
         "text": "SNMP"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 34,
@@ -779,7 +845,9 @@
         "text": "172.30.252.0"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 35,
@@ -802,7 +870,9 @@
         "text": "ルータが RIP-2 プロトコルを使用して、隣接するルータのグループに、経路の更新情報を送信する際に使用する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 36,
@@ -825,7 +895,9 @@
         "text": "利用者の誕生日,電話番号などの個人情報を言葉巧みに聞き出して、パスワードを類推する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 37,
@@ -848,7 +920,9 @@
         "text": "データを秘匿する目的で用いる場合,復号鍵を秘密にしておく必要がない。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 38,
@@ -871,7 +945,9 @@
         "text": "接続元 IPアドレス: BBB.45.67.90, 送信者のドメイン名: a.b.d, 受信者のドメイン名: a.b.c"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 39,
@@ -894,7 +970,9 @@
         "text": "機能: 組織内 CSIRT の機能の一部又は全部をサービスプロバイダとして、有償で請け負う。 サービス対象: 顧客"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 40,
@@ -917,7 +995,9 @@
         "text": "否認防止"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 41,
@@ -940,7 +1020,9 @@
         "text": "理論的にあり得る復号鍵の全てを機器に入力して秘密情報の取得を試みる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 42,
@@ -963,7 +1045,9 @@
         "text": "マルウェア対策ソフトを OS のスタートアッププログラムに登録し、OS 起動時に自動的にマルウェアスキャンを行うことによって、マルウェアの被害を防ぐ技術"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 43,
@@ -986,7 +1070,9 @@
         "text": "ネットワーク上のストレージの共有フォルダをネットワークドライブに割り当てて、そこに重要なデータをバックアップする。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 44,
@@ -1009,7 +1095,9 @@
         "text": "電子メールの送信元ドメインでメール送信に使うメールサーバの IP アドレスを DNS サーバに登録しておき、受信側で送信元ドメインの DNS サーバに登録されているIPアドレスと電子メールの送信元メールサーバの IP アドレスとを照合する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 45,
@@ -1032,7 +1120,9 @@
         "text": "公開鍵暗号方式によるデジタル署名を用いることによって、正当な DNS サーバからの応答であることをクライアントが検証できる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 46,
@@ -1055,7 +1145,9 @@
         "text": "ロードテスト"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 47,
@@ -1078,7 +1170,9 @@
         "text": "ローコード開発"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 48,
@@ -1101,7 +1195,9 @@
         "text": "予防保守"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 49,
@@ -1124,7 +1220,9 @@
         "text": "プロセスやツール,包括的なドキュメント,契約交渉、計画に従うこと"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 50,
@@ -1147,7 +1245,9 @@
         "text": "タスクスケジューリングの仕組みなどを提供するソフトウェア"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 51,
@@ -1170,7 +1270,9 @@
         "text": "プロジェクトの除外事項"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 52,
@@ -1193,7 +1295,9 @@
         "text": "プロジェクトの進捗が、計画よりも進んでいる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 53,
@@ -1216,7 +1320,9 @@
         "text": "4"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 54,
@@ -1239,7 +1345,9 @@
         "text": "リスクへの対応"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 55,
@@ -1262,7 +1370,9 @@
         "text": "問題を“記録・分類”し、“優先度付け”し、“必要ならばエスカレーション”し、“可能ならば解決する”一連の処置"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 56,
@@ -1285,7 +1395,9 @@
         "text": "13"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 57,
@@ -1308,7 +1420,9 @@
         "text": "フルバックアップ方式に比べ、差分バックアップ方式はバックアップに要する時間が長い。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 58,
@@ -1331,7 +1445,9 @@
         "text": "監査調書は、保管の必要がない監査人の備忘録である。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 59,
@@ -1354,7 +1470,9 @@
         "text": "並行シミュレーション法を用いて,受注伝票を処理するプログラムの論理の正確性を確かめる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 60,
@@ -1377,7 +1495,9 @@
         "text": "IT を利用せず手作業だけで内部統制を運用している場合、直ちに内部統制の不備となる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 61,
@@ -1400,7 +1520,9 @@
         "text": "投資戦略の有効性を検証する際に、過去のデータを用いてどの程度の利益が期待できるかをシミュレーションする手法"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 62,
@@ -1423,7 +1545,9 @@
         "text": "財務管理ソリューション"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 63,
@@ -1446,7 +1570,9 @@
         "text": "ビジネスプロセスの構成要素とそれを支援する IT 基盤を、ソフトウェア部品であるサービスとして提供するシステムアーキテクチャのこと"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 64,
@@ -1469,7 +1595,9 @@
         "text": "ROI (Return On Investment)"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 65,
@@ -1492,7 +1620,9 @@
         "text": "分析又はシミュレーション"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 66,
@@ -1515,7 +1645,9 @@
         "text": "他社からの製造委託を受けて、半導体製品の製造を行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 67,
@@ -1538,7 +1670,9 @@
         "text": "自社の内部環境の強みと弱み、取り巻く外部環境の機会と脅威を抽出し、取組方針を整理して戦略を考える。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 68,
@@ -1561,7 +1695,9 @@
         "text": "バイラルマーケティング"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 69,
@@ -1584,7 +1720,9 @@
         "text": "製品の使用割合"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 70,
@@ -1607,7 +1745,9 @@
         "text": "自社の業務の工程を見直すことで、生産性向上とコスト削減を実現する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 71,
@@ -1630,7 +1770,9 @@
         "text": "現実世界の都市の構造や活動状況のデータによって仮想世界を構築し、災害の発生や時間軸を自由に操作して、現実世界では実現できないシミュレーションを行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 72,
@@ -1653,7 +1795,9 @@
         "text": "トークンエコノミー"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 73,
@@ -1676,7 +1820,9 @@
         "text": "設計変更内容を、AIを用いて吟味して、製造現場に正確に伝達する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 74,
@@ -1699,7 +1845,9 @@
         "text": "不測の事態が生じた場合の組織的対応力や、支障が生じた事業を復元させる力"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 75,
@@ -1722,7 +1870,9 @@
         "text": "リーダーシップの有効性は、リーダーがもつパーソナリティと、リーダーがどれだけ統制力や影響力を行使できるかという状況要因に依存するとしている。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 76,
@@ -1745,7 +1895,9 @@
         "text": "連関図"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 77,
@@ -1768,7 +1920,9 @@
         "text": "17.0"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 78,
@@ -1791,7 +1945,9 @@
         "text": "処理速度を向上させるために、購入したプログラムを改変した。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 79,
@@ -1814,7 +1970,9 @@
         "text": "匿名加工情報であっても、第三者提供を行う際には事前に本人の承諾が必要である。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 80,
@@ -1837,6 +1995,8 @@
         "text": "“契約”が労働者派遣契約で、企業Aが派遣元,企業Bが派遣先であるとき,企業Bに労働者Cが出向しているといえる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   }
 ]

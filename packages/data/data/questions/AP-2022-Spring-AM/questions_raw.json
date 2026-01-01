@@ -20,7 +20,9 @@
         "text": "{(1.0)2×2^5-(1.0)2×2^-4}+(1.1)2×2^-3"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 2,
@@ -43,7 +45,9 @@
         "text": "S - (A∩B)"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 3,
@@ -66,7 +70,9 @@
         "text": "3.00"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 4,
@@ -89,7 +95,9 @@
         "text": "1110111"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 5,
@@ -112,7 +120,9 @@
         "text": "リストへの挿入位置が分かる場合には、リストにある実際の要素数にかかわらず、要素の挿入を一定時間で行うことができる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 6,
@@ -135,7 +145,9 @@
         "text": "複数のタスクからの呼出しに対して、並行して実行されても、それぞれのタスクに正しい結果を返す。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 7,
@@ -158,7 +170,9 @@
         "text": "Python"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 8,
@@ -181,7 +195,9 @@
         "text": "VLIW"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 9,
@@ -204,7 +220,9 @@
         "text": "0.95"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 10,
@@ -227,7 +245,9 @@
         "text": "任意のキャッシュメモリのブロックを主記憶のどの部分にも割り当てられる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 11,
@@ -250,7 +270,9 @@
         "text": "48"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 12,
@@ -273,7 +295,9 @@
         "text": "並列化できる計算処理の割合が増えると、速度向上比は、プロセッサ数に反比例して減少する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 13,
@@ -296,7 +320,9 @@
         "text": "待機系から現用系に定期的にロードされ実行される診断プログラムが、現用系の障害を検出したとき"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 14,
@@ -319,7 +345,9 @@
         "text": "予防保全"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 15,
@@ -342,7 +370,9 @@
         "text": "0.46"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 16,
@@ -365,7 +395,9 @@
         "text": "250"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 17,
@@ -388,7 +420,9 @@
         "text": "ラウンドロビン"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 18,
@@ -411,7 +445,9 @@
         "text": "メモリ領域の獲得と返却の頻度が高いシステムでは、フラグメンテーションの発生を防止するため、メモリ領域が返却されるたびにガーベジコレクションを行う必要がある。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 19,
@@ -434,7 +470,9 @@
         "text": "9"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 20,
@@ -457,7 +495,9 @@
         "text": "論理回路を基板上に実装した後で再プログラムできる集積回路"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 21,
@@ -480,7 +520,9 @@
         "text": "8978"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 22,
@@ -503,7 +545,9 @@
         "text": "マイクロフォン,センサなどが出力する微小な電気信号を増幅する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 23,
@@ -526,7 +570,9 @@
         "text": "内部メモリの物理アドレスを整然と配置する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 24,
@@ -549,7 +595,9 @@
         "text": "利用者が参加する手法: 認知的ウォークスルー法, 専門家だけで実施する手法: ヒューリスティック評価法"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 25,
@@ -572,7 +620,9 @@
         "text": "描画の対象となる物体の各面をピクセルに分割し、ピクセルごとに視点までの距離を計算し、その最小値を作業領域に保持することによって、視点までの距離が最小となる面を求める。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 26,
@@ -595,7 +645,9 @@
         "text": "整合性と分断耐性を満たすが可用性を満たさない。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 27,
@@ -618,7 +670,9 @@
         "text": "データの冗長性を排除し、更新の一貫性と効率性を保持するための正規化"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 28,
@@ -641,7 +695,9 @@
         "text": "エ (1正規形: c, 2正規形: b, 3正規形: a)"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 29,
@@ -664,7 +720,9 @@
         "text": "更新前情報: 不要, 更新後情報: 不要"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 30,
@@ -687,7 +745,9 @@
         "text": "データを複数のサーバに複製し、性能と可用性を向上させること"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 31,
@@ -710,7 +770,9 @@
         "text": "2001.db8.3ab.ff01"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 32,
@@ -733,7 +795,9 @@
         "text": "PPTP"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 33,
@@ -756,7 +820,9 @@
         "text": "TELNET"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 34,
@@ -779,7 +845,9 @@
         "text": "30"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 35,
@@ -802,7 +870,9 @@
         "text": "データ転送機能とネットワーク制御機能を論理的に分離し、ネットワーク制御を集中的に行うことを可能にしたアーキテクチャ"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 36,
@@ -825,7 +895,9 @@
         "text": "認証や認可に関する情報を交換するための仕様"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 37,
@@ -848,7 +920,9 @@
         "text": "サイバーキルチェーンの2番目の段階をいい、攻撃対象に特化したPDFやドキュメントファイルにマルウェアを仕込む。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 38,
@@ -871,7 +945,9 @@
         "text": "利用者が入力したパスワードと、サーバから受け取ったランダムなデータとをクライアントで演算し、その結果をサーバに送信して、サーバで検証する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 39,
@@ -894,7 +970,9 @@
         "text": "送信者がメッセージに固定文字列を付加し、更に送信者の署名鍵を使って暗号化することによって、受信者がメッセージの改ざん部位を特定できるようになる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 40,
@@ -917,7 +995,9 @@
         "text": "ファーストパーティ cookie を承諾する設定によって,当該 Web ブラウザがデジタル証明書の失効情報を入手でき、閲覧中の Web サイトのデジタル証明書の有効性を確認できるようになる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 41,
@@ -940,7 +1020,9 @@
         "text": "利用者IDなどの情報を Web サーバに送信するのは、利用者のPCではなく、リバースプロキシサーバである。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 42,
@@ -963,7 +1045,9 @@
         "text": "利用者の誕生日や電話番号などの個人情報を言葉巧みに聞き出して、パスワードを類推する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 43,
@@ -986,7 +1070,9 @@
         "text": "リスクの重大性を評価するために目安とする条件"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 44,
@@ -1009,7 +1095,9 @@
         "text": "Web サイトからの受信データを受信処理した後、不正なコード列が検知されない場合だけPCに送信する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 45,
@@ -1032,7 +1120,9 @@
         "text": "ネットワーク上を流れるパケットを収集し、そのプロトコルヘッダやペイロードを解析して、あらかじめ登録された攻撃パターンと一致するものを検出する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 46,
@@ -1055,7 +1145,9 @@
         "text": "データ結合"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 47,
@@ -1078,7 +1170,9 @@
         "text": "(1) A=0, B=0 (2) A=0, B=1 (3) A=1, B=0"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 48,
@@ -1101,7 +1195,9 @@
         "text": "予防保守"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 49,
@@ -1124,7 +1220,9 @@
         "text": "ベロシティ"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 50,
@@ -1147,7 +1245,9 @@
         "text": "タスクスケジューリングの仕組みなどを提供するソフトウェア"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 51,
@@ -1170,7 +1270,9 @@
         "text": "150"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 52,
@@ -1193,7 +1295,9 @@
         "text": "モンテカルロ法"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 53,
@@ -1216,7 +1320,9 @@
         "text": "120"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 54,
@@ -1239,7 +1345,9 @@
         "text": "プロジェクトのステークホルダの情報及びコミュニケーションのニーズ"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 55,
@@ -1262,7 +1370,9 @@
         "text": "15"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 56,
@@ -1285,7 +1395,9 @@
         "text": "平均サービス回復時間"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 57,
@@ -1308,7 +1420,9 @@
         "text": "システム障害が発生した場合には、データの復旧や整合性のチェックなどを行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 58,
@@ -1331,7 +1445,9 @@
         "text": "平時にはBCPを従業員に非公開としている。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 59,
@@ -1354,7 +1470,9 @@
         "text": "監査調書は監査の過程で入手した客観的な事実の記録なので、監査担当者の所見は記述しない。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 60,
@@ -1377,7 +1495,9 @@
         "text": "一つの監査目的に対して、通常は、複数の監査手続を組み合わせて監査を実施する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 61,
@@ -1400,7 +1520,9 @@
         "text": "保管したログは、情報セキュリティインシデントが発生した場合にだけ分析し,分析結果に応じて必要な対策を講じる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 62,
@@ -1423,7 +1545,9 @@
         "text": "利用者の視点から業務システムの機能を幾つかの独立した部品に分けることによって、業務プロセスとの対応付けや他ソフトウェアとの連携を容易にする手法"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 63,
@@ -1446,7 +1570,9 @@
         "text": "プロジェクトを、戦略との適合性や費用対効果、リスクといった観点から評価を行い、情報化投資のバランスを管理し、最適化を図ること"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 64,
@@ -1469,7 +1595,9 @@
         "text": "ROI (Return On Investment)"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 65,
@@ -1492,7 +1620,9 @@
         "text": "地震などの大規模災害時であっても、144時間以内にシステムを復旧できること"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 66,
@@ -1515,7 +1645,9 @@
         "text": "ユースケース図"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 67,
@@ -1538,7 +1670,9 @@
         "text": "市場成長率が低く、相対的市場占有率が低い事業"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 68,
@@ -1561,7 +1695,9 @@
         "text": "製品ライフサイクルを、導入期,成長期,成熟期,衰退期という四つの段階に分類し、企業にとって最適な戦略を立案する手法である。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 69,
@@ -1584,7 +1720,9 @@
         "text": "人から人へ、プラスの評価が口コミで爆発的に広まりやすいインターネットの特長を生かす手法"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 70,
@@ -1607,7 +1745,9 @@
         "text": "複数の企業から生産だけを専門に請け負い、多くの製品を低コストで生産する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 71,
@@ -1630,7 +1770,9 @@
         "text": "自治体の住民情報"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 72,
@@ -1653,7 +1795,9 @@
         "text": "より品質が高い部品を調達するために、部品の納入指定業者を複数定め、競争入札で部品を調達する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 73,
@@ -1676,7 +1820,9 @@
         "text": "7"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 74,
@@ -1699,7 +1845,9 @@
         "text": "日程調整,資料準備,議事録作成など、会議運営の事務的作業に特化した支援を行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 75,
@@ -1722,7 +1870,9 @@
         "text": "リーダシップの有効性は、リーダがもつパーソナリティと、リーダがどれだけ統制力や影響力を行使できるかという状況要因に依存するとしている。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 76,
@@ -1745,7 +1895,9 @@
         "text": "1,600"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 77,
@@ -1768,7 +1920,9 @@
         "text": "B社に帰属する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 78,
@@ -1791,7 +1945,9 @@
         "text": "不正アクセスの目的で、不正に入手した他人の利用者 IDとパスワードをPCに保管する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 79,
@@ -1814,7 +1970,9 @@
         "text": "B社の従業員が、A社を作業場所として、B社の責任者の指揮命令に従って設計書を作成している。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 80,
@@ -1837,6 +1995,8 @@
         "text": "電気電子製品の生産から処分までの全ての段階で、有害物質が環境及び人の健康に及ぼす危険を最小化する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   }
 ]

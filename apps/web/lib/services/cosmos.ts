@@ -7,8 +7,12 @@ const DATABASE_NAME = "pm-exam-dx-db";
 
 let client: CosmosClient | undefined;
 
-try {
-    if (CONNECTION_STRING) {
+const getClient = () => {
+    if (client) return client;
+
+    if (!CONNECTION_STRING) return undefined;
+
+    try {
         let connStr = CONNECTION_STRING;
         if (connStr.includes("localhost")) {
             connStr = connStr.replace("localhost", "127.0.0.1");
@@ -19,14 +23,17 @@ try {
             connectionString: connStr,
             agent: new https.Agent({ rejectUnauthorized: false })
         });
+        return client;
+    } catch (e) {
+        console.error("Failed to init Cosmos Client:", e);
+        return undefined;
     }
-} catch (e) {
-    // console.warn("Failed to init Cosmos Client:", e);
-}
+};
 
 const getDatabase = () => {
-    if (!client) throw new Error("Cosmos DB not initialized (Check COSMOS_DB_CONNECTION)");
-    return client.database(DATABASE_NAME);
+    const c = getClient();
+    if (!c) throw new Error("Cosmos DB not initialized (Check COSMOS_DB_CONNECTION)");
+    return c.database(DATABASE_NAME);
 };
 
 const getContainer = (name: string): Container => {
@@ -43,10 +50,11 @@ export const containers = {
 };
 
 export const initDatabase = async () => {
-    if (!client) {
+    const c = getClient();
+    if (!c) {
         return;
     }
-    const { database } = await client.databases.createIfNotExists({ id: DATABASE_NAME });
+    const { database } = await c.databases.createIfNotExists({ id: DATABASE_NAME });
 
     // Create containers with PKs
     await database.containers.createIfNotExists({ id: "Questions", partitionKey: "/examId" });
