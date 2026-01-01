@@ -12,6 +12,9 @@
     "clean": "turbo run clean",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "devDependencies": {
     "turbo": "latest",
     "prettier": "^3.0.0"
