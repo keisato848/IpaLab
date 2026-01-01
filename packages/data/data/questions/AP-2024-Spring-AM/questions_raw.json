@@ -20,7 +20,9 @@
         "text": "取り出した玉の色から、どの袋から取り出されたのかを推定するための確率を求める場合"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 2,
@@ -43,7 +45,9 @@
         "text": "2ρ/(1-2ρ) × Ts"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 3,
@@ -66,7 +70,9 @@
         "text": "知識がルールに従って表現されており、演繹手法を利用した推論によって有意な結論を導く手法である。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 4,
@@ -89,7 +95,9 @@
         "text": "1010101"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 5,
@@ -112,7 +120,9 @@
         "text": "n > M+1"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "基礎理論"
   },
   {
     "qNo": 6,
@@ -135,7 +145,9 @@
         "text": "E D - C B × ÷ A +"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 7,
@@ -158,7 +170,9 @@
         "text": "未処理の数字列の中から最小値を探索し、未処理の数字列の最初の数字と入れ替える操作を繰り返し行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 8,
@@ -181,7 +195,9 @@
         "text": "転送元の開始アドレス: 1004, 転送先の開始アドレス: 1006, 方向フラグ: 1, 転送語数: 4"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 9,
@@ -204,7 +220,9 @@
         "text": "量子状態を変化させながら観測するので、100℃以上の高温で動作する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 10,
@@ -227,7 +245,9 @@
         "text": "0.9"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "アルゴリズムとプログラミング"
   },
   {
     "qNo": 11,
@@ -250,7 +270,9 @@
         "text": "1.20"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 12,
@@ -273,7 +295,9 @@
         "text": "フォールトトレランスとは、故障が生じてもシステムに重大な影響が出ないように、あらかじめ定められた安全状態にシステムを固定し、全体として安全が維持されるような設計方法である。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 13,
@@ -296,7 +320,9 @@
         "text": "複数のストレージを組み合わせることによって、仮想的な1台のストレージとして運用することができる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 14,
@@ -319,7 +345,9 @@
         "text": "20"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 15,
@@ -342,7 +370,9 @@
         "text": "解析的に解が求められるモデルの検証には使用できない。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 16,
@@ -365,7 +395,9 @@
         "text": "実行中のタスクより優先度が高い動作可能なタスクが実行待ち行列に追加された場合、OS は実行中のタスクを中断し、優先度が高い動作可能なタスクを実行中に切り替える。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 17,
@@ -388,7 +420,9 @@
         "text": "Dだけ"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 18,
@@ -411,7 +445,9 @@
         "text": "9"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 19,
@@ -434,7 +470,9 @@
         "text": "プロファイラ"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 20,
@@ -457,7 +495,9 @@
         "text": "直流電力を交流電力に変換する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 21,
@@ -480,7 +520,9 @@
         "text": "OR gate symbol"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 22,
@@ -503,7 +545,9 @@
         "text": "8978"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 23,
@@ -526,7 +570,9 @@
         "text": "トランスを用いて容易に昇圧、降圧ができる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 24,
@@ -549,7 +595,9 @@
         "text": "文字を任意の倍率に拡大して表示する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 25,
@@ -572,7 +620,9 @@
         "text": "データが格納されているディスク装置へのI/O回数を減少させる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
   },
   {
     "qNo": 26,
@@ -595,7 +645,9 @@
         "text": "COALESCE (SUM(在庫.在庫数), NULL)"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 27,
@@ -618,7 +670,9 @@
         "text": "ロールフォワード"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 28,
@@ -641,7 +695,9 @@
         "text": "ルックアップテーブル"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 29,
@@ -664,7 +720,9 @@
         "text": "データ項目の名称、形式など、データそのものの特性を表すメタ情報を管理するデータベース"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 30,
@@ -687,7 +745,9 @@
         "text": "タイムスロットを割り当てられたノードだけが送信を行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 31,
@@ -710,7 +770,9 @@
         "text": "マルチキャストアドレス"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 32,
@@ -733,7 +795,9 @@
         "text": "VRRP"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 33,
@@ -756,7 +820,9 @@
         "text": "120"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 34,
@@ -779,7 +845,9 @@
         "text": "ルータやスイッチの機器内部で動作するソフトウェアを、オープンソースソフトウェア (OSS) で実現する方式"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 35,
@@ -802,7 +870,9 @@
         "text": "利用者の過去の取引履歴や決済に用いているデバイスの情報に加えて、操作しているのが人間であることを確認した上で、カード会社が追加の本人認証を行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "技術要素"
   },
   {
     "qNo": 36,
@@ -825,7 +895,9 @@
         "text": "社内の利用者間の電子メールについて、宛先メールアドレスが書き換えられ、送信ができなくなる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 37,
@@ -848,7 +920,9 @@
         "text": "利用者のURLの入力誤りを悪用して、偽サイトに誘導する攻撃の検知"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 38,
@@ -871,7 +945,9 @@
         "text": "n²"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 39,
@@ -894,7 +970,9 @@
         "text": "WHOIS データベースの技術連絡担当"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 40,
@@ -917,7 +995,9 @@
         "text": "事象の起こりやすさ及び結果"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 41,
@@ -940,7 +1020,9 @@
         "text": "電子メールサービスに対する大量,かつ,サイズの大きな電子メールの配信"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 42,
@@ -963,7 +1045,9 @@
         "text": "TLS"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 43,
@@ -986,7 +1070,9 @@
         "text": "電子メールを送信するサーバが、電子メールの送信者の上司からの承認が得られるまで、一時的に電子メールの送信を保留する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 44,
@@ -1009,7 +1095,9 @@
         "text": "利用者認証にICカードを利用している業務システムにおいて、退職者のICカードは業務システム側で利用を停止して、他の利用者が利用できないようにする。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 45,
@@ -1032,7 +1120,9 @@
         "text": "二つのクラスに集約の関係があるときには、集約オブジェクトは部分となるオブジェクトと、属性及び操作を共有する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
   },
   {
     "qNo": 46,
@@ -1055,7 +1145,9 @@
         "text": "大域的なデータを参照するモジュール間の関係は、共通結合である。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 47,
@@ -1078,7 +1170,9 @@
         "text": "図エ"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 48,
@@ -1101,7 +1195,9 @@
         "text": "バリューストリームマップ"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 49,
@@ -1124,7 +1220,9 @@
         "text": "明確に定義された用語を使用し、ソフトウェアライフサイクルプロセスの共通枠組みを規定している。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 50,
@@ -1147,7 +1245,9 @@
         "text": "文書構造がマーク付けされたテキストファイルを読み込んで、印刷可能なドキュメントを組版するソフトウェア"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Technology",
+    "subCategory": "システム開発技術"
   },
   {
     "qNo": 51,
@@ -1170,7 +1270,9 @@
         "text": "計画に比べてコストは少なくなり、プロジェクトの完了は早くなる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 52,
@@ -1193,7 +1295,9 @@
         "text": "7"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 53,
@@ -1216,7 +1320,9 @@
         "text": "リスクへの対応を実行するかどうか及びそれが期待する効果を上げられるかどうかを明らかにし、プロジェクトの混乱を最小限にする。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 54,
@@ -1239,7 +1345,9 @@
         "text": "採用すべき案: 新規システムの開発, 期待金額価値(億円): 130"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 55,
@@ -1262,7 +1370,9 @@
         "text": "260"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 56,
@@ -1285,7 +1395,9 @@
         "text": "提供するサービス及びサービスレベル目標を決定し、サービス提供者が顧客との間で合意文書を交わす。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 57,
@@ -1308,7 +1420,9 @@
         "text": "X 社が提供するハウジングサービスを利用する企業が自社で管理する IT 機器を使用するために購入した電力の、発電に伴う温室効果ガス"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 58,
@@ -1331,7 +1445,9 @@
         "text": "システム監査の中長期における方針等を明らかにすることを目的として作成する文書"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 59,
@@ -1354,7 +1470,9 @@
         "text": "モニタリング"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 60,
@@ -1377,7 +1495,9 @@
         "text": "不正アクセスを防止するためのファイアウォールの運用管理"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Management",
+    "subCategory": "プロジェクト・サービスマネジメント"
   },
   {
     "qNo": 61,
@@ -1400,7 +1520,9 @@
         "text": "組織間で共有される可能性の高い情報について、名称,定義及び各種属性を総体的に記述したモデル"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 62,
@@ -1423,7 +1545,9 @@
         "text": "デジタル社会形成のために政府が迅速かつ重点的に実施すべき施策などを、デジタル庁がまとめたもの"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 63,
@@ -1446,7 +1570,9 @@
         "text": "利用者の視点から業務システムの機能を幾つかの独立した部品に分けることによって、業務プロセスとの対応付けや他ソフトウェアとの連携を容易にする手法"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 64,
@@ -1469,7 +1595,9 @@
         "text": "d"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 65,
@@ -1492,7 +1620,9 @@
         "text": "生産設備をもつ企業が、他社からの委託を受けて電子機器を製造する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 66,
@@ -1515,7 +1645,9 @@
         "text": "部品調達のリスクが顕在化したときに備えて、対処するための計画を策定する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 67,
@@ -1538,7 +1670,9 @@
         "text": "市場成長率が低く、相対的市場占有率が低い事業"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 68,
@@ -1561,7 +1695,9 @@
         "text": "ファイブフォース分析"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 69,
@@ -1584,7 +1720,9 @@
         "text": "商品が市場に投入されてから、次第に売れなくなり姿を消すまでのプロセスを、導入期,成長期,成熟(市場飽和)期,衰退期の4段階で表現して、その市場における製品の寿命を検討すること"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 70,
@@ -1607,7 +1745,9 @@
         "text": "デジタル空間に現実世界と同等な世界を、様々なセンサーで収集したデータを用いて構築し、現実世界では実施できないようなシミュレーションを行うこと"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 71,
@@ -1630,7 +1770,9 @@
         "text": "眼鏡メーカーが、店内で顧客の顔の形状を 3D スキャナーによってデジタル化し、パターンの組み合わせで顧客に合ったフレーム形状を設計する。その後、工場に設計情報を送信し、パーツを組み合わせてフレームを効率的に製造する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 72,
@@ -1653,7 +1795,9 @@
         "text": "周りの環境から微小なエネルギーを収穫して、電力に変換する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 73,
@@ -1676,7 +1820,9 @@
         "text": "非協力ゲームのモデルであり、相手の行動に対して最適な行動をとる行動原理の中で、どのプレイヤーも自分だけが戦略を変更しても利得を増やせない戦略の組合せ状態"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 74,
@@ -1699,7 +1845,9 @@
         "text": "連関図"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 75,
@@ -1722,7 +1870,9 @@
         "text": "60"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 76,
@@ -1745,7 +1895,9 @@
         "text": "2,862"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 77,
@@ -1768,7 +1920,9 @@
         "text": "480"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 78,
@@ -1791,7 +1945,9 @@
         "text": "文字,図形、記号などの標章で、商品や役務について使用するもの"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 79,
@@ -1814,7 +1970,9 @@
         "text": "他社サービスと類似しているが、自社サービスに適しており、正当な利益を得る目的があると認められるドメインを取得し、それを利用した。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   },
   {
     "qNo": 80,
@@ -1837,6 +1995,8 @@
         "text": "本人の病歴、犯罪の経歴など不当な差別や不利益を生じさせるおそれのある情報"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "category": "Strategy",
+    "subCategory": "システム戦略・経営戦略"
   }
 ]

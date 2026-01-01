@@ -13,6 +13,7 @@
         "sync-db": "ts-node src/scripts/sync-db.ts",
         "cleanse": "ts-node src/scripts/cleanse-pm-data.ts",
         "extract": "ts-node src/scripts/run-extract.ts",
+        "fix-cats": "ts-node src/scripts/fix-subcategories.ts",
         "lint": "eslint . --ext .ts"
     },
     "dependencies": {

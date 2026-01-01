@@ -79,7 +79,8 @@ export default function ExamListPage() {
             if (isAM) {
                 timeMatch = false;
             } else {
-                timeMatch = e.title.includes('\u5348\u5f8c') || e.id.endsWith('PM') || e.id.includes('-PM'); // 午後
+                // 午後: Includes title '午後', ID ends with 'PM', ID contains '-PM', OR ID starts with 'PM-' (Project Manager)
+                timeMatch = e.title.includes('\u5348\u5f8c') || e.id.endsWith('PM') || e.id.includes('-PM') || e.id.startsWith('PM-');
             }
         }
         return catMatch && timeMatch;
