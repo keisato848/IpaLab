@@ -174,7 +174,8 @@ async function main() {
         (
             f.includes('2025') ||
             f.startsWith('FE-') ||
-            (f.startsWith('AP-') && f.includes('-PM')) // Keep existing AP PM logic if needed
+            (f.startsWith('AP-') && f.includes('-PM')) ||
+            (f.startsWith('PM-') && f.includes('-PM1')) // Include PM Afternoon I
         )
     );
 

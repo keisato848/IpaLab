@@ -20,6 +20,13 @@ export const EXAM_LIST = [
     { category: "PM", year: "2022", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000008smf-att/2022r04a_pm_am2_qs.pdf" },
     { category: "PM", year: "2021", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000apad-att/2021r03a_pm_am2_qs.pdf" },
 
+    // PM (Project Manager) - Afternoon I (PM1)
+    { category: "PM", year: "2025", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_pm_pm1_qs.pdf" },
+    { category: "PM", year: "2024", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06a_pm_pm1_qs.pdf" },
+    { category: "PM", year: "2023", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05a_pm_pm1_qs.pdf" },
+    { category: "PM", year: "2022", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000008smf-att/2022r04a_pm_pm1_qs.pdf" },
+    { category: "PM", year: "2021", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000apad-att/2021r03a_pm_pm1_qs.pdf" },
+
     // FE (Fundamental Information Technology) - Subject A (AM equivalent)
     // FE (Fundamental Information Technology) - Subject A (AM equivalent)
     // 2019 Fall (Last traditional?)
