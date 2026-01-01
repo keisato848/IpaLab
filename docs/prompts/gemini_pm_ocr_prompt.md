@@ -63,6 +63,8 @@ Output a SINGLE JSON object.
     - **Tables**: Convert to Markdown tables.
 2.  **Mermaid Conversion**:
     - Try to interpret the logic of the diagram accurately.
+    - **CRITICAL**: Do NOT use invalid syntax. For example, `note:` is invalid in Sequence Diagrams unless followed by position (e.g., `Note right of Alice: Message`). **Do NOT** output lines starting with `note:` without an actor or position. If you want to add a note that doesn't fit the syntax, put it as a text comment `%% This is a note` or outside the code block.
+    - Ensure all participants in a sequence diagram are defined if using aliases.
     - If a diagram is too complex or non-standard (e.g. an arbitrary illustration), use a placeholder `[図X: (Description of image)]` AND strictly describe the contents in text. However, prioritize Mermaid whenever possible.
 3.  **Sub-Questions**:
     - Structure them cleanly.
