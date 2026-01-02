@@ -134,7 +134,99 @@ async function main() {
             else type = 'AM1'; // Default
 
             try {
-                // Logic...
+                const content = fs.readFileSync(path.join(dataDir, file), 'utf8');
+                const data = JSON.parse(content);
+
+                // 1. Upsert Exam
+                // Generate Title
+                let titlePrefix = "";
+                if (examPrefix === 'AP') titlePrefix = "応用情報技術者";
+                else if (examPrefix === 'FE') titlePrefix = "基本情報技術者";
+                else if (examPrefix === 'PM') titlePrefix = "プロジェクトマネージャ";
+                else if (examPrefix === 'SC') titlePrefix = "情報処理安全確保支援士";
+
+                let termStr = seasonStr === 'S' ? "春期" : "秋期";
+                let typeLabel = "午前";
+                if (type === 'AM2') typeLabel = "午前II";
+                else if (type === 'PM') typeLabel = "午後";
+                else if (type === 'PM1') typeLabel = "午後I";
+                else if (type === 'PM2') typeLabel = "午後II";
+
+                const examTitle = `${yearStr}年度 ${termStr} ${titlePrefix} ${typeLabel}`;
+
+                const examItem = {
+                    id: examId,
+                    title: examTitle,
+                    category: examPrefix,
+                    year: parseInt(yearStr),
+                    term: seasonStr,
+                    type: type,
+                    date: `${yearStr}-${seasonStr === 'S' ? '04' : '10'}-15`, // Approx date
+                };
+
+                await container.items.upsert(examItem);
+
+                console.log(`Upserted Exam: ${examId}`);
+
+                // 2. Upsert Questions
+                const questions = data.questions || []; // Handle root array or object
+                // Some raw files might be { questions: [] } or just []
+                const itemsToUpsert = [];
+
+                if (Array.isArray(questions)) {
+                    // Start loop
+                    for (const q of questions) {
+                        // PM/Afternoon logic (often nested)
+                        if (type.startsWith('PM') || type === 'AM2' || examPrefix === 'PM' || examPrefix === 'SC') {
+                            // PM AM2 is Multiple Choice, but PM/PM1/PM2 are descriptive
+                            // Check structure. If it has options, it's MC.
+                            if (q.options && q.options.length > 0) {
+                                // MC Question (e.g. SC AM2)
+                                itemsToUpsert.push({
+                                    id: `${examId}-${q.qNo}`,
+                                    examId: examId,
+                                    type: type,
+                                    qNo: q.qNo,
+                                    text: q.text,
+                                    options: q.options,
+                                    correctOption: q.correctOption,
+                                    explanation: "" // Explanations are separate usually
+                                });
+                            } else {
+                                // Descriptive Question (PM1, PM2, SC PM)
+                                // Schema: { id, examId, type, qNo, theme?, description?, questions: [] }
+                                itemsToUpsert.push({
+                                    id: `${examId}-${q.qNo || q.subQNo}`, // Warning: qNo might be string "設問1"
+                                    examId: examId,
+                                    type: type,
+                                    qNo: q.qNo || 99, // Num
+                                    subQNo: q.subQNo, // String label
+                                    theme: q.theme,
+                                    description: data.description || q.description, // Main description might be on root or question
+                                    questions: q.questions || q.subQuestions // Nested subquestions
+                                });
+                            }
+                        } else {
+                            // Standard AM (AP/FE)
+                            itemsToUpsert.push({
+                                id: `${examId}-${q.qNo}`,
+                                examId: examId,
+                                type: type,
+                                qNo: q.qNo,
+                                text: q.text,
+                                options: q.options,
+                                correctOption: q.correctOption
+                            });
+                        }
+                    }
+                }
+
+                // Actually upsert questions
+                const questionContainer = database.container(CONTAINER_NAME);
+                for (const item of itemsToUpsert) {
+                    await questionContainer.items.upsert(item);
+                }
+                console.log(`Upserted ${itemsToUpsert.length} questions for ${examId}`);
             } catch (err: any) {
                 console.error(`Failed to process ${folderName}:`, err.message);
                 continue;
