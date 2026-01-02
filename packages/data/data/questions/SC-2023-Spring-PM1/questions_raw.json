@@ -1,0 +1,61 @@
+{
+  "qNo": 1,
+  "theme": "Webアプリケーションプログラム開発 (Web Application Program Development)",
+  "description": "G社は、システム開発を行う従業員100名のSI企業である。このたび、オフィス用品を販売する従業員200名のY社から、システム開発を受託した。開発プロジェクトのリーダーには、G社の開発課の D 主任が任命され、メンバーには、開発課から、Eさんと新人のFさんが任命された。G社では、セキュリティの品質を担保するために、プログラミング完了後にツールによるソースコードの静的解析を実施することにしている。\n\n### 受託したシステムの概要\n\n受託したシステムには、Y社の得意先がオフィス用品を注文する機能、Y社とY社の得意先が注文履歴を表示させる機能、Y社とY社の得意先が注文番号を基に注文情報を照会する機能(以下,注文情報照会機能という), Y社とY社の得意先が納品書のPDFファイルをダウンロードする機能などがある。\n\n### ツールによるソースコードの静的解析\n\nプログラミングが完了し、ツールによるソースコードの静的解析を実施したところ、Fさんが作成した納品書 PDF ダウンロードクラスのソースコードに問題があることが分かった。納品書 PDFダウンロードクラスのソースコードを図1に、静的解析の結果を表1に示す。\n\n#### 図1 納品書 PDF ダウンロードクラスのソースコード\n```java\n(省略) //package宣言, import宣言など\n1: public class DeliverySlipBL {\n2: private static final String PDF_DIRECTORY = \"/var/pdf\"; //PDFディレクトリ定義\n3: (省略) //変数宣言など\n4: public DeliverySlipBean getDeliverySlipPDF (String inOrderNo, Connection conn) {\n5: (省略) //変数宣言など\n6: DeliverySlipBean deliverySlipBean = new DeliverySlipBean();\n7: try {\n/* 検索用SQL文作成 */\n8: String sql = \"SELECT \";\n9: sql = sql + (省略); //抽出項目,テーブル名など\n10: sql = sql + \" WHERE head.order_no = '\" + inOrderNo + \"';\n11: sql = sql + (省略); //抽出条件の続き\n12: Statement stmt = conn.createStatement();\n13: ResultSet resultObj = stmt.executeQuery(sql);\n(省略) //注文情報の存在チェック (存在しないときはnullを返してメソッドを終了)\n14: String clientCode = resultObj.getString(\"client_code\"); //得意先コード取得\n15: File fileObj = new File(PDF_DIRECTORY + \"/\" + clientCode + \"/\" + \"DeliverySlip\"\n16: + inOrderNo + \".pdf\");\n(省略) //PDFファイルが既に存在しているかの確認など\n17: BufferedInputStream in = new BufferedInputStream(new FileInputStream(fileObj));\n18: byte[] buf = new byte[in.available()];\n19: in.read(buf);\n20: deliverySlipBean.setFileByte(buf);\n21: } catch (Exception e) {\n22: (省略) //エラー処理 (ログ出力など)\n23: }\n24: return deliverySlipBean;\n25: }\n26: (省略)\n```\n\n#### 表1 静的解析の結果\n\n| 項番 | 脆弱性 | 指摘箇所 | 指摘内容 |\n| :--- | :--- | :--- | :--- |\n| 1 | SQLインジェクション | (省略) | (省略) |\n| 2 | ディレクトリトラバーサル | [ a ] 行目 | ファイルアクセスに用いるパス名の文字列作成で、利用者が入力したデータを直接使用している。 |\n| 3 | 確保したリソースの解放漏れ | (省略) | 変数 stmt, 変数 resultObj, 変数 [ b ] が指すリソースが解放されない。 |\n\nこの解析結果を受けて、Fさんは、Eさんの指導の下、ソースコードを修正した。表1の項番1について図1の8行目から11行目を図2に示すソースコードに修正した。項番2と項番3についてもソースコードを修正した。\n\n#### 図2 納品書 PDF ダウンロードクラスの修正後のソースコード (SQL Injection Fix)\n```java\nsql = sql + \" [ c ] \";\nsql = sql + (省略); //抽出条件の続き\n[ d ] ;\nstmt.setString(1, inOrderNo);\nResultSet resultObj = stmt.executeQuery();\n```\n\n再度、ツールによるソースコードの静的解析が実施され、表1の指摘は解消していることが確認された。\n\n### システムテスト\n\nシステムテストを開始したところ、注文情報照会機能において不具合が見つかった。この不具合は、ある得意先の利用者 ID でログインして画面から注文番号を入力すると、別の得意先の注文情報が出力されるというものであった。なお、ログイン処理時に、ログインした利用者IDと、利用者 ID にひも付く得意先コード及び得意先名はセッションオブジェクトに保存されている。\n\n注文情報照会機能には、業務処理を実行するクラス(以下、ビジネスロジッククラスという)及びリクエスト処理を実行するクラス(以下、サーブレットクラスという)が使用されている。注文情報照会機能が参照するデータベースの E-R 図を図3に、Eさんが作成したビジネスロジッククラスのソースコードを図4に、サーブレットクラスのソースコードを図5に示す。\n\n#### 図3 注文情報照会機能が参照するデータベースのE-R図\n\n```mermaid\nerDiagram\n    % 利用者マスター (Users)\n    利用者マスター {\n        string 利用者ID PK\n        string 利用者名\n        string 得意先コード FK\n        string パスワードソルト\n        string パスワードハッシュ\n    }\n\n    % 得意先マスター (Clients)\n    得意先マスター {\n        string 得意先コード PK\n        string 得意先名\n        string 郵便番号\n        string 住所\n        string 電話番号\n    }\n\n    % 注文ヘッダーテーブル (Order Headers)\n    注文ヘッダーテーブル {\n        string 注文番号 PK\n        string 注文日時\n        string 得意先コード FK\n        int 注文総額\n        int 消費税額\n    }\n\n    % 注文明細テーブル (Order Details)\n    注文明細テーブル {\n        string 注文番号 FK\n        string 注文明細番号 PK\n        string 商品コード\n        int 数量\n    }\n\n    得意先マスター ||--o{ 利用者マスター : 所属\n    得意先マスター ||--o{ 注文ヘッダーテーブル : 注文\n    注文ヘッダーテーブル ||--o{ 注文明細テーブル : 構成\n```\n\n#### 図4 ビジネスロジッククラスのソースコード (OrderInfoBL)\n\n```java\n(省略) //package宣言, import宣言など\n1: public class OrderInfoBL {\n2: private static String orderNo; //注文番号\n/* 注文番号の設定メソッド */\n3: public static void setOrderNo (String inOrderNo) {\n4: orderNo = inOrderNo;\n5: }\n/* 注文情報の取得メソッド */\n6: public static OrderInfoBean getOrderInfoBean() {\n7: PreparedStatement psObj;\n(省略) //try文、変数定義など\n8: String sql = \"SELECT \";\n9: sql = sql + (省略); //SQL文構築\n10: sql = sql + \" WHERE head.order_no = ?\"; //抽出条件:注文ヘッダーテーブルの注文番号と画面から入力された注文番号との完全一致\n11: (省略) //PreparedStatementの作成\n12: psObj.setString(1, orderNo); //検索キーに注文番号をセット\n13: ResultSet resultObj = psObj.executeQuery();\n(省略) //例外処理やその他の処理\n```\n\n#### 図5 サーブレットクラスのソースコード (OrderInfoServlet)\n\n```java\n(省略) //package宣言, import宣言など\n1: public class OrderInfoServlet extends HttpServlet {\n(省略) //変数定義\n2: public void doPost(HttpServletRequest reqObj, HttpServletResponse resObj) throws\nIOException, ServletException {\n3: String orderNo; //注文番号\n(省略) //try文, リクエストから注文番号を取得\n4: OrderInfoBL.setOrderNo (orderNo);\n5: OrderInfoBean orderInfoBeanObj = OrderInfoBL.getOrderInfoBean();\n(省略) //例外処理やその他の処理\n```\n\nD 主任, E さん, F さんは、不具合の原因が特定できず、セキュアプログラミングに詳しい技術課のHさんに協力を要請した。Hさんはアプリケーションログ及びソースコードを解析し、不具合の原因を特定した。原因は、図4で変数 [ e ] が [ f ] として宣言されていることである。この不具合は, ①並列動作する複数の処理が同一のリソースに同時にアクセスしたとき,想定外の処理結果が生じるものである。\n\n原因を特定することができたので、Eさんは、Hさんの支援の下、次の4点を行った。\n\n(1) 図4の2行目から5行目までのソースコードを削除する。\n(2) 図4の6行目を、図6に示すソースコードに修正する。\n\n#### 図6 ビジネスロジッククラスの修正後のソースコード\n\n```java\npublic OrderInfoBean getOrderInfoBean([ g ]) {\n```\n\n(3) 図5の4行目と5行目を、図7に示すソースコードに修正する。\n\n#### 図7 サーブレットクラスの修正後のソースコード\n\n```java\nOrderInfoBL orderInfoBLObj = [ h ] OrderInfoBL();\nOrderInfoBean orderInfoBeanObj = orderInfoBLObj.[ i ];\n```\n\n(4) 保険的な対策として、図4の10行目の抽出条件に、セッションオブジェクトに保存された [ j ] と注文ヘッダーテーブルの [ j ] の完全一致の条件を AND 条件として追加する。\n\nソースコードの修正後,改めてシステムテストを実施した。システムテストの結果は良好であり、システムがリリースされた。\n",
+  "questions": [
+    {
+      "subQNo": "設問1",
+      "text": "[ツールによるソースコードの静的解析]について答えよ。\n(1) 表1中の [ a ] に入れる適切な行番号を、図1中から選び、答えよ。\n(2) 表1中の [ b ] に入れる適切な変数名を、図1中から選び、答えよ。\n(3) 図2中の [ c ] , [ d ] に入れる適切な字句を答えよ。",
+      "explanation": "### 設問1の解説\nこの設問は、Fさんが作成したPDFダウンロード機能に潜む代表的な脆弱性（SQLインジェクション、ディレクトリトラバーサル、リソースリーク）に関する修正対応を問うています。\n\n#### (1) ディレクトリトラバーサルの指摘箇所 (a)\nディレクトリトラバーサルは、ファイルパスの構築にユーザー入力をそのまま使用することで、攻撃者がパス指定を操作し、想定外のファイルにアクセスする脆弱性です。\n図1を見ると、ユーザーが入力する `inOrderNo` を使用してファイルパスを作成しているのは、15行目と16行目にかけてです。特にファイルオブジェクトの生成が始まる15行目が適切な指摘箇所となります。\n**解答: 15**\n\n#### (2) リソース解放漏れが指摘された変数 (b)\nリソースの解放漏れは、データベース接続やファイルストリームなどのリソースを使い終わった後に閉じないことで発生します。これにより、システムの動作が不安定になったり、リソースが枯渇したりします。\n図1では、DB関連で `stmt` と `resultObj` が、ファイルアクセス関連で `in` (BufferedInputStream) が使用されていますが、これらが `try-catch` ブロック内で閉じられていません。\nしたがって、解放漏れが指摘されている3番目の変数名として `in` が適切です。\n**解答: in**\n\n#### (3) SQLインジェクション修正後の字句 (c, d)\nSQLインジェクションの脆弱性を解消するためには、ユーザー入力をSQL文に直接連結するのではなく、プリペアドステートメント（PreparedStatement）を使用する必要があります。\n\n**[ c ]** は、SQL文中のユーザー入力値が入るべき箇所を示すプレースホルダです。\n**解答: WHERE head.order_no = ?**\n\n**[ d ]** は、SQL文の構築後に、そのSQL文を使ってプリペアドステートメントオブジェクトを作成している箇所です。オリジナルのコードでは `Statement` を使用していましたが、ここでは `PreparedStatement` に変更し、SQL文を引数に渡す必要があります。\n**解答: stmt = conn.prepareStatement(sql)**\n",
+      "subQuestions": [
+        {
+          "label": "(1)",
+          "text": "表1中の [ a ] に入れる適切な行番号を、図1中から選び、答えよ。",
+          "point": 13
+        },
+        {
+          "label": "(2)",
+          "text": "表1中の [ b ] に入れる適切な変数名を、図1中から選び、答えよ。",
+          "point": 13
+        },
+        {
+          "label": "(3)",
+          "text": "図2中の [ c ] , [ d ] に入れる適切な字句を答えよ。",
+          "point": 13
+        }
+      ]
+    },
+    {
+      "subQNo": "設問2",
+      "text": "[システムテスト]について答えよ。\n(1) 本文中の [ e ] に入れる適切な変数名を、図5中から選び、答えよ。\n(2) 本文中の [ f ] に入れる適切な字句を、英字10字以内で答えよ。\n(3) 本文中の下線①の不具合は何と呼ばれるか。15字以内で答えよ。\n(4) 図6中の [ g ], 図7中の [ h ], [ i ] に入れる適切な字句を答えよ。\n(5) 本文中の [ j ] に入れる適切な属性名を、図3中から選び、答えよ。",
+      "explanation": "### 設問2の解説\nシステムテストで見つかった不具合は、ログインしたユーザーが、別得意先の注文情報を参照できてしまうというものでした。これは、Webアプリケーションにおけるセッション管理やスレッドの取り扱いに関する欠陥です。\n\n#### (1) (2) (3) 不具合の原因特定\n\n図4を見ると、ビジネスロジッククラス `OrderInfoBL` の変数 `orderNo` ( [ e ] ) が `private static` ( [ f ] ) として宣言されています。この `static` 修飾子により、`orderNo` はクラスのすべてのインスタンス、すなわちすべての処理スレッドで共有される静的変数となります。\n\nサーブレット (図5) では、リクエストごとに `setOrderNo` (行4) で値を設定し、すぐに `getOrderInfoBean` (行5) で値を取得して処理を行っています。\n\n複数のユーザーリクエストが同時に処理された場合、以下のシーケンスでデータが上書きされ、想定外の結果（別ユーザーの注文番号を使った問い合わせ）が発生します。\n\n#### 競合状態の流れ\n```mermaid\nsequenceDiagram\n    participant U1 as ユーザー1 (スレッドA)\n    participant U2 as ユーザー2 (スレッドB)\n    participant BL as OrderInfoBL (静的変数)\n\n    U1->>BL: setOrderNo(Order_A)\n    Note right of BL: orderNo = Order_A\n    U2->>BL: setOrderNo(Order_B)\n    Note right of BL: orderNo = Order_B (上書き発生)\n    U1->>BL: getOrderInfoBean()\n    Note right of BL: OrderInfoBLはOrder_Bを参照\n    BL-->>U1: Order_Bの情報を返却\n```\n\n(1) 共有リソースとなった変数名 [ e ] は `orderNo` です。\n**解答: orderNo**\n\n(2) 静的変数を宣言するキーワード [ f ] は `static` です。\n**解答: static**\n\n(3) 下線①「並列動作する複数の処理が同一のリソースに同時にアクセスしたとき,想定外の処理結果が生じるもの」は、代表的な並行処理のバグであり、**競合状態** (Race Condition) と呼ばれます。\n**解答: 競合状態**\n\n#### (4) 修正後のコード (g, h, i)\n\nこの修正の目的は、静的変数 `orderNo` を廃止し、スレッドごとに独立したデータを持つようにすることです。\n\n**[ g ]**: 図4の2～5行目（静的変数とsetter）が削除されたため、`getOrderInfoBean` メソッドは注文番号を引数として受け取る必要があります。\n**解答: String orderNo**\n\n**[ h ]**: サーブレット側では、BLクラスを静的呼び出しするのではなく、リクエストごとにインスタンス化（オブジェクト生成）して利用するように変更します。\n**解答: new**\n\n**[ i ]**: 新しく生成されたインスタンス `orderInfoBLObj` を使用して、修正されたメソッド `getOrderInfoBean` を呼び出し、注文番号を引数として渡します。\n**解答: getOrderInfoBean(orderNo)**\n\n#### (5) 保険的な対策 (j)\n\n不具合の原因である競合状態は修正されましたが、保険的な対策として、SQLクエリにログインユーザーの権限に基づいたアクセス制御を追加します。これにより、万が一、注文番号が漏洩しても、別得意先の情報を取得できなくなります。\n\nログイン時にセッションに保存され、注文ヘッダーテーブル (図3) にも存在する、得意先を特定するための属性は **得意先コード** です。\n\n抽出条件として、セッションの [ j ] (`得意先コード`) と注文ヘッダーテーブルの [ j ] (`得意先コード`) が一致することを必須とします。\n**解答: 得意先コード**\n",
+      "subQuestions": [
+        {
+          "label": "(1)",
+          "text": "本文中の [ e ] に入れる適切な変数名を、図5中から選び、答えよ。",
+          "point": 13
+        },
+        {
+          "label": "(2)",
+          "text": "本文中の [ f ] に入れる適切な字句を、英字10字以内で答えよ。",
+          "point": 12
+        },
+        {
+          "label": "(3)",
+          "text": "本文中の下線①の不具合は何と呼ばれるか。15字以内で答えよ。",
+          "point": 12
+        },
+        {
+          "label": "(4)",
+          "text": "図6中の [ g ], 図7中の [ h ], [ i ] に入れる適切な字句を答えよ。",
+          "point": 12
+        },
+        {
+          "label": "(5)",
+          "text": "本文中の [ j ] に入れる適切な属性名を、図3中から選び、答えよ。",
+          "point": 12
+        }
+      ]
+    }
+  ]
+}
