@@ -5,7 +5,15 @@ import fs from 'fs/promises';
 import path from 'path';
 
 // Load environment variables
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+const envPaths = [
+    path.resolve(__dirname, '../../.env'),
+    path.resolve(__dirname, '../../../../apps/web/.env.local'),
+    path.resolve(__dirname, '../../../../apps/web/.env')
+];
+
+envPaths.forEach(envPath => {
+    dotenv.config({ path: envPath });
+});
 
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
@@ -15,6 +23,7 @@ if (!apiKey) {
 const fileManager = new GoogleAIFileManager(apiKey);
 const genAI = new GoogleGenerativeAI(apiKey);
 
+// Use a model that supports file input and JSON generation
 // Use a model that supports file input and JSON generation
 const model = genAI.getGenerativeModel({
     model: "gemini-flash-latest",
@@ -62,8 +71,8 @@ async function generateWithRetry(promptParts: any[], maxRetries = 5) {
         } catch (error: any) {
             console.error(`Generation failed (attempt ${i + 1}/${maxRetries}):`, error.message);
             if (error.status === 429 || error.message?.includes('429')) {
-                console.log("Rate limit hit. Waiting 60s...");
-                await new Promise(r => setTimeout(r, 60000));
+                console.log("Rate limit hit. Waiting 120s...");
+                await new Promise(r => setTimeout(r, 120000));
             } else {
                 await new Promise(r => setTimeout(r, 5000));
             }
@@ -176,12 +185,19 @@ async function main() {
             f.startsWith('FE-') ||
             (f.startsWith('AP-') && f.includes('-PM')) ||
             (f.startsWith('PM-') && (f.includes('-PM1') || f.includes('-PM2'))) || // Include PM Afternoon I & II
-            (f.startsWith('SC-') && (f.includes('-AM2') || f.includes('-PM') || f.includes('-PM1') || f.includes('-PM2'))) // Include SC
+            (f.startsWith('SC-') && (f.includes('-AM2') || f.includes('-PM') || f.includes('-PM1') || f.includes('-PM2'))) || // Include SC
+            (f.startsWith('IP-')) // Include IT Passport
         )
     );
 
     // Sort Newest First (2024 -> 2016)
-    examFiles.sort((a, b) => b.localeCompare(a));
+    examFiles.sort((a, b) => {
+        const aIsIP = a.startsWith('IP-');
+        const bIsIP = b.startsWith('IP-');
+        if (aIsIP && !bIsIP) return -1;
+        if (!aIsIP && bIsIP) return 1;
+        return b.localeCompare(a);
+    });
 
     console.log(`Found ${examFiles.length} AP PM exams.`);
 
