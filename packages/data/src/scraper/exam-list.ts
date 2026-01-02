@@ -72,5 +72,9 @@ export const EXAM_LIST = [
     // Subject A (AM)
     { category: "FE", year: "2022", term: "Sample", type: "AM", url: "https://www.ipa.go.jp/shiken/syllabus/henkou/2022/gmcbt80000007cfs-att/fe_kamoku_a_set_sample_qs.pdf" },
     // Subject B (PM) - Stored as PM for download convienence
-    { category: "FE", year: "2022", term: "Sample", type: "PM", url: "https://www.ipa.go.jp/shiken/syllabus/henkou/2022/gmcbt80000007cfs-att/fe_kamoku_b_set_sample_qs.pdf" }
+    { category: "FE", year: "2022", term: "Sample", type: "PM", url: "https://www.ipa.go.jp/shiken/syllabus/henkou/2022/gmcbt80000007cfs-att/fe_kamoku_b_set_sample_qs.pdf" },
+
+    // IP (IT Passport) - Publicly Available Questions (Open Questions)
+    // 2024 (Reiwa 6)
+    { category: "IP", year: "2024", term: "Spring", type: "AM", url: "https://www3.jitec.ipa.go.jp/JitesCbt/html/openinfo/pdf/questions/2024r06_ip_qs.pdf" }
 ];

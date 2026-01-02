@@ -144,10 +144,12 @@ async function main() {
                 else if (examPrefix === 'FE') titlePrefix = "基本情報技術者";
                 else if (examPrefix === 'PM') titlePrefix = "プロジェクトマネージャ";
                 else if (examPrefix === 'SC') titlePrefix = "情報処理安全確保支援士";
+                else if (examPrefix === 'IP') titlePrefix = "ITパスポート";
 
                 let termStr = seasonStr === 'S' ? "春期" : "秋期";
                 let typeLabel = "午前";
-                if (type === 'AM2') typeLabel = "午前II";
+                if (examPrefix === 'IP') typeLabel = "公開問題";
+                else if (type === 'AM2') typeLabel = "午前II";
                 else if (type === 'PM') typeLabel = "午後";
                 else if (type === 'PM1') typeLabel = "午後I";
                 else if (type === 'PM2') typeLabel = "午後II";
