@@ -27,6 +27,42 @@ export const EXAM_LIST = [
     { category: "PM", year: "2022", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000008smf-att/2022r04a_pm_pm1_qs.pdf" },
     { category: "PM", year: "2021", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000apad-att/2021r03a_pm_pm1_qs.pdf" },
 
+    // SC (Information Security Specialist) - Morning II (AM2)
+    { category: "SC", year: "2025", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_sc_am2_qs.pdf" },
+    { category: "SC", year: "2024", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06a_sc_am2_qs.pdf" },
+    { category: "SC", year: "2024", term: "Spring", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_sc_am2_qs.pdf" },
+    { category: "SC", year: "2023", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05a_sc_am2_qs.pdf" },
+    { category: "SC", year: "2023", term: "Spring", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_sc_am2_qs.pdf" },
+    { category: "SC", year: "2022", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000008smf-att/2022r04a_sc_am2_qs.pdf" },
+    { category: "SC", year: "2022", term: "Spring", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_sc_am2_qs.pdf" },
+    { category: "SC", year: "2021", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000apad-att/2021r03a_sc_am2_qs.pdf" },
+    { category: "SC", year: "2021", term: "Spring", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_sc_am2_qs.pdf" },
+
+    // SC - Afternoon (PM) - Single Exam (2023 Fall onwards)
+    { category: "SC", year: "2025", term: "Fall", type: "PM", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_sc_pm_qs.pdf" },
+    { category: "SC", year: "2024", term: "Fall", type: "PM", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06a_sc_pm_qs.pdf" },
+    { category: "SC", year: "2024", term: "Spring", type: "PM", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_sc_pm_qs.pdf" },
+    { category: "SC", year: "2023", term: "Fall", type: "PM", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05a_sc_pm_qs.pdf" },
+
+    // SC - Afternoon I (PM1) & II (PM2) - Split Exams (Until 2023 Spring)
+    { category: "SC", year: "2023", term: "Spring", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_sc_pm1_qs.pdf" },
+    { category: "SC", year: "2023", term: "Spring", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_sc_pm2_qs.pdf" },
+    { category: "SC", year: "2022", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000008smf-att/2022r04a_sc_pm1_qs.pdf" },
+    { category: "SC", year: "2022", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000008smf-att/2022r04a_sc_pm2_qs.pdf" },
+    { category: "SC", year: "2022", term: "Spring", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_sc_pm1_qs.pdf" },
+    { category: "SC", year: "2022", term: "Spring", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_sc_pm2_qs.pdf" },
+    { category: "SC", year: "2021", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000apad-att/2021r03a_sc_pm1_qs.pdf" },
+    { category: "SC", year: "2021", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000apad-att/2021r03a_sc_pm2_qs.pdf" },
+    { category: "SC", year: "2021", term: "Spring", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_sc_pm1_qs.pdf" },
+    { category: "SC", year: "2021", term: "Spring", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_sc_pm2_qs.pdf" },
+
+    // PM (Project Manager) - Afternoon II (PM2)
+    { category: "PM", year: "2025", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_pm_pm2_qs.pdf" },
+    { category: "PM", year: "2024", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06a_pm_pm2_qs.pdf" },
+    { category: "PM", year: "2023", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05a_pm_pm2_qs.pdf" },
+    { category: "PM", year: "2022", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000008smf-att/2022r04a_pm_pm2_qs.pdf" },
+    { category: "PM", year: "2021", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000apad-att/2021r03a_pm_pm2_qs.pdf" },
+
     // FE (Fundamental Information Technology) - Subject A (AM equivalent)
     // FE (Fundamental Information Technology) - Subject A (AM equivalent)
     // 2019 Fall (Last traditional?)

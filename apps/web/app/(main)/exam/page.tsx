@@ -79,8 +79,8 @@ export default function ExamListPage() {
             if (isAM) {
                 timeMatch = false;
             } else {
-                // 午後: Includes title '午後', ID ends with 'PM', ID contains '-PM', OR ID starts with 'PM-' (Project Manager)
-                timeMatch = e.title.includes('\u5348\u5f8c') || e.id.endsWith('PM') || e.id.includes('-PM') || e.id.startsWith('PM-');
+                // 午後: Includes title '午後', ID ends with 'PM', ID contains '-PM', OR ID starts with 'PM-'/'SC-' (Project Manager/Security Specialist)
+                timeMatch = e.title.includes('\u5348\u5f8c') || e.id.endsWith('PM') || e.id.includes('-PM') || e.id.startsWith('PM-') || e.id.startsWith('SC-');
             }
         }
         return catMatch && timeMatch;
@@ -107,6 +107,7 @@ export default function ExamListPage() {
                             <button onClick={() => setFilter('AP')} className={`${styles.filterBtn} ${filter === 'AP' ? styles.filterBtnSelected : ''}`}>応用情報 (AP)</button>
                             <button onClick={() => setFilter('FE')} className={`${styles.filterBtn} ${filter === 'FE' ? styles.filterBtnSelected : ''}`}>基本情報 (FE)</button>
                             <button onClick={() => setFilter('PM')} className={`${styles.filterBtn} ${filter === 'PM' ? styles.filterBtnSelected : ''}`}>プロマネ (PM)</button>
+                            <button onClick={() => setFilter('SC')} className={`${styles.filterBtn} ${filter === 'SC' ? styles.filterBtnSelected : ''}`}>安全確保支援士 (SC)</button>
                         </div>
                     </div>
 
