@@ -34,6 +34,14 @@ export function LoginForm() {
                 </button>
             </div>
 
+            <p className={styles.consent}>
+                ログインすることで、
+                <a href="/terms" className={styles.link} target="_blank" rel="noopener noreferrer">利用規約</a>
+                および
+                <a href="/privacy" className={styles.link} target="_blank" rel="noopener noreferrer">プライバシーポリシー</a>
+                に同意したものとみなします。
+            </p>
+
             <div className={styles.divider}>
                 <span>または</span>
             </div>
