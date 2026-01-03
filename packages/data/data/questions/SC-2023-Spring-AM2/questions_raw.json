@@ -20,7 +20,8 @@
         "text": "CRYPTREC 暗号リストにある電子政府推奨暗号リストとは、互換性維持目的に限った継続利用を推奨する暗号技術のリストである。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 2,
@@ -43,7 +44,8 @@
         "text": "ハッシュ化されずに保存されている平文パスワードを使ってログインする。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 3,
@@ -66,7 +68,8 @@
         "text": "リバースプロキシで利用者認証が行われ、クライアントは認証成功後にリバースプロキシ経由で SP にアクセスする。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 4,
@@ -89,7 +92,8 @@
         "text": "衝突発見困難性とは、ハッシュ値が一致する二つの元のメッセージの発見に要する計算量が大きいことによる、発見の困難性のことである。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 5,
@@ -112,7 +116,8 @@
         "text": "プレースホルダを用いたエスケープ処理を行うことによって、不正な SQL 構文による DNS リソースレコードの書換えを防ぐ。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 6,
@@ -135,7 +140,8 @@
         "text": "ルート認証局は、下位の認証局の公開鍵にルート認証局の公開鍵でデジタル署名したデジタル証明書を発行する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 7,
@@ -158,7 +164,8 @@
         "text": "複数ブロックの暗号化の処理は並列に実行できないが、複数ブロックの復号の処理は並列に実行できる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 8,
@@ -181,7 +188,8 @@
         "text": "日本セキュリティ監査協会“クラウド情報セキュリティ管理基準(平成28年度版)”"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 9,
@@ -204,7 +212,8 @@
         "text": "責任, 戦略, 取得, パフォーマンス, 適合, 人間行動"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 10,
@@ -227,7 +236,8 @@
         "text": "悪意のある通信を正常な通信と見せかけ、HTTP リクエストを分割して送信されたとき, WAF が遮断しない。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 11,
@@ -250,7 +260,8 @@
         "text": "保護層を備えて、内部のデータが不正に書き換えられないようにする。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 12,
@@ -273,7 +284,8 @@
         "text": "IPS が監視対象の通信を通過させるように通信経路上に設置され、定義した異常な通信と合致する通信を不正と判断して遮断する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 13,
@@ -296,7 +308,8 @@
         "text": "調査対象のPCのシステムログファイル"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 14,
@@ -319,7 +332,8 @@
         "text": "WPA3-Enterprise は, IEEE 802.1X の規格に沿った利用者認証及び動的に配布される暗号化鍵を用いた暗号化通信を実装するための規格である。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 15,
@@ -342,7 +356,8 @@
         "text": "ネットワーク機器において、内部ネットワークから外部のメールサーバの TCP ポート番号 25 への直接の通信を禁止する仕組み"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 16,
@@ -365,7 +380,8 @@
         "text": "ISP 管理下のネットワークに向けて ISP 管理外のネットワークから送信されるスパムメールを制限する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 17,
@@ -388,7 +404,8 @@
         "text": "Web アプリケーションプログラムの実装における対策: プレースホルダを利用する。 / 実装以外の対策: Web アプリケーションプログラムが利用するデータベースのアカウントがもつデータベースアクセス権限を必要最小限にする。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 18,
@@ -411,7 +428,8 @@
         "text": "5,000"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 19,
@@ -434,7 +452,8 @@
         "text": "ルートポート (Root Port)"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 20,
@@ -457,7 +476,8 @@
         "text": "255.255.255.255 はサブネットの外へのブロードキャストだけに使用され、サブネット内のブロードキャストには使用できない。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 21,
@@ -480,7 +500,8 @@
         "text": "SELECT 権限、及び SELECT 権限の付与権を付与するが、UPDATE 権限, INSERT 権限, DELETE 権限、及びそれらの付与権は付与しない。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 22,
@@ -503,7 +524,8 @@
         "text": "ネットワーク, バス, デバッグインタフェースなどの脆弱性を利用して, IoT 機器への攻撃と侵入を試みるテストを行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 23,
@@ -526,7 +548,8 @@
         "text": "他人のソフトウェアを正当な手段で入手し、試験又は研究のために逆コンパイルを行った。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 24,
@@ -549,7 +572,8 @@
         "text": "インシデントの発生を記録し、関係する部署に状況を連絡する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 25,
@@ -572,6 +596,7 @@
         "text": "情報システムリスクは常に一定ではないことから、情報システムリスクの特性の変化及び変化がもたらす影響に留意する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   }
 ]

@@ -68,19 +68,20 @@ export default function ExamListPage() {
         fetchExamsAndStats();
     }, [session]);
 
+    const [subcategoryFilter, setSubcategoryFilter] = useState('ALL');
+
     const filteredExams = exams.filter(e => {
         const catMatch = filter === 'ALL' || e.category === filter;
         let timeMatch = true;
 
         if (timeFilter === 'AM') {
-            timeMatch = e.id.includes('AM') || e.title.includes('\u5348\u524d'); // 午前
+            timeMatch = e.id.includes('AM') || e.title.includes('午前');
         } else if (timeFilter === 'PM') {
-            const isAM = e.id.includes('AM') || e.title.includes('\u5348\u524d'); // 午前
+            const isAM = e.id.includes('AM') || e.title.includes('午前');
             if (isAM) {
                 timeMatch = false;
             } else {
-                // 午後: Includes title '午後', ID ends with 'PM', ID contains '-PM', OR ID starts with 'PM-'/'SC-' (Project Manager/Security Specialist)
-                timeMatch = e.title.includes('\u5348\u5f8c') || e.id.endsWith('PM') || e.id.includes('-PM') || e.id.startsWith('PM-') || e.id.startsWith('SC-');
+                timeMatch = e.title.includes('午後') || e.id.endsWith('PM') || e.id.includes('-PM') || e.id.startsWith('PM-') || e.id.startsWith('SC-');
             }
         }
         return catMatch && timeMatch;
@@ -104,10 +105,11 @@ export default function ExamListPage() {
                         <span className={styles.filterLabel}>区分:</span>
                         <div className={styles.filterButtons}>
                             <button onClick={() => setFilter('ALL')} className={`${styles.filterBtn} ${filter === 'ALL' ? styles.filterBtnSelected : ''}`}>すべて</button>
-                            <button onClick={() => setFilter('AP')} className={`${styles.filterBtn} ${filter === 'AP' ? styles.filterBtnSelected : ''}`}>応用情報 (AP)</button>
                             <button onClick={() => setFilter('FE')} className={`${styles.filterBtn} ${filter === 'FE' ? styles.filterBtnSelected : ''}`}>基本情報 (FE)</button>
-                            <button onClick={() => setFilter('PM')} className={`${styles.filterBtn} ${filter === 'PM' ? styles.filterBtnSelected : ''}`}>プロマネ (PM)</button>
+                            <button onClick={() => setFilter('AP')} className={`${styles.filterBtn} ${filter === 'AP' ? styles.filterBtnSelected : ''}`}>応用情報 (AP)</button>
                             <button onClick={() => setFilter('SC')} className={`${styles.filterBtn} ${filter === 'SC' ? styles.filterBtnSelected : ''}`}>安全確保支援士 (SC)</button>
+                            <button onClick={() => setFilter('PM')} className={`${styles.filterBtn} ${filter === 'PM' ? styles.filterBtnSelected : ''}`}>プロマネ (PM)</button>
+                            <button onClick={() => setFilter('IP')} className={`${styles.filterBtn} ${filter === 'IP' ? styles.filterBtnSelected : ''}`}>ITパスポート (IP)</button>
                         </div>
                     </div>
 
@@ -118,6 +120,23 @@ export default function ExamListPage() {
                             <button onClick={() => setTimeFilter('ALL')} className={`${styles.filterBtn} ${timeFilter === 'ALL' ? styles.filterBtnSelected : ''}`}>すべて</button>
                             <button onClick={() => setTimeFilter('AM')} className={`${styles.filterBtn} ${timeFilter === 'AM' ? styles.filterBtnSelected : ''}`}>午前 (AM)</button>
                             <button onClick={() => setTimeFilter('PM')} className={`${styles.filterBtn} ${timeFilter === 'PM' ? styles.filterBtnSelected : ''}`}>午後 (PM)</button>
+                        </div>
+                    </div>
+
+                    {/* Subcategory Filter (Pass-through) */}
+                    <div className={styles.filterGroup}>
+                        <span className={styles.filterLabel}>分野:</span>
+                        <div className={styles.filterButtons}>
+                            <select
+                                className={styles.dropdown}
+                                value={subcategoryFilter}
+                                onChange={(e) => setSubcategoryFilter(e.target.value)}
+                            >
+                                <option value="ALL">指定なし</option>
+                                <option value="Technology">テクノロジ系</option>
+                                <option value="Management">マネジメント系</option>
+                                <option value="Strategy">ストラテジ系</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -147,8 +166,11 @@ export default function ExamListPage() {
                         else if (exam.id.includes('PM2')) startType = 'PM2';
                         else if (exam.id.includes('PM') && !exam.id.startsWith('PM-')) startType = 'PM';
 
+                        // Append subcategory filter to URL
+                        const linkHref = `/exam/${exam.id}/${startType}${subcategoryFilter !== 'ALL' ? `?category=${subcategoryFilter}` : ''}`;
+
                         return (
-                            <Link href={`/exam/${exam.id}/${startType}`} key={exam.id} className={styles.cardLink}>
+                            <Link href={linkHref} key={exam.id} className={styles.cardLink}>
                                 <article className={styles.card}>
                                     <div className={styles.cardHeader}>
                                         <span className={styles.tag}>{exam.category}</span>
