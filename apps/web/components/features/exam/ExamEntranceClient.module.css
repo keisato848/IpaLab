@@ -165,3 +165,48 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
+
+/* Status Styles */
+.correct {
+    border-color: #22c55e;
+    background-color: #f0fdf4;
+    /* Green-50 */
+}
+
+.incorrect {
+    border-color: #ef4444;
+    background-color: #fef2f2;
+    /* Red-50 */
+}
+
+.iconCorrect {
+    color: #22c55e;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+.iconIncorrect {
+    color: #ef4444;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+.statusBadge {
+    margin-top: auto;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding-top: 0.5rem;
+    width: 100%;
+    text-align: right;
+    color: var(--text-secondary);
+}
+
+.correct .statusBadge {
+    color: #15803d;
+    /* Green-700 */
+}
+
+.incorrect .statusBadge {
+    color: #b91c1c;
+    /* Red-700 */
+}

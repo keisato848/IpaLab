@@ -29,7 +29,8 @@
           "answer": "FW",
           "point": 13
         }
-      ]
+      ],
+      "subCategory": "その他"
     },
     {
       "subQNo": "設問2",
@@ -71,7 +72,8 @@
           "answer": "イ",
           "point": 12
         }
-      ]
+      ],
+      "subCategory": "その他"
     }
   ]
 }

@@ -1,90 +1,93 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as glob from 'glob';
-
-interface Question {
-    qNo: number;
-    text: string;
-    options: any[];
-    correctOption: string | null;
-    category?: string;
-    subCategory?: string;
-}
-
-const mapCategory = (qNo: number): string => {
-    if (qNo <= 50) return 'Technology';
-    if (qNo <= 60) return 'Management';
-    if (qNo <= 80) return 'Strategy';
-    return 'Technology';
-};
-
-const mapSubCategory = (qNo: number): string => {
-    if (qNo <= 5) return '基礎理論'; // Basic Theory
-    if (qNo <= 10) return 'アルゴリズムとプログラミング'; // Algorithms & Programming
-    if (qNo <= 25) return 'コンピュータシステム'; // Computer System
-    if (qNo <= 35) return '技術要素'; // DB, Network
-    if (qNo <= 45) return 'セキュリティ'; // Security
-    if (qNo <= 50) return 'システム開発技術'; // System Development
-    if (qNo <= 60) return 'プロジェクト・サービスマネジメント'; // Project & Service Mgmt
-    if (qNo <= 80) return 'システム戦略・経営戦略'; // Strategy
-    return 'General';
-};
+import { glob } from 'glob';
 
 const DATA_DIR = path.resolve(__dirname, '../../data/questions');
 
+// Default mapping based on Category
+const DEFAULT_SUBCATEGORIES: Record<string, string> = {
+    'Technology': 'テクノロジ系',
+    'Management': 'マネジメント系',
+    'Strategy': 'ストラテジ系',
+    'Other': 'その他'
+};
+
 async function main() {
-    console.log(`Scanning for AP AM questions in ${DATA_DIR}...`);
+    console.log(`Scanning for questions_raw.json in ${DATA_DIR}...`);
+    const files = await glob(`${DATA_DIR}/**/questions_raw.json`);
 
-    // Glob all questions_raw.json in AP-* folders
-    // We target AP-*-AM folders strictly to avoid touching PM or FE for now if schema differs
-    const files = glob.sync('AP-*-AM/questions_raw.json', { cwd: DATA_DIR });
-
-    console.log(`Found ${files.length} exam files to process.`);
-
-    let updatedCount = 0;
+    let totalFixed = 0;
+    let totalFiles = 0;
 
     for (const file of files) {
-        const fullPath = path.join(DATA_DIR, file);
-        const content = fs.readFileSync(fullPath, 'utf8');
-        let questions: Question[];
+        // Extract Exam ID context from path
+        // e.g. .../data/questions/FE-2019-Spring-AM/questions_raw.json -> FE-2019-Spring-AM
+        const parentDir = path.basename(path.dirname(file));
 
+        let content = fs.readFileSync(file, 'utf-8');
+        let data: any;
         try {
-            questions = JSON.parse(content);
+            data = JSON.parse(content);
         } catch (e) {
-            console.error(`Failed to parse ${file}: ${e}`);
+            console.error(`Failed to parse ${file}:`, e);
             continue;
         }
 
-        if (!Array.isArray(questions)) {
-            console.warn(`Skipping ${file}: content is not an array (likely PM exam)`);
+        let questions: any[] = [];
+        let isRootArray = Array.isArray(data);
+
+        if (isRootArray) {
+            questions = data;
+        } else if (data.questions && Array.isArray(data.questions)) {
+            questions = data.questions;
+        } else {
+            console.warn(`Skipping ${file}: Unknown structure`);
             continue;
         }
 
         let fileModified = false;
-        questions = questions.map(q => {
-            const newCat = mapCategory(q.qNo);
-            const newSub = mapSubCategory(q.qNo);
 
-            if (q.category !== newCat || q.subCategory !== newSub) {
+        for (const q of questions) {
+            // Check for subCategory (camelCase seems to be the standard in viewed file)
+            // But also check 'subcategory' (lowercase) just in case
+            const currentSub = q.subCategory || q.subcategory;
+
+            if (!currentSub || currentSub.trim() === '') {
+                // Determine default
+                const category = q.category || 'Other';
+                const defaultSub = DEFAULT_SUBCATEGORIES[category] || category; // Fallback to category name itself
+
+                q.subCategory = defaultSub; // Standardize to subCategory
+
+                // Remove lowercase variant if it existed to clean up
+                if (q.subcategory) delete q.subcategory;
+
                 fileModified = true;
-                return {
-                    ...q,
-                    category: newCat,
-                    subCategory: newSub
-                };
+                totalFixed++;
+            } else {
+                // Ensure standardization if mixed casing exists
+                if (q.subcategory && !q.subCategory) {
+                    q.subCategory = q.subcategory;
+                    delete q.subcategory;
+                    fileModified = true;
+                }
             }
-            return q;
-        });
+        }
 
         if (fileModified) {
-            fs.writeFileSync(fullPath, JSON.stringify(questions, null, 2));
-            console.log(`Updated ${file}`);
-            updatedCount++;
+            // Write back
+            const newContent = isRootArray ? questions : { ...data, questions };
+            fs.writeFileSync(file, JSON.stringify(newContent, null, 2));
+            console.log(`Updated ${parentDir} (${questions.length} items)`);
+            totalFiles++;
         }
     }
 
-    console.log(`Finished. Updated ${updatedCount} files.`);
+    console.log(`\nFix Complete.`);
+    console.log(`Files updated: ${totalFiles}`);
+    console.log(`Total questions fixed: ${totalFixed}`);
+    console.log(`\nNext Step: Run 'npm run sync-db' to propagate changes to the database.`);
 }
 
-main();
+main().catch(console.error);

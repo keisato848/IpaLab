@@ -26,7 +26,8 @@
           "answer": "改行文字",
           "point": 13
         }
-      ]
+      ],
+      "subCategory": "その他"
     },
     {
       "subQNo": "設問2",
@@ -57,7 +58,8 @@
           "answer": "stmt",
           "point": 12
         }
-      ]
+      ],
+      "subCategory": "その他"
     },
     {
       "subQNo": "設問3",
@@ -70,7 +72,8 @@
           "answer": "情報番号 = ? AND プロジェクトID = ?",
           "point": 12
         }
-      ]
+      ],
+      "subCategory": "その他"
     }
   ]
 }
