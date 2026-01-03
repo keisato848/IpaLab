@@ -145,7 +145,7 @@ export default function ExamListPage() {
                         if (exam.id.includes('AM2')) startType = 'AM2';
                         else if (exam.id.includes('PM1')) startType = 'PM1';
                         else if (exam.id.includes('PM2')) startType = 'PM2';
-                        else if (exam.id.includes('PM') && !exam.id.startsWith('PM-') && !exam.id.startsWith('SC-')) startType = 'PM';
+                        else if (exam.id.includes('PM') && !exam.id.startsWith('PM-')) startType = 'PM';
 
                         return (
                             <Link href={`/exam/${exam.id}/${startType}`} key={exam.id} className={styles.cardLink}>
