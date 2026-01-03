@@ -177,7 +177,7 @@ async function main() {
                 console.log(`Upserted Exam: ${examId} into Exams container`);
 
                 // 2. Upsert Questions
-                const questions = data.questions || []; // Handle root array or object
+                const questions = Array.isArray(data) ? data : (data.questions || []); // Handle root array or object
                 // Some raw files might be { questions: [] } or just []
                 const itemsToUpsert = [];
 
@@ -209,6 +209,7 @@ async function main() {
                                     type: type,
                                     qNo: q.qNo || 99, // Num
                                     subQNo: q.subQNo, // String label
+                                    text: q.text || q.theme || "（記述式問題）", // Ensure text exists for frontend summary
                                     theme: q.theme,
                                     description: data.description || q.description, // Main description might be on root or question
                                     questions: q.questions || q.subQuestions // Nested subquestions
