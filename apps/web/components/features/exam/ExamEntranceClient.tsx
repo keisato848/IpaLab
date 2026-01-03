@@ -133,7 +133,7 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                                     <span className={styles.qNo}>Q{q.qNo}</span>
                                     <span className={styles.qCat}>{q.subCategory || q.category}</span>
                                 </div>
-                                <p className={styles.qSummary}>{q.text.substring(0, 40)}...</p>
+                                <p className={styles.qSummary}>{(q.text || "").substring(0, 40)}...</p>
                             </Link>
                         ))}
                     </div>
