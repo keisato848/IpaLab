@@ -15,33 +15,50 @@ envPaths.forEach(envPath => {
     dotenv.config({ path: envPath });
 });
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-    throw new Error('GEMINI_API_KEY is not set');
+// Load API Keys
+const apiKeys: string[] = [];
+if (process.env.GEMINI_API_KEY) apiKeys.push(process.env.GEMINI_API_KEY);
+for (let i = 1; i <= 4; i++) {
+    const key = process.env[`GEMINI_API_KEY_${i}`];
+    if (key) apiKeys.push(key);
 }
 
-const fileManager = new GoogleAIFileManager(apiKey);
-const genAI = new GoogleGenerativeAI(apiKey);
+if (apiKeys.length === 0) {
+    throw new Error('No GEMINI_API_KEY found in environment variables.');
+}
 
-// Use a model that supports file input and JSON generation
-// Use a model that supports file input and JSON generation
-const model = genAI.getGenerativeModel({
-    model: "gemini-flash-latest",
-});
+console.log(`Loaded ${apiKeys.length} API keys for rotation.`);
 
-async function uploadToGemini(filePath: string, mimeType: string) {
+// Client factory with rotation
+let keyIndex = 0;
+function getGeminiClient() {
+    const key = apiKeys[keyIndex];
+    keyIndex = (keyIndex + 1) % apiKeys.length; // Round-robin
+    return {
+        fileManager: new GoogleAIFileManager(key),
+        model: new GoogleGenerativeAI(key).getGenerativeModel({
+            model: "gemini-flash-latest",
+            generationConfig: {
+                responseMimeType: "application/json"
+            }
+        }),
+        keyIndex: (keyIndex === 0 ? apiKeys.length : keyIndex) - 1 // Return logical index of key used
+    };
+}
+
+async function uploadToGemini(client: { fileManager: GoogleAIFileManager }, filePath: string, mimeType: string) {
     const maxRetries = 3;
     for (let i = 0; i < maxRetries; i++) {
         try {
-            const uploadResult = await fileManager.uploadFile(filePath, {
+            const uploadResult = await client.fileManager.uploadFile(filePath, {
                 mimeType,
                 displayName: path.basename(filePath),
             });
             const file = uploadResult.file;
             console.log(`Uploaded file ${file.displayName} as: ${file.name} (URI: ${file.uri})`);
             return file;
-        } catch (error) {
-            console.error(`Upload failed (attempt ${i + 1}/${maxRetries}):`, error);
+        } catch (error: any) {
+            console.error(`Upload failed (attempt ${i + 1}/${maxRetries}):`, error.message);
             if (i === maxRetries - 1) throw error;
             await new Promise(r => setTimeout(r, 2000 * (i + 1)));
         }
@@ -49,12 +66,12 @@ async function uploadToGemini(filePath: string, mimeType: string) {
     throw new Error("Unreachable");
 }
 
-async function waitForActive(file: any) {
+async function waitForActive(client: { fileManager: GoogleAIFileManager }, file: any) {
     let currentState = file.state;
     console.log(`Waiting for file processing... (Current: ${currentState})`);
     while (currentState === "PROCESSING") {
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        const currentFile = await fileManager.getFile(file.name);
+        const currentFile = await client.fileManager.getFile(file.name);
         currentState = currentFile.state;
         console.log(`State: ${currentState}`);
     }
@@ -64,15 +81,28 @@ async function waitForActive(file: any) {
 }
 
 
-async function generateWithRetry(promptParts: any[], maxRetries = 5) {
+async function generateWithRetry(client: { model: any }, promptParts: any[], maxRetries = 5) {
     for (let i = 0; i < maxRetries; i++) {
         try {
-            return await model.generateContent(promptParts);
+            return await client.model.generateContent(promptParts);
         } catch (error: any) {
             console.error(`Generation failed (attempt ${i + 1}/${maxRetries}):`, error.message);
+
+            // If Rate Limit (429) or Overloaded (503), we should failing fast?
+            // Actually, simply waiting 60s per key is one strategy.
+            // But if we have 5 keys, we should just ROTATE.
+            // However, our current architecture passes a single `client` (bound to 1 key) to this function.
+            // To support rotation *within* this retry loop, we would need to request a new client/key here.
+
+            // For now, let's keep the wait strategy but maybe reduce it if we had rotation logic here.
+            // Given the current structure, let's Stick to the wait 
+            // BUT, if we hit 429, maybe throw immediately so the Caller can retry with a new client?
+            // The caller (extractQuestions) does NOT have a retry loop for *extraction*, only *upload* has internal retries.
+
+            // OPTIMIZATION: Just wait.
             if (error.status === 429 || error.message?.includes('429')) {
-                console.log("Rate limit hit. Waiting 120s...");
-                await new Promise(r => setTimeout(r, 120000));
+                console.log("Rate limit hit. Waiting 20s...");
+                await new Promise(r => setTimeout(r, 20000));
             } else {
                 await new Promise(r => setTimeout(r, 5000));
             }
@@ -82,7 +112,8 @@ async function generateWithRetry(promptParts: any[], maxRetries = 5) {
     throw new Error("Max retries exceeded");
 }
 
-async function extractQuestions(examId: string, rawDir: string, outDir: string) {
+// Updated to accept client instance
+async function extractQuestions(examId: string, rawDir: string, outDir: string, startClientIndex: number) {
     const filePath = path.join(rawDir, `${examId}.pdf`);
     const isAfternoon = examId.includes('-PM');
     const promptPath = isAfternoon
@@ -99,33 +130,57 @@ async function extractQuestions(examId: string, rawDir: string, outDir: string) 
     let promptText = await fs.readFile(promptPath, 'utf-8');
     promptText += "\n\nIMPORTANT: Output ONLY the JSON array. Do not wrap in markdown code blocks.";
 
-    console.log(`Extracting Questions for ${examId}...`);
-    try {
-        const file = await uploadToGemini(filePath, "application/pdf");
-        await waitForActive(file);
+    // Retry loop for KEY ROTATION
+    const MAX_KEY_RETRIES = 5;
+    let success = false;
 
-        const result = await generateWithRetry([
-            { fileData: { mimeType: file.mimeType, fileUri: file.uri } },
-            { text: promptText }
-        ]);
+    for (let attempts = 0; attempts < MAX_KEY_RETRIES; attempts++) {
+        // Create a fresh client for this attempt
+        const client = getGeminiClient();
+        console.log(`[Key #${client.keyIndex}] Extracting QUESTIONS for ${examId}... (Attempt ${attempts + 1})`);
 
-        const responseText = result.response.text();
-        const examDir = path.join(outDir, examId);
-        await fs.mkdir(examDir, { recursive: true });
+        try {
+            const file = await uploadToGemini(client, filePath, "application/pdf");
+            await waitForActive(client, file);
 
-        let jsonStr = formatJson(responseText);
-        // PM returns a single object usually, but AM returns an array.
-        // The implementation_plan expects questions_raw.json to be an array for synchronization.
-        // If PM returns a single object (Concept), we might need to wrap it or adapt sync-db.
-        // For now, save raw as returned.
-        await fs.writeFile(path.join(examDir, 'questions_raw.json'), jsonStr);
-        console.log(`Saved raw Questions to ${path.join(examDir, 'questions_raw.json')}`);
-    } catch (e) {
-        console.error("Error extracting questions:", e);
+            // We use a small internal retry for transient errors, but if it fails, we catch and ROTATE key.
+            const result = await client.model.generateContent([
+                { fileData: { mimeType: file.mimeType, fileUri: file.uri } },
+                { text: promptText }
+            ]);
+
+            const responseText = result.response.text();
+            const examDir = path.join(outDir, examId);
+            await fs.mkdir(examDir, { recursive: true });
+
+            let jsonStr = formatJson(responseText);
+            await fs.writeFile(path.join(examDir, 'questions_raw.json'), jsonStr);
+            console.log(`[Key #${client.keyIndex}] Saved raw Questions to ${path.join(examDir, 'questions_raw.json')}`);
+            success = true;
+            break; // Success!
+
+        } catch (e: any) {
+            console.error(`[Key #${client.keyIndex}] Error extracting questions for ${examId}:`, e.message);
+
+            if (e.status === 429 || e.message?.includes('429') || e.status === 503) {
+                console.log(`[Key #${client.keyIndex}] Quota exceeded or Overloaded. Switching to next key...`);
+                // Continue loop -> gets new client -> new key
+                await new Promise(r => setTimeout(r, 2000)); // Small pause
+            } else {
+                // Non-recoverable or unknown error? 
+                // For now, let's treat most errors as "try another key" unless it's file IO
+                console.log(`[Key #${client.keyIndex}] Unexpected error. Switching key just in case...`);
+                await new Promise(r => setTimeout(r, 2000));
+            }
+        }
+    }
+
+    if (!success) {
+        console.error(`Failed to extract QUESTIONS for ${examId} after ${MAX_KEY_RETRIES} key rotations.`);
     }
 }
 
-async function extractAnswers(examId: string, rawDir: string, outDir: string) {
+async function extractAnswers(examId: string, rawDir: string, outDir: string, startClientIndex: number) {
     const filePath = path.join(rawDir, `${examId}-Ans.pdf`);
     const promptPath = path.resolve(__dirname, '../../../../docs/prompts/gemini_answer_ocr_prompt.md');
 
@@ -139,25 +194,45 @@ async function extractAnswers(examId: string, rawDir: string, outDir: string) {
     let promptText = await fs.readFile(promptPath, 'utf-8');
     promptText += "\n\nIMPORTANT: Output ONLY the JSON object. Do not wrap in markdown code blocks.";
 
-    console.log(`Extracting Answers for ${examId}...`);
-    try {
-        const file = await uploadToGemini(filePath, "application/pdf");
-        await waitForActive(file);
+    // Retry loop for KEY ROTATION
+    const MAX_KEY_RETRIES = 5;
+    let success = false;
 
-        const result = await generateWithRetry([
-            { fileData: { mimeType: file.mimeType, fileUri: file.uri } },
-            { text: promptText }
-        ]);
+    for (let attempts = 0; attempts < MAX_KEY_RETRIES; attempts++) {
+        const client = getGeminiClient();
+        console.log(`[Key #${client.keyIndex}] Extracting ANSWERS for ${examId}... (Attempt ${attempts + 1})`);
 
-        const responseText = result.response.text();
-        const examDir = path.join(outDir, examId);
-        await fs.mkdir(examDir, { recursive: true });
+        try {
+            const file = await uploadToGemini(client, filePath, "application/pdf");
+            await waitForActive(client, file);
 
-        let jsonStr = formatJson(responseText);
-        await fs.writeFile(path.join(examDir, 'answers_raw.json'), jsonStr);
-        console.log(`Saved raw Answers to ${path.join(examDir, 'answers_raw.json')}`);
-    } catch (e) {
-        console.error("Error extracting answers:", e);
+            const result = await client.model.generateContent([
+                { fileData: { mimeType: file.mimeType, fileUri: file.uri } },
+                { text: promptText }
+            ]);
+
+            const responseText = result.response.text();
+            const examDir = path.join(outDir, examId);
+            await fs.mkdir(examDir, { recursive: true });
+
+            let jsonStr = formatJson(responseText);
+            await fs.writeFile(path.join(examDir, 'answers_raw.json'), jsonStr);
+            console.log(`[Key #${client.keyIndex}] Saved raw Answers to ${path.join(examDir, 'answers_raw.json')}`);
+            success = true;
+            break;
+
+        } catch (e: any) {
+            console.error(`[Key #${client.keyIndex}] Error extracting answers for ${examId}:`, e.message);
+            if (e.status === 429 || e.message?.includes('429') || e.status === 503) {
+                console.log(`[Key #${client.keyIndex}] Quota exceeded. Switching to next key...`);
+                await new Promise(r => setTimeout(r, 2000));
+            } else {
+                await new Promise(r => setTimeout(r, 2000));
+            }
+        }
+    }
+    if (!success) {
+        console.error(`Failed to extract ANSWERS for ${examId} after ${MAX_KEY_RETRIES} key rotations.`);
     }
 }
 
@@ -184,13 +259,13 @@ async function main() {
             f.includes('2025') ||
             f.startsWith('FE-') ||
             (f.startsWith('AP-') && f.includes('-PM')) ||
-            (f.startsWith('PM-') && (f.includes('-PM1') || f.includes('-PM2'))) || // Include PM Afternoon I & II
-            (f.startsWith('SC-') && (f.includes('-AM2') || f.includes('-PM') || f.includes('-PM1') || f.includes('-PM2'))) || // Include SC
-            (f.startsWith('IP-')) // Include IT Passport
+            (f.startsWith('PM-') && (f.includes('-PM1') || f.includes('-PM2'))) ||
+            (f.startsWith('SC-') && (f.includes('-AM2') || f.includes('-PM') || f.includes('-PM1') || f.includes('-PM2'))) ||
+            (f.startsWith('IP-'))
         )
     );
 
-    // Sort Newest First (2024 -> 2016)
+    // Sort Newest First
     examFiles.sort((a, b) => {
         const aIsIP = a.startsWith('IP-');
         const bIsIP = b.startsWith('IP-');
@@ -199,16 +274,10 @@ async function main() {
         return b.localeCompare(a);
     });
 
-    console.log(`Found ${examFiles.length} AP PM exams.`);
-
-    console.log(`Found ${examFiles.length} potential exams. Processing PM first.`);
+    console.log(`Found ${examFiles.length} exams. Processing with key rotation.`);
 
     for (const file of examFiles) {
         const examId = path.basename(file, '.pdf');
-
-        // Allow both AM and PM
-        // if (!examId.includes('AM')) { ... } 
-
         console.log(`--- Processing ${examId} ---`);
 
         const examOutDir = path.join(outDir, examId);
@@ -217,7 +286,6 @@ async function main() {
         // Process Questions and Answers in parallel
         await Promise.all([
             (async () => {
-                // Questions
                 const qOut = path.join(examOutDir, 'questions_raw.json');
                 let skipQ = false;
                 try {
@@ -227,12 +295,10 @@ async function main() {
                 } catch { }
 
                 if (!skipQ) {
-                    await extractQuestions(examId, rawDir, outDir);
-                    // Minimal delay between internal operations not needed if Q/A are independent
+                    await extractQuestions(examId, rawDir, outDir, 0);
                 }
             })(),
             (async () => {
-                // Answers
                 const aOut = path.join(examOutDir, 'answers_raw.json');
                 let skipA = false;
                 try {
@@ -242,12 +308,12 @@ async function main() {
                 } catch { }
 
                 if (!skipA) {
-                    await extractAnswers(examId, rawDir, outDir);
+                    await extractAnswers(examId, rawDir, outDir, 0);
                 }
             })()
         ]);
 
-        // Small buffer between exams to avoid instant burst
+        // Small buffer
         await new Promise(r => setTimeout(r, 1000));
     }
 }
