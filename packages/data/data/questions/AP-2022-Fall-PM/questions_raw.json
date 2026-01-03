@@ -18,7 +18,8 @@
           "answer": "ア",
           "point": 13
         }
-      ]
+      ],
+      "subCategory": "その他"
     },
     {
       "subQNo": "設問2",
@@ -40,7 +41,8 @@
           "answer": "ア",
           "point": 12
         }
-      ]
+      ],
+      "subCategory": "その他"
     },
     {
       "subQNo": "設問3",
@@ -62,7 +64,8 @@
           "answer": "エージェントから受信したログの保存、分析",
           "point": 12
         }
-      ]
+      ],
+      "subCategory": "その他"
     }
   ]
 }

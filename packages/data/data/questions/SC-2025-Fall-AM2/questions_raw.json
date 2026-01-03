@@ -20,7 +20,8 @@
         "text": "CRYPTREC 暗号リストには電子政府推奨暗号リストがあり、それは互換性維持目的に限った継続利用を推奨する暗号技術のリストである。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 2,
@@ -43,7 +44,8 @@
         "text": "ハッシュ化されずに保存されている平文パスワードを使ってログインする。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 3,
@@ -66,7 +68,8 @@
         "text": "量子コンピュータを使った攻撃に対しても従来のコンピュータを使って安全性を確保できる暗号技術"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 4,
@@ -89,7 +92,8 @@
         "text": "本人確認を行い、デジタル証明書の発行申請の承認又は却下を行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 5,
@@ -112,7 +116,8 @@
         "text": "何らかの方法で AI の実行ファイルを入手し、逆アセンブルや逆コンパイルによってAIのソースコードを得る。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 6,
@@ -135,7 +140,8 @@
         "text": "署名対象と署名アルゴリズムはASN.1によって記述する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 7,
@@ -158,7 +164,8 @@
         "text": "IPアドレスAを攻撃元とするパスワードリスト攻撃"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 8,
@@ -181,7 +188,8 @@
         "text": "マルウェアが、ドメイン情報を管理しているサイトに不正にアクセスし、ドメイン情報を書き換える。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 9,
@@ -204,7 +212,8 @@
         "text": "ワンタイムパッド"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 10,
@@ -227,7 +236,8 @@
         "text": "認証に利用する接触型 IC カードは、カード内のコイルの誘導起電力を利用している。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 11,
@@ -250,7 +260,8 @@
         "text": "利用者がシステムにログインする際に、利用者の入力した利用者 ID 及びパスワードとシステムに登録されている情報とを照合し、利用者本人かどうかを確認する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 12,
@@ -273,7 +284,8 @@
         "text": "日本国内で発生した情報セキュリティインシデントの受付、対応支援を技術的な立場から行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 13,
@@ -296,7 +308,8 @@
         "text": "WHOIS データベースの技術連絡担当組織"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 14,
@@ -319,7 +332,8 @@
         "text": "利用者や機器の異常な振る舞いを検知する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 15,
@@ -342,7 +356,8 @@
         "text": "組織のファイルサーバのデータを継続的に監視し、重要データを暗号化してクラウドサービスのストレージにバックアップを格納する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 16,
@@ -365,7 +380,8 @@
         "text": "Web ブラウザからのリクエストを Web サーバで受け付けた際に、リクエストに含まれる“<”,“>”などの特殊文字を,“&lt;”, “&gt;”などの文字列に置き換える。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 17,
@@ -388,7 +404,8 @@
         "text": "無線LANの信号レベルで衝突を検知する CSMA/CD 方式の仕様"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 18,
@@ -411,7 +428,8 @@
         "text": "SAX"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 19,
@@ -434,7 +452,8 @@
         "text": "ルーティング情報の更新を30秒ごとに行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 20,
@@ -457,7 +476,8 @@
         "text": "400番台は、リクエストがサーバに正常に受信され、処理が完了したことを意味する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 21,
@@ -480,7 +500,8 @@
         "text": "ログファイルへのコミット情報書込み完了時点"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 22,
@@ -503,7 +524,8 @@
         "text": "ボトムアップテスト"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 23,
@@ -526,7 +548,8 @@
         "text": "注文者に帰属する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 24,
@@ -549,7 +572,8 @@
         "text": "99.63"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 25,
@@ -572,6 +596,7 @@
         "text": "組織体内外の環境変化によってリスクが相当程度変化した場合には、監査計画の見直しを検討し、必要に応じて変更する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   }
 ]
