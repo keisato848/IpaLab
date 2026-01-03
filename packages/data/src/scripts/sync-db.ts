@@ -164,11 +164,17 @@ async function main() {
                     term: seasonStr,
                     type: type,
                     date: `${yearStr}-${seasonStr === 'S' ? '04' : '10'}-15`, // Approx date
+                    stats: {
+                        total: 80, // Default to 80, will be overwritten by frontend stats merge logic mostly, but prevents crash
+                        completed: 0,
+                        correctRate: 0
+                    }
                 };
 
-                await container.items.upsert(examItem);
+                const examsContainer = database.container(EXAM_CONTAINER_NAME);
+                await examsContainer.items.upsert(examItem);
 
-                console.log(`Upserted Exam: ${examId}`);
+                console.log(`Upserted Exam: ${examId} into Exams container`);
 
                 // 2. Upsert Questions
                 const questions = data.questions || []; // Handle root array or object
