@@ -6,6 +6,22 @@
     color: var(--text-primary);
 }
 
+.dropdown {
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background-color: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+    color: #374151;
+}
+
+.dropdown:focus {
+    outline: none;
+    border-color: #2563eb;
+    ring: 2px solid #93c5fd;
+}
+
 .header {
     margin-bottom: 2rem;
 }
@@ -57,7 +73,8 @@
     padding: 8px 16px;
     border-radius: 20px;
     border: 1px solid var(--border-color);
-    background-color: var(--bg-primary); /* Default button bg */
+    background-color: var(--bg-primary);
+    /* Default button bg */
     color: var(--text-secondary);
     cursor: pointer;
     font-weight: bold;
@@ -66,7 +83,7 @@
 }
 
 .filterBtn:hover {
-    background-color: var(--bg-hover, rgba(0,0,0,0.05));
+    background-color: var(--bg-hover, rgba(0, 0, 0, 0.05));
 }
 
 .filterBtnSelected {

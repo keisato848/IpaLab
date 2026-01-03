@@ -20,7 +20,8 @@
         "text": "クロスサイトスクリプティング"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 2,
@@ -43,7 +44,8 @@
         "text": "認証情報に加え,属性情報と認可情報を異なるドメインに伝達するための Web サービスの仕様"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 3,
@@ -66,7 +68,8 @@
         "text": "中間者攻撃"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 4,
@@ -89,7 +92,8 @@
         "text": "(M+n-1)!/(n!(M-1)!)"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 5,
@@ -112,7 +116,8 @@
         "text": "攻撃者が、ボットに感染したPCを遠隔操作して社内ネットワーク上のPCを次々にマルウェア感染させて、利用者IDとパスワードを入手する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 6,
@@ -135,7 +140,8 @@
         "text": "量子通信路を用いて安全に共有した乱数列を使い捨ての暗号鍵として用いることによって,原理的に第三者に解読されない秘匿通信が実現できる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 7,
@@ -158,7 +164,8 @@
         "text": "SECURITY ACTION"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 8,
@@ -181,7 +188,8 @@
         "text": "製品のリリース前に、不要にもかかわらず開放されているポートの存在,パスワードの設定漏れなど約200項目の脆弱性の有無を調査できるテストベッドを国内の IoT 機器製造者向けに公開し、市場に流通する IoT 機器のセキュリティ向上を目指す。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 9,
@@ -204,7 +212,8 @@
         "text": "製造業のサプライチェーンを構成する小規模事業者の経営者が、サイバー攻撃を受けた際に行う事後対応をまとめたものである。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 10,
@@ -227,7 +236,8 @@
         "text": "認証機関から貸与された暗号モジュール試験報告書作成支援ツールを用いて暗号モジュールの安全性についての評価試験を行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 11,
@@ -250,7 +260,8 @@
         "text": "インターネットバンキング利用時の通信を SSL ではなく TLS を利用して暗号化するように Web サイトを設定する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 12,
@@ -273,7 +284,8 @@
         "text": "SaaS"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 13,
@@ -296,7 +308,8 @@
         "text": "利用者のURLの入力誤りを悪用して、偽サイトに誘導する攻撃の検知"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 14,
@@ -319,7 +332,8 @@
         "text": "Web サイトにアクセスすると, Web ブラウザは、以降の指定された期間,当該サイトには全て HTTPS によって接続する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 15,
@@ -342,7 +356,8 @@
         "text": "TLS は Web サーバと特定の利用者が通信するためのプロトコルであり, Web サーバへの事前の利用者登録が不可欠である。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 16,
@@ -365,7 +380,8 @@
         "text": "SMTP Submission"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 17,
@@ -388,7 +404,8 @@
         "text": "サーバには IEEE 802.1X のオーセンティケータを実装し,かつ, RADIUS サーバの機能をもたせる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 18,
@@ -411,7 +428,8 @@
         "text": "トークンパッシング方式"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 19,
@@ -434,7 +452,8 @@
         "text": "TFTP"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 20,
@@ -457,7 +476,8 @@
         "text": "スパニングツリープロトコル"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 21,
@@ -480,7 +500,8 @@
         "text": "データ構造がどのように定義されているかを示す情報であり、Web サイトなどに公開して検索できるようにする。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 22,
@@ -503,7 +524,8 @@
         "text": "フォールトトレランス"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 23,
@@ -526,7 +548,8 @@
         "text": "ベンチマーキング"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 24,
@@ -549,7 +572,8 @@
         "text": "99.63"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 25,
@@ -572,6 +596,7 @@
         "text": "組織内の全ての利用者に対して、アクセス管理の重要性についての教育を行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   }
 ]

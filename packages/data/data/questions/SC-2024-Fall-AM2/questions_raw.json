@@ -20,7 +20,8 @@
         "text": "Augmented Reality"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 2,
@@ -43,7 +44,8 @@
         "text": "Model Inversion 攻撃"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 3,
@@ -66,7 +68,8 @@
         "text": "サイバーキルチェーン"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 4,
@@ -89,7 +92,8 @@
         "text": "送信元を偽って、NTP サーバにレスポンスデータが大きくなるリクエストを送信する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 5,
@@ -112,7 +116,8 @@
         "text": "量子通信路を用いた鍵配送システムを利用し、大容量のデータを高速に送受信する技術"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 6,
@@ -135,7 +140,8 @@
         "text": "ボットネットを使って多数の端末から攻撃対象のメールサーバに大量のなりすましメールを送信し、攻撃対象のメールサーバを停止させる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 7,
@@ -158,7 +164,8 @@
         "text": "利用者 A の Web ブラウザ: 受信する, Web サーバ B: 受信しない, IdP: 受信する"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 8,
@@ -181,7 +188,8 @@
         "text": "リバースプロキシ方式では、SSO を利用する全てのトラフィックがリバースプロキシサーバに集中する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 9,
@@ -204,7 +212,8 @@
         "text": "量子通信路を用いて安全に共有した乱数列を使い捨ての暗号鍵として用いることによって、原理的に第三者に解読されない秘匿通信が実現できる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 10,
@@ -227,7 +236,8 @@
         "text": "SPF"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 11,
@@ -250,7 +260,8 @@
         "text": "ファイアウォール,マルウェア対策製品,侵入検知製品など複数のセキュリティ製品のログの集約及び相関分析を自動化するための専用装置"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 12,
@@ -273,7 +284,8 @@
         "text": "悪意のある通信を正常な通信と見せかけ, HTTP リクエストを分割して送信されたとき、WAF が遮断しない。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 13,
@@ -296,7 +308,8 @@
         "text": "IPS が監視対象の通信を通過させるように通信経路上に設置される。通常時の通信を定義し、それから外れた通信を不正と判断して遮断する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 14,
@@ -319,7 +332,8 @@
         "text": "HTTP レスポンスヘッダーに, X-Frame-Options を設定する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 15,
@@ -342,7 +356,8 @@
         "text": "UDP のペイロードデータの暗号化を可能としている。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 16,
@@ -365,7 +380,8 @@
         "text": "Web サービス D が、利用者 A のデジタル証明書を Web サービス C に送信する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 17,
@@ -388,7 +404,8 @@
         "text": "サーバには IEEE 802.1X のオーセンティケータを実装し、かつ, RADIUS サーバの機能をもたせる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 18,
@@ -411,7 +428,8 @@
         "text": "RSTP"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 19,
@@ -434,7 +452,8 @@
         "text": "ルータでメッセージを転送する際に、送信元が設定した TTL が 0 になった場合は、Destination Unreachableを返す。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 20,
@@ -457,7 +476,8 @@
         "text": "レイヤー2 スイッチ"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 21,
@@ -480,7 +500,8 @@
         "text": "一つの関係に外部キーが複数存在してもよい。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 22,
@@ -503,7 +524,8 @@
         "text": "抽象度が異なる要素を分割して階層化するための Layers,コンポーネント分割のための Broker などで構成される。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 23,
@@ -526,7 +548,8 @@
         "text": "プログラムコードを書く前にテストコードを書く。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 24,
@@ -549,7 +572,8 @@
         "text": "パフォーマンスを向上するために繰り返し行われる活動"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 25,
@@ -572,6 +596,7 @@
         "text": "組織内の全ての利用者に対して、アクセス管理の重要性についての教育を行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   }
 ]

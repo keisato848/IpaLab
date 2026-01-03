@@ -20,7 +20,8 @@
         "text": "Model Inversion 攻撃"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 2,
@@ -43,7 +44,8 @@
         "text": "ハッシュ化されずに保存されている平文パスワードを使ってログインする。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 3,
@@ -66,7 +68,8 @@
         "text": "量子通信路を用いた鍵配送システムを利用し、大容量のデータを高速に送受信する技術"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 4,
@@ -89,7 +92,8 @@
         "text": "リバースプロキシで利用者認証が行われ、クライアントは認証成功後にリバースプロキシ経由でSPにアクセスする。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 5,
@@ -112,7 +116,8 @@
         "text": "取引データを複数の取引ごとにまとめ、それらを時系列につなげたチェーンに保存することによって取引データの改ざんを検知可能にしたもの"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 6,
@@ -135,7 +140,8 @@
         "text": "パケットのデータ部をチェックして、アプリケーション層での不正なアクセスを防止できる。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 7,
@@ -158,7 +164,8 @@
         "text": "無線LANセキュリティの技術仕様"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 8,
@@ -181,7 +188,8 @@
         "text": "認証局は、有効期限内のディジタル証明書のシリアル番号を CRL に記載することがある。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 9,
@@ -204,7 +212,8 @@
         "text": "制御システム固有のサイバーセキュリティ管理策"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 10,
@@ -227,7 +236,8 @@
         "text": "Web ブラウザがアクセスする URL 内のパスと cookie に設定されたパスのプレフィックスが一致するときだけ、Web ブラウザから cookie が送出される。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 11,
@@ -250,7 +260,8 @@
         "text": "TCP 23 番ポートは IoT 機器へのメール送信用プロトコルで使用されており、そのプロトコルを用いると、マルウェアを添付した電子メールを IoT 機器に送信するという攻撃ができることが多いから"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 12,
@@ -273,7 +284,8 @@
         "text": "d → c → a → b"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 13,
@@ -296,7 +308,8 @@
         "text": "チップ内の信号線などに探針を直接当て、処理中のデータを観測して解析する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 14,
@@ -319,7 +332,8 @@
         "text": "コンピュータやルータのアクセス可能な通信ポートを外部から調査する。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 15,
@@ -342,7 +356,8 @@
         "text": "WPA3-Enterprise は, IEEE 802.1X の規格に沿った利用者認証及び動的に配布される暗号化鍵を用いた暗号化通信を実装するための規格である。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 16,
@@ -365,7 +380,8 @@
         "text": "利用者IDとパスワードによる利用者認証"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 17,
@@ -388,7 +404,8 @@
         "text": "認証暗号アルゴリズムとハッシュアルゴリズムの組みで構成されている。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 18,
@@ -411,7 +428,8 @@
         "text": "VXLAN"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 19,
@@ -434,7 +452,8 @@
         "text": "伝搬する、中継する"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 20,
@@ -457,7 +476,8 @@
         "text": "255"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 21,
@@ -480,7 +500,8 @@
         "text": "“製品”表への行追加"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 22,
@@ -503,7 +524,8 @@
         "text": "モデルベースドテスト"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 23,
@@ -526,7 +548,8 @@
         "text": "WMRM"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 24,
@@ -549,7 +572,8 @@
         "text": "利用者の誤操作や誤入力を未然に防ぐことによって、システムの誤動作を防止できるようにする。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   },
   {
     "qNo": 25,
@@ -572,6 +596,7 @@
         "text": "クラウドサービスを提供する事業者の施設内のネットワークに、暗号化通信が採用されているかどうか検討されているか。"
       }
     ],
-    "correctOption": null
+    "correctOption": null,
+    "subCategory": "その他"
   }
 ]

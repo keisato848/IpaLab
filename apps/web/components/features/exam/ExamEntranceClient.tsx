@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { guestManager } from '@/lib/guest-manager';
+import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { getLearningRecords, LearningRecord, Question } from '@/lib/api';
 import styles from './ExamEntranceClient.module.css';
 
@@ -21,6 +23,12 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
     const [progress, setProgress] = useState<{ completed: number, total: number }>({ completed: 0, total: questions.length });
     const [isLoaded, setIsLoaded] = useState(false);
 
+    const searchParams = useSearchParams();
+    const categoryFilter = searchParams.get('category');
+
+    // State for learning status
+    const [statusMap, setStatusMap] = useState<Record<string, 'correct' | 'incorrect'>>({});
+
     useEffect(() => {
         async function fetchProgress() {
             const userId = session?.user?.id || guestManager.getGuestId();
@@ -31,41 +39,38 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
 
             try {
                 const records = await getLearningRecords(userId, examId);
-                // Filter for this exam is already done by API, but double check
-                const correctCount = records.filter(r => r.isCorrect).length; // or just completed count?
-                // Unique questions answered
                 const answeredQIds = new Set(records.map(r => r.questionId));
 
-                // Find max answered qNo
-                // Assuming question IDs are like 'AP-2024-Spring-AM-1'
-                // But better to map based on 'questions' array passed in.
-                // We want the first UNANSWERED question, or the one after the last answered one.
-                // Usually "Resume" means "Next unattempted".
+                // Build status map
+                const newStatusMap: Record<string, 'correct' | 'incorrect'> = {};
 
-                // Let's sort questions by qNo
-                // Identify first q where !answeredQIds.has(q.id)
-                // Actually 'records' store qId.
+                // Group records by questionId
+                const recordsByQ: Record<string, LearningRecord[]> = {};
+                records.forEach(r => {
+                    if (!recordsByQ[r.questionId]) recordsByQ[r.questionId] = [];
+                    recordsByQ[r.questionId].push(r);
+                });
 
+                Object.keys(recordsByQ).forEach(qId => {
+                    const qRecords = recordsByQ[qId];
+                    // If ANY correct, mark as correct (Optimistic)
+                    // Or prioritize latest? Let's use ANY correct for "Done" feel.
+                    const hasCorrect = qRecords.some(r => r.isCorrect);
+                    newStatusMap[qId] = hasCorrect ? 'correct' : 'incorrect';
+                });
+                setStatusMap(newStatusMap);
+
+                // ... existing nextQNo logic ...
                 let firstUnanswered: number = 1;
                 for (const q of questions) {
-                    // Check if there is a record for this question
-                    // Note: multiple attempts possible, so we check existence
-                    const hasRecord = answeredQIds.has(q.id);
-                    if (!hasRecord) {
+                    if (!answeredQIds.has(q.id)) {
                         firstUnanswered = q.qNo;
                         break;
                     }
-                    firstUnanswered = q.qNo + 1; // If all checked so far are answered, next is +1
+                    firstUnanswered = q.qNo + 1;
                 }
-
-                // Cap at total
-                if (firstUnanswered > questions.length) firstUnanswered = 1; // Or finished? User might want to review. 
-                // If finished, maybe Q1 is fine, or random? Let's default to Q1 but show 100%.
-
-                if (answeredQIds.size === questions.length) {
-                    // All done
-                    firstUnanswered = 1;
-                }
+                if (firstUnanswered > questions.length) firstUnanswered = 1;
+                if (answeredQIds.size === questions.length) firstUnanswered = 1;
 
                 setNextQNo(firstUnanswered);
                 setProgress({ completed: answeredQIds.size, total: questions.length });
@@ -86,12 +91,34 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
     const linkHref = `/exam/${year}/${type}/${nextQNo}?mode=practice`;
 
     const mockSettings = (() => {
-        if (type === 'AM2') return { time: 40, count: questions.length }; // AM2 is usually 25q, 40min
-        if (type.includes('PM')) return { time: 150, count: questions.length }; // PM is 150min
-        return { time: 150, count: 80 }; // Default AM1
+        if (type === 'AM2') return { time: 40, count: questions.length };
+        if (type.includes('PM')) return { time: 150, count: questions.length };
+        return { time: 150, count: 80 };
     })();
 
-    const displayCount = questions.length > 0 ? questions.length : mockSettings.count;
+    // Filter questions based on query param
+    const displayQuestions = questions.filter(q => {
+        if (!categoryFilter || categoryFilter === 'ALL') return true;
+
+        // Check both category and subCategory
+        // q.subCategory might be standardized Japanese e.g. "テクノロジ系"
+        // categoryFilter is English e.g. "Technology"
+        // Need mapping? Or lenient check?
+        // fix-subcategories.ts mapped 'Technology' -> 'テクノロジ系'.
+        // So we should compare against mapped values or raw.
+
+        // Simple mapping for filter:
+        const map: Record<string, string> = {
+            'Technology': 'テクノロジ系',
+            'Management': 'マネジメント系',
+            'Strategy': 'ストラテジ系'
+        };
+        const targetJp = map[categoryFilter];
+
+        return (q.subCategory === targetJp) || (q.category === categoryFilter) || (q.subCategory === categoryFilter);
+    });
+
+    const displayCount = displayQuestions.length > 0 ? displayQuestions.length : mockSettings.count;
 
     return (
         <div className={styles.container}>
@@ -102,6 +129,12 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
             <header className={styles.header}>
                 <h1>{examLabel}</h1>
                 <p className={styles.description}>
+                    {categoryFilter && categoryFilter !== 'ALL' ? (
+                        <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mb-2">
+                            フィルタ中: {categoryFilter}
+                        </span>
+                    ) : null}
+                    <br />
                     モードを選択して開始してください。
                     <br />
                     練習モードでは一問ごとに正誤を確認できます。
@@ -119,23 +152,46 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
             </header>
 
             <section className={styles.questionList}>
-                <h2>問題一覧 ({questions.length}問)</h2>
-                {questions.length === 0 ? (
+                <h2>問題一覧 ({displayQuestions.length}問)</h2>
+                {displayQuestions.length === 0 ? (
                     <p className={styles.noData}>
                         問題データが見つかりません。<br />
                         バックエンドAPIが起動しているか、examId ({examId}) が正しいか確認してください。
+                        <br />(フィルタ条件に一致する問題がない可能性があります)
                     </p>
                 ) : (
                     <div className={styles.grid}>
-                        {questions.map(q => (
-                            <Link href={`/exam/${year}/${type}/${q.qNo}?mode=practice`} key={q.id} className={`${styles.qItem}`}>
-                                <div className={styles.qHeader}>
-                                    <span className={styles.qNo}>Q{q.qNo}</span>
-                                    <span className={styles.qCat}>{q.subCategory || q.category}</span>
-                                </div>
-                                <p className={styles.qSummary}>{(q.text || "").substring(0, 40)}...</p>
-                            </Link>
-                        ))}
+                        {displayQuestions.map(q => {
+                            const status = statusMap[q.id]; // 'correct' | 'incorrect' | undefined
+                            const statusClass = status === 'correct' ? styles.correct
+                                : status === 'incorrect' ? styles.incorrect
+                                    : '';
+
+                            return (
+                                <Link
+                                    href={`/exam/${year}/${type}/${q.qNo}?mode=practice`}
+                                    key={q.id}
+                                    className={`${styles.qItem} ${statusClass}`}
+                                >
+                                    <div className={styles.qHeader}>
+                                        <span className={styles.qNo}>
+                                            Q{q.qNo}
+                                            {status === 'correct' && <FaCheckCircle className={styles.iconCorrect} />}
+                                            {status === 'incorrect' && <FaTimesCircle className={styles.iconIncorrect} />}
+                                        </span>
+                                        <span className={styles.qCat}>{q.subCategory || q.category}</span>
+                                    </div>
+                                    <p className={styles.qSummary}>{(q.text || "").substring(0, 40)}...</p>
+
+                                    {/* Accessibility Badge */}
+                                    {status && (
+                                        <div className={styles.statusBadge}>
+                                            {status === 'correct' ? '済: 正解' : '済: 不正解'}
+                                        </div>
+                                    )}
+                                </Link>
+                            );
+                        })}
                     </div>
                 )}
             </section>
