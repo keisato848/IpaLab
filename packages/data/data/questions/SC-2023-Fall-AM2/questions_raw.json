@@ -20,7 +20,7 @@
         "text": "セッションハイジャック"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -44,7 +44,7 @@
         "text": "サーバとクライアントのそれぞれがお互いに別の暗号アルゴリズムを選択できる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -68,7 +68,7 @@
         "text": "本人確認を行い、デジタル証明書の発行を指示する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -92,7 +92,7 @@
         "text": "デジタル署名では、署名対象と署名アルゴリズムを ASN.1 によって記述する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -116,7 +116,7 @@
         "text": "マルウェア感染した PC に制限を掛けて利用できないようにし、その制限の解除と引換えに暗号資産を要求する攻撃"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -140,7 +140,7 @@
         "text": "ランダムな宛先 IP アドレスを使用して IoT 機器などに感染を広げるとともに、C&C サーバからの指令に従って標的に対して DDoS 攻撃を行う。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -164,7 +164,7 @@
         "text": "ログイン時に、送金操作を行う PC とは別のデバイスによって、一定時間だけ有効なログイン用のワンタイムパスワードを算出し、インターネットバンキングに送信する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -188,7 +188,7 @@
         "text": "利用者が文書やデータの属性情報や論理構造を定義する言語である SGML を、インターネット用に最適化したもの"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -212,7 +212,7 @@
         "text": "認証局を監査する第三者機関の運用などに関する詳細を規定した文書"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -236,7 +236,7 @@
         "text": "製品のリリース前に、不要にもかかわらず開放されているポートの存在、パスワードの設定漏れなど約 200 項目の脆弱性の有無を調査できるテストベッドを国内の IoT 機器製造者向けに公開し、市場に流通する IoT 機器のセキュリティ向上を目指す。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -260,7 +260,7 @@
         "text": "リスク特定とは、リスクを発見,認識及び記述するプロセスのことであり、リスク源、事象、それらの原因及び起こり得る結果の特定が含まれる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -284,7 +284,7 @@
         "text": "SOAR (Security Orchestration, Automation, and Response)"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -308,7 +308,7 @@
         "text": "リゾルバが、リソースレコードの受信時にデジタル署名を検証することによって、データの作成元の正当性とデータの完全性を確認する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -332,7 +332,7 @@
         "text": "認証を行うためのプロトコルであり、認証サーバが、利用者(リソースオーナー)の許可を得て、サービス(クライアント)に対し、適切な権限を付与するためのものである。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -356,7 +356,7 @@
         "text": "SSH"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -380,7 +380,7 @@
         "text": "SMTP Submission"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -404,7 +404,7 @@
         "text": "変更種別: 追加, 送信元: インターネット, 宛先: WebAP サーバ, サービス: ODBC, 制御: 許可"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -428,7 +428,7 @@
         "text": "255.255.255.192"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -452,7 +452,7 @@
         "text": "239.0.1.1"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -476,7 +476,7 @@
         "text": "RARP"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -500,7 +500,7 @@
         "text": "ユーザーからの指示によるデータベースの読込み情報、書込み情報などを格納したもの"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -524,7 +524,7 @@
         "text": "テスト駆動開発"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -548,7 +548,7 @@
         "text": "モデルの全体像を作成した上で、優先度を付けた詳細なフィーチャリストを作成し、フィーチャを単位として計画し、フィーチャごとの設計と構築とを繰り返す。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -572,7 +572,7 @@
         "text": "マネジメントレビュー"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -596,7 +596,7 @@
         "text": "利用部門からのデータ変更依頼票に基づいて、システム部門が直接修正を実施していた。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   }
 ]

@@ -21,7 +21,7 @@
           "text": "管理,終結"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -46,7 +46,7 @@
           "text": "プロジェクトを正式に許可する文書であって、プロジェクトマネージャを特定して適切な責任と権限を明確にし、ビジネスニーズ、目標,期待される結果などを明確にした文書"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -71,7 +71,7 @@
           "text": "リスクの管理"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -96,7 +96,7 @@
           "text": "実行責任,説明責任,相談対応, リスク管理"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -121,7 +121,7 @@
           "text": "動乱期(Storming)"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -146,7 +146,7 @@
           "text": "プロジェクトの要求事項を満たすように、プロジェクト作業の実施に必要な資源を確保し、必要な方法で配分する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -171,7 +171,7 @@
           "text": "コストには余裕があるので、残作業のコスト効率を計画よりも上げる必要はないが、スケジュールが予定より遅れているので、クラッシングなどを用いたスケジュール短縮を検討する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -196,7 +196,7 @@
           "text": "作業を、階層的に詳細化して、管理可能な大きさに細分化する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -221,7 +221,7 @@
           "text": "作業Fを最も遅く開始できるのは11日目である。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -246,7 +246,7 @@
           "text": "[グラフ エ: 開発規模が増加すると開発生産性が減少する図 (凸型)]"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -271,7 +271,7 @@
           "text": "1 / (1/X + 1/Y + 1/Z)"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -296,7 +296,7 @@
           "text": "新規システムの開発, 130"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -321,7 +321,7 @@
           "text": "C, D"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -346,7 +346,7 @@
           "text": "二つ以上のシステム、製品又は構成要素が情報を交換し、既に交換された情報を使用することができる度合い"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -371,7 +371,7 @@
           "text": "包括的なドキュメントに価値があることを認めながらも、動くソフトウェアに、より価値をおく。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -396,7 +396,7 @@
           "text": "ペアプログラミング"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -421,7 +421,7 @@
           "text": "ひとまとまりの要件を1単位として設計からテストまで実施するので、要件ごとに開発状況が把握できる。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -446,7 +446,7 @@
           "text": "D"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -471,7 +471,7 @@
           "text": "バックアップシステムを用意しておき、緊急時にはバックアップシステムを起動して、データを最新状態にする処理を行った後にサービスを復旧する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -496,7 +496,7 @@
           "text": "B社及びC社"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -521,7 +521,7 @@
           "text": "グリーン購入法"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -546,7 +546,7 @@
           "text": "地球環境などの課題において 2030年を年限とする持続可能でより良い世界を目指す国際目標"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -571,7 +571,7 @@
           "text": "有効期限切れで失効したデジタル証明書は、所有者が新たなデジタル証明書を取得するまでの間、CRL に登録される。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -596,7 +596,7 @@
           "text": "リバースプロキシを使ったシングルサインオンの場合,利用者認証においてパスワードの代わりにデジタル証明書を用いることができる。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -621,7 +621,7 @@
           "text": "人的リソース, データ,ナレッジを共有し、演習の効果の最大化を図る。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     }
