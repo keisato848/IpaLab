@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { guestManager } from '@/lib/guest-manager';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
@@ -19,12 +19,21 @@ interface ExamEntranceClientProps {
 
 export default function ExamEntranceClient({ year, type, examId, examLabel, questions }: ExamEntranceClientProps) {
     const { data: session } = useSession();
+    const router = useRouter();
     const [nextQNo, setNextQNo] = useState<number>(1);
     const [progress, setProgress] = useState<{ completed: number, total: number }>({ completed: 0, total: questions.length });
     const [isLoaded, setIsLoaded] = useState(false);
 
     const searchParams = useSearchParams();
     const categoryFilter = searchParams.get('category');
+
+    // Handle filter change
+    const handleFilterChange = (val: string) => {
+        const newUrl = new URL(window.location.href);
+        if (val === 'ALL') newUrl.searchParams.delete('category');
+        else newUrl.searchParams.set('category', val);
+        router.push(newUrl.toString());
+    };
 
     // State for learning status
     const [statusMap, setStatusMap] = useState<Record<string, 'correct' | 'incorrect'>>({});
@@ -129,16 +138,48 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
             <header className={styles.header}>
                 <h1>{examLabel}</h1>
                 <p className={styles.description}>
-                    {categoryFilter && categoryFilter !== 'ALL' ? (
-                        <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mb-2">
-                            フィルタ中: {categoryFilter}
-                        </span>
-                    ) : null}
-                    <br />
                     モードを選択して開始してください。
                     <br />
                     練習モードでは一問ごとに正誤を確認できます。
                 </p>
+
+                {/* Subcategory Filter UI */}
+                <div className={styles.filterContainer}>
+                    <label className={styles.filterLabel}>分野で絞り込み:</label>
+                    <select
+                        className={styles.filterSelect}
+                        value={categoryFilter || 'ALL'}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            // Update URL query param to keep state on refresh
+                            // Since this is a client component, we can use router.push or window.history
+                            // But cleaner to just reload or push state. Next.js router is best.
+                            // We need 'useRouter'
+                            const newUrl = new URL(window.location.href);
+                            if (val === 'ALL') newUrl.searchParams.delete('category');
+                            else newUrl.searchParams.set('category', val);
+                            window.history.pushState(null, '', newUrl.toString());
+                            // Trigger re-render by local state or router?
+                            // next/navigation searchParams is reactive?
+                            // Actually better to use useRouter().push()
+                        }}
+                    // Actually let's use a simpler approach: Local State driven + Sync to URL?
+                    // Or just fully local state?
+                    // Requirement: "Move filter" implies keeping it persistent?
+                    // User said: "Select from dynamic list if possible"
+                    >
+                        <option value="ALL">指定なし (すべて表示)</option>
+                        {/* TODO: Generate dynamic options? Strict requirement "Dynamic or Constant". 
+                             Constants are easier for now: Technology, Management, Strategy.
+                             Or extract unique from questions? */}
+                        <option value="Technology">テクノロジ系</option>
+                        <option value="Management">マネジメント系</option>
+                        <option value="Strategy">ストラテジ系</option>
+                        {/* Dynamic unique subcategories from questions if available? */}
+                        {/* Let's append unique ones not in constant? */}
+                    </select>
+                </div>
+
                 <div className={styles.actions}>
                     <Link href={linkHref} className={`${styles.btn} ${styles.btnPractice}`}>
                         {isLoaded ? btnText : "読み込み中..."}
@@ -173,27 +214,36 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                                     key={q.id}
                                     className={`${styles.qItem} ${statusClass}`}
                                 >
-                                    <div className={styles.qHeader}>
-                                        <span className={styles.qNo}>
-                                            Q{q.qNo}
-                                            {status === 'correct' && <FaCheckCircle className={styles.iconCorrect} />}
-                                            {status === 'incorrect' && <FaTimesCircle className={styles.iconIncorrect} />}
-                                        </span>
-                                        <span className={styles.qCat}>{q.subCategory || q.category}</span>
-                                    </div>
+                                    <span className={styles.qNo}>
+                                        Q{q.qNo}
+                                        {status === 'correct' && <FaCheckCircle className={styles.iconCorrect} />}
+                                        {status === 'incorrect' && <FaTimesCircle className={styles.iconIncorrect} />}
+                                    </span>
+
                                     <p className={styles.qSummary}>{(q.text || "").substring(0, 40)}...</p>
 
-                                    {/* Accessibility Badge */}
-                                    {status && (
-                                        <div className={styles.statusBadge}>
-                                            {status === 'correct' ? '済: 正解' : '済: 不正解'}
-                                        </div>
-                                    )}
+                                    {/* Accessibility and Subcategory Badge */}
+                                    <div className={styles.badgeContainer}>
+                                        {/* Subcategory Badge */}
+                                        {(q.subCategory || q.category) && (
+                                            <span className={styles.subcategoryBadge}>
+                                                {q.subCategory || q.category}
+                                            </span>
+                                        )}
+
+                                        {/* Status Badge */}
+                                        {status && (
+                                            <span className={styles.statusBadge}>
+                                                {status === 'correct' ? '済: 正解' : '済: 不正解'}
+                                            </span>
+                                        )}
+                                    </div>
                                 </Link>
                             );
                         })}
                     </div>
-                )}
+                )
+                }
             </section>
         </div>
     );

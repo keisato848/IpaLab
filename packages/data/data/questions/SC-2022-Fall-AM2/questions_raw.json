@@ -20,7 +20,7 @@
         "text": "MAC は、送信者がメッセージと送信者の公開鍵を用いて生成する。MAC を用いると、受信者が送信者の真正性を確認できる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -44,7 +44,7 @@
         "text": "本人確認を行い、デジタル証明書の発行申請の承認又は却下を行う。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -68,7 +68,7 @@
         "text": "XML Signature"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -92,7 +92,7 @@
         "text": "サイズが大きい電子メールや大量の電子メールを攻撃対象に送り付ける。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -116,7 +116,7 @@
         "text": "IP アドレス A を攻撃元とするパスワードリスト攻撃"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -140,7 +140,7 @@
         "text": "不正に取得したある他のサイトの利用者 ID とパスワードとの組みの一覧表を用いて, ログインを試行する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -164,7 +164,7 @@
         "text": "リバースプロキシ方式では、SSO を利用する全てのトラフィックがリバースプロキシサーバに集中し、リバースプロキシサーバが単一障害点になり得る。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -188,7 +188,7 @@
         "text": "データに非可逆処理をして生成される固定長のハッシュ値からは、元のデータを推測できない。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -212,7 +212,7 @@
         "text": "ISO/IEC 30147"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -236,7 +236,7 @@
         "text": "クラウドサービス利用組織の管理者が、従業員が利用しているクラウドサービスに対して、CASB を利用して利用状況の可視化を行うことによって、許可を得ずにクラウドサービスを利用している者を特定できる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -260,7 +260,7 @@
         "text": "HTTP レスポンスヘッダーに, X-Frame-Options を設定する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -284,7 +284,7 @@
         "text": "ハッシュ関数を必須の技術として、参加者がデータの改ざんを検出するために利用する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -308,7 +308,7 @@
         "text": "TLS"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -332,7 +332,7 @@
         "text": "メールクライアントからメールサーバへの電子メール送信は、POP 接続で利用者認証済みの場合にだけ許可する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -356,7 +356,7 @@
         "text": "メールサーバの TCP ポート 25 番を利用不可にする。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -380,7 +380,7 @@
         "text": "PGP: メールサーバごと, S/MIME: メールサーバごと, SMTP over TLS: メールサーバごと"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -404,7 +404,7 @@
         "text": "建物外への無線 LAN 電波の漏れを防ぐことによって第三者による盗聴を防止する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -428,7 +428,7 @@
         "text": "ヘッダーは固定長であり、拡張ヘッダー長は 8 オクテットの整数倍である。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -452,7 +452,7 @@
         "text": "マルチキャストアドレスを割り振る。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -476,7 +476,7 @@
         "text": "VRRP"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -500,7 +500,7 @@
         "text": "結果表: (A: A001, B: 10, C: NULL, D: NULL), (A: A002, B: 20, C: A002, D: 20), (A: A003, B: 30, C: A003, D: 30), (A: NULL, B: NULL, C: A004, D: 40), (A: A005, B: 50, C: NULL, D: NULL)"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -524,7 +524,7 @@
         "text": "(A=7, B=1), (A=1, B=0)"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -548,7 +548,7 @@
         "text": "HDCP (High-bandwidth Digital Content Protection)"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -572,7 +572,7 @@
         "text": "D"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -596,7 +596,7 @@
         "text": "ストレージデバイスの管理者 ID"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   }
 ]

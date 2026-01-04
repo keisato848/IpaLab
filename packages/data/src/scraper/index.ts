@@ -1,68 +1,55 @@
 import axios from 'axios';
 import fs from 'fs/promises';
 import path from 'path';
-import { extractAnswersFromPdf } from '../utils/pdf';
-
-// Example: Scrape answers for AP 2023 Fall AM1
-// URL to the PDF containing answers (Usually IPA publishes "kaito_pdf" or similar)
-// For MVP, we might need a manual mapping of Exam ID to Answer PDF URL
-const EXAM_CONFIG = [
-    {
-        examId: 'AP-2023-Fall-AM',
-        url: 'https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05a_ap_am_ans.pdf'
-        // Note: URL is hypothetical for demonstration. Real scraper would need exact URLs or discover them.
-    }
-];
+import { EXAM_LIST } from './exam-list';
 
 async function main() {
-    const rawDir = path.resolve(__dirname, '../../data/raw');
+    // This script downloads PDFs from the URLs in exam-list.ts
+    const rawDir = path.resolve(__dirname, '../../data/raw_pdfs');
     await fs.mkdir(rawDir, { recursive: true });
 
-    for (const config of EXAM_CONFIG) {
-        console.log(`Processing ${config.examId}...`);
+    // Filter for recent FE exams only to save time
+    const targetExams = EXAM_LIST.filter(e => e.category === 'FE' && parseInt(e.year) >= 2023);
+    console.log(`Targeting ${targetExams.length} FE exams.`);
+
+    for (const exam of targetExams) {
+        const examId = `${exam.category}-${exam.year}-${exam.term}-${exam.type}`;
         try {
-            console.log(`Downloading PDF from ${config.url}`);
-            let pdfBuffer: Buffer;
+            console.log(`Downloading PDF from ${exam.url}`);
 
-            try {
-                const response = await axios.get(config.url, { responseType: 'arraybuffer' });
-                pdfBuffer = Buffer.from(response.data);
-            } catch (err) {
-                console.warn(`Download failed (${err}). Using empty buffer for test.`);
-                // Create a minimal valid PDF buffer or just skip extraction to avoid crash
-                // For this demo, let's stop here or provide a mock result directly
-                const mockAnswers = Array.from({ length: 80 }, (_, i) => ({ qNo: i + 1, correct: ['a', 'b', 'c', 'd'][i % 4] }));
+            // 1. Download Question PDF
+            const pdfPath = path.join(rawDir, `${examId}.pdf`);
+            const exists = await fs.access(pdfPath).then(() => true).catch(() => false);
 
-                const output = {
-                    examId: config.examId,
-                    scrapedAt: new Date().toISOString(),
-                    sourceUrl: config.url,
-                    answers: mockAnswers,
-                    note: "MOCK DATA (Download Failed)"
-                };
-
-                const filePath = path.join(rawDir, `${config.examId}_answers.json`);
-                await fs.writeFile(filePath, JSON.stringify(output, null, 2), 'utf-8');
-                console.log(`Saved MOCK data to ${filePath}`);
-                continue;
+            if (!exists) {
+                try {
+                    const response = await axios.get(exam.url, { responseType: 'arraybuffer' });
+                    await fs.writeFile(pdfPath, response.data);
+                    console.log(`Saved ${examId}.pdf`);
+                } catch (err: any) {
+                    console.error(`Failed to download ${examId}: ${err.message}`);
+                }
+            } else {
+                console.log(`Skipping ${examId}.pdf (already exists)`);
             }
 
-            console.log('Extracting text...');
-            const answers = await extractAnswersFromPdf(pdfBuffer);
-
-            const output = {
-                examId: config.examId,
-                scrapedAt: new Date().toISOString(),
-                sourceUrl: config.url,
-                answers
-            };
-
-            const filePath = path.join(rawDir, `${config.examId}_answers.json`);
-            await fs.writeFile(filePath, JSON.stringify(output, null, 2), 'utf-8');
-            console.log(`Saved to ${filePath}`);
+            // 2. Download Answer PDF (if available) - Rename to -Ans.pdf for gemini-extract compatibility
+            // Although fix-answers.ts handles it separately, having it here is good backup.
+            if ((exam as any).answerUrl) {
+                const ansPath = path.join(rawDir, `${examId}-Ans.pdf`);
+                if (!(await fs.access(ansPath).then(() => true).catch(() => false))) {
+                    try {
+                        const response = await axios.get((exam as any).answerUrl, { responseType: 'arraybuffer' });
+                        await fs.writeFile(ansPath, response.data);
+                        console.log(`Saved ${examId}-Ans.pdf`);
+                    } catch (err: any) {
+                        console.error(`Failed to download Answers for ${examId}: ${err.message}`);
+                    }
+                }
+            }
 
         } catch (error) {
-            console.error(`Failed to process ${config.examId}:`, error);
+            console.error(`Failed to process ${examId}:`, error);
         }
     }
 }
