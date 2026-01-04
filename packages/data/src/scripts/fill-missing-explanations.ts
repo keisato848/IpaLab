@@ -93,15 +93,19 @@ async function processQuestion(model: any, q: any) {
 async function main() {
     const questionsDir = path.resolve(__dirname, '../../data/questions');
 
-    // Target only AP Morning exams
+    // Target AP-*-AM, FE-*-AM, PM-*-AM2, SC-*-AM2, and IP-*-AM
     const dirs = fs.readdirSync(questionsDir).filter(d =>
-        d.startsWith('AP-') && d.endsWith('-AM')
+        (d.startsWith('AP-') && d.endsWith('-AM')) ||
+        (d.startsWith('FE-') && d.endsWith('-AM')) ||
+        (d.startsWith('PM-') && d.endsWith('-AM2')) ||
+        (d.startsWith('SC-') && d.endsWith('-AM2')) ||
+        (d.startsWith('IP-') && d.endsWith('-AM'))
     );
 
     // Sort to process newest first (usually most relevant)
     dirs.sort().reverse();
 
-    console.log(`Found ${dirs.length} AP exams to check.`);
+    console.log(`Found ${dirs.length} exams to check.`);
 
     const model = getGeminiClient();
     const BATCH_SIZE = 15; // Parallel requests

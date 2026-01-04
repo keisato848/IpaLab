@@ -181,15 +181,57 @@ async function main() {
                 // Some raw files might be { questions: [] } or just []
                 const itemsToUpsert = [];
 
-                if (Array.isArray(questions)) {
-                    // Start loop
-                    for (const q of questions) {
-                        // PM/Afternoon logic (often nested)
-                        if (type.startsWith('PM') || type === 'AM2' || examPrefix === 'PM' || examPrefix === 'SC') {
-                            // PM AM2 is Multiple Choice, but PM/PM1/PM2 are descriptive
-                            // Check structure. If it has options, it's MC.
-                            if (q.options && q.options.length > 0) {
-                                // MC Question (e.g. SC AM2)
+                if (Array.isArray(questions) && questions.length > 0) {
+                    // Check if 'data' itself is the main question (SC/PM case where file = 1 question)
+                    const isSingleQuestionFile = !Array.isArray(data) && data.qNo && data.description;
+
+                    if (isSingleQuestionFile) {
+                        // Upsert the ROOT object as a single item
+                        itemsToUpsert.push({
+                            id: `${examId}-${data.qNo}`,
+                            examId: examId,
+                            type: type,
+                            qNo: data.qNo,
+                            text: data.theme || `問${data.qNo}`,
+                            description: data.description,
+                            questions: data.questions // Nested subquestions preserved
+                        });
+                    } else {
+                        // Standard Loop (AM exams or PM exams with multiple questions in one array)
+                        for (const q of questions) {
+                            // PM/Afternoon logic (often nested)
+                            if (type.startsWith('PM') || type === 'AM2' || examPrefix === 'PM' || examPrefix === 'SC') {
+                                // PM AM2 is Multiple Choice, but PM/PM1/PM2 are descriptive
+                                // Check structure. If it has options, it's MC.
+                                if (q.options && q.options.length > 0) {
+                                    // MC Question (e.g. SC AM2)
+                                    itemsToUpsert.push({
+                                        id: `${examId}-${q.qNo}`,
+                                        examId: examId,
+                                        type: type,
+                                        qNo: q.qNo,
+                                        text: q.text,
+                                        options: q.options,
+                                        correctOption: q.correctOption,
+                                        explanation: q.explanation // Fix: Map explanation for SC/PM AM2
+                                    });
+                                } else {
+                                    // Descriptive Question (PM1, PM2, SC PM) - Legacy/Fallback path
+                                    // If we are here, it means it wasn't a "Single Question File" or it's an array of questions
+                                    itemsToUpsert.push({
+                                        id: `${examId}-${q.qNo || q.subQNo}`, // Warning: qNo might be string "設問1"
+                                        examId: examId,
+                                        type: type,
+                                        qNo: q.qNo || 99, // Num
+                                        subQNo: q.subQNo, // String label
+                                        text: q.text || q.theme || "（記述式問題）", // Ensure text exists for frontend summary
+                                        theme: q.theme,
+                                        description: data.description || q.description, // Main description might be on root or question
+                                        questions: q.questions || q.subQuestions // Nested subquestions
+                                    });
+                                }
+                            } else {
+                                // Standard AM (AP/FE)
                                 itemsToUpsert.push({
                                     id: `${examId}-${q.qNo}`,
                                     examId: examId,
@@ -198,35 +240,9 @@ async function main() {
                                     text: q.text,
                                     options: q.options,
                                     correctOption: q.correctOption,
-                                    explanation: "" // Explanations are separate usually
-                                });
-                            } else {
-                                // Descriptive Question (PM1, PM2, SC PM)
-                                // Schema: { id, examId, type, qNo, theme?, description?, questions: [] }
-                                itemsToUpsert.push({
-                                    id: `${examId}-${q.qNo || q.subQNo}`, // Warning: qNo might be string "設問1"
-                                    examId: examId,
-                                    type: type,
-                                    qNo: q.qNo || 99, // Num
-                                    subQNo: q.subQNo, // String label
-                                    text: q.text || q.theme || "（記述式問題）", // Ensure text exists for frontend summary
-                                    theme: q.theme,
-                                    description: data.description || q.description, // Main description might be on root or question
-                                    questions: q.questions || q.subQuestions // Nested subquestions
+                                    explanation: q.explanation // Add explanation support
                                 });
                             }
-                        } else {
-                            // Standard AM (AP/FE)
-                            itemsToUpsert.push({
-                                id: `${examId}-${q.qNo}`,
-                                examId: examId,
-                                type: type,
-                                qNo: q.qNo,
-                                text: q.text,
-                                options: q.options,
-                                correctOption: q.correctOption,
-                                explanation: q.explanation // Add explanation support
-                            });
                         }
                     }
                 }
