@@ -3,7 +3,12 @@
 
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import rehypeRaw from 'rehype-raw';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import dynamic from 'next/dynamic';
 import styles from './AIAnswerBox.module.css';
@@ -141,7 +146,14 @@ export default function AIAnswerBox({
 
                     <div className={styles.feedbackSection}>
                         <h3>AIフィードバック</h3>
-                        <p className={styles.feedbackText}>{result.feedback}</p>
+                        <div className={styles.markdownBody}>
+                            <ReactMarkdown
+                                remarkPlugins={[remarkGfm, remarkMath] as any}
+                                rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                            >
+                                {result.feedback}
+                            </ReactMarkdown>
+                        </div>
                     </div>
 
                     {result.mermaidDiagram && (
@@ -154,8 +166,13 @@ export default function AIAnswerBox({
                     {result.improvedAnswer && (
                         <div className={styles.improvedSection}>
                             <h3>改善された回答例</h3>
-                            <div className={styles.improvedText}>
-                                {result.improvedAnswer}
+                            <div className={styles.markdownBody}>
+                                <ReactMarkdown
+                                    remarkPlugins={[remarkGfm, remarkMath] as any}
+                                    rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                                >
+                                    {result.improvedAnswer}
+                                </ReactMarkdown>
                             </div>
                         </div>
                     )}
