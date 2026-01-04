@@ -20,7 +20,7 @@
         "text": "(n XOR 11111111) + 00000001"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -44,7 +44,7 @@
         "text": "a: NISHIN (k) ← j mod 2, b: j ← j div 2"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -68,7 +68,7 @@
         "text": "Q: 真, R: 真"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -92,7 +92,7 @@
         "text": "0011111110"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -116,7 +116,7 @@
         "text": "エ"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -140,7 +140,7 @@
         "text": "B(j, 7-i) ← A(i, j)"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -164,7 +164,7 @@
         "text": "11"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -188,7 +188,7 @@
         "text": "25"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -212,7 +212,7 @@
         "text": "領域割付け関数を使用するときは,割付けができなかったときの処理を記述する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -236,7 +236,7 @@
         "text": "ページフォールトの発生"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -260,7 +260,7 @@
         "text": "10"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -284,7 +284,7 @@
         "text": "D, C, A, B"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -308,7 +308,7 @@
         "text": "5"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -332,7 +332,7 @@
         "text": "a (1 - (1 - b)³) (1 - (1 - c)²)"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -356,7 +356,7 @@
         "text": "L ≧ (S - R) × T"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -380,7 +380,7 @@
         "text": "実行可能なプログラムを,主記憶装置にロードするプログラムである。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -404,7 +404,7 @@
         "text": "C, B, A"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -428,7 +428,7 @@
         "text": "ルートディレクトリから対象ファイルに至るパス名"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -452,7 +452,7 @@
         "text": "メモリセル構造が単純なので高集積化することができ,ビット単価を安くできる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -476,7 +476,7 @@
         "text": "論理チェック"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -500,7 +500,7 @@
         "text": "ビューは一つの基底表に対して一つだけ定義できる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -524,7 +524,7 @@
         "text": "どの部署にも所属しない従業員が存在してもよい。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -548,7 +548,7 @@
         "text": "テキストファイルやバイナリデータなど,格納するデータの形式に応じてリポジトリを使い分ける。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -572,7 +572,7 @@
         "text": "併合(merge)"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -596,7 +596,7 @@
         "text": "PPP (Point-to-Point Protocol)"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -620,7 +620,7 @@
         "text": "128"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -644,7 +644,7 @@
         "text": "SMTP"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -668,7 +668,7 @@
         "text": "UDP"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -692,7 +692,7 @@
         "text": "送信元(Web サーバ)のポート番号: 80と50001 以外からサーバ側で割り当てた番号, 宛先(PC)のポート番号: 50001"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -716,7 +716,7 @@
         "text": "ブルートフォース攻撃"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -740,7 +740,7 @@
         "text": "侵入して乗っ取ったコンピュータに対して,他のコンピュータへの攻撃などの不正な操作をするよう,外部から命令を出したり応答を受け取ったりする。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -764,7 +764,7 @@
         "text": "メッセージの秘匿性を確保する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -788,7 +788,7 @@
         "text": "電子メールの内容が改ざんされることを防ぐ。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -812,7 +812,7 @@
         "text": "ネットワーク上を流れるパケットを収集し,そのプロトコルヘッダやペイロードを解析して、あらかじめ登録された攻撃パターンと一致するものを検出する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -836,7 +836,7 @@
         "text": "ハードディスク内のファイルの拡張子とファイルヘッダの内容を基に,拡張子が偽装された不正なプログラムファイルを検出する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -860,7 +860,7 @@
         "text": "入力の全体の長さが制限を超えているときは受け付けない。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -884,7 +884,7 @@
         "text": "SMTP-AUTH"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -908,7 +908,7 @@
         "text": "抽象化"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -932,7 +932,7 @@
         "text": "他のモジュールを呼び出すときに,呼び出したモジュールの論理を制御するための引数を渡す。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -956,7 +956,7 @@
         "text": "ホワイトボックステスト"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -980,7 +980,7 @@
         "text": "毎回のスプリントプランニングにおいて,スプリントの期間をゴールの難易度に応じて,1週間から1か月までの範囲に設定する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -1004,7 +1004,7 @@
         "text": "リスクは,プロジェクトが完了に近づくにつれて減少する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1028,7 +1028,7 @@
         "text": "単位作業項目に適用する作業量の基準値を決めておき,作業項目を単位作業項目まで分解し,基準値を適用して算出した作業量の積算で全体の作業量を見積もる方法である。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -1052,7 +1052,7 @@
         "text": "12"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1076,7 +1076,7 @@
         "text": "強み,弱み,機会,脅威の観点から IT サービスマネジメントの現状を分析する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1100,7 +1100,7 @@
         "text": "ロールフォワード"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1124,7 +1124,7 @@
         "text": "システム監査人の所属部署を内部監査部門とする。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1148,7 +1148,7 @@
         "text": "データベースが暗号化されていること"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1172,7 +1172,7 @@
         "text": "対面での会議開催が困難な場合に,ネットワークを介して対面と同じようなコミュニケーションができるツール"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -1196,7 +1196,7 @@
         "text": "d"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -1220,7 +1220,7 @@
         "text": "グリーン購入"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1244,7 +1244,7 @@
         "text": "組織活動の目的を達成するために行う,業務とシステムの全体最適化手法"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -1268,7 +1268,7 @@
         "text": "実用最小限の製品・サービスを短期間で作り,構築・計測・学習というフィードバックループで改良や方向転換をして,継続的にイノベーションを行う手法"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1292,7 +1292,7 @@
         "text": "太陽光発電装置などのエネルギー機器,家電機器,センサ類などを家庭内通信ネットワークに接続して,エネルギーの可視化と消費の最適制御を行う。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1316,7 +1316,7 @@
         "text": "メーカや卸売業者から商品を直接発送することによって,在庫リスクを負うことなく自分の Web サイトで商品が販売できること"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1340,7 +1340,7 @@
         "text": "個人が,自らが使用した商品などの評価に関する情報を,不特定多数に向けて発信するブログや SNS などの Web サイト"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1364,7 +1364,7 @@
         "text": "8,000"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -1388,7 +1388,7 @@
         "text": "7.5"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1412,7 +1412,7 @@
         "text": "180"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1436,7 +1436,7 @@
         "text": "労働者派遣契約関係"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   }
 ]

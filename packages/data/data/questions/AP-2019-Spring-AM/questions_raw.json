@@ -20,7 +20,7 @@
         "text": "(n+1) OR 256"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Technology",
     "subCategory": "基礎理論"
   },
@@ -45,7 +45,7 @@
         "text": "無限級数で表される数値の計算処理を有限項で打ち切ったことによって発生する誤差"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Technology",
     "subCategory": "基礎理論"
   },
@@ -70,7 +70,7 @@
         "text": "知識がルールに従って表現されており、演繹手法を利用した推論によって有意な結論を導く手法である。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Technology",
     "subCategory": "基礎理論"
   },
@@ -95,7 +95,7 @@
         "text": "複数の衛星からの電波を受け取り、電波に含まれる情報から発信と受信の時刻差を求め、電波の伝播速度をかけることによって、各衛星との距離を割り出し、それを基に緯度及び経度を特定する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Technology",
     "subCategory": "基礎理論"
   },
@@ -120,7 +120,7 @@
         "text": "アドレスに対応したビットマップ"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "基礎理論"
   },
@@ -145,7 +145,7 @@
         "text": "5"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Technology",
     "subCategory": "アルゴリズムとプログラミング"
   },
@@ -170,7 +170,7 @@
         "text": "XML"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Technology",
     "subCategory": "アルゴリズムとプログラミング"
   },
@@ -195,7 +195,7 @@
         "text": "並列実行可能な複数の命令を、複数の演算器に振り分けることによって並列に実行する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Technology",
     "subCategory": "アルゴリズムとプログラミング"
   },
@@ -220,7 +220,7 @@
         "text": "転送元の開始アドレス: 1004, 転送先の開始アドレス: 1006, 方向フラグ: 1, 転送語数: 4"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Technology",
     "subCategory": "アルゴリズムとプログラミング"
   },
@@ -245,7 +245,7 @@
         "text": "200"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Technology",
     "subCategory": "アルゴリズムとプログラミング"
   },
@@ -270,7 +270,7 @@
         "text": "連絡用,業務用などに利用される小型の携帯型トランシーバに使われる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -295,7 +295,7 @@
         "text": "③, ②, ①"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -320,7 +320,7 @@
         "text": "C, B, A"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -345,7 +345,7 @@
         "text": "1.9"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -370,7 +370,7 @@
         "text": "400"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -395,7 +395,7 @@
         "text": "11"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -420,7 +420,7 @@
         "text": "ヒープ領域も構造的にはスタックと同じプッシュとポップの操作によって、データの格納と取出しを行う。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -445,7 +445,7 @@
         "text": "両方のタスクの優先度を同じにする。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -470,7 +470,7 @@
         "text": "7000"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -495,7 +495,7 @@
         "text": "フリップフロップ"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -520,7 +520,7 @@
         "text": "物理量を検出して、電気信号に変える。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -545,7 +545,7 @@
         "text": "160"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -570,7 +570,7 @@
         "text": "入力 A=1, B=1, C=1, D=1. 出力 E=1, F=1."
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -595,7 +595,7 @@
         "text": "ブロックコード"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -620,7 +620,7 @@
         "text": "物体をワイヤフレーム、ポリゴンなどを用いて、モデル化すること"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "コンピュータシステム"
   },
@@ -645,7 +645,7 @@
         "text": "内部スキーマ"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Technology",
     "subCategory": "技術要素"
   },
@@ -670,7 +670,7 @@
         "text": "GRANT 文で許可する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Technology",
     "subCategory": "技術要素"
   },
@@ -695,7 +695,7 @@
         "text": "SELECT クラス名, AVG(点数) FROM 試験結果 WHERE 点数 >= 600 GROUP BY クラス名 HAVING (MAX(受験年月日) BETWEEN '2018-04-01' AND '2019-03-31')"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Technology",
     "subCategory": "技術要素"
   },
@@ -720,7 +720,7 @@
         "text": "テキストファイルやバイナリデータなど、格納するデータの形式に応じてリポジトリを使い分ける。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Technology",
     "subCategory": "技術要素"
   },
@@ -745,7 +745,7 @@
         "text": "ひとたびコミットすれば、その後どのような障害が起こっても状態の変更が保たれるという性質である。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Technology",
     "subCategory": "技術要素"
   },
@@ -770,7 +770,7 @@
         "text": "宛先IPアドレス: , 送信元 IPアドレス: ○, 宛先ポート番号: , 送信元ポート番号: ○"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Technology",
     "subCategory": "技術要素"
   },
@@ -795,7 +795,7 @@
         "text": "マルチホーミング"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Technology",
     "subCategory": "技術要素"
   },
@@ -820,7 +820,7 @@
         "text": "イーサネットフレームの宛先: MAC3, IP データグラムの宛先: IP3"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "技術要素"
   },
@@ -845,7 +845,7 @@
         "text": "10.170.70.255"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Technology",
     "subCategory": "技術要素"
   },
@@ -870,7 +870,7 @@
         "text": "リバースプロキシ"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Technology",
     "subCategory": "技術要素"
   },
@@ -895,7 +895,7 @@
         "text": "ソフトウェアやハードウェアの脆弱性を検査するために作成されたプログラム"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Technology",
     "subCategory": "セキュリティ"
   },
@@ -920,7 +920,7 @@
         "text": "利用者が認証情報を忘れ,かつ, Web ブラウザに保存しているパスワード情報も使用できない場合でも、救済することによって、利用者は普段どおりにシステムを利用できる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "セキュリティ"
   },
@@ -945,7 +945,7 @@
         "text": "利用者の誕生日や電話番号などの個人情報を言葉巧みに聞き出して、パスワードを類推する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "セキュリティ"
   },
@@ -970,7 +970,7 @@
         "text": "プログラムを実行する際に、プログラムファイルのハッシュ値と脅威情報を突き合わせることによって、マルウェアを発見する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Technology",
     "subCategory": "セキュリティ"
   },
@@ -995,7 +995,7 @@
         "text": "公開鍵暗号方式によるディジタル署名を用いることによって、正当な DNS サーバからの応答であることをクライアントが検証できる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Technology",
     "subCategory": "セキュリティ"
   },
@@ -1020,7 +1020,7 @@
         "text": "マルウェアに感染しているファイルを、マルウェアに感染していると判断する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "セキュリティ"
   },
@@ -1045,7 +1045,7 @@
         "text": "D"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "セキュリティ"
   },
@@ -1070,7 +1070,7 @@
         "text": "不正な動作をする可能性があるプログラムを特別な領域で動作させることによって、他の領域に悪影響が及ぶのを防ぐ。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Technology",
     "subCategory": "セキュリティ"
   },
@@ -1095,7 +1095,7 @@
         "text": "利用者のPCから送信された URL"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Technology",
     "subCategory": "セキュリティ"
   },
@@ -1120,7 +1120,7 @@
         "text": "ファイルへのマルウェア感染を監視し、検出する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Technology",
     "subCategory": "セキュリティ"
   },
@@ -1145,7 +1145,7 @@
         "text": "プログラムが最も効率よくアクセスできるようにデータ構造を設計する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "システム開発技術"
   },
@@ -1170,7 +1170,7 @@
         "text": "ハードディスクに RAID1 を採用して、MTBF で示される信頼性が向上するようにする。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Technology",
     "subCategory": "システム開発技術"
   },
@@ -1195,7 +1195,7 @@
         "text": "予防保守"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "システム開発技術"
   },
@@ -1220,7 +1220,7 @@
         "text": "[図エの内容: 要員数がステップ状に変化するグラフ]"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Technology",
     "subCategory": "システム開発技術"
   },
@@ -1245,7 +1245,7 @@
         "text": "使用されたテスト方法及び作業標準の適切性"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Technology",
     "subCategory": "システム開発技術"
   },
@@ -1270,7 +1270,7 @@
         "text": "プロジェクトマネジメントの活動を遂行し、プロジェクトの全体計画に従ってプロジェクトの成果物の提示を支援するために使用する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Management",
     "subCategory": "プロジェクト・サービスマネジメント"
   },
@@ -1295,7 +1295,7 @@
         "text": "150"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Management",
     "subCategory": "プロジェクト・サービスマネジメント"
   },
@@ -1320,7 +1320,7 @@
         "text": "作業Fを最も遅く開始できるのは11日目である。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Management",
     "subCategory": "プロジェクト・サービスマネジメント"
   },
@@ -1345,7 +1345,7 @@
         "text": "インシデントの発生を記録し、関係する部署に状況を連絡する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Management",
     "subCategory": "プロジェクト・サービスマネジメント"
   },
@@ -1370,7 +1370,7 @@
         "text": "同時に被災する可能性がほとんどない複数のデータセンタにシステムを分散して稼働させることによって、一部のデータセンタが被災しても顧客に対するサービスの深刻な停止を引き起こすことなく, IT サービスを即時に復旧させる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Management",
     "subCategory": "プロジェクト・サービスマネジメント"
   },
@@ -1395,7 +1395,7 @@
         "text": "15"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Management",
     "subCategory": "プロジェクト・サービスマネジメント"
   },
@@ -1420,7 +1420,7 @@
         "text": "受託者から納品された成果物に対して、監査人がユーザ受入テスト計画を策定していること"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Management",
     "subCategory": "プロジェクト・サービスマネジメント"
   },
@@ -1445,7 +1445,7 @@
         "text": "監査テーマに合わせて、監査チームを編成する手順"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Management",
     "subCategory": "プロジェクト・サービスマネジメント"
   },
@@ -1470,7 +1470,7 @@
         "text": "システム監査人が、監査対象部門の改善実施状況を確認する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Management",
     "subCategory": "プロジェクト・サービスマネジメント"
   },
@@ -1495,7 +1495,7 @@
         "text": "取引先との打合せは、社員が業務を行っている執務室から分離された場所であって、かつ、機密性の高い情報資産が置かれていない場所で行っている。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Management",
     "subCategory": "プロジェクト・サービスマネジメント"
   },
@@ -1520,7 +1520,7 @@
         "text": "リスクを最小化するように支援する専門組織を設けることによって、組織全体のプロジェクトマネジメントの能力と品質の向上を図る。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1545,7 +1545,7 @@
         "text": "財務管理ソリューション"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1570,7 +1570,7 @@
         "text": "分析要件に応じ、決定木分析, ニューラルネットワークなどのモデリング手法の選択、モデルへのパラメタの設定,分析結果の評価ができる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1595,7 +1595,7 @@
         "text": "投資をしない"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1620,7 +1620,7 @@
         "text": "ユースケース図"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1645,7 +1645,7 @@
         "text": "ベンダが提供するソフトウェアを,利用料金を支払うことによって一定期間の利用権を得て利用する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1670,7 +1670,7 @@
         "text": "収益性が高い事業分野での市場シェア"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1695,7 +1695,7 @@
         "text": "遵法"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1720,7 +1720,7 @@
         "text": "形式知から新たに形式知を得ること"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1745,7 +1745,7 @@
         "text": "ブランド向上を図るために、自社製品の革新性について Webに掲載した。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1770,7 +1770,7 @@
         "text": "ディジタル空間に現実世界と同等な世界を、様々なセンサで収集したデータを用いて構築し、現実世界では実施できないようなシミュレーションを行うこと"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1795,7 +1795,7 @@
         "text": "部品の供給から製品の販売までの一連のプロセスの情報をリアルタイムで交換することによって、在庫の削減とリードタイムの短縮を実現する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1820,7 +1820,7 @@
         "text": "検索エンジンを運営する企業と契約し、自社の商品・サービスと関連したキーワードが検索に用いられた際に広告を表示する仕組み"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1845,7 +1845,7 @@
         "text": "連関図"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1870,7 +1870,7 @@
         "text": "300"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1895,7 +1895,7 @@
         "text": "5,000"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1920,7 +1920,7 @@
         "text": "a: 標準原価差額の計算, b: 実際原価の計算, c: 原価差異分析"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1945,7 +1945,7 @@
         "text": "本人の病歴、犯罪の経歴など不当な差別や不利益を生じさせるおそれのある情報"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1970,7 +1970,7 @@
         "text": "振込手数料を下請事業者が負担する旨を発注前に書面で合意したので、親事業者が負担した実費の範囲内で振込手数料を差し引いて下請代金を支払う。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   },
@@ -1995,7 +1995,7 @@
         "text": "コストの低減"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "category": "Strategy",
     "subCategory": "システム戦略・経営戦略"
   }

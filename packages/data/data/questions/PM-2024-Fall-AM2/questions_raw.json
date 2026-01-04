@@ -21,7 +21,7 @@
           "text": "プロジェクトを正式に許可する文書であって,プロジェクトマネージャを特定して適切な責任と権限を明確にし、ビジネスニーズ,目標,期待される結果などを明確にした文書"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -46,7 +46,7 @@
           "text": "実行責任,説明責任,相談対応, リスク管理"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -71,7 +71,7 @@
           "text": "プロジェクトの完遂に必要な人的資源を得ること"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -96,7 +96,7 @@
           "text": "1.3"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -121,7 +121,7 @@
           "text": "21"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -146,7 +146,7 @@
           "text": "21"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -171,7 +171,7 @@
           "text": "定められた期間に受入れが行われたチームの成果物の量を表すものである。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -196,7 +196,7 @@
           "text": "プロジェクトの完成時にはCPIが1.0となることを利用して、CPIが1.0となる完成時期を予測し、スケジュールを見直す。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -221,7 +221,7 @@
           "text": "5.2"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -246,7 +246,7 @@
           "text": "3 / ( (1/X) + (1/Y) + (1/Z) )"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -271,7 +271,7 @@
           "text": "リスクの優先順位を定めるために、各リスクの発生確率及びそのリスクが発生した場合にプロジェクトの目標に及ぼす結果を推定する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -296,7 +296,7 @@
           "text": "500"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -321,7 +321,7 @@
           "text": "抽象度が異なる要素を分割して階層化するための Layers, コンポーネント分割のための Broker などで構成される。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -346,7 +346,7 @@
           "text": "計画していた移行作業の時間を超過したが、手順どおりに移行作業を終了したので、移行リハーサルを完了した。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -371,7 +371,7 @@
           "text": "プロジェクトレベルで管理されている。プロジェクトは、計画され、実施され、測定され、そして制御されている。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -396,7 +396,7 @@
           "text": "他のユーザーストーリーとの依存関係をもっている。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -421,7 +421,7 @@
           "text": "包括的なドキュメントに価値があることを認めながらも、動くソフトウェアに、より価値をおく。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -446,7 +446,7 @@
           "text": "組織が使用しているサービスマネジメントの用語を、当該規格で使用している用語に置き換えるための要求事項"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -471,7 +471,7 @@
           "text": "フルバックアップ取得の平均処理時間が約2倍になる。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -496,7 +496,7 @@
           "text": "ベンダーの役務や技術に対する報酬に加え、委託業務の遂行に要した費用の全てをベンダーに支払う。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -521,7 +521,7 @@
           "text": "ユーザーとベンダー間で AI 技術を利用したソフトウェアの開発・利用に関する契約を締結するときに、法的拘束力を有するこのガイドラインにのっとって責任分担を明確にしなければならない。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -546,7 +546,7 @@
           "text": "反対する少数メンバーがいる場合は、そのメンバーに圧力を加えて統一した意見にさせる。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -571,7 +571,7 @@
           "text": "認証や認可に関する情報を交換するための仕様"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -596,7 +596,7 @@
           "text": "トリアージ"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -621,7 +621,7 @@
           "text": "ファイアウォールを用いて外部との通信を記録し、自社の Web サーバから不審な宛先への通信が発生していないか調査する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     }

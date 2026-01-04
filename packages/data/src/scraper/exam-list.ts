@@ -1,6 +1,6 @@
 export const EXAM_LIST = [
     // AP (Applied Information Technology Engineer)
-    { category: "AP", year: "2025", term: "Fall", type: "AM", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_ap_am_qs.pdf" },
+    { category: "AP", year: "2025", term: "Fall", type: "AM", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_ap_am_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_ap_am_ans.pdf" },
     { category: "AP", year: "2024", term: "Fall", type: "AM", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06a_ap_am_qs.pdf" },
     { category: "AP", year: "2024", term: "Spring", type: "AM", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_ap_am_qs.pdf" },
     { category: "AP", year: "2023", term: "Fall", type: "AM", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05a_ap_am_qs.pdf" },
@@ -76,5 +76,13 @@ export const EXAM_LIST = [
 
     // IP (IT Passport) - Publicly Available Questions (Open Questions)
     // 2024 (Reiwa 6)
-    { category: "IP", year: "2024", term: "Spring", type: "AM", url: "https://www3.jitec.ipa.go.jp/JitesCbt/html/openinfo/pdf/questions/2024r06_ip_qs.pdf" }
+    { category: "IP", year: "2024", term: "Spring", type: "AM", url: "https://www3.jitec.ipa.go.jp/JitesCbt/html/openinfo/pdf/questions/2024r06_ip_qs.pdf", answerUrl: "https://www3.jitec.ipa.go.jp/JitesCbt/html/openinfo/pdf/questions/2024r06_ip_ans.pdf" },
+
+    // FE (Fundamental Information Technology) - New CBT Format (Publicly Available Questions)
+    // 2024 (Reiwa 6)
+    { category: "FE", year: "2024", term: "Public", type: "AM", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000ah6x-att/2024r06_fe_kamoku_a_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000ah6x-att/2024r06_fe_kamoku_a_ans.pdf" },
+    { category: "FE", year: "2024", term: "Public", type: "PM", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000ah6x-att/2024r06_fe_kamoku_b_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000ah6x-att/2024r06_fe_kamoku_b_ans.pdf" },
+    // 2023 (Reiwa 5)
+    { category: "FE", year: "2023", term: "Public", type: "AM", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/sg_fe/koukai/t6hhco0000003zx0-att/2023r05_fe_kamoku_a_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/sg_fe/koukai/t6hhco0000003zx0-att/2023r05_fe_kamoku_a_ans.pdf" },
+    { category: "FE", year: "2023", term: "Public", type: "PM", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/sg_fe/koukai/t6hhco0000003zx0-att/2023r05_fe_kamoku_b_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/sg_fe/koukai/t6hhco0000003zx0-att/2023r05_fe_kamoku_b_ans.pdf" }
 ];

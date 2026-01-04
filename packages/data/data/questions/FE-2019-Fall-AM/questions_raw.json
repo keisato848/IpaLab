@@ -20,7 +20,7 @@
         "text": "a: NISHIN (k) ← j mod 2, b: j ← j div 2"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -44,7 +44,7 @@
         "text": "16進表記 FF のビット列と論理和をとる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -68,7 +68,7 @@
         "text": "[図エ参照]"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -92,7 +92,7 @@
         "text": "∞"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -116,7 +116,7 @@
         "text": "[図エ参照]"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -140,7 +140,7 @@
         "text": "1/5"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -164,7 +164,7 @@
         "text": "F5_1"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -188,7 +188,7 @@
         "text": "4"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -212,7 +212,7 @@
         "text": "B(j, 7-i) ← A (i, j)"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -236,7 +236,7 @@
         "text": "11"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -260,7 +260,7 @@
         "text": "25"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -284,7 +284,7 @@
         "text": "125,000"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -308,7 +308,7 @@
         "text": "5"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -332,7 +332,7 @@
         "text": "数台のネットワークカメラ及びPCをネットワークハブに接続する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -356,7 +356,7 @@
         "text": "RAID4"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -380,7 +380,7 @@
         "text": "0.19"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -404,7 +404,7 @@
         "text": "L ≥ (S - R) × T"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -428,7 +428,7 @@
         "text": "Bの実行中にAに起動がかかると、Bを待ち状態にしてAを実行する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -452,7 +452,7 @@
         "text": "直前に行ったバックアップの後、ファイル更新を示す情報にかかわらず、全てのファイルをバックアップし、ファイル更新を示す情報は変更しないでそのまま残しておく。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -476,7 +476,7 @@
         "text": "メモリセル構造が単純なので高集積化することができ、ビット単価を安くできる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -500,7 +500,7 @@
         "text": "C6"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -524,7 +524,7 @@
         "text": "A=0, B=0 -> X=1; A=0, B=1 -> X=1; A=1, B=0 -> X=1; A=1, B=1 -> X=0"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -548,7 +548,7 @@
         "text": "連番コード"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -572,7 +572,7 @@
         "text": "ワンセグ放送で使用されている動画圧縮技術"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -596,7 +596,7 @@
         "text": "どの部署にも所属しない従業員が存在してもよい。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -620,7 +620,7 @@
         "text": "学生番号 WHERE 点数 >= 80"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -644,7 +644,7 @@
         "text": "和 (union)"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -668,7 +668,7 @@
         "text": "遷移前の状態: コミット処理中, 遷移後の状態: コミット済"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -692,7 +692,7 @@
         "text": "①: update Y, ②: update Z, ③: update X, ④: read W"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -716,7 +716,7 @@
         "text": "9.6"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -740,7 +740,7 @@
         "text": "タイムスロットを割り当てられたノードだけが送信を行う。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -764,7 +764,7 @@
         "text": "物理層において、入力信号を全てのLANポートに対して中継する機能"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -788,7 +788,7 @@
         "text": "パケットフィルタリング"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -812,7 +812,7 @@
         "text": "BからCへのHTTP要求及びCからBへの HTTP 応答"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -836,7 +836,7 @@
         "text": "B社 Web サーバにアクセスしようとするB社従業員"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -860,7 +860,7 @@
         "text": "ハードディスク内のファイルの拡張子とファイルヘッダの内容を基に、拡張子が偽装された不正なプログラムファイルを検出する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -884,7 +884,7 @@
         "text": "無線 LAN のセキュリティ規格"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -908,7 +908,7 @@
         "text": "送信者の秘密鍵であり、送信者がメッセージダイジェストからディジタル署名を作成する際に使用する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -932,7 +932,7 @@
         "text": "プログラムが確保するメモリ領域に、領域の大きさを超える長さの文字列を入力してあふれさせ、ダウンさせる攻撃"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -956,7 +956,7 @@
         "text": "ファイルAの内容が改ざんされていても、ファイルAにSHA-256を適用して値を算出し、その値と値Bの差分を確認することによって、ファイルAの内容のうち改ざんされている部分を修復できる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -980,7 +980,7 @@
         "text": "ソーシャルエンジニアリング"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1004,7 +1004,7 @@
         "text": "Web サーバを外部セグメントに、データベースサーバをDMZ に設置する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -1028,7 +1028,7 @@
         "text": "パケットのヘッダ情報の検査だけではなく、通信先のアプリケーションプログラムを識別して通信を制御する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1052,7 +1052,7 @@
         "text": "SMTP-AUTH"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1076,7 +1076,7 @@
         "text": "プロセス"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1100,7 +1100,7 @@
         "text": "他のモジュールを呼び出すときに、呼び出したモジュールの論理を制御するための引数を渡す。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1124,7 +1124,7 @@
         "text": "m/S = T/n"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -1148,7 +1148,7 @@
         "text": "ドライバは、引数を渡してテスト対象モジュールを呼び出す。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1172,7 +1172,7 @@
         "text": "命令網羅を満足するならば、判定条件網羅も満足する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1196,7 +1196,7 @@
         "text": "ユースケースの活用"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -1220,7 +1220,7 @@
         "text": "SS 関係 (Start-to-Start)"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1244,7 +1244,7 @@
         "text": "B, E, G"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -1268,7 +1268,7 @@
         "text": "単位作業項目に適用する作業量の基準値を決めておき、作業項目を単位作業項目まで分解し、基準値を適用して算出した作業量の積算で全体の作業量を見積もる方法である。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -1292,7 +1292,7 @@
         "text": "42"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1316,7 +1316,7 @@
         "text": "方針,目的,計画及びサービスの要求事項について、サービスマネジメントシステム及びサービスを監視,測定及びレビューし、それらの結果を報告する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1340,7 +1340,7 @@
         "text": "新旧両システムを並行運用することによって、移行に必要な費用が低減できる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -1364,7 +1364,7 @@
         "text": "RTO"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1388,7 +1388,7 @@
         "text": "テストは利用者側の担当者だけで行われていること"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -1412,7 +1412,7 @@
         "text": "独立性を担保するために、システム監査人は情報システム部にも経理部にも所属しない者とする。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1436,7 +1436,7 @@
         "text": "ハードウェアに関するアクセス制御の運用手続を実施した。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1460,7 +1460,7 @@
         "text": "ベンチマーキング"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1484,7 +1484,7 @@
         "text": "フォークリフトなどを用いて人の操作で保管商品を搬入・搬出していたものを、コンピュータ制御で無人化した自動倉庫システムに置き換える。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -1508,7 +1508,7 @@
         "text": "データの正規化が難しい非構造化データである音声データや画像データは、処理の対象にすべきではない。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1532,7 +1532,7 @@
         "text": "プライバシーマーク"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -1556,7 +1556,7 @@
         "text": "他システムとの情報授受などのインタフェースを明確にする。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1580,7 +1580,7 @@
         "text": "テレビ、新聞、雑誌などの複数のメディアを併用し、消費者への多角的なアプローチを目指すマーケティング手法"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -1604,7 +1604,7 @@
         "text": "製品の製造の生産性向上が目標であるので、製造期間短縮日数を指標とする。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1628,7 +1628,7 @@
         "text": "業務プロセスにおいて革新的な改革をすること"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -1652,7 +1652,7 @@
         "text": "情報リテラシの有無や IT の利用環境の相違などによって生じる、社会的又は経済的な格差のことである。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1676,7 +1676,7 @@
         "text": "より品質が高い部品を調達するために、部品の納入指定業者を複数定め、競争入札で部品を調達する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -1700,7 +1700,7 @@
         "text": "実店舗などで仮想通貨を使った支払や決済を行う。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -1724,7 +1724,7 @@
         "text": "複数のアカウント情報をあらかじめ登録しておくことによって、一度の認証で複数の金融機関の口座取引情報を一括して表示する個人向け Web サービスのこと"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -1748,7 +1748,7 @@
         "text": "累積生産量が倍増するたびに工場従業員の生産性が向上し、一定の比率で単位コストが減少する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -1772,7 +1772,7 @@
         "text": "自然災害に加え、情報システムの機器故障やマルウェア感染も検討範囲に含める。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -1796,7 +1796,7 @@
         "text": "豊富な業務経験、情報技術の知識、リーダシップをもち、プロジェクトの運営を管理する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -1820,7 +1820,7 @@
         "text": "8,000"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -1844,7 +1844,7 @@
         "text": "投資による実現効果によって、投資額をどれだけの期間で回収可能かを定量的に算定するものである。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -1868,7 +1868,7 @@
         "text": "180"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -1892,7 +1892,7 @@
         "text": "ソフトウェアをPCにインストールした時点"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -1916,7 +1916,7 @@
         "text": "利用者によってネットワークからダウンロードされたデータ"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   }
 ]
