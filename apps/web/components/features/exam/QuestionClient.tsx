@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import rehypeRaw from 'rehype-raw';
 // @ts-ignore
 import he from 'he';
@@ -350,7 +353,11 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                             {question.subCategory || '問題文'}
                         </h2>
                         <div className={styles.markdownBody}>
-                            <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+                            <ReactMarkdown
+                                remarkPlugins={[remarkGfm, remarkMath] as any}
+                                rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                                components={components}
+                            >
                                 {question.text}
                             </ReactMarkdown>
                         </div>
@@ -363,8 +370,14 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                 <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
                                     {currentSubQ.subQNo || `設問 ${currentSubQIndex + 1}`}
                                 </h3>
-                                <div style={{ marginBottom: '1.5rem', fontSize: '1rem', lineHeight: '1.6' }}>
-                                    {currentSubQ.text}
+                                <div className={styles.markdownBody}>
+                                    <ReactMarkdown
+                                        remarkPlugins={[remarkGfm, remarkMath] as any}
+                                        rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                                        components={components}
+                                    >
+                                        {currentSubQ.text}
+                                    </ReactMarkdown>
                                 </div>
                                 <AIAnswerBox
                                     questionText={`${question.text}\n\n${currentSubQ.text}`}
@@ -515,7 +528,11 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 {/* Left: Question Body */}
                 <div className={styles.questionPanel}>
                     <div className={styles.markdownBody}>
-                        <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+                        <ReactMarkdown
+                            remarkPlugins={[remarkGfm, remarkMath] as any}
+                            rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                            components={components}
+                        >
                             {question.text}
                         </ReactMarkdown>
                     </div>
@@ -579,7 +596,11 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                 {selectedOption === question.correctOption ? '正解！' : '不正解...'}
                             </div>
                             <div className={styles.explanationBody}>
-                                <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+                                <ReactMarkdown
+                                    remarkPlugins={[remarkGfm, remarkMath] as any}
+                                    rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                                    components={components}
+                                >
                                     {question.explanation || '(解説がありません)'}
                                 </ReactMarkdown>
                             </div>

@@ -224,7 +224,8 @@ async function main() {
                                 qNo: q.qNo,
                                 text: q.text,
                                 options: q.options,
-                                correctOption: q.correctOption
+                                correctOption: q.correctOption,
+                                explanation: q.explanation // Add explanation support
                             });
                         }
                     }
