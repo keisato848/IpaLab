@@ -191,12 +191,64 @@
     vertical-align: middle;
 }
 
-.statusBadge {
+/* Filter Styles */
+.filterContainer {
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filterLabel {
+    font-weight: bold;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.filterSelect {
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    cursor: pointer;
+    min-width: 240px;
+    font-family: inherit;
+    transition: border-color 0.2s, ring 0.2s;
+}
+
+.filterSelect:focus {
+    outline: none;
+    border-color: var(--accent-color, #0070f3);
+    box-shadow: 0 0 0 2px var(--bg-secondary), 0 0 0 4px var(--accent-color, #0070f3);
+}
+
+/* Badge Container to align items */
+.badgeContainer {
     margin-top: auto;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+}
+
+.subcategoryBadge {
+    font-size: 0.75rem;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    color: var(--text-secondary);
+}
+
+.statusBadge {
     font-size: 0.75rem;
     font-weight: 600;
-    padding-top: 0.5rem;
-    width: 100%;
     text-align: right;
     color: var(--text-secondary);
 }

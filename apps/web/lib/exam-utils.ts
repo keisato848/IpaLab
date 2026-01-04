@@ -30,19 +30,25 @@ export function getExamLabel(examId: string): string {
     let seasonLabel = season;
     if (season === 'Spring') seasonLabel = '春期';
     if (season === 'Fall') seasonLabel = '秋期';
+    if (season === 'Public') seasonLabel = '公開問題';
 
     // 4. Time (AM/PM/AM1/AM2)
     // Note: ID might be AP-2024-Spring-AM, so 'time' is index 3
     let timeLabel = '';
 
-    // Sometimes the ID passed here might be just the prefix, or have suffixes.
-    // The parts split: [AP, 2024, Spring, AM]
-
     const suffix = time || ''; // AM, PM, AM1 etc
-    if (suffix.startsWith('AM')) timeLabel = '(午前)';
-    if (suffix === 'AM1') timeLabel = '(午前I)';
-    if (suffix === 'AM2') timeLabel = '(午前II)';
-    if (suffix.startsWith('PM')) timeLabel = '(午後)';
+
+    // Special handling for FE 2023 onwards (CBT: Subject A/B)
+    if (type === 'FE' && year >= 2023) {
+        if (suffix.startsWith('AM')) timeLabel = '(科目A)';
+        if (suffix.startsWith('PM')) timeLabel = '(科目B)';
+    } else {
+        // Standard legacy AM/PM
+        if (suffix.startsWith('AM')) timeLabel = '(午前)';
+        if (suffix === 'AM1') timeLabel = '(午前I)';
+        if (suffix === 'AM2') timeLabel = '(午前II)';
+        if (suffix.startsWith('PM')) timeLabel = '(午後)';
+    }
 
     return `${typeLabel} ${yearLabel} ${seasonLabel} ${timeLabel}`.trim();
 }

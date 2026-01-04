@@ -21,7 +21,7 @@
           "text": "プロジェクトを許可し、経営的決定を下すプロジェクトスポンサ、又は上級レベルでの指導を行うプロジェクト運営委員会"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -46,7 +46,7 @@
           "text": "立ち上げのプロセス群"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -71,7 +71,7 @@
           "text": "予算、コスト,スケジュール、又はスコープのパラメータとベースラインとの差異を判定し、これに基づいて将来のある時点におけるパラメータのベースラインからの差異を予測する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -96,7 +96,7 @@
           "text": "変更要求によるスコープの拡大を変更管理委員会に諮ったが、承認されなかった。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -121,7 +121,7 @@
           "text": "全ての利用者が満足する UI を開発するという達成困難な目標を開発チームに対して設定したので、開発チームの士気が下がり、その後の生産性が低下した。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -146,7 +146,7 @@
           "text": "14"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -171,7 +171,7 @@
           "text": "2日増加する"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -196,7 +196,7 @@
           "text": "クリティカルパス上の先行作業が終了する前に後続作業に着手し、双方の作業を並行して実施する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -221,7 +221,7 @@
           "text": "[グラフ エ]"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -246,7 +246,7 @@
           "text": "終結"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -271,7 +271,7 @@
           "text": "成果物"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -296,7 +296,7 @@
           "text": "プロジェクトのステークホルダの情報及びコミュニケーションのニーズを決定すること"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -321,7 +321,7 @@
           "text": "質の高いユーザーストーリーとなっているかどうかを評価する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -346,7 +346,7 @@
           "text": "組織の品質管理プロセスのプロジェクトへの効果的な適用を確実なものにするよう支援する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -371,7 +371,7 @@
           "text": "プロダクトバックログ"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -396,7 +396,7 @@
           "text": "明確に定義された用語を使用し、ソフトウェアライフサイクルプロセスの共通枠組みを規定している。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -421,7 +421,7 @@
           "text": "発見されたバグの内容、バグが発生したソフトウェアのバージョンなどを記録し、その修正計画や修正履歴を管理する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -446,7 +446,7 @@
           "text": "[グラフ エ]"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -471,7 +471,7 @@
           "text": "Zabbix"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -496,7 +496,7 @@
           "text": "システム基盤に関わる可用性,性能,拡張性,運用性,保守性、移行性などの項目"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -521,7 +521,7 @@
           "text": "修正済プログラムの検査が終了した日"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -546,7 +546,7 @@
           "text": "公益通報は、氏名を明らかにして行わなければならない。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -571,7 +571,7 @@
           "text": "パスワード認証とスマートフォンへのプッシュ通知による認証を採用しているシステムにおいて、利用者がプッシュ通知の承認操作を行うまで、攻撃者が不正なログイン操作を繰り返す。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -596,7 +596,7 @@
           "text": "レピュテーションリスク"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -621,7 +621,7 @@
           "text": "d → c → a → b"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     }

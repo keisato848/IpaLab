@@ -68,8 +68,6 @@ export default function ExamListPage() {
         fetchExamsAndStats();
     }, [session]);
 
-    const [subcategoryFilter, setSubcategoryFilter] = useState('ALL');
-
     const filteredExams = exams.filter(e => {
         const catMatch = filter === 'ALL' || e.category === filter;
         let timeMatch = true;
@@ -122,23 +120,6 @@ export default function ExamListPage() {
                             <button onClick={() => setTimeFilter('PM')} className={`${styles.filterBtn} ${timeFilter === 'PM' ? styles.filterBtnSelected : ''}`}>午後 (PM)</button>
                         </div>
                     </div>
-
-                    {/* Subcategory Filter (Pass-through) */}
-                    <div className={styles.filterGroup}>
-                        <span className={styles.filterLabel}>分野:</span>
-                        <div className={styles.filterButtons}>
-                            <select
-                                className={styles.dropdown}
-                                value={subcategoryFilter}
-                                onChange={(e) => setSubcategoryFilter(e.target.value)}
-                            >
-                                <option value="ALL">指定なし</option>
-                                <option value="Technology">テクノロジ系</option>
-                                <option value="Management">マネジメント系</option>
-                                <option value="Strategy">ストラテジ系</option>
-                            </select>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -166,8 +147,9 @@ export default function ExamListPage() {
                         else if (exam.id.includes('PM2')) startType = 'PM2';
                         else if (exam.id.includes('PM') && !exam.id.startsWith('PM-')) startType = 'PM';
 
-                        // Append subcategory filter to URL
-                        const linkHref = `/exam/${exam.id}/${startType}${subcategoryFilter !== 'ALL' ? `?category=${subcategoryFilter}` : ''}`;
+
+                        // Link generation
+                        const linkHref = `/exam/${exam.id}/${startType}`;
 
                         return (
                             <Link href={linkHref} key={exam.id} className={styles.cardLink}>

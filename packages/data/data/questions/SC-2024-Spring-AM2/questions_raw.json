@@ -20,7 +20,7 @@
         "text": "Web ブラウザからのリクエストをWeb サーバで受け付けた際に、リクエストに含まれる“<”, “>”などの特殊文字を, \"&lt;”, “&gt;”などの文字列に置き換える。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -44,7 +44,7 @@
         "text": "MACは、送信者がメッセージと送信者の公開鍵を用いて生成する。MACを用いると、受信者が送信者の真正性を確認できる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -68,7 +68,7 @@
         "text": "本人確認を行い、デジタル証明書の発行申請の承認又は却下を行う。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -92,7 +92,7 @@
         "text": "XML Signature"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -116,7 +116,7 @@
         "text": "IP アドレスAを攻撃元とするパスワードリスト攻撃"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -140,7 +140,7 @@
         "text": "認証局は、有効期限内のデジタル証明書が失効されたとき、そのシリアル番号を CRL に記載する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -164,7 +164,7 @@
         "text": "我が国の政府機関などにおける情報セキュリティのベースライン,及びより高い水準の情報セキュリティを確保するための対策事項を規定している。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -188,7 +188,7 @@
         "text": "SIM3"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -212,7 +212,7 @@
         "text": "ソフトウェア及びハードウェアの脆弱性の種類の一覧"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -236,7 +236,7 @@
         "text": "無線LANセキュリティの技術仕様"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -260,7 +260,7 @@
         "text": "クラウドサービスプロバイダが、クラウドサービスを運用している施設に対して、CASB を利用して入退室管理を行うことによって、クラウドサービス運用環境への物理的な不正アクセスを防止できる。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -284,7 +284,7 @@
         "text": "端末でのパスワードの入力なしに、端末とアクセスポイントとの通信の暗号化が可能となる仕様"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -308,7 +308,7 @@
         "text": "Web ブラウザは、Web サイトにアクセスすると、以降の指定された期間,当該サイトには全て HTTPS によって接続する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -332,7 +332,7 @@
         "text": "認証を要求するクライアント側の装置やソフトウェア"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -356,7 +356,7 @@
         "text": "不正なサーバ証明書の発行を防ぐ。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -380,7 +380,7 @@
         "text": "PGP: メールサーバごと, S/MIME: メールサーバごと, SMTP over TLS: メールサーバごと"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -404,7 +404,7 @@
         "text": "米国の非営利団体 MITRE によって策定された、ソフトウェアにおけるセキュリティ上の弱点の種類を識別するための基準"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -428,7 +428,7 @@
         "text": "プロトコル番号"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -452,7 +452,7 @@
         "text": "電子メールサービスで、迷惑メール対策などのために SMTP のポート番号 25 の代わりに使用する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -476,7 +476,7 @@
         "text": "Cache-Control: public"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "subCategory": "その他"
   },
   {
@@ -500,7 +500,7 @@
         "text": "1, 5"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -524,7 +524,7 @@
         "text": "並行シミュレーション"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "subCategory": "その他"
   },
   {
@@ -548,7 +548,7 @@
         "text": "明確で厳密な意味を定義することができる言語を用いてソフトウェアの仕様を記述して、満たすべき性質と仕様とが整合しているかどうかを論理的に検証する。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "subCategory": "その他"
   },
   {
@@ -572,7 +572,7 @@
         "text": "利用量が増えるにつれて利用料金が増加し、その増加率（傾き）が増大するグラフ"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   },
   {
@@ -596,7 +596,7 @@
         "text": "入力情報の完全性、正確性,正当性等を確保する統制"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "subCategory": "その他"
   }
 ]

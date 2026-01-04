@@ -21,7 +21,7 @@
           "text": "デモは顧客からの変更要望が出やすくなるので、進捗状況を完成度合いの数値で表して報告すべきであった。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -46,7 +46,7 @@
           "text": "プロジェクトの目標を達成するために完了する必要がある作業を表すための、階層的分割の枠組みを提供する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -71,7 +71,7 @@
           "text": "プロジェクトチームの編成"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -96,7 +96,7 @@
           "text": "プロジェクトに影響されるか、又は影響を及ぼす個人,集団又は組織を明らかにし、その利害及び関係に関連する情報を文書化する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -121,7 +121,7 @@
           "text": "150"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -146,7 +146,7 @@
           "text": "15"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -171,7 +171,7 @@
           "text": "18"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -196,7 +196,7 @@
           "text": "クリティカルパス上の先行作業の全てが終了する前に後続作業に着手し、一部を並行して実施する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -221,7 +221,7 @@
           "text": "2.1"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -246,7 +246,7 @@
           "text": "50"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -271,7 +271,7 @@
           "text": "リスク事象発生時の影響金額 ÷ リスク対応に掛かるコスト"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -296,7 +296,7 @@
           "text": "終結"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -321,7 +321,7 @@
           "text": "ラウンドロビン, ウォークスルー, インスペクション"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -346,7 +346,7 @@
           "text": "同一名称のメソッドをもつオブジェクトを抽象化してクラスを定義する。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -371,7 +371,7 @@
           "text": "ペアプログラミング"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -396,7 +396,7 @@
           "text": "利害関係者のニーズを製品又はサービスに変換し、その製品を適用するか,又はそのサービスを運用することによって、利害関係者要件を満たし、顧客満足を獲得できるようにする。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -421,7 +421,7 @@
           "text": "当該ソフトウェアを組み込んだ機器のハードウェア部分の特許を取得できなくなる。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -446,7 +446,7 @@
           "text": "D案"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -471,7 +471,7 @@
           "text": "マネジメントレビュー"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -496,7 +496,7 @@
           "text": "実現可能か否かにはこだわらず、全ての利害関係者のニーズ及び期待が漏れなく要件定義書に盛り込まれている。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -521,7 +521,7 @@
           "text": "特定電気通信による情報の流通によって権利を侵害された者が、個人情報保護委員会に苦情を申し立て、被害が認定された際に特定電気通信役務提供者に対して命令される措置である。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     },
@@ -546,7 +546,7 @@
           "text": "労使協定によって1か月以内の一定期間の総労働時間を定め、1日の固定勤務時間以外では、労働者に始業・終業時刻の決定を委ねる制度"
         }
       ],
-      "correctOption": null,
+      "correctOption": "c",
       "point": 4,
       "subCategory": "その他"
     },
@@ -571,7 +571,7 @@
           "text": "評価保証レベル (Evaluation Assurance Level: EAL)の要件に基づいて、セキュリティ機能の強度を評価するための国際規格である。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "a",
       "point": 4,
       "subCategory": "その他"
     },
@@ -596,7 +596,7 @@
           "text": "犯罪に関する証拠となり得るデータを保全し、調査、分析、その後の訴訟などに備える。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "d",
       "point": 4,
       "subCategory": "その他"
     },
@@ -621,7 +621,7 @@
           "text": "ベンダーや情報セキュリティ関連機関が提供するセキュリティアドバイザリなどの最新のセキュリティ情報に注目し、ソフトウェアの脆弱性の検査を行う。"
         }
       ],
-      "correctOption": null,
+      "correctOption": "b",
       "point": 4,
       "subCategory": "その他"
     }
