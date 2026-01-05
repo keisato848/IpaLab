@@ -1,0 +1,196 @@
+{
+  "questions": [
+    {
+      "qNo": 1,
+      "theme": "アルゴリズム (素数探索)",
+      "description": "関数 findPrimeNumbers の空欄補充に関する問題。",
+      "context": {
+        "title": "素数探索アルゴリズムの分析",
+        "background": "関数 findPrimeNumbers は、引数で与えられた整数以下の、全ての素数だけを格納した配列を返す関数である。ここで、引数に与える整数は2以上である。配列の要素番号は1から始まる。\n\n## プログラム\n\n\n○整数型の配列: findPrimeNumbers(整数型:maxNum)\n整数型の配列:pnList ← {} //要素数0の配列\n整数型:i,j\n論理型:divideFlag\nfor(iを2 から [ a ] まで 1 ずつ増やす)\n    divideFlag← true\n    /* iの正の平方根の整数部分が2未満のときは,繰返し処理を実行しない */\n    for(jを2から iの正の平方根の整数部分 まで 1 ずつ増やす) // α\n        if ( [ b ] )\n            divideFlag← false\n            /* αの行から始まる繰返し処理を終了する */\n        endif\n    endfor\n    if (divideFlag が true と等しい)\n        pnListの末尾に iの値を追加する\n    endif\nendfor\nreturn pnList\n\n\n{{diagram:table1}}",
+        "diagrams": [
+          {
+            "id": "table1",
+            "label": "解答群",
+            "type": "markdown",
+            "content": "| | a | b |\n|---|---|---|\n| ア | maxNum | i ÷ jの余りが 0 と等しい |\n| イ | maxNum | i ÷ jの商が 1 と等しくない |\n| ウ | maxNum + 1 | i ÷ jの余りが 0 と等しい |\n| エ | maxNum + 1 | i ÷ jの商が 1 と等しくない |"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "subQNo": "問1",
+          "text": "プログラム中の [ a ] と [ b ] に入れる正しい答えの組合せを、解答群の中から選べ。",
+          "references": [
+            "table1"
+          ],
+          "answer": "ア",
+          "explanation": "### a の決定\n\n外側のループ `for(iを2 から [ a ] まで 1 ずつ増やす)` は、素数判定を行う対象の数 $i$ の範囲を定めます。関数は `maxNum` 以下の全ての素数を求めるため、$i$ は 2 から `maxNum` まで増加する必要があります。したがって、[ a ] は `maxNum` です。\n\n### b の決定\n\n内側のループは、数 $i$ が素数であるかを確認するために、2 から $\\lfloor\\sqrt{i}\\rfloor$ までの数 $j$ で割り切れるかをチェックします。割り切れる場合、 $i$ は素数ではありません。割り切れるという条件は、割り算の余りが 0 であることです。擬似言語では剰余算に `mod` を使用しますが、選択肢は日本語で示されています。\n\n[ b ] は `i ÷ jの余りが 0 と等しい` (すなわち $i \\pmod j = 0$) でなければなりません。\n\n### 組合せの確認\n\nこの結果、[ a ] = `maxNum`、[ b ] = `i ÷ jの余りが 0 と等しい` となる組合せは「ア」です。",
+          "point": 16
+        }
+      ]
+    },
+    {
+      "qNo": 2,
+      "theme": "プログラム実行 (プロシージャコール)",
+      "description": "次のプログラムにおいて,手続 proc2 を呼び出すと, [ 出力順序 ] の順に出力される。",
+      "context": {
+        "title": "プロシージャコールの実行順序",
+        "background": "次のプログラムにおいて,手続 proc2 を呼び出すと, [ 出力順序 ] の順に出力される。\n\n## プログラム\n{{diagram:fig1}}\n\n## 解答群\n{{diagram:fig2}}",
+        "diagrams": [
+          {
+            "id": "fig1",
+            "label": "プログラム",
+            "type": "markdown",
+            "content": "Oproc1()\n    ”A”を出力する\n    proc3()\n\nOproc2()\n    proc3()\n    ”B”を出力する\n    proc1()\n\nOproc3()\n    ”C”を出力する"
+          },
+          {
+            "id": "fig2",
+            "label": "解答群",
+            "type": "markdown",
+            "content": "ア “A”, “B”, “B”, “C”\nイ “A”, “C”\nウ “A”, “C”, “B”, “C”\nエ “B”, “A”, “B”, “C”\nオ “B”, “C”, “B”, “A”\nカ “C”, “B”\nキ “C”, “B”, “A”\nク “C”, “B”, “A”, “C”"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "subQNo": "問2",
+          "text": "次の記述中の [ 出力順序 ] に入れる正しい答えを,解答群の中から選べ。",
+          "references": [
+            "fig1",
+            "fig2"
+          ],
+          "answer": "ク",
+          "explanation": "手続 `proc2()` の実行順序をトレースします。\n\n### 実行トレース\n\nmermaid\nsequenceDiagram\nparticipant P2 as proc2()\nparticipant P3 as proc3()\nparticipant P1 as proc1()\n\nNote over P2: 実行開始\n\nP2->>P3: proc3() を呼び出し\nP3->>P3: \"C\" を出力\nP3-->>P2: 戻る\n\nP2->>P2: \"B\" を出力\n\nP2->>P1: proc1() を呼び出し\nP1->>P1: \"A\" を出力\nP1->>P3: proc3() を呼び出し\nP3->>P3: \"C\" を出力\nP3-->>P1: 戻る\nP1-->>P2: 戻る\n\nNote over P2: 実行終了\n\n\n出力される文字の順番は、`C`, `B`, `A`, `C` となります。\n\nこれは解答群の「ク」に一致します。",
+          "point": 16
+        }
+      ]
+    },
+    {
+      "qNo": 3,
+      "theme": "アルゴリズム (クイックソート)",
+      "context": {
+        "title": "クイックソートのプログラムトレース",
+        "background": "手続 sort は,大域の整数型の配列 data の,引数 first で与えられた要素番号から引数 last で与えられた要素番号までの要素を昇順に整列する。ここで, first < last とする。手続 sort を sort(1, 5)として呼び出すと, /*** α ***/の行を最初に実行したときの出力は “ [ 出力結果 ] ” となる。配列の要素番号は1から始まる。\n\n大域:整数型の配列: data ← {2, 1, 3, 5, 4}\n\n## プログラム (sort(first, last))\n\n{{diagram:fig1}}\n\n## 解答群\n\nア 1 2 3 4 5\nイ 1 2 3 5 4\nウ 2 1 3 4 5\nエ 2 1 3 5 4",
+        "diagrams": [
+          {
+            "id": "fig1",
+            "label": "プログラム (sort(first, last))",
+            "type": "markdown",
+            "content": "\n○sort(整数型:first, 整数型:last)\n整数型:pivot, i, j\npivot ← data[(first + last) ÷ 2 の商]\ni← first\nj← last\n\nwhile (true)\n    while (data[i] < pivot)\n        i←i+1\n    endwhile\n    while (pivot < data[j])\n        j←j-1\n    endwhile\n    if (i ≥ j)\n        繰返し処理を終了する\n    endif\n    data[i]とdata[j]の値を入れ替える\n    i←i+1\n    j←j-1\nendwhile\ndataの全要素の値を要素番号の順に空白区切りで出力する /*** α ***/\nif (first < i - 1)\n    sort(first, i - 1)\nendif\nif(j + 1 < last)\n    sort(j + 1, last)\nendif\n"
+          }
+        ]
+      },
+      "description": " Full text ... ",
+      "questions": [
+        {
+          "subQNo": "問3",
+          "text": "次の記述中の [ 出力結果 ] に入れる正しい答えを,解答群の中から選べ。",
+          "references": [
+            "fig1"
+          ],
+          "answer": "エ",
+          "explanation": "手続 `sort(1, 5)` の実行をトレースし、`/*** α ***/` の行が最初に実行される時点での配列 `data` の内容を確認します。\n\n### 初期状態\n\n`data = {2, 1, 3, 5, 4}` (インデックス 1, 2, 3, 4, 5)\n`first = 1`, `last = 5`\n\n### パス 1 (パーティション処理)\n\n1. **ピボットの決定**: `pivot ← data[(1 + 5) ÷ 2 の商]` = `data[3]` = 3。\n2. **インデックスの初期化**: `i = 1`, `j = 5`。\n3. **メインループ開始 (while true)**:\n    a. **i の移動**: `while (data[i] < 3)` を実行。\n        - i=1, data[1]=2 (True). i=2。\n        - i=2, data[2]=1 (True). i=3。\n        - i=3, data[3]=3 (False). 停止。 **i = 3**。\n    b. **j の移動**: `while (3 < data[j])` を実行。\n        - j=5, data[5]=4 (True). j=4。\n        - j=4, data[4]=5 (True). j=3。\n        - j=3, data[3]=3 (False). 停止。 **j = 3**。\n    c. **終了判定**: `if (i ≥ j)`。 3 ≥ 3 (True) のため、メインループを終了します。\n\n4. **出力**: ループ終了後、`/*** α ***/` の行で `data` が出力されます。\n\nこの最初のパーティション処理では、i と j がピボット（3）の位置で出会い、要素の入れ替えが行われずにループが終了しました。したがって、配列の内容は初期状態のままです。\n\n### 出力結果\n\n`data` の内容: 2 1 3 5 4\n\nこれは解答群の「エ」に一致します。",
+          "point": 16
+        }
+      ]
+    },
+    {
+      "qNo": 4,
+      "theme": "データ構造 (ハッシュテーブル)",
+      "description": "関数 add は,引数で指定された正の整数 value を大域の整数型の配列 hashArray に格納する。格納できた場合は true を返し,格納できなかった場合は false を返す。ここで,整数 value を hashArray のどの要素に格納すべきかを,関数 calcHash1 及び calcHash2 を利用して決める。配列の要素番号は1から始まる。\n\n手続 test の処理が終了した直後の hashArray の内容は, [ 配列の内容 ] である。\n\n大域:整数型の配列:hashArray\n\n## プログラム\n\n### add(value)\n\n\n○論理型:add(整数型: value)\n整数型:i← calcHash1(value)\nif (hashArray[i] = -1)\n    hashArray[i] ← value\n    return true\nelse\n    i ← calcHash2(value)\n    if (hashArray[i] = -1)\n        hashArray[i] ← value\n        return true\n    endif\nendif\nreturn false\n\n\n### calcHash1(value)\n\n`return (value mod hashArrayの要素数)+1`\n\n### calcHash2(value)\n\n`return ((value + 3) mod hashArrayの要素数) + 1`\n\n### test()\n\n\nOtest()\nhashArray ← {5個の -1}\nadd(3)\nadd(18)\nadd(11)\n\n\n## 解答群\n\nア {-1, 3, -1, 18, 11}\nイ {-1, 11, -1, 3, -1}\nウ {-1, 18, -1, 3, -1}\nエ {-1, 18, -1, 3, 11}\nオ {-1, 18, 11, 3, -1}",
+      "context": {
+        "title": "ハッシュテーブルを用いたデータ格納処理",
+        "background": "関数 add は,引数で指定された正の整数 value を大域の整数型の配列 hashArray に格納する。格納できた場合は true を返し,格納できなかった場合は false を返す。ここで,整数 value を hashArray のどの要素に格納すべきかを,関数 calcHash1 及び calcHash2 を利用して決める。配列の要素番号は1から始まる。\n\n手続 test の処理が終了した直後の hashArray の内容は, [ 配列の内容 ] である。\n\n大域:整数型の配列:hashArray\n\n## プログラム\n\n### add(value)\n\n\n○論理型:add(整数型: value)\n整数型:i← calcHash1(value)\nif (hashArray[i] = -1)\n    hashArray[i] ← value\n    return true\nelse\n    i ← calcHash2(value)\n    if (hashArray[i] = -1)\n        hashArray[i] ← value\n        return true\n    endif\nendif\nreturn false\n\n\n### calcHash1(value)\n\n`return (value mod hashArrayの要素数)+1`\n\n### calcHash2(value)\n\n`return ((value + 3) mod hashArrayの要素数) + 1`\n\n### test()\n\n\nOtest()\nhashArray ← {5個の -1}\nadd(3)\nadd(18)\nadd(11)\n\n\n## 解答群\n\nア {-1, 3, -1, 18, 11}\nイ {-1, 11, -1, 3, -1}\nウ {-1, 18, -1, 3, -1}\nエ {-1, 18, -1, 3, 11}\nオ {-1, 18, 11, 3, -1}",
+        "diagrams": []
+      },
+      "questions": [
+        {
+          "subQNo": "問4",
+          "text": "次の記述中の [ 配列の内容 ] に入れる正しい答えを,解答群の中から選べ。",
+          "references": [],
+          "answer": "エ",
+          "explanation": "ハッシュテーブル `hashArray` の要素数 $N$ は 5 です。配列のインデックスは 1 から 5 です。\n\n### 初期状態\n\n`hashArray` = `{-1, -1, -1, -1, -1}` (Index 1 to 5)\n\n### 1. add(3) の実行 (value = 3)\n\n*   **ハッシュ1**: $i = (3 \\pmod 5) + 1 = 4$.\n*   `hashArray[4]` は -1 (空き) のため、格納。\n\n`hashArray` = `{-1, -1, -1, 3, -1}`\n\n### 2. add(18) の実行 (value = 18)\n\n*   **ハッシュ1**: $i = (18 \\pmod 5) + 1 = 3 + 1 = 4$.\n*   `hashArray[4]` は 3 (衝突) のため、ハッシュ2へ。\n*   **ハッシュ2**: $i = ((18 + 3) \\pmod 5) + 1 = (21 \\pmod 5) + 1 = 1 + 1 = 2$.\n*   `hashArray[2]` は -1 (空き) のため、格納。\n\n`hashArray` = `{-1, 18, -1, 3, -1}`\n\n### 3. add(11) の実行 (value = 11)\n\n*   **ハッシュ1**: $i = (11 \\pmod 5) + 1 = 1 + 1 = 2$.\n*   `hashArray[2]` は 18 (衝突) のため、ハッシュ2へ。\n*   **ハッシュ2**: $i = ((11 + 3) \\pmod 5) + 1 = (14 \\pmod 5) + 1 = 4 + 1 = 5$.\n*   `hashArray[5]` は -1 (空き) のため、格納。\n\n`hashArray` = `{-1, 18, -1, 3, 11}`\n\n### 最終結果\n\n配列の内容は `{-1, 18, -1, 3, 11}` であり、解答群の「エ」に一致します。",
+          "point": 16
+        }
+      ]
+    },
+    {
+      "qNo": 5,
+      "theme": "数学的計算 (コサイン類似度)",
+      "context": {
+        "title": "コサイン類似度計算プログラムの解析",
+        "background": "関数 calcCosineSimilarity は、二つの配列 vector1 と vector2 を受け取り、コサイン類似度を返す。コサイン類似度は次の数式で計算される。配列の要素番号は1から始まる。\n\n$$ S = \\frac{a_1b_1 + a_2b_2 + \\dots + a_nb_n}{\\sqrt{a_1^2 + a_2^2 + \\dots + a_n^2} \\sqrt{b_1^2 + b_2^2 + \\dots + b_n^2}} $$\n\n## プログラム (calcCosineSimilarity)\n{{diagram:fig1}}\n\n## 解答群\n{{diagram:table1}}",
+        "diagrams": [
+          {
+            "id": "fig1",
+            "label": "プログラム (calcCosineSimilarity)",
+            "type": "markdown",
+            "content": "○実数型:calcCosineSimilarity(実数型の配列: vector1, 実数型の配列: vector2)\n実数型: similarity, numerator, denominator, temp ← 0\n整数型:i\nnumerator ← 0\n\n// 分子 (numerator) の計算: Σ a_i b_i\nfor(iを1から vector1の要素数 まで 1 ずつ増やす)\n    numerator ← numerator + [ a ]\nendfor\n\n// 分母の左側 (||vector1||) の計算: sqrt(Σ a_i^2)\nfor(iを1から vector1の要素数 まで 1 ずつ増やす)\n    temp ← temp + vector1[i]の2乗\nendfor\ndenominator ← tempの正の平方根\n\n// 分母の右側 (||vector2||) の計算: sqrt(Σ b_i^2)\ntemp ← 0\nfor(iを1から vector2の要素数 まで 1 ずつ増やす)\n    temp ← temp + vector2[i]の2乗\nendfor\ndenominator ← [ b ]\n\nsimilarity ← numerator ÷ denominator\nreturn similarity"
+          },
+          {
+            "id": "table1",
+            "label": "解答群",
+            "type": "markdown",
+            "content": "| | a | b |\n|---|---|---|\n| ア | (vector1[i] × vector2[i])の正の平方根 | denominator × (tempの正の平方根) |\n| イ | (vector1[i] × vector2[i])の正の平方根 | denominator + (tempの正の平方根) |\n| ウ | (vector1[i] × vector2[i])の正の平方根 | tempの正の平方根 |\n| エ | vector1[i] × vector2[i] | denominator × (tempの正の平方根) |\n| オ | vector1[i] × vector2[i] | denominator + (tempの正の平方根) |\n| カ | vector1[i] × vector2[i] | tempの正の平方根 |\n| キ | vector1[i]の2乗 | denominator × (tempの正の平方根) |\n| ク | vector1[i]の2乗 | denominator + (tempの正の平方根) |\n| ケ | vector1[i]の2乗 | tempの正の平方根 |"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "subQNo": "問5",
+          "text": "プログラム中の [ a ] と [ b ] に入れる正しい答えの組合せを,解答群の中から選べ。",
+          "references": [
+            "fig1",
+            "table1"
+          ],
+          "answer": "エ",
+          "explanation": "### a の決定 (分子の計算)\n\n分子はベクトルの内積 $\\sum a_i b_i$ です。ループ内で $i$ 番目の要素の積を `numerator` に加算しています。$a_i$ は `vector1[i]`、$b_i$ は `vector2[i]` です。\n\n[ a ] は `vector1[i] × vector2[i]` です。\n\n### b の決定 (分母の計算)\n\n分母は $|\\|vector1|\\| \\times |\\|vector2|\\|$ です。\n\n1. 最初の計算で `denominator` には $|\\|vector1|\\| = \\sqrt{\\sum a_i^2}$ が格納されています。\n2. 次のループで `temp` には $\\sum b_i^2$ が計算されています。\n3. [ b ] の行では、`denominator` (既に $|\\|vector1|\\|$) に $|\\|vector2|\\| = \\sqrt{\\sum b_i^2}$ を乗算し、分母全体を完成させる必要があります。$\\sqrt{\\sum b_i^2}$ は `tempの正の平方根` です。\n\n[ b ] は `denominator × (tempの正の平方根)` です。\n\n### 組合せの確認\n\n[ a ] = `vector1[i] × vector2[i]`、[ b ] = `denominator × (tempの正の平方根)` となる組合せは「エ」です。",
+          "point": 16
+        }
+      ]
+    },
+    {
+      "qNo": 6,
+      "theme": "情報セキュリティ (リスクアセスメント)",
+      "description": "",
+      "context": {
+        "title": "業務委託における情報セキュリティリスク評価",
+        "background": "A社は、放送会社や運輸会社向けに広告制作ビジネスを展開している。A社は、人事業務の効率化を図るべく,人事業務の委託を検討することにした。A社が委託する業務(以下,B業務という)を図1に示す。\n\n{{diagram:fig1}}\n\n委託先候補のC社は,B業務について,次のようにA社に提案した。\n\n・B業務だけに従事する専任の従業員を割り当てる。\n・B業務では、図2の複合機のスキャン機能を使用する。\n\n{{diagram:fig2}}\n\nA社は、C社と業務委託契約を締結する前に,秘密保持契約を締結した。その後,C社に質問表を送付し、回答を受けて,業務委託での情報セキュリティリスクの評価を実施した。その結果,図3の発見があった。\n\n{{diagram:fig3}}\n\nそこで、A社では,初期設定の状態のままではA社にとって情報セキュリティリスクがあり,初期設定から変更するという対策が必要であると評価した。",
+        "diagrams": [
+          {
+            "id": "fig1",
+            "label": "図1 B業務",
+            "type": "markdown",
+            "content": "・採用予定者から郵送されてくる入社時の誓約書,前職の源泉徴収票などの書類を PDF ファイルに変換し,ファイルサーバに格納する。(省略)"
+          },
+          {
+            "id": "fig2",
+            "label": "図2 複合機のスキャン機能 (抜粋)",
+            "type": "markdown",
+            "content": "・スキャン機能を使用する際は、従業員ごとに付与した利用者 ID とパスワードをパネルに入力する。\n・スキャンしたデータをPDF ファイルに変換する。\n・PDFファイルを従業員ごとに異なる鍵で暗号化して、電子メールに添付する。\n・スキャンを実行した本人宛てに電子メールを送信する。\n・PDF ファイルが大きい場合は,PDF ファイルを添付する代わりに、自社の社内ネットワーク上に設置したサーバ(以下,B サーバという)に自動的に保存し,保存先の URL を電子メールの本文に記載して送信する。\n注1) Bサーバにアクセスする際は,従業員ごとの利用者 ID とパスワードが必要になる。"
+          },
+          {
+            "id": "fig3",
+            "label": "図3 発見事項",
+            "type": "markdown",
+            "content": "・複合機のスキャン機能では,電子メールの差出人アドレス,件名,本文及び添付ファイル名を初期設定の状態で使用しており,誰がスキャンを実行しても同じである。\n・複合機のスキャン機能の初期設定情報はベンダーの Web サイトで公開されており,誰でも閲覧できる。\n注1) 複合機の初期設定はC社の情報システム部だけが変更可能である。"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "subQNo": "設問",
+          "text": "対策が必要であるとA社が評価した情報セキュリティリスクはどれか。解答群のうち、最も適切なものを選べ。",
+          "references": [
+            "fig1",
+            "fig2",
+            "fig3"
+          ],
+          "answer": "エ",
+          "explanation": "本問は、複合機のスキャン機能の初期設定が原因で発生する、最も重大な情報セキュリティリスクを特定することを求められています。\n\n### 発見事項とリスクの分析\n\n1.  **機密性リスクの焦点**: B業務は、採用予定者の誓約書や源泉徴収票といった**個人情報 (PII)** を含むPDFを扱うため、機密性の確保が最重要です。\n2.  **設定の脆弱性**: 複合機からの通知メールの差出人、件名、本文、添付ファイル名がすべて初期設定（固定値）であり、かつその設定情報が公開されています (図3)。\n3.  **データ保存方法**: PDFが小さい場合は暗号化されて添付されますが、**大きい場合は B サーバに保存され、メール本文に URL が記載されます** (図2)。\n\n**攻撃シナリオ**: 攻撃者が C 社内部ネットワークに侵入するか、C 社従業員の認証情報を盗み出した場合、固定されたメールメタデータ（差出人や件名）を利用することで、機密情報を含む URL が記載されたメールを簡単に特定・フィルタリング・傍受できます。傍受した URL と、すでに盗み出した C 社従業員の ID/PW を利用して B サーバにアクセスすれば、大容量の機密PDF（A社の採用予定者の個人情報）を容易に取得できてしまいます。\n\n### 解答群の評価\n\n*   **ア**: 複合機を装ったフィッシング。これはリスクの一つですが、情報漏洩（機密性の侵害）という最も重大なリスクに直結しているのは B サーバ経由の漏洩です。\n*   **イ**: スパム誤認による業務遅延。可用性の問題であり、機密性・完全性の問題よりも優先度は低いと考えられます。\n*   **ウ**: ランサムウェア。添付ファイルは既に複合機で暗号化されており、添付ファイルの復号鍵を持たない攻撃者がさらに暗号化するのは困難です。また、URL アクセスのリスクを考慮していません。\n*   **エ**: 攻撃者が複合機からのメールを盗聴し、本文 URL を使って B サーバにアクセスし、個人情報が漏洩する。これは、固定されたメールメタデータ（容易な識別）と、大容量ファイルは URL 経由で B サーバに格納される仕組みが組み合わさることで発生する、最も重大な機密性リスクです。\n\nしたがって、**エ**が最も適切な情報セキュリティリスクです。",
+          "point": 16
+        }
+      ]
+    }
+  ]
+}
