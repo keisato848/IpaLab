@@ -105,16 +105,15 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
         return { time: 150, count: 80 };
     })();
 
-    // Filter questions based on query param
     const displayQuestions = questions.filter(q => {
+        // Filter out ghost data/placeholders
+        if (q.qNo >= 99) return false;
+
         if (!categoryFilter || categoryFilter === 'ALL') return true;
 
         // Check both category and subCategory
         // q.subCategory might be standardized Japanese e.g. "テクノロジ系"
         // categoryFilter is English e.g. "Technology"
-        // Need mapping? Or lenient check?
-        // fix-subcategories.ts mapped 'Technology' -> 'テクノロジ系'.
-        // So we should compare against mapped values or raw.
 
         // Simple mapping for filter:
         const map: Record<string, string> = {

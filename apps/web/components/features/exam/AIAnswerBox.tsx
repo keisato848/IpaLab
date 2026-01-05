@@ -25,7 +25,7 @@ interface AIAnswerBoxProps {
     onSave?: (data: { answer: string; result: ScoreResult }) => void;
 }
 
-interface ScoreResult {
+export interface ScoreResult {
     score: number;
     radarChartData: { subject: string; A: number; fullMark: number }[];
     feedback: string;
@@ -39,8 +39,9 @@ export default function AIAnswerBox({
     limit,
     initialAnswer = '',
     initialResult,
-    onSave
-}: AIAnswerBoxProps) {
+    onSave,
+    hideChart = false
+}: AIAnswerBoxProps & { hideChart?: boolean }) {
     const [answer, setAnswer] = useState(initialAnswer);
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<ScoreResult | null>(initialResult || null);
@@ -126,22 +127,24 @@ export default function AIAnswerBox({
                             <span className={styles.scoreLabel}>スコア</span>
                             <span className={styles.scoreValue}>{result.score}</span>
                         </div>
-                        <div className={styles.radarContainer}>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={result.radarChartData}>
-                                    <PolarGrid />
-                                    <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
-                                    <PolarRadiusAxis angle={30} domain={[0, 10]} hide />
-                                    <Radar
-                                        name="Score"
-                                        dataKey="A"
-                                        stroke="#3b82f6"
-                                        fill="#3b82f6"
-                                        fillOpacity={0.6}
-                                    />
-                                </RadarChart>
-                            </ResponsiveContainer>
-                        </div>
+                        {!hideChart && (
+                            <div className={styles.radarContainer}>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={result.radarChartData}>
+                                        <PolarGrid />
+                                        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
+                                        <PolarRadiusAxis angle={30} domain={[0, 10]} hide />
+                                        <Radar
+                                            name="Score"
+                                            dataKey="A"
+                                            stroke="#3b82f6"
+                                            fill="#3b82f6"
+                                            fillOpacity={0.6}
+                                        />
+                                    </RadarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
                     </div>
 
                     <div className={styles.feedbackSection}>

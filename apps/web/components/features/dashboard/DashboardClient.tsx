@@ -83,7 +83,10 @@ export default function DashboardClient() {
                     setQuickStartLabel("クイックスタート (続きから)");
                 }
             } catch (e) {
-                // Fallback
+                // Fallback: If fetch fails, just go to next Q (risky but better than crashing)
+                // Better: limit to a reasonable max or assume last Q in set.
+                // Or: assume Q1 if we can't determine.
+                // Current fallback:
                 setQuickStartUrl(`/exam/${yearPart}/${typeUrl}/${nextQNo}?mode=practice`);
             }
         }

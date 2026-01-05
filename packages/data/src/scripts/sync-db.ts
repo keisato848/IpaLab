@@ -134,7 +134,21 @@ async function main() {
             else type = 'AM1'; // Default
 
             try {
-                const content = fs.readFileSync(path.join(dataDir, file), 'utf8');
+                // Check for questions_transformed.json first
+                const transformedPath = path.join(dataDir, folderName, 'questions_transformed.json');
+                const rawPath = path.join(dataDir, file);
+
+                let content = "";
+                let isTransformed = false;
+
+                if (fs.existsSync(transformedPath)) {
+                    console.log(`Using transformed data for ${folderName}`);
+                    content = fs.readFileSync(transformedPath, 'utf8');
+                    isTransformed = true;
+                } else {
+                    content = fs.readFileSync(rawPath, 'utf8');
+                }
+
                 const data = JSON.parse(content);
 
                 // 1. Upsert Exam
@@ -164,105 +178,132 @@ async function main() {
                     term: seasonStr,
                     type: type,
                     date: `${yearStr}-${seasonStr === 'S' ? '04' : '10'}-15`, // Approx date
-                    stats: {
-                        total: 80, // Default to 80, will be overwritten by frontend stats merge logic mostly, but prevents crash
-                        completed: 0,
-                        correctRate: 0
-                    }
+                    total: questions.length * (type.includes('PM') ? 1 : 20),
+                    completed: 0,
+                    correctRate: 0
+                }
+            };
+
+            const examsContainer = database.container(EXAM_CONTAINER_NAME);
+            await examsContainer.items.upsert(examItem);
+
+            console.log(`Upserted Exam: ${examId} into Exams container`);
+
+            // 2. Upsert Questions
+            const questions = Array.isArray(data) ? data : (data.questions || []);
+            const itemsToUpsert = [];
+
+            if (Array.isArray(questions) && questions.length > 0) {
+
+                // Helper to extract Question Number from text if qNo is missing
+                const extractQNo = (text: string): number | null => {
+                    if (!text) return null;
+                    const match = text.match(/(?:問|Question|Big Question)\s*(\d+)/i);
+                    return match ? parseInt(match[1], 10) : null;
                 };
 
-                const examsContainer = database.container(EXAM_CONTAINER_NAME);
-                await examsContainer.items.upsert(examItem);
+                const isPMExam = type.startsWith('PM') || examPrefix === 'PM' || (examPrefix === 'SC' && type !== 'AM2' && type !== 'AM1');
 
-                console.log(`Upserted Exam: ${examId} into Exams container`);
+                // Case A trigger: Hierarchical flag OR Transformed file implies hierarchy
+                const isHierarchical = (isPMExam && questions[0].subQNo !== undefined) || isTransformed;
 
-                // 2. Upsert Questions
-                const questions = Array.isArray(data) ? data : (data.questions || []); // Handle root array or object
-                // Some raw files might be { questions: [] } or just []
-                const itemsToUpsert = [];
+                if (isHierarchical) {
+                    // --- Case A: Hierarchical PM Question ---
 
-                if (Array.isArray(questions) && questions.length > 0) {
-                    // Check if 'data' itself is the main question (SC/PM case where file = 1 question)
-                    const isSingleQuestionFile = !Array.isArray(data) && data.qNo && data.description;
+                    // Determine Parent QNo
+                    let parentQNo = (typeof data === 'object' && !Array.isArray(data)) ? data.qNo : null;
+                    if (!parentQNo && data.theme) parentQNo = extractQNo(data.theme);
+                    if (!parentQNo && data.description) parentQNo = extractQNo(data.description);
+                    if (!parentQNo) parentQNo = 99; // Fallback
 
-                    if (isSingleQuestionFile) {
-                        // Upsert the ROOT object as a single item
-                        itemsToUpsert.push({
-                            id: `${examId}-${data.qNo}`,
-                            examId: examId,
-                            type: type,
-                            qNo: data.qNo,
-                            text: data.theme || `問${data.qNo}`,
-                            description: data.description,
-                            questions: data.questions // Nested subquestions preserved
-                        });
-                    } else {
-                        // Standard Loop (AM exams or PM exams with multiple questions in one array)
-                        for (const q of questions) {
-                            // PM/Afternoon logic (often nested)
-                            if (type.startsWith('PM') || type === 'AM2' || examPrefix === 'PM' || examPrefix === 'SC') {
-                                // PM AM2 is Multiple Choice, but PM/PM1/PM2 are descriptive
-                                // Check structure. If it has options, it's MC.
-                                if (q.options && q.options.length > 0) {
-                                    // MC Question (e.g. SC AM2)
-                                    itemsToUpsert.push({
-                                        id: `${examId}-${q.qNo}`,
-                                        examId: examId,
-                                        type: type,
-                                        qNo: q.qNo,
-                                        text: q.text,
-                                        options: q.options,
-                                        correctOption: q.correctOption,
-                                        explanation: q.explanation // Fix: Map explanation for SC/PM AM2
-                                    });
-                                } else {
-                                    // Descriptive Question (PM1, PM2, SC PM) - Legacy/Fallback path
-                                    // If we are here, it means it wasn't a "Single Question File" or it's an array of questions
-                                    itemsToUpsert.push({
-                                        id: `${examId}-${q.qNo || q.subQNo}`, // Warning: qNo might be string "設問1"
-                                        examId: examId,
-                                        type: type,
-                                        qNo: q.qNo || 99, // Num
-                                        subQNo: q.subQNo, // String label
-                                        text: q.text || q.theme || "（記述式問題）", // Ensure text exists for frontend summary
-                                        theme: q.theme,
-                                        description: data.description || q.description, // Main description might be on root or question
-                                        questions: q.questions || q.subQuestions // Nested subquestions
-                                    });
-                                }
-                            } else {
-                                // Standard AM (AP/FE)
+                    // Determine Description/Context
+                    // New Schema has 'context' object. Old Schema has 'description' string.
+                    // We map 'context' to 'context' field in DB, and keeping 'description' for backward compat or search if possible.
+                    // If context exists, use context.background as description fallback?
+
+                    const contextObj = data.context || null;
+                    const descriptionText = contextObj ? contextObj.background : (data.description || "");
+
+                    itemsToUpsert.push({
+                        id: `${examId}-${parentQNo}`,
+                        examId: examId,
+                        type: type,
+                        qNo: parentQNo,
+                        text: data.theme || `問${parentQNo}`,
+                        description: descriptionText,
+                        context: contextObj, // NEW FIELD
+                        questions: questions
+                    });
+
+                } else { // --- Case B: Flat List (AM Exams, SC AM2, or PM Independent Questions) ---
+                    // This preserves the original logic for AM exams.
+
+                    for (const q of questions) {
+                        // For AM/Flat, we expect q.qNo to exist.
+                        const resolvedQNo = q.qNo || 99;
+
+                        // PM/Afternoon logic (often nested)
+                        if (type.startsWith('PM') || type === 'AM2' || examPrefix === 'PM' || examPrefix === 'SC') {
+                            // PM AM2 is Multiple Choice
+                            if (q.options && q.options.length > 0) {
                                 itemsToUpsert.push({
-                                    id: `${examId}-${q.qNo}`,
+                                    id: `${examId}-${resolvedQNo}`,
                                     examId: examId,
                                     type: type,
-                                    qNo: q.qNo,
+                                    qNo: resolvedQNo,
                                     text: q.text,
                                     options: q.options,
                                     correctOption: q.correctOption,
-                                    explanation: q.explanation // Add explanation support
+                                    explanation: q.explanation
+                                });
+                            } else {
+                                // Descriptive Question but NOT a subquestion (Legacy/Fallback)
+                                // Or a collection of Descriptive Questions that are independent
+                                itemsToUpsert.push({
+                                    id: `${examId}-${resolvedQNo}`,
+                                    examId: examId,
+                                    type: type,
+                                    qNo: resolvedQNo,
+                                    subQNo: q.subQNo,
+                                    text: q.text || q.theme || "（記述式問題）",
+                                    theme: q.theme,
+                                    description: q.description || data.description,
+                                    questions: q.questions || q.subQuestions
                                 });
                             }
+                        } else {
+                            // Standard AM (AP/FE) - STRICTLY HERE
+                            itemsToUpsert.push({
+                                id: `${examId}-${resolvedQNo}`,
+                                examId: examId,
+                                type: type,
+                                qNo: resolvedQNo,
+                                text: q.text,
+                                options: q.options,
+                                correctOption: q.correctOption,
+                                explanation: q.explanation
+                            });
                         }
                     }
                 }
-
-                // Actually upsert questions
-                const questionContainer = database.container(CONTAINER_NAME);
-                for (const item of itemsToUpsert) {
-                    await questionContainer.items.upsert(item);
-                }
-                console.log(`Upserted ${itemsToUpsert.length} questions for ${examId}`);
-            } catch (err: any) {
-                console.error(`Failed to process ${folderName}:`, err.message);
-                continue;
             }
+
+            // Actually upsert questions
+            const questionContainer = database.container(CONTAINER_NAME);
+            for (const item of itemsToUpsert) {
+                await questionContainer.items.upsert(item);
+            }
+            console.log(`Upserted ${itemsToUpsert.length} questions for ${examId}`);
+        } catch (err: any) {
+            console.error(`Failed to process ${folderName}:`, err.message);
+            continue;
         }
+    }
 
         console.log("Done.");
-    } catch (e: any) {
-        console.error("Error during sync:", e?.message || e);
-    }
+} catch (e: any) {
+    console.error("Error during sync:", e?.message || e);
+}
 
 }
 
