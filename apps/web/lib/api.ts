@@ -14,10 +14,22 @@ export interface Question {
     correctOption: string;
     explanation?: string;
     // PM specific fields
-    // PM specific fields
     isPM?: boolean;
-    subQuestions?: any[]; // Detailed type can be added if needed
+    subQuestions?: any[];
     point?: number;
+    // Hierarchical PM fields
+    description?: string;
+    context?: {
+        title?: string;
+        background: string;
+        diagrams?: {
+            id: string;
+            label: string;
+            type: "mermaid" | "image" | "markdown";
+            content: string;
+        }[];
+    };
+    questions?: Question[];
 }
 
 export interface LearningRecord {
@@ -72,13 +84,15 @@ export async function getExams(): Promise<Exam[]> {
     }
 }
 
-export async function getQuestions(examId: string): Promise<Question[]> {
+export async function getQuestions(examId: string, init?: RequestInit): Promise<Question[]> {
     // console.log(`Fetching questions from ${API_BASE}/exams/${examId}/questions`); // Reduced logging
     try {
         const res = await fetch(`${API_BASE}/exams/${examId}/questions`, {
-            cache: 'no-store', // Questions might update or we might want fresh valid data
+            cache: 'no-store', // Default
+            ...init, // Allow override
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                ...init?.headers
             }
         });
 
