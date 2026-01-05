@@ -24,6 +24,7 @@ const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false })
 // ... imports
 import ExamSummary from './ExamSummary';
 import AIAnswerBox from './AIAnswerBox';
+import SCPMExamView from './SCPMExamView';
 
 
 
@@ -330,6 +331,45 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         }
     };
 
+    // --- SC/PM Exam View Injection (New Format) ---
+    if (question.context) {
+        return (
+            <div className="flex flex-col h-screen overflow-hidden bg-background">
+                {/* Optional: Keep minimal header or custom header for PM View */}
+                <header className="flex-none h-16 border-b px-4 flex items-center justify-between bg-card text-foreground">
+                    <div className="flex items-center gap-4">
+                        <Link href="/" className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                            IpaLab
+                        </Link>
+                        <span className="text-sm font-medium text-muted-foreground border-l pl-4 border-gray-300 dark:border-gray-700">
+                            {examLabel} {isMock ? '(模試モード)' : ''}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => router.push(`/exam/${year}/${type}`)}
+                            className="text-sm px-4 py-2 rounded-md font-medium border border-gray-200 dark:border-gray-800 bg-white dark:bg-zinc-950 hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors shadow-sm"
+                        >
+                            終了して一覧へ
+                        </button>
+                    </div>
+                </header>
+
+                <div className="flex-1 overflow-hidden">
+                    <SCPMExamView
+                        question={question}
+                        onAnswerSubmit={(subQIdx, answer) => {
+                            // This might be for simple text input updates if needed, 
+                            // but AIAnswerBox handles its own state mostly.
+                        }}
+                        onGrade={(data, subQIdx) => handleSaveAIScore(data, subQIdx as number)}
+                        descriptiveHistory={descriptiveHistory}
+                    />
+                </div>
+            </div>
+        );
+    }
+
     if (isPM) {
         return (
             <div className={styles.container}>
@@ -415,7 +455,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                         一覧へ戻る
                     </Link>
                 </footer>
-            </div >
+            </div>
         );
     }
 
@@ -474,53 +514,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                             )}
                         </div>
 
-                        {/* Mobile/Global: Settings Button */}
-                        <button
-                            className={styles.settingsBtn}
-                            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                            aria-label="表示設定"
-                        >
-                            ⚙️
-                        </button>
-
-                        {/* Settings Popup */}
-                        {isSettingsOpen && (
-                            <div className={styles.settingsPopup}>
-                                <div className={styles.popupHeader}>
-                                    <span>表示設定</span>
-                                    <button onClick={() => setIsSettingsOpen(false)}>×</button>
-                                </div>
-                                <label className={styles.settingRow}>
-                                    <span>統計情報を表示</span>
-                                    <input
-                                        type="checkbox"
-                                        checked={showExamStats}
-                                        onChange={toggleShowExamStats}
-                                    />
-                                </label>
-
-                                {/* Mobile Only Stats in Popup */}
-                                {showExamStats && (
-                                    <div className={styles.popupStats}>
-                                        <div className={styles.popupStatRow}>
-                                            <span>今回:</span>
-                                            <span>{sessionStats.total > 0 ? `${Math.round((sessionStats.correct / sessionStats.total) * 100)}%` : '-'}</span>
-                                        </div>
-                                        <div className={styles.popupStatRow}>
-                                            <span>通算:</span>
-                                            <span>{examStats && examStats.total > 0 ? `${Math.round((examStats.correct / examStats.total) * 100)}%` : '-'}</span>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
                     </div>
-
-                    {isMock && (
-                        <span className={styles.timer}>
-                            ⏳ {formatTime(timeLeft)}
-                        </span>
-                    )}
                 </div>
             </header>
 

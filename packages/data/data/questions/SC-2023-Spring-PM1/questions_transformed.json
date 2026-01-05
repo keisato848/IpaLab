@@ -1,0 +1,150 @@
+{
+  "questions": [
+    {
+      "qNo": 1,
+      "theme": "ソースコードの静的解析と脆弱性対策",
+      "description": "L社におけるPDFダウンロード機能のソースコード解析と修正対応に関する問題。",
+      "context": {
+        "title": "PDFダウンロード機能の脆弱性修正",
+        "background": "L社では、開発部門がWebアプリケーションのソースコードに対する静的解析ツールを導入した。Fさんが担当したPDFダウンロード機能のソースコード（図1）を解析したところ、複数の脆弱性が指摘された。Fさんはこの指摘に基づき、コードの修正を行った。\n\n## 図1 脆弱性のあるソースコード（pdfDownload.jspの抜粋）\n{{diagram:fig1}}\n\n## 表1 静的解析ツールの出力結果\n{{diagram:table1}}\n\n## 図2 SQLインジェクション修正後のコードの抜粋\n{{diagram:fig2}}",
+        "diagrams": [
+          {
+            "id": "fig1",
+            "label": "図1 脆弱性のあるソースコード（pdfDownload.jspの抜粋）",
+            "type": "markdown",
+            "content": "java\n 1: public void doGet(HttpServletRequest request, HttpServletResponse response) {\n 2:   String inOrderNo = request.getParameter(\"orderNo\");\n 3:   Connection conn = null;\n 4:   Statement stmt = null;\n 5:   ResultSet resultObj = null;\n 6:   BufferedInputStream in = null;\n 7:   \n 8:   try {\n 9:     conn = getConnection();\n10:     \n11:     String sql = \"SELECT * FROM order_head head JOIN order_detail detail ON head.order_id = detail.order_id \"\n12:                + \"WHERE head.order_no = '\" + inOrderNo + \"'\"; \n13:     stmt = conn.createStatement();\n14:     resultObj = stmt.executeQuery(sql);\n15:     \n16:     String fileName = \"/var/data/\" + inOrderNo + \".pdf\"; \n17:     \n18:     File file = new File(fileName);\n19:     in = new new BufferedInputStream(new FileInputStream(file));\n20:     // ... rest of file serving logic\n21:     \n22:   } catch (Exception e) {\n23:     // Error handling\n24:   } finally {\n25:     // Missing resource closing \n26:   }\n27: }\n"
+          },
+          {
+            "id": "table1",
+            "label": "表1 静的解析ツールの出力結果",
+            "type": "markdown",
+            "content": "| 行番号 | 深刻度 | 検出された問題 | 対応する変数名 |\n|---|---|---|---|\n| [ a ] | 高 | ディレクトリトラバーサル | inOrderNo |\n| 12 | 高 | SQLインジェクション | inOrderNo |\n| 25 | 中 | リソースリーク | [ b ] |"
+          },
+          {
+            "id": "fig2",
+            "label": "図2 SQLインジェクション修正後のコードの抜粋",
+            "type": "markdown",
+            "content": "java\nString sql = \"SELECT * FROM order_head head JOIN order_detail detail ON head.order_id = detail.order_id \"\n           + \"[ c ]\";\n[ d ];\nstmt.setString(1, inOrderNo);\nresultObj = stmt.executeQuery();\n"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "subQNo": "設問1",
+          "text": "[ツールによるソースコードの静的解析]について答えよ。",
+          "references": [
+            "fig1",
+            "table1",
+            "fig2"
+          ],
+          "subQuestions": [
+            {
+              "label": "(1)",
+              "text": "表1中の [ a ] に入れる適切な行番号を、図1中から選び、答えよ。",
+              "answer": "15",
+              "explanation": "ディレクトリトラバーサルは、ファイルパスの構築にユーザー入力をそのまま使用することで、攻撃者がパス指定を操作し、想定外のファイルにアクセスする脆弱性です。図1を見ると、ユーザーが入力する `inOrderNo` を使用してファイルパスを作成しているのは、15行目と16行目にかけてです。特にファイルオブジェクトの生成が始まる15行目が適切な指摘箇所となります。"
+            },
+            {
+              "label": "(2)",
+              "text": "表1中の [ b ] に入れる適切な変数名を、図1中から選び、答えよ。",
+              "answer": "in",
+              "explanation": "リソースの解放漏れは、データベース接続やファイルストリームなどのリソースを使い終わった後に閉じないことで発生します。これにより、システムの動作が不安定になったり、リソースが枯渇したりします。図1では、DB関連で `stmt` と `resultObj` が、ファイルアクセス関連で `in` (BufferedInputStream) が使用されていますが、これらが `try-catch` ブロック内で閉じられていません。したがって、解放漏れが指摘されている3番目の変数名として `in` が適切です。"
+            },
+            {
+              "label": "(3)",
+              "text": "図2中の [ c ] , [ d ] に入れる適切な字句を答えよ。",
+              "answer": "c: WHERE head.order_no = ?, d: stmt = conn.prepareStatement(sql)",
+              "explanation": "SQLインジェクションの脆弱性を解消するためには、ユーザー入力をSQL文に直接連結するのではなく、プリペアドステートメント（PreparedStatement）を使用する必要があります。[ c ] は、SQL文中のユーザー入力値が入るべき箇所を示すプレースホルダです。[ d ] は、SQL文の構築後に、そのSQL文を使ってプリペアドステートメントオブジェクトを作成している箇所です。オリジナルのコードでは `Statement` を使用していましたが、ここでは `PreparedStatement` に変更し、SQL文を引数に渡す必要があります。"
+            }
+          ],
+          "point": 50
+        }
+      ],
+      "point": 50
+    },
+    {
+      "qNo": 3,
+      "theme": "Webアプリケーションの並行処理の脆弱性対策とシステムテスト",
+      "description": "提供された入力データは、大問3の設問2とその解答解説です。設問文脈（背景）および図表の具体的な内容（図3～図7）は、このデータには含まれていません。",
+      "context": {
+        "title": "システムテストにおける競合状態の検出と修正",
+        "background": "L社が開発したWebアプリケーションのシステムテストにおいて、ログインしたユーザーが、別得意先の注文情報を参照できてしまうという重大な不具合が検出された。この不具合の原因特定と修正、および保険的な対策について以下の設問に答える。{{diagram:fig3}} {{diagram:fig4}} {{diagram:fig5}} {{diagram:fig6}} {{diagram:fig7}}",
+        "diagrams": [
+          {
+            "id": "fig3",
+            "label": "注文ヘッダーテーブルの属性構造",
+            "type": "image",
+            "content": "得意先コード, 注文番号, 注文日時, 注文金額 など (具体的な構造は原文に依存します)"
+          },
+          {
+            "id": "fig4",
+            "label": "OrderInfoBLクラス（修正前）の抜粋",
+            "type": "image",
+            "content": "private static String orderNo; public void setOrderNo(String orderNo) {...}; public OrderInfoBean getOrderInfoBean() {...} (具体的な構造は原文に依存します)"
+          },
+          {
+            "id": "fig5",
+            "label": "注文情報参照サーブレット（修正前）の処理フロー",
+            "type": "image",
+            "content": "OrderInfoBL orderInfoBL = new OrderInfoBL(); orderInfoBL.setOrderNo(orderNo); OrderInfoBean bean = orderInfoBL.getOrderInfoBean(); (具体的な構造は原文に依存します)"
+          },
+          {
+            "id": "fig6",
+            "label": "修正後のOrderInfoBLクラス（[g]部分）",
+            "type": "image",
+            "content": "public OrderInfoBean getOrderInfoBean([g]) (具体的な構造は原文に依存します)"
+          },
+          {
+            "id": "fig7",
+            "label": "修正後の注文情報参照サーブレット（[h], [i]部分）",
+            "type": "image",
+            "content": "OrderInfoBL orderInfoBLObj = [h] OrderInfoBL(); OrderInfoBean bean = orderInfoBLObj.[i]; (具体的な構造は原文に依存します)"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "subQNo": "設問2",
+          "text": "[システムテスト]について答えよ。\n(1) 本文中の [ e ] に入れる適切な変数名を、図5中から選び、答えよ。\n(2) 本文中の [ f ] に入れる適切な字句を、英字10字以内で答えよ。\n(3) 本文中の下線①の不具合は何と呼ばれるか。15字以内で答えよ。\n(4) 図6中の [ g ], 図7中の [ h ], [ i ] に入れる適切な字句を答えよ。\n(5) 本文中の [ j ] に入れる適切な属性名を、図3中から選び、答えよ。",
+          "references": [
+            "fig3",
+            "fig4",
+            "fig5",
+            "fig6",
+            "fig7"
+          ],
+          "explanation": "### 設問2の解説\nシステムテストで見つかった不具合は、ログインしたユーザーが、別得意先の注文情報を参照できてしまうというものでした。これは、Webアプリケーションにおけるセッション管理やスレッドの取り扱いに関する欠陥です。\n\n#### (1) (2) (3) 不具合の原因特定\n\n図4を見ると、ビジネスロジッククラス `OrderInfoBL` の変数 `orderNo` ( [ e ] ) が `private static` ( [ f ] ) として宣言されています。この `static` 修飾子により、`orderNo` はクラスのすべてのインスタンス、すなわちすべての処理スレッドで共有される静的変数となります。\n\nサーブレット (図5) では、リクエストごとに `setOrderNo` (行4) で値を設定し、すぐに `getOrderInfoBean` (行5) で値を取得して処理を行っています。\n\n複数のユーザーリクエストが同時に処理された場合、以下のシーケンスでデータが上書きされ、想定外の結果（別ユーザーの注文番号を使った問い合わせ）が発生します。\n\n#### 競合状態の流れ\nmermaid\nsequenceDiagram\n    participant U1 as ユーザー1 (スレッドA)\n    participant U2 as ユーザー2 (スレッドB)\n    participant BL as OrderInfoBL (静的変数)\n\n    U1->>BL: setOrderNo(Order_A)\n    Note right of BL: orderNo = Order_A\n    U2->>BL: setOrderNo(Order_B)\n    Note right of BL: orderNo = Order_B (上書き発生)\n    U1->>BL: getOrderInfoBean()\n    Note right of BL: OrderInfoBLはOrder_Bを参照\n    BL-->>U1: Order_Bの情報を返却\n\n\n(1) 共有リソースとなった変数名 [ e ] は `orderNo` です。\n**解答: orderNo**\n\n(2) 静的変数を宣言するキーワード [ f ] は `static` です。\n**解答: static**\n\n(3) 下線①「並列動作する複数の処理が同一のリソースに同時にアクセスしたとき,想定外の処理結果が生じるもの」は、代表的な並行処理のバグであり、**競合状態** (Race Condition) と呼ばれます。\n**解答: 競合状態**\n\n#### (4) 修正後のコード (g, h, i)\n\nこの修正の目的は、静的変数 `orderNo` を廃止し、スレッドごとに独立したデータを持つようにすることです。\n\n**[ g ]**: 図4の2～5行目（静的変数とsetter）が削除されたため、`getOrderInfoBean` メソッドは注文番号を引数として受け取る必要があります。\n**解答: String orderNo**\n\n**[ h ]**: サーブレット側では、BLクラスを静的呼び出しするのではなく、リクエストごとにインスタンス化（オブジェクト生成）して利用するように変更します。\n**解答: new**\n\n**[ i ]**: 新しく生成されたインスタンス `orderInfoBLObj` を使用して、修正されたメソッド `getOrderInfoBean` を呼び出し、注文番号を引数として渡します。\n**解答: getOrderInfoBean(orderNo)**\n\n#### (5) 保険的な対策 (j)\n\n不具合の原因である競合状態は修正されましたが、保険的な対策として、SQLクエリにログインユーザーの権限に基づいたアクセス制御を追加します。これにより、万が一、注文番号が漏洩しても、別得意先の情報を取得できなくなります。\n\nログイン時にセッションに保存され、注文ヘッダーテーブル (図3) にも存在する、得意先を特定するための属性は **得意先コード** です。\n\n抽出条件として、セッションの [ j ] (`得意先コード`) と注文ヘッダーテーブルの [ j ] (`得意先コード`) が一致することを必須とします。\n**解答: 得意先コード**\n",
+          "subQuestions": [
+            {
+              "label": "(1)",
+              "text": "本文中の [ e ] に入れる適切な変数名を、図5中から選び、答えよ。",
+              "answer": "orderNo"
+            },
+            {
+              "label": "(2)",
+              "text": "本文中の [ f ] に入れる適切な字句を、英字10字以内で答えよ。",
+              "answer": "static"
+            },
+            {
+              "label": "(3)",
+              "text": "本文中の下線①の不具合は何と呼ばれるか。15字以内で答えよ。",
+              "answer": "競合状態"
+            },
+            {
+              "label": "(4)",
+              "text": "図6中の [ g ], 図7中の [ h ], [ i ] に入れる適切な字句を答えよ。",
+              "answer": "g: String orderNo, h: new, i: getOrderInfoBean(orderNo)"
+            },
+            {
+              "label": "(5)",
+              "text": "本文中の [ j ] に入れる適切な属性名を、図3中から選び、答えよ。",
+              "answer": "得意先コード"
+            }
+          ],
+          "point": 50
+        }
+      ],
+      "point": 50
+    }
+  ]
+}
