@@ -151,6 +151,23 @@ async function main() {
 
                 const data = JSON.parse(content);
 
+                // [NEW] Load Classification Data if available
+                const classifiedPath = path.join(dataDir, folderName, 'questions_classified.json');
+                let classificationMap = new Map<number, { category: string, subCategory: string }>();
+                if (fs.existsSync(classifiedPath)) {
+                    try {
+                        const clsData = JSON.parse(fs.readFileSync(classifiedPath, 'utf-8'));
+                        if (Array.isArray(clsData)) {
+                            clsData.forEach((c: any) => {
+                                if (c.qNo) classificationMap.set(c.qNo, { category: c.category, subCategory: c.subCategory });
+                            });
+                            console.log(`Loaded classification data for ${folderName} (${classificationMap.size} items)`);
+                        }
+                    } catch (e) {
+                        console.warn(`Failed to load classification data for ${folderName}`, e);
+                    }
+                }
+
                 // Define questions FIRST because it is used in examItem stats
                 const questions = Array.isArray(data) ? data : (data.questions || []);
 
@@ -255,6 +272,8 @@ async function main() {
                                         type: type,
                                         qNo: resolvedQNo,
                                         text: q.text,
+                                        category: classificationMap.get(resolvedQNo)?.category || examPrefix, // Fallback to examPrefix if missing
+                                        subCategory: classificationMap.get(resolvedQNo)?.subCategory || undefined,
                                         options: q.options,
                                         correctOption: q.correctOption,
                                         explanation: q.explanation

@@ -40,7 +40,12 @@ Output a JSON array of objects. Each object must follow this schema:
 1.  **Reading Order**: Strictly follow the 2-column layout. Do not mix text from the right column into the left column's question.
 2.  **Text Cleaning**:
     - Remove newlines within sentences. Merge them into a single line unless it's a logical paragraph break.
-    - If there is a figure or diagram (indicated by "図1" or a visual box), insert a placeholder in the text like `[図1参照]`. **Do not omit the question** just because it has a diagram.
+    - **Diagrams/Figures (CRITICAL)**:
+        - You **MUST** convert all diagrams (Flowcharts, ER, State, Sequence, Logic Circuits, Stack/Queue Visuals) into **Mermaid** code blocks.
+        - **DO NOT** use text placeholders like `[図説明: ...]`. Users want to see the diagram.
+        - Use `graph TD`, `graph LR`, `sequenceDiagram`, `stateDiagram-v2`, `erDiagram` or `packet-beta`.
+        - If a chart is a data table, convert it to a Markdown Table.
+        - Only use text description if the image is a photograph or purely artistic illustration. For technical structure, **Mermaid is mandatory**.
 3.  **Options**:
     - Map "ア" to "a", "イ" to "b", "ウ" to "c", "エ" to "d".
     - The option text should just be the content (exclude the "ア" label).

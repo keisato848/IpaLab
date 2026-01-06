@@ -1,0 +1,402 @@
+[
+  {
+    "qNo": 1,
+    "category": "Technology",
+    "subCategory": "離散数学"
+  },
+  {
+    "qNo": 2,
+    "category": "Technology",
+    "subCategory": "応用数学"
+  },
+  {
+    "qNo": 3,
+    "category": "Technology",
+    "subCategory": "情報理論"
+  },
+  {
+    "qNo": 4,
+    "category": "Technology",
+    "subCategory": "ネットワーク"
+  },
+  {
+    "qNo": 5,
+    "category": "Technology",
+    "subCategory": "OS"
+  },
+  {
+    "qNo": 6,
+    "category": "Technology",
+    "subCategory": "アルゴリズム"
+  },
+  {
+    "qNo": 7,
+    "category": "Technology",
+    "subCategory": "ソフトウェア"
+  },
+  {
+    "qNo": 8,
+    "category": "Technology",
+    "subCategory": "プロセッサ"
+  },
+  {
+    "qNo": 9,
+    "category": "Technology",
+    "subCategory": "ハードウェア"
+  },
+  {
+    "qNo": 10,
+    "category": "Technology",
+    "subCategory": "ハードウェア"
+  },
+  {
+    "qNo": 11,
+    "category": "Technology",
+    "subCategory": "システム構成"
+  },
+  {
+    "qNo": 12,
+    "category": "Technology",
+    "subCategory": "システム構築"
+  },
+  {
+    "qNo": 13,
+    "category": "Technology",
+    "subCategory": "システム構成"
+  },
+  {
+    "qNo": 14,
+    "category": "Management",
+    "subCategory": "サービスマネジメント"
+  },
+  {
+    "qNo": 15,
+    "category": "Technology",
+    "subCategory": "OS"
+  },
+  {
+    "qNo": 16,
+    "category": "Technology",
+    "subCategory": "OS"
+  },
+  {
+    "qNo": 17,
+    "category": "Technology",
+    "subCategory": "プログラミング"
+  },
+  {
+    "qNo": 18,
+    "category": "Technology",
+    "subCategory": "OS"
+  },
+  {
+    "qNo": 19,
+    "category": "Technology",
+    "subCategory": "メモリ"
+  },
+  {
+    "qNo": 20,
+    "category": "Technology",
+    "subCategory": "ハードウェア"
+  },
+  {
+    "qNo": 21,
+    "category": "Technology",
+    "subCategory": "基礎理論"
+  },
+  {
+    "qNo": 22,
+    "category": "Technology",
+    "subCategory": "基礎理論"
+  },
+  {
+    "qNo": 23,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
+  },
+  {
+    "qNo": 24,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 25,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 26,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 27,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 28,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 29,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 30,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 31,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 32,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 33,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 34,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 35,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 36,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 37,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 38,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 39,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 40,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 41,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
+  },
+  {
+    "qNo": 42,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
+  },
+  {
+    "qNo": 43,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
+  },
+  {
+    "qNo": 44,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
+  },
+  {
+    "qNo": 45,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
+  },
+  {
+    "qNo": 46,
+    "category": "Technology",
+    "subCategory": "システム開発"
+  },
+  {
+    "qNo": 47,
+    "category": "Technology",
+    "subCategory": "オブジェクト指向"
+  },
+  {
+    "qNo": 48,
+    "category": "Technology",
+    "subCategory": "ソフトウェア開発管理"
+  },
+  {
+    "qNo": 49,
+    "category": "Technology",
+    "subCategory": "ソフトウェア"
+  },
+  {
+    "qNo": 50,
+    "category": "Strategy",
+    "subCategory": "知的財産"
+  },
+  {
+    "qNo": 51,
+    "category": "Management",
+    "subCategory": "プロジェクトマネジメント"
+  },
+  {
+    "qNo": 52,
+    "category": "Management",
+    "subCategory": "プロジェクトマネジメント"
+  },
+  {
+    "qNo": 53,
+    "category": "Management",
+    "subCategory": "プロジェクトマネジメント"
+  },
+  {
+    "qNo": 54,
+    "category": "Strategy",
+    "subCategory": "OR/IE"
+  },
+  {
+    "qNo": 55,
+    "category": "Management",
+    "subCategory": "サービスマネジメント"
+  },
+  {
+    "qNo": 56,
+    "category": "Management",
+    "subCategory": "サービスマネジメント"
+  },
+  {
+    "qNo": 57,
+    "category": "Technology",
+    "subCategory": "ハードウェア"
+  },
+  {
+    "qNo": 58,
+    "category": "Management",
+    "subCategory": "システム監査"
+  },
+  {
+    "qNo": 59,
+    "category": "Management",
+    "subCategory": "システム監査"
+  },
+  {
+    "qNo": 60,
+    "category": "Management",
+    "subCategory": "システム監査"
+  },
+  {
+    "qNo": 61,
+    "category": "Management",
+    "subCategory": "プロジェクトマネジメント"
+  },
+  {
+    "qNo": 62,
+    "category": "Strategy",
+    "subCategory": "システム戦略"
+  },
+  {
+    "qNo": 63,
+    "category": "Technology",
+    "subCategory": "データベース"
+  },
+  {
+    "qNo": 64,
+    "category": "Strategy",
+    "subCategory": "会計"
+  },
+  {
+    "qNo": 65,
+    "category": "Strategy",
+    "subCategory": "OR/IE"
+  },
+  {
+    "qNo": 66,
+    "category": "Strategy",
+    "subCategory": "法務"
+  },
+  {
+    "qNo": 67,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 68,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 69,
+    "category": "Strategy",
+    "subCategory": "システム戦略"
+  },
+  {
+    "qNo": 70,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 71,
+    "category": "Strategy",
+    "subCategory": "システム戦略"
+  },
+  {
+    "qNo": 72,
+    "category": "Strategy",
+    "subCategory": "システム戦略"
+  },
+  {
+    "qNo": 73,
+    "category": "Technology",
+    "subCategory": "ネットワーク"
+  },
+  {
+    "qNo": 74,
+    "category": "Strategy",
+    "subCategory": "OR/IE"
+  },
+  {
+    "qNo": 75,
+    "category": "Strategy",
+    "subCategory": "OR/IE"
+  },
+  {
+    "qNo": 76,
+    "category": "Strategy",
+    "subCategory": "会計"
+  },
+  {
+    "qNo": 77,
+    "category": "Strategy",
+    "subCategory": "OR/IE"
+  },
+  {
+    "qNo": 78,
+    "category": "Strategy",
+    "subCategory": "知的財産"
+  },
+  {
+    "qNo": 79,
+    "category": "Strategy",
+    "subCategory": "知的財産"
+  },
+  {
+    "qNo": 80,
+    "category": "Strategy",
+    "subCategory": "法務"
+  }
+]

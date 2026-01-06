@@ -1,0 +1,502 @@
+[
+  {
+    "qNo": 1,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 2,
+    "category": "Strategy",
+    "subCategory": "法務"
+  },
+  {
+    "qNo": 3,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 4,
+    "category": "Strategy",
+    "subCategory": "システム戦略"
+  },
+  {
+    "qNo": 5,
+    "category": "Strategy",
+    "subCategory": "企業活動"
+  },
+  {
+    "qNo": 6,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 7,
+    "category": "Technology",
+    "subCategory": "システム開発"
+  },
+  {
+    "qNo": 8,
+    "category": "Strategy",
+    "subCategory": "会計"
+  },
+  {
+    "qNo": 9,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 10,
+    "category": "Strategy",
+    "subCategory": "法務"
+  },
+  {
+    "qNo": 11,
+    "category": "Management",
+    "subCategory": "サービスマネジメント"
+  },
+  {
+    "qNo": 12,
+    "category": "Strategy",
+    "subCategory": "標準化"
+  },
+  {
+    "qNo": 13,
+    "category": "Technology",
+    "subCategory": "データベース"
+  },
+  {
+    "qNo": 14,
+    "category": "Technology",
+    "subCategory": "応用数学"
+  },
+  {
+    "qNo": 15,
+    "category": "Strategy",
+    "subCategory": "OR/IE"
+  },
+  {
+    "qNo": 16,
+    "category": "Strategy",
+    "subCategory": "システム戦略"
+  },
+  {
+    "qNo": 17,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 18,
+    "category": "Strategy",
+    "subCategory": "企業活動"
+  },
+  {
+    "qNo": 19,
+    "category": "Strategy",
+    "subCategory": "システム戦略"
+  },
+  {
+    "qNo": 20,
+    "category": "Strategy",
+    "subCategory": "会計"
+  },
+  {
+    "qNo": 21,
+    "category": "Strategy",
+    "subCategory": "システム戦略"
+  },
+  {
+    "qNo": 22,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 23,
+    "category": "Strategy",
+    "subCategory": "システム戦略"
+  },
+  {
+    "qNo": 24,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 25,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 26,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 27,
+    "category": "Strategy",
+    "subCategory": "企業と法務"
+  },
+  {
+    "qNo": 28,
+    "category": "Strategy",
+    "subCategory": "システム戦略"
+  },
+  {
+    "qNo": 29,
+    "category": "Strategy",
+    "subCategory": "システム戦略"
+  },
+  {
+    "qNo": 30,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 31,
+    "category": "Strategy",
+    "subCategory": "システム戦略"
+  },
+  {
+    "qNo": 32,
+    "category": "Strategy",
+    "subCategory": "企業と法務"
+  },
+  {
+    "qNo": 33,
+    "category": "Technology",
+    "subCategory": "開発技術"
+  },
+  {
+    "qNo": 34,
+    "category": "Strategy",
+    "subCategory": "システム戦略"
+  },
+  {
+    "qNo": 35,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 36,
+    "category": "Management",
+    "subCategory": "プロジェクトマネジメント"
+  },
+  {
+    "qNo": 37,
+    "category": "Management",
+    "subCategory": "プロジェクトマネジメント"
+  },
+  {
+    "qNo": 38,
+    "category": "Management",
+    "subCategory": "サービスマネジメント"
+  },
+  {
+    "qNo": 39,
+    "category": "Management",
+    "subCategory": "サービスマネジメント"
+  },
+  {
+    "qNo": 40,
+    "category": "Technology",
+    "subCategory": "開発技術"
+  },
+  {
+    "qNo": 41,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 42,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 43,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 44,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 45,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 46,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 47,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 48,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 49,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 50,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 51,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 52,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 53,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 54,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 55,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 56,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 57,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 58,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 59,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 60,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 61,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 62,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 63,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 64,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 65,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 66,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 67,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 68,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 69,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 70,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 71,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 72,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 73,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 74,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 75,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 76,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 77,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 78,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 79,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 80,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 81,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 82,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 83,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 84,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 85,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 86,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 87,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 88,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 89,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 90,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 91,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 92,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 93,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 94,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 95,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 96,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 97,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 98,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 99,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  },
+  {
+    "qNo": 100,
+    "category": "Unknown",
+    "subCategory": "Unknown"
+  }
+]

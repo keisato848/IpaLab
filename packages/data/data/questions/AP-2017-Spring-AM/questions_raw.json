@@ -1,132 +1,122 @@
 [
   {
     "qNo": 1,
-    "text": "論理和(∨),論理積(∧),排他的論理和(⊕)の結合法則の成立に関する記述として、適切な組合せはどれか。\n\n| | (A∨B)∨C = A∨(B∨C) | (A∧B)∧C = A∧(B∧C) | (A⊕B)⊕C = A⊕(B⊕C) |\n|---|---|---|---|\n| ア | 必ずしも成立しない | 成立する | 成立する |\n| イ | 成立する | 必ずしも成立しない | 成立する |\n| ウ | 成立する | 成立する | 必ずしも成立しない |\n| エ | 成立する | 成立する | 成立する |",
+    "text": "論理和(V), 論理積(八), 排他的論理和(⊕)の結合法則の成立に関する記述として、適切な組合せはどれか。\n\n| | (A V B) V C = A V (B V C) | (A 八 B) 八 C = A 八 (B 八 C) | (A ⊕ B) ⊕ C = A ⊕ (B ⊕ C) |\n|---|---|---|---|\n| ア | 必ずしも成立しない | 成立する | 成立する |\n| イ | 成立する | 必ずしも成立しない | 成立する |\n| ウ | 成立する | 成立する | 必ずしも成立しない |\n| エ | 成立する | 成立する | 成立する |",
     "options": [
       {
         "id": "a",
-        "text": "ア (A∨B)∨C = A∨(B∨C): 必ずしも成立しない, (A∧B)∧C = A∧(B∧C): 成立する, (A⊕B)⊕C = A⊕(B⊕C): 成立する"
+        "text": "アの組合せ"
       },
       {
         "id": "b",
-        "text": "イ (A∨B)∨C = A∨(B∨C): 成立する, (A∧B)∧C = A∧(B∧C): 必ずしも成立しない, (A⊕B)⊕C = A⊕(B⊕C): 成立する"
+        "text": "イの組合せ"
       },
       {
         "id": "c",
-        "text": "ウ (A∨B)∨C = A∨(B∨C): 成立する, (A∧B)∧C = A∧(B∧C): 成立する, (A⊕B)⊕C = A⊕(B⊕C): 必ずしも成立しない"
+        "text": "ウの組合せ"
       },
       {
         "id": "d",
-        "text": "エ (A∨B)∨C = A∨(B∨C): 成立する, (A∧B)∧C = A∧(B∧C): 成立する, (A⊕B)⊕C = A⊕(B⊕C): 成立する"
+        "text": "エの組合せ"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 2,
-    "text": "(1+α)ⁿ の計算を, 1+n×αで近似計算ができる条件として、適切なものはどれか。",
+    "text": "(1+a)^n の計算を, 1+n×a で近似計算ができる条件として、適切なものはどれか。",
     "options": [
       {
         "id": "a",
-        "text": "|α|が1に比べて非常に小さい。"
+        "text": "|a| が 1 に比べて非常に小さい。"
       },
       {
         "id": "b",
-        "text": "|α|がnに比べて非常に大きい。"
+        "text": "|a| が n に比べて非常に大きい。"
       },
       {
         "id": "c",
-        "text": "|α÷n|が1よりも大きい。"
+        "text": "|a÷n| が 1 よりも大きい。"
       },
       {
         "id": "d",
-        "text": "|n×α|が1よりも大きい。"
+        "text": "|n×a| が 1 よりも大きい。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 3,
-    "text": "ノードとノードの間のエッジの有無を、隣接行列を用いて表す。ある無向グラフの隣接行列が次の場合,グラフで表現したものはどれか。ここで、ノードを隣接行列の行と列に対応させて、ノード間にエッジが存在する場合は1で、エッジが存在しない場合は0で示す。\n[隣接行列と図参照]",
+    "text": "ノードとノードの間のエッジの有無を、隣接行列を用いて表す。ある無向グラフの隣接行列が次の場合,グラフで表現したものはどれか。ここで、ノードを隣接行列の行と列に対応させて、ノード間にエッジが存在する場合は1で、エッジが存在しない場合は0で示す。\n\n**隣接行列:**\n| | a | b | c | d | e | f |\n|---|---|---|---|---|---|---|\n| a | 0 | 1 | 0 | 0 | 0 | 0 |\n| b | 1 | 0 | 1 | 1 | 0 | 0 |\n| c | 0 | 1 | 0 | 1 | 1 | 0 |\n| d | 0 | 1 | 1 | 0 | 0 | 0 |\n| e | 0 | 0 | 1 | 0 | 0 | 1 |\n| f | 0 | 0 | 0 | 0 | 1 | 0 |",
     "options": [
       {
         "id": "a",
-        "text": "ア [図参照]"
+        "text": "グラフ ア:\n```mermaid\ngraph LR\n  a -- b\n  b -- c\n  c -- d\n  d -- e\n  e -- f\n```"
       },
       {
         "id": "b",
-        "text": "イ [図参照]"
+        "text": "グラフ イ:\n```mermaid\ngraph LR\n  a -- b\n  b -- c\n  c -- d\n  d -- e\n  e -- f\n  b -- d\n```"
       },
       {
         "id": "c",
-        "text": "ウ [図参照]"
+        "text": "グラフ ウ:\n```mermaid\ngraph LR\n  a -- b\n  b -- c\n  c -- d\n  d -- e\n  e -- f\n  c -- e\n```"
       },
       {
         "id": "d",
-        "text": "エ [図参照]"
+        "text": "グラフ エ:\n```mermaid\ngraph LR\n  a -- b\n  b -- c\n  c -- d\n  e -- f\n  b -- d\n  c -- e\n```"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 4,
-    "text": "あるプログラム言語において、識別子 (identifier)は、先頭が英字で始まり、それ以降に任意個の英数字が続く文字列である。これを BNF で定義したとき, a に入るものはどれか。\n<digit> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9\n<letter> ::= A | B | C | ... | X | Y | Z | a | b | c | ... | x | y | z\n<identifier> ::= a",
+    "text": "あるプログラム言語において、識別子 (identifier)は、先頭が英字で始まり、それ以降に任意個の英数字が続く文字列である。これを BNF で定義したとき, a に入るものはどれか。\n\n<digit> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9\n<letter> ::= A | B | C | ... | X | Y | Z | a | b | c | ... | x | y | z\n<identifier> ::= a",
     "options": [
       {
         "id": "a",
-        "text": "<letter> | <digit> | <identifier><letter> | <identifier><digit>"
+        "text": "<letter> <digit>|<identifier><letter>|<identifier><digit>"
       },
       {
         "id": "b",
-        "text": "<letter><digit> | <letter><identifier> | <identifier><digit>"
+        "text": "<letter> <digit>|<letter><identifier> | <identifier><digit>"
       },
       {
         "id": "c",
-        "text": "<letter> | <identifier><digit>"
+        "text": "<letter>|<identifier><digit>"
       },
       {
         "id": "d",
         "text": "<letter><identifier><digit> | <identifier><letter>"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 5,
-    "text": "次の数式は、ある細菌の第n世代の個数 f(n)が1世代後にどのように変化するかを表現したものである。この漸化式の解釈として, 1世代後の細菌の個数が, 第n世代と比較してどのようになるかを適切に説明しているものはどれか。\nf(n+1) + 0.2 × f(n) = 2 × f(n)",
+    "text": "次の数式は、ある細菌の第 n 世代の個数 f(n)が 1 世代後にどのように変化するかを表現したものである。この漸化式の解釈として, 1 世代後の細菌の個数が, 第 n 世代と比較してどのようになるかを適切に説明しているものはどれか。\n\nf(n+1) + 0.2 × f(n) = 2 × f(n)",
     "options": [
       {
         "id": "a",
-        "text": "1世代後の個数は, 第n世代の個数の1.8倍に増える。"
+        "text": "1世代後の個数は, 第n 世代の個数の 1.8 倍に増える。"
       },
       {
         "id": "b",
-        "text": "1世代後の個数は、第n世代の個数の2.2倍に増える。"
+        "text": "1世代後の個数は、第n世代の個数の 2.2 倍に増える。"
       },
       {
         "id": "c",
-        "text": "1世代後の個数は、第n世代の個数の2倍になり、更に増殖後の20%が増える。"
+        "text": "1世代後の個数は、第n 世代の個数の 2 倍になり、更に増殖後の 20%が増える。"
       },
       {
         "id": "d",
-        "text": "1世代後の個数は、第n世代の個数の2倍になるが、増殖後の20%が死ぬ。"
+        "text": "1世代後の個数は、第n世代の個数の 2 倍になるが、増殖後の 20%が死ぬ。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 6,
-    "text": "次の流れ図の処理で、終了時のxに格納されているものはどれか。ここで、与えられたa, bは正の整数であり, mod (x,y) はxをyで割った余りを返す。\n[流れ図参照]",
+    "text": "次の流れ図の処理で、終了時の x に格納されているものはどれか。ここで、与えられた a, b は正の整数であり, mod (x,y) は x を y で割った余りを返す。\n\n```mermaid\nflowchart TD\n    start([開始]) --> A{x ← a}; \n    A --> B{y ← b};\n    B --> C(ループ1);\n    C --> D{y = 0?};\n    D -- No --> E1{t ← mod(x, y)};\n    E1 --> E2{x ← y};\n    E2 --> E3{y ← t};\n    E3 --> C;\n    D -- Yes --> F([終了]);\n```",
     "options": [
       {
         "id": "a",
@@ -145,9 +135,7 @@
         "text": "aをbで割った商"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 7,
@@ -170,9 +158,7 @@
         "text": "再配置可能プログラムは、主記憶装置上のどの領域にロードされても実行可能なプログラムであるが、再使用可能ではない。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 8,
@@ -195,9 +181,7 @@
         "text": "命令を読み出すために、次の命令が格納されたアドレスを保持する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 9,
@@ -220,9 +204,7 @@
         "text": "マルチコアプロセッサにおいて、使用しないコアの消費電力枠を,動作しているコアに割り当てる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 10,
@@ -245,13 +227,11 @@
         "text": "主記憶へのアクセス頻度が少ないので、バスの占有率が低い。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 11,
-    "text": "15 M バイトのプログラムを圧縮した状態でフラッシュメモリに格納している。プログラムの圧縮率が40%, フラッシュメモリから主記憶への転送速度が 20M バイト/秒であり, 1M バイトに圧縮されたデータの展開に主記憶上で 0.03 秒が掛かるとき,このプログラムが主記憶に展開されるまでの時間は何秒か。ここで、フラッシュメモリから主記憶への転送と圧縮データの展開は同時には行われないものとする。",
+    "text": "15 Mバイトのプログラムを圧縮した状態でフラッシュメモリに格納している。プログラムの圧縮率が40%, フラッシュメモリから主記憶への転送速度が 20M バイト/秒であり, 1M バイトに圧縮されたデータの展開に主記憶上で 0.03 秒が掛かるとき,このプログラムが主記憶に展開されるまでの時間は何秒か。ここで、フラッシュメモリから主記憶への転送と圧縮データの展開は同時には行われないものとする。",
     "options": [
       {
         "id": "a",
@@ -270,13 +250,11 @@
         "text": "1.20"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 12,
-    "text": "Web システムにおける CDN (Contents Delivery Network)に関する記述として、適切なものはどれか。",
+    "text": "Web システムにおける CDN (Contents Delivery Network)に関する記述として,適切なものはどれか。",
     "options": [
       {
         "id": "a",
@@ -295,34 +273,30 @@
         "text": "動画や音声などの大容量のデータを利用する際に、インターネット回線の負荷を軽減するようにサーバを分散配置する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 13,
-    "text": "CPUと磁気ディスク装置で構成されるシステムで、表に示すジョブ A, B を実行する。この二つのジョブが実行を終了するまでのCPUの使用率と磁気ディスク装置の使用率との組合せのうち、適切なものはどれか。ここで、ジョブ A, B はシステムの動作開始時点ではいずれも実行可能状態にあり, A, Bの順で実行される。CPU及び磁気ディスク装置は、ともに一つの要求だけを発生順に処理する。ジョブA, Bとも、CPUの処理を終了した後、磁気ディスク装置の処理を実行する。\n[表参照]",
+    "text": "CPUと磁気ディスク装置で構成されるシステムで、表に示すジョブ A, B を実行する。この二つのジョブが実行を終了するまでのCPUの使用率と磁気ディスク装置の使用率との組合せのうち、適切なものはどれか。ここで、ジョブ A, B はシステムの動作開始時点ではいずれも実行可能状態にあり, A, Bの順で実行される。CPU及び磁気ディスク装置は、ともに一つの要求だけを発生順に処理する。ジョブ A, B とも、CPUの処理を終了した後、磁気ディスク装置の処理を実行する。\n\n**ジョブ実行時間 (単位: 秒):**\n| ジョブ | CPUの処理時間 | 磁気ディスク装置の処理時間 |\n|---|---|---|\n| A | 3 | 7 |\n| B | 12 | 10 |\n\n**使用率の選択肢:**\n| | CPUの使用率 | 磁気ディスク装置の使用率 |\n|---|---|---|\n| ア | 0.47 | 0.53 |\n| イ | 0.60 | 0.68 |\n| ウ | 0.79 | 0.89 |\n| エ | 0.88 | 1.00 |",
     "options": [
       {
         "id": "a",
-        "text": "CPU使用率: 0.47, 磁気ディスク装置使用率: 0.53"
+        "text": "ア"
       },
       {
         "id": "b",
-        "text": "CPU使用率: 0.60, 磁気ディスク装置使用率: 0.68"
+        "text": "イ"
       },
       {
         "id": "c",
-        "text": "CPU使用率: 0.79, 磁気ディスク装置使用率: 0.89"
+        "text": "ウ"
       },
       {
         "id": "d",
-        "text": "CPU使用率: 0.88, 磁気ディスク装置使用率: 1.00"
+        "text": "エ"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 14,
@@ -345,13 +319,11 @@
         "text": "命令を分類し、それぞれの使用頻度を重みとした加重平均によって全命令の平均実行速度を求める。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 15,
-    "text": "図に示す二つの装置から構成される並列システムの稼働率は幾らか。ここで、どちらか一つの装置が稼働していればシステムとして稼働しているとみなし、装置 A, Bとも, MTBFは450時間, MTTRは50時間とする。\n[図参照]",
+    "text": "図に示す二つの装置から構成される並列システムの稼働率は幾らか。ここで、どちらか一つの装置が稼働していればシステムとして稼働しているとみなし、装置 A, B とも, MTBFは450時間, MTTRは50時間とする。\n\n```mermaid\ngraph LR\n    subgraph System\n        A[装置 A]\n        B[装置 B]\n    end\n    A -- Parallel -- B\n```",
     "options": [
       {
         "id": "a",
@@ -370,13 +342,11 @@
         "text": "0.99"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 16,
-    "text": "4 ブロックのキャッシュメモリ C0~ C3 が表に示す状態である。ここで、新たに別のブロックの内容をキャッシュメモリにロードする必要が生じたとき、C2 のブロックを置換の対象とするアルゴリズムはどれか。\n[表参照]",
+    "text": "4 ブロックのキャッシュメモリ C0~C3 が表に示す状態である。ここで、新たに別のブロックの内容をキャッシュメモリにロードする必要が生じたとき、C2 のブロックを置換の対象とするアルゴリズムはどれか。\n\n| キャッシュメモリ | ロード時刻(分:秒) | 最終参照時刻(分:秒) | 参照回数 |\n|---|---|---|---|\n| C0 | 0:00 | 0:08 | 10 |\n| C1 | 0:03 | 0:06 | 1 |\n| C2 | 0:04 | 0:05 | 3 |\n| C3 | 0:05 | 0:10 | 5 |",
     "options": [
       {
         "id": "a",
@@ -395,9 +365,7 @@
         "text": "LRU"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 17,
@@ -420,9 +388,7 @@
         "text": "UML (Unified Modeling Language)"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 18,
@@ -445,9 +411,7 @@
         "text": "テストカバレージ分析ツール"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 19,
@@ -470,9 +434,7 @@
         "text": "GPL であるソースコードを組み込んだ派生物をGPLにするか否かは、派生物の開発者が決める。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 20,
@@ -495,38 +457,34 @@
         "text": "無停電電源装置を備えたデータサーバ"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 21,
-    "text": "16進数 ABCD1234 をリトルエンディアンで4バイトのメモリに配置したものはどれか。ここで、0~+3はバイトアドレスのオフセット値である。\n[表参照]",
+    "text": "16進数 ABCD1234 をリトルエンディアンで 4 バイトのメモリに配置したものはどれか。ここで、0~+3 はバイトアドレスのオフセット値である。\n\n| | 0 | +1 | +2 | +3 |\n|---|---|---|---|---|\n| ア | 12 | 34 | AB | CD |\n| イ | 34 | 12 | CD | AB |\n| ウ | 43 | 21 | DC | BA |\n| エ | AB | CD | 12 | 34 |",
     "options": [
       {
         "id": "a",
-        "text": "0: 12, +1: 34, +2: AB, +3: CD"
+        "text": "ア"
       },
       {
         "id": "b",
-        "text": "0: 34, +1: 12, +2: CD, +3: AB"
+        "text": "イ"
       },
       {
         "id": "c",
-        "text": "0: 43, +1: 21, +2: DC, +3: BA"
+        "text": "ウ"
       },
       {
         "id": "d",
-        "text": "0: AB, +1: CD, +2: 12, +3: 34"
+        "text": "エ"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 22,
-    "text": "16 ビットのダウンカウンタを用い、カウンタの値が0になると割込みを発生するハードウェアタイマがある。カウンタに初期値として10進数の150をセットしてタイマをスタートすると、最初の割込みが発生するまでの時間は何マイクロ秒か。ここで、タイマの入力クロックは16MHzを32分周したものとする。",
+    "text": "16 ビットのダウンカウンタを用い、カウンタの値が 0 になると割込みを発生するハードウェアタイマがある。カウンタに初期値として 10 進数の 150 をセットしてタイマをスタートすると、最初の割込みが発生するまでの時間は何マイクロ秒か。ここで、タイマの入力クロックは 16 MHz を 32 分周したものとする。",
     "options": [
       {
         "id": "a",
@@ -545,34 +503,30 @@
         "text": "300"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 23,
-    "text": "図の回路が実現する論理式はどれか。ここで、論理式中の“・”は論理積,“+”は論理和を表す。\n[図参照]",
+    "text": "図の回路が実現する論理式はどれか。ここで、論理式中の“・”は論理積,“+”は論理和を表す。\n\n**回路図の構造:**\n入力 A は NOT ゲート、その出力と入力 B は AND ゲート G1 に入力される。\n入力 A と入力 B は OR ゲート G2 に入力される。\nG1 と G2 の出力は最終 AND ゲートに入力され、出力 F となる。",
     "options": [
       {
         "id": "a",
-        "text": "F=A"
+        "text": "F = A"
       },
       {
         "id": "b",
-        "text": "F=B"
+        "text": "F = B"
       },
       {
         "id": "c",
-        "text": "F=A・B"
+        "text": "F = A・B"
       },
       {
         "id": "d",
-        "text": "F=A+B"
+        "text": "F = A+B"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 24,
@@ -595,9 +549,7 @@
         "text": "ブロックコード"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 25,
@@ -620,13 +572,11 @@
         "text": "ディザリング"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 26,
-    "text": "データモデルを解釈してオブジェクト図を作成した。解釈の誤りを適切に指摘した記述はどれか。ここで、モデルの表記には UML を用い、オブジェクト図の一部の属性の表示は省略した。\n[データモデルとオブジェクト図参照]",
+    "text": "データモデルを解釈してオブジェクト図を作成した。解釈の誤りを適切に指摘した記述はどれか。ここで、モデルの表記には UML を用い、オブジェクト図の一部の属性の表示は省略した。\n\n**データモデル (UML Class Diagram excerpt):**\n```mermaid\nclassDiagram\n    class 顧客{\n        顧客番号\n        顧客名\n        住所\n    }\n    class 注文{\n        注文番号\n        注文日\n        注文数\n    }\n    class 商品{\n        商品番号\n        商品名\n        価格\n    }\n    顧客 \"1\" -- \"*\" 注文\n    注文 \"*\" -- \"1\" 商品\n```\n\n**オブジェクト図のリンク:**\nA商店:顧客 -> 123456:注文, 123457:注文, 123459:注文\n123456:注文 -> 47型テレビ:商品, 2ドア冷蔵庫:商品\n123457:注文 -> 2ドア冷蔵庫:商品\n123459:注文 -> ドラム式洗濯機:商品",
     "options": [
       {
         "id": "a",
@@ -645,13 +595,11 @@
         "text": "“ドラム式洗濯機:商品”がどの注文にもリンクしていないのは、誤りである。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 27,
-    "text": "“受注明細”表は、どのレベルまでの正規形の条件を満足しているか。ここで、実線の下線は主キーを表す。\n受注明細 (受注番号, 明細番号, 商品コード, 商品名, 数量)\n[表参照]",
+    "text": "“受注明細”表は、どのレベルまでの正規形の条件を満足しているか。ここで、実線の下線は主キーを表す。\n\n**受注明細テーブル:**\n受注明細(\u003cu\u003e受注番号, 明細番号\u003c/u\u003e, 商品コード, 商品名, 数量)",
     "options": [
       {
         "id": "a",
@@ -670,38 +618,34 @@
         "text": "第4正規形"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 28,
-    "text": "“部品”表のメーカコード列に対し, B+木インデックスを作成した。これによって,“部品”表の検索の性能改善が最も期待できる操作はどれか。ここで、部品及びメーカのデータ件数は十分に多く,“部品”表に存在するメーカコード列の値の種類は十分な数があり、かつ、均一に分散しているものとする。また、“部品”表のごく少数の行には,メーカコード列に NULL が設定されている。実線の下線は主キーを, 破線の下線は外部キーを表す。\n部品(部品コード,部品名,メーカコード)\nメーカ(メーカコード,メーカ名,住所)",
+    "text": "“部品”表のメーカコード列に対し, B+木インデックスを作成した。これによって,“部品”表の検索の性能改善が最も期待できる操作はどれか。ここで、部品及びメーカのデータ件数は十分に多く,“部品”表に存在するメーカコード列の値の種類は十分な数があり、かつ、均一に分散しているものとする。また、“部品”表のごく少数の行には,メーカコード列に NULL が設定されている。実線の下線は主キーを,破線の下線は外部キーを表す。\n\n部品(\u003cu\u003e部品コード\u003c/u\u003e, 部品名, \u003cs\u003eメーカコード\u003c/s\u003e)\nメーカ(\u003cu\u003eメーカコード\u003c/u\u003e, メーカ名, 住所)",
     "options": [
       {
         "id": "a",
-        "text": "メーカコードの値が1001以外の部品を検索する。"
+        "text": "メーカコードの値が 1001 以外の部品を検索する。"
       },
       {
         "id": "b",
-        "text": "メーカコードの値が1001でも4001でもない部品を検索する。"
+        "text": "メーカコードの値が 1001 でも 4001 でもない部品を検索する。"
       },
       {
         "id": "c",
-        "text": "メーカコードの値が4001以上,4003以下の部品を検索する。"
+        "text": "メーカコードの値が 4001 以上, 4003 以下の部品を検索する。"
       },
       {
         "id": "d",
-        "text": "メーカコードの値がNULL 以外の部品を検索する。"
+        "text": "メーカコードの値が NULL 以外の部品を検索する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 29,
-    "text": "トランザクションAとBが、共通の資源であるテーブルaとbを表に示すように更新するとき、デッドロックとなるのはどの時点か。ここで、表中の①~⑧は処理の実行順序を示す。また、ロックはテーブルの更新直前にテーブル単位で行い, アンロックはトランザクション終了時に行うものとする。\n[表参照]",
+    "text": "トランザクション A と B が、共通の資源であるテーブル a と b を表に示すように更新するとき、デッドロックとなるのはどの時点か。ここで、表中の①~⑧は処理の実行順序を示す。また、ロックはテーブルの更新直前にテーブル単位で行い, アンロックはトランザクション終了時に行うものとする。\n\n| 時間 | トランザクション A | トランザクション B |\n|---|---|---|\n| ① | トランザクション開始 | |\n| ② | | トランザクション開始 |\n| ③ | テーブル a 更新 (Lock a) | |\n| ④ | | テーブル b 更新 (Lock b) |\n| ⑤ | テーブル b 更新 (Try Lock b) | |\n| ⑥ | | テーブル a 更新 (Try Lock a) |\n| ⑦ | トランザクション終了 (Unlock a, b) | |\n| ⑧ | | トランザクション終了 (Unlock a, b) |",
     "options": [
       {
         "id": "a",
@@ -720,9 +664,7 @@
         "text": "⑥"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 30,
@@ -745,9 +687,7 @@
         "text": "データを複数のサーバに複製し,性能と可用性を向上させること"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 31,
@@ -763,16 +703,14 @@
       },
       {
         "id": "c",
-        "text": "データ送受信の開始時にデータ送受信のネゴシエーションとして RTS/CTS 方式を用い、受信の確認はACK を使用する。"
+        "text": "データ送受信の開始時にデータ送受信のネゴシエーションとして RTS/CTS 方式を用い、受信の確認は ACK を使用する。"
       },
       {
         "id": "d",
         "text": "伝送路上にトークンを巡回させ、トークンを受け取った端末だけがデータを送信できる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 32,
@@ -795,9 +733,7 @@
         "text": "SNMP"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 33,
@@ -820,9 +756,7 @@
         "text": "UDP"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 34,
@@ -845,9 +779,7 @@
         "text": "ルータやスイッチの機器内部で動作するソフトウェアを、オープンソースソフトウェア(OSS)で実現する方式"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 35,
@@ -855,7 +787,7 @@
     "options": [
       {
         "id": "a",
-        "text": "1台のブロードバンドルータに接続する PCの数が多過ぎることによって、インターネットへのアクセスが遅くなること"
+        "text": "1台のブロードバンドルータに接続する PC の数が多過ぎることによって、インターネットへのアクセスが遅くなること"
       },
       {
         "id": "b",
@@ -863,16 +795,14 @@
       },
       {
         "id": "c",
-        "text": "イーサネットフレームの宛先MACアドレスがFF-FF-FF-FF-FF-FFで送信され, LANに接続した全てのPCが受信してしまうこと"
+        "text": "イーサネットフレームの宛先 MAC アドレスが FF-FF-FF-FF-FF-FF で送信され, LAN に接続した全ての PC が受信してしまうこと"
       },
       {
         "id": "d",
         "text": "ネットワークスイッチ間にループとなる経路ができることによって、特定のイーサネットフレームが大量に複製されて、通信が極端に遅くなったり通信できなくなったりすること"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 36,
@@ -895,13 +825,11 @@
         "text": "インターネットにアクセスする組織内の利用者 PC について、外部からの不正アクセスを困難にすることができる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 37,
-    "text": "A社の Web サーバは、サーバ証明書を使って TLS 通信を行っている。PCから A社の Web サーバへのTLSを用いたアクセスにおいて、当該 PC がサーバ証明書を入手した後に、認証局の公開鍵を利用して行う動作はどれか。",
+    "text": "A社の Web サーバは、サーバ証明書を使って TLS 通信を行っている。PCから A社の Web サーバへの TLS を用いたアクセスにおいて、当該 PC がサーバ証明書を入手した後に、認証局の公開鍵を利用して行う動作はどれか。",
     "options": [
       {
         "id": "a",
@@ -920,9 +848,7 @@
         "text": "利用者が入力して送付する秘匿データを、認証局の公開鍵を使って暗号化する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 38,
@@ -945,17 +871,15 @@
         "text": "公開鍵暗号方式では、署名に用いる鍵を公開しておく必要がある。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 39,
-    "text": "経済産業省と IPA が策定した“サイバーセキュリティ経営ガイドライン (Ver1.1)”の説明はどれか。",
+    "text": "経済産業省と IPA が策定した “サイバーセキュリティ経営ガイドライン (Ver1.1)” の説明はどれか。",
     "options": [
       {
         "id": "a",
-        "text": "企業が IT活用を推進していく中で、サイバー攻撃から企業を守る観点で経営者が認識すべき 3原則と、情報セキュリティ対策を実施する上での責任者となる担当幹部に、経営者が指示すべき事項をまとめたもの"
+        "text": "企業が IT 活用を推進していく中で、サイバー攻撃から企業を守る観点で経営者が認識すべき 3 原則と、情報セキュリティ対策を実施する上での責任者となる担当幹部に、経営者が指示すべき事項をまとめたもの"
       },
       {
         "id": "b",
@@ -963,16 +887,14 @@
       },
       {
         "id": "c",
-        "text": "事業体のITに関する経営者の活動を大きくIT ガバナンス(統制)とITマネジメント(管理)に分割し、具体的な目標と工程として37のプロセスを定義したもの"
+        "text": "事業体の IT に関する経営者の活動を大きく IT ガバナンス(統制)と IT マネジメント(管理)に分割し、具体的な目標と工程として 37 のプロセスを定義したもの"
       },
       {
         "id": "d",
         "text": "世界的規模で生じているサイバーセキュリティ上の脅威に関して、企業の経営者を支援する施策を総合的かつ効果的に推進するための国の責務を定めたもの"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 40,
@@ -995,9 +917,7 @@
         "text": "ミニブログのメッセージにおいて、ドメイン名を短縮してリンク先の URL を分かりにくくすることによって、攻撃コードを埋め込んだ Web サイトに標的組織の従業員を誘導する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 41,
@@ -1017,12 +937,10 @@
       },
       {
         "id": "d",
-        "text": "再帰的な問合せを行う際のトランザクションIDを固定する。"
+        "text": "再帰的な問合せを行う際のトランザクション ID を固定する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 42,
@@ -1045,14 +963,12 @@
         "text": "アクセスポイントは、利用者ごとに付与された SSID を確認し,無線LAN へのアクセス権限を識別する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 43,
-    "text": "図のような構成と通信サービスのシステムにおいて, Web アプリケーションの脆弱性対策のためのWAFの設置場所として、最も適切な箇所はどこか。ここで、WAFには通信を暗号化したり、復号したりする機能はないものとする。\n[図参照]",
-    "options": [
+    "text": "図のような構成と通信サービスのシステムにおいて, Web アプリケーションの脆弱性対策のための WAF の設置場所として、最も適切な箇所はどこか。ここで、WAF には通信を暗号化したり、復号したりする機能はないものとする。\n\n```mermaid\ngraph TD\n    subgraph Client\n        PC1[PC]\n        PC2[PC]\n        PC3[PC]\n    end\n    Client --> Internet[インターネット]\n    Internet --> a(HTTPS a)\n    a --> Firewall[ファイアウォール]\n    Firewall --> b(HTTPS b)\n    b --> SSL_Accel[SSLアクセラレータ]\n    SSL_Accel --> c(HTTP c)\n    c --> WebServer[Webサーバ]\n    WebServer --> d[データベースアクセス用サービス d]\n    d --> DBServer[データベースサーバ]\n```",
+    ""options"": [
       {
         "id": "a",
         "text": "a"
@@ -1070,9 +986,7 @@
         "text": "d"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 44,
@@ -1080,53 +994,49 @@
     "options": [
       {
         "id": "a",
-        "text": "HTTPSを使った SQL インジェクション攻撃を受けると、 Web アプリケーションでデータベースへの不正な入力をチェックできないので、悪意のある SQL が実行されてしまう。"
+        "text": "HTTPS を使った SQL インジェクション攻撃を受けると、Web アプリケーションでデータベースへの不正な入力をチェックできないので、悪意のある SQL が実行されてしまう。"
       },
       {
         "id": "b",
-        "text": "HTTPSを使ったクロスサイトスクリプティング攻撃を受けると、Web ブラウザでプログラムやスクリプトを実行しない設定にしても実行を禁止できなくなるので、悪意のある Web サイトからダウンロードされたプログラムやスクリプトが実行されてしまう。"
+        "text": "HTTPS を使ったクロスサイトスクリプティング攻撃を受けると、Web ブラウザでプログラムやスクリプトを実行しない設定にしても実行を禁止できなくなるので、悪意のある Web サイトからダウンロードされたプログラムやスクリプトが実行されてしまう。"
       },
       {
         "id": "c",
-        "text": "HTTPS を使ったブルートフォース攻撃を受けると、ログイン試行のチェックができないので、 Web アプリケーションでアカウントロックなどの対策が実行できなくなってしまう。"
+        "text": "HTTPS を使ったブルートフォース攻撃を受けると、ログイン試行のチェックができないので、Web アプリケーションでアカウントロックなどの対策が実行できなくなってしまう。"
       },
       {
         "id": "d",
         "text": "攻撃者が社内ネットワークに仕掛けたマルウェアによって HTTPS が使われると、通信内容がチェックできないので、秘密情報が社外に送信されてしまう。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 45,
-    "text": "VPNで使用されるセキュアなプロトコルである IPsec, L2TP, TLSの、OSI 基本参照モデルにおける相対的な位置関係はどれか。\n[表参照]",
+    "text": "VPN で使用されるセキュアなプロトコルである IPsec, L2TP, TLS の、OSI 基本参照モデルにおける相対的な位置関係はどれか。\n\n| OSI基本参照モデル | A | B | C | D |\n|---|---|---|---|---|\n| 上位層 (アプリケーション層) | IPsec | IPsec | TLS | TLS |\n| | L2TP | TLS | IPsec | L2TP |\n| 下位層 (物理層) | TLS | L2TP | L2TP | IPsec |",
     "options": [
       {
         "id": "a",
-        "text": "A (上位層: IPsec, 中位層: L2TP, 下位層: TLS)"
+        "text": "A"
       },
       {
         "id": "b",
-        "text": "B (上位層: IPsec, 中位層: TLS, 下位層: L2TP)"
+        "text": "B"
       },
       {
         "id": "c",
-        "text": "C (上位層: TLS, 中位層: IPsec, 下位層: L2TP)"
+        "text": "C"
       },
       {
         "id": "d",
-        "text": "D (上位層: TLS, 中位層: L2TP, 下位層: IPsec)"
+        "text": "D"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 46,
-    "text": "組込み機器のソフトウェア開発にプラットフォーム開発を適用する利点として、適切なものはどれか。",
+    "text": "組込み機器のソフトウェア開発にプラットフォーム開発を適用する利点として,適切なものはどれか。",
     "options": [
       {
         "id": "a",
@@ -1145,63 +1055,57 @@
         "text": "複数の機器に共通のバグが発生したとき、ソフトウェアのプラットフォーム部分をバグの原因から除外できる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 47,
-    "text": "汎化の適切な例はどれか。\n[図参照]",
+    "text": "汎化の適切な例はどれか。\n\nア:\n```mermaid\nclassDiagram\n  哺乳類 <|-- 人\n  哺乳類 <|-- 犬\n  哺乳類 <|-- 猫\n```\nイ:\n```mermaid\nclassDiagram\n  自動車 o-- アクセル\n  自動車 o-- ブレーキ\n  自動車 o-- ハンドル\n```\nウ:\n```mermaid\nclassDiagram\n  商品 -- 受注\n  商品 -- 在庫\n  商品 -- 出荷\n```\nエ:\n```mermaid\nclassDiagram\n  class 取引先{\n    会社名\n    住所\n    電話番号\n  }\n```",
     "options": [
       {
         "id": "a",
-        "text": "ア [図参照: 哺乳類 -> 人, 犬, 猫]"
+        "text": "アの図"
       },
       {
         "id": "b",
-        "text": "イ [図参照: 自動車 -> アクセル, ブレーキ, ハンドル]"
+        "text": "イの図"
       },
       {
         "id": "c",
-        "text": "ウ [図参照: 商品 -> 受注, 在庫, 出荷]"
+        "text": "ウの図"
       },
       {
         "id": "d",
-        "text": "エ [図参照: 取引先 -> 会社名, 住所, 電話番号]"
+        "text": "エの図"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 48,
-    "text": "流れ図において、分岐網羅を満たし、かつ、条件網羅を満たすテストデータの組みはどれか。\n[流れ図とテストデータ表参照]",
+    "text": "流れ図において、分岐網羅を満たし、かつ、条件網羅を満たすテストデータの組みはどれか。\n\n**フローチャート:**\n```mermaid\nflowchart TD\n    A[a←0\\nb←0] --> B{x≥1 or y=1}\n    B -- Yes --> C[a←1]\n    B -- No --> D{y>1}\n    C --> D\n    D -- Yes --> E[b←1]\n    D -- No --> F([End])\n    E --> F\n```\n\n**テストデータ:**\n| | x | y |\n|---|---|---|\n| ア | 2, 1, 1 | 2, 2, 2 |\n| イ | 0, 1 | 0, 2 |\n| ウ | 1, 1, 0 | 2, 1, 1 |\n| エ | 1, 0, 0 | 2, 1, 2 |",
     "options": [
       {
         "id": "a",
-        "text": "(x=2, y=2), (x=1, y=2), (x=1, y=2)"
+        "text": "アのテストデータ"
       },
       {
         "id": "b",
-        "text": "(x=1, y=2), (x=0, y=0), (x=1, y=2)"
+        "text": "イのテストデータ"
       },
       {
         "id": "c",
-        "text": "(x=1, y=2), (x=1, y=1), (x=0, y=1)"
+        "text": "ウのテストデータ"
       },
       {
         "id": "d",
-        "text": "(x=1, y=2), (x=0, y=1), (x=0, y=2)"
+        "text": "エのテストデータ"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 49,
-    "text": "アジャイル開発で“イテレーション”を行う目的のうち、適切なものはどれか。",
+    "text": "アジャイル開発で “イテレーション” を行う目的のうち、適切なものはどれか。",
     "options": [
       {
         "id": "a",
@@ -1220,9 +1124,7 @@
         "text": "毎日決めた時刻にチームメンバが集まって開発の状況を共有し,問題が拡大したり、状況が悪化したりするのを避ける。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 50,
@@ -1230,28 +1132,26 @@
     "options": [
       {
         "id": "a",
-        "text": "出願日から25年を超えた特許Aと同じ技術を新たに事業化する場合"
+        "text": "出願日から 25 年を超えた特許 A と同じ技術を新たに事業化する場合"
       },
       {
         "id": "b",
-        "text": "特許Aの出願日よりも前から特許Aと同じ技術を独自に開発して、特許Aの出願日に日本国内でその技術を用いた製品を製造し、市場で販売していたことが証明できる場合"
+        "text": "特許 A の出願日よりも前から特許 A と同じ技術を独自に開発して、特許 A の出願日に日本国内でその技術を用いた製品を製造し、市場で販売していたことが証明できる場合"
       },
       {
         "id": "c",
-        "text": "特許Aを家庭内で個人的に利用するだけの場合"
+        "text": "特許 A を家庭内で個人的に利用するだけの場合"
       },
       {
         "id": "d",
-        "text": "日本国内で製造し、米国に輸出する製品に特許Aを利用する場合"
+        "text": "日本国内で製造し、米国に輸出する製品に特許 A を利用する場合"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 51,
-    "text": "期間 10日間のプロジェクトを、5日目の終了時にアーンドバリュー分析したところ、表のとおりであった。現在のコスト効率が今後も続く場合,完成時総コスト見積り (EAC)は何万円か。\n[表参照]",
+    "text": "期間 10 日間のプロジェクトを、5 日目の終了時にアーンドバリュー分析したところ、表のとおりであった。現在のコスト効率が今後も続く場合,完成時総コスト見積り (EAC) は何万円か。\n\n| 管理項目 | 金額 (万円) |\n|---|---|\n| 完成時総予算(BAC) | 100 |\n| プランドバリュー(PV) | 50 |\n| アーンドバリュー(EV) | 40 |\n| 実コスト(AC) | 60 |",
     "options": [
       {
         "id": "a",
@@ -1270,38 +1170,34 @@
         "text": "150"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 52,
-    "text": "図のアローダイアグラムから読み取ったことのうち、適切なものはどれか。ここで、プロジェクトの開始日は0日目とする。\n[図参照]",
+    "text": "図のアローダイアグラムから読み取ったことのうち、適切なものはどれか。ここで、プロジェクトの開始日は 0 日目とする。\n\n```mermaid\ngraph TD\n    subgraph Critical Path Network\n        N0(Start) --> |A 5| N1\n        N0 --> |B 10| N2\n        N1 --> |C 20| N3\n        N1 --> |D 30| N3\n        N1 --> |E 10| N4\n        N2 -.-> N3(Dummy 0)\n        N2 --> |F 10| N4\n        N3 --> |G 20| N5\n        N4 --> |H 10| N5(End)\n    end\n    style N0 fill:#fff\n    style N5 fill:#fff\n```",
     "options": [
       {
         "id": "a",
-        "text": "作業Cを最も早く開始できるのは5日目である。"
+        "text": "作業 C を最も早く開始できるのは 5 日目である。"
       },
       {
         "id": "b",
-        "text": "作業Dはクリティカルパス上の作業である。"
+        "text": "作業 D はクリティカルパス上の作業である。"
       },
       {
         "id": "c",
-        "text": "作業Eの余裕日数は30日である。"
+        "text": "作業 E の余裕日数は 30 日である。"
       },
       {
         "id": "d",
-        "text": "作業Fを最も遅く開始できるのは10日目である。"
+        "text": "作業 F を最も遅く開始できるのは 10 日目である。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 53,
-    "text": "PMBOK ガイド 第5版によれば、定量的リスク分析で実施することはどれか。",
+    "text": "PMBOK ガイド 第 5 版によれば、定量的リスク分析で実施することはどれか。",
     "options": [
       {
         "id": "a",
@@ -1320,13 +1216,11 @@
         "text": "プロジェクトに影響を与える可能性があるリスクを洗い出す。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 54,
-    "text": "PMBOK ガイド第5版における、マイナスのリスクに対する戦略として用いられる“リスク転嫁”の説明はどれか。",
+    "text": "PMBOK ガイド第 5 版における、マイナスのリスクに対する戦略として用いられる “リスク転嫁” の説明はどれか。",
     "options": [
       {
         "id": "a",
@@ -1345,13 +1239,11 @@
         "text": "リスクへの具体的な対応策は事前に設定せず、リスクが発生した時点で対処する。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 55,
-    "text": "ITIL 2011 edition の可用性管理プロセスにおいて, IT サービスの可用性と信頼性の管理に関わる KPIとして用いるものはどれか。",
+    "text": "ITIL 2011 edition の可用性管理プロセスにおいて, IT サービスの可用性と信頼性の管理に関わる KPI として用いるものはどれか。",
     "options": [
       {
         "id": "a",
@@ -1367,16 +1259,14 @@
       },
       {
         "id": "d",
-        "text": "目標を達成できなかったSLAの項目数"
+        "text": "目標を達成できなかった SLA の項目数"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 56,
-    "text": "新システムの開発を計画している。提案された4案の中で,TCO(総所有費用)が最小のものはどれか。ここで、このシステムは開発後、3年間使用されるものとする。\n[表参照]",
+    "text": "新システムの開発を計画している。提案された 4 案の中で, TCO(総所有費用)が最小のものはどれか。ここで、このシステムは開発後、3 年間使用されるものとする。\n\n**費用テーブル (単位: 百万円):**\n| | A案 | B案 | C案 | D案 |\n|---|---|---|---|---|\n| ハードウェア導入費用 | 30 | 30 | 40 | 40 |\n| システム開発費用 | 30 | 50 | 30 | 40 |\n| 導入教育費用 | 5 | 5 | 5 | 5 |\n| ネットワーク通信費用/年 | 20 | 20 | 15 | 15 |\n| 保守費用/年 | 6 | 5 | 5 | 5 |\n| システム運用費用/年 | 6 | 4 | 6 | 4 |",
     "options": [
       {
         "id": "a",
@@ -1395,13 +1285,11 @@
         "text": "D案"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 57,
-    "text": "ITサービスマネジメントにおける問題管理プロセスの活動はどれか。",
+    "text": "IT サービスマネジメントにおける問題管理プロセスの活動はどれか。",
     "options": [
       {
         "id": "a",
@@ -1420,9 +1308,7 @@
         "text": "リリースの試験"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 58,
@@ -1445,9 +1331,7 @@
         "text": "調査結果に事実誤認がないことを被監査部門に確認した上で、監査人が改善の必要があると判断した事項を記載する。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 59,
@@ -1470,9 +1354,7 @@
         "text": "並行シミュレーション法を用いて,受注伝票を処理するプログラムの論理の正確性を確かめる。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 60,
@@ -1495,9 +1377,7 @@
         "text": "ファイル,データ内容の改ざん"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 61,
@@ -1520,9 +1400,7 @@
         "text": "ROI"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 62,
@@ -1545,9 +1423,7 @@
         "text": "リスクを最小化するように支援する専門組織を設けることによって、組織全体のプロジェクトマネジメントの能力と品質の向上を図る。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 63,
@@ -1555,24 +1431,22 @@
     "options": [
       {
         "id": "a",
-        "text": "売上高営業利益率を前年比5%アップとする。"
+        "text": "売上高営業利益率を前年比 5%アップとする。"
       },
       {
         "id": "b",
-        "text": "顧客クレーム件数を1か月当たり20件以内とする。"
+        "text": "顧客クレーム件数を 1 か月当たり 20 件以内とする。"
       },
       {
         "id": "c",
-        "text": "新システムの利用者研修会の受講率を100%とする。"
+        "text": "新システムの利用者研修会の受講率を 100%とする。"
       },
       {
         "id": "d",
-        "text": "注文受付から製品出荷までの日数を3日短縮とする。"
+        "text": "注文受付から製品出荷までの日数を 3 日短縮とする。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 64,
@@ -1595,13 +1469,11 @@
         "text": "ユースケース図"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 65,
-    "text": "組込みシステム開発において、製品に搭載する LSI を新規に開発したい。LSI設計を自社で行い, LSI 製造を外部に委託する場合の委託先として、適切なものはどれか。",
+    "text": "組込みシステム開発において、製品に搭載する LSI を新規に開発したい。LSI 設計を自社で行い, LSI 製造を外部に委託する場合の委託先として、適切なものはどれか。",
     "options": [
       {
         "id": "a",
@@ -1620,9 +1492,7 @@
         "text": "ファブレスメーカ"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 66,
@@ -1645,13 +1515,11 @@
         "text": "電機メーカによる不動産会社の買収・合併"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 67,
-    "text": "SCMの目的はどれか。",
+    "text": "SCM の目的はどれか。",
     "options": [
       {
         "id": "a",
@@ -1670,13 +1538,11 @@
         "text": "複数の企業や組織にまたがる調達から販売までの業務プロセス全ての情報を統合的に管理することによって,コスト低減や納期短縮などを目的とする。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 68,
-    "text": "事業戦略のうち,浸透価格戦略に該当するものはどれか。",
+    "text": "事業戦略のうち, 浸透価格戦略に該当するものはどれか。",
     "options": [
       {
         "id": "a",
@@ -1695,13 +1561,11 @@
         "text": "低価格戦略と積極的なプロモーションによって、新製品のマーケットシェアの増大を図る。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 69,
-    "text": "他の技法では答えが得られにくい、未来予測のような問題に多く用いられ、(1)~(3)の手順に従って行われる予測技法はどれか。\n(1) 複数の専門家を回答者として選定する。\n(2) 質問に対する回答結果を集約してフィードバックし、再度質問を行う。\n(3) 回答結果を統計的に処理し、分布とともに回答結果を示す。",
+    "text": "他の技法では答えが得られにくい、未来予測のような問題に多く用いられ、(1)~(3)の手順に従って行われる予測技法はどれか。\n\n(1) 複数の専門家を回答者として選定する。\n(2) 質問に対する回答結果を集約してフィードバックし、再度質問を行う。\n(3) 回答結果を統計的に処理し、分布とともに回答結果を示す。",
     "options": [
       {
         "id": "a",
@@ -1720,9 +1584,7 @@
         "text": "デルファイ法"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 70,
@@ -1742,12 +1604,10 @@
       },
       {
         "id": "d",
-        "text": "部品の組立てから完成検査まで、ほとんどの工程を1人又は数人で作業する。"
+        "text": "部品の組立てから完成検査まで、ほとんどの工程を 1 人又は数人で作業する。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 71,
@@ -1770,9 +1630,7 @@
         "text": "決済を仲介し、落札者から送金を受け、商品の受渡し完了後に出品者へ送金を行う仕組みのこと"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 72,
@@ -1784,7 +1642,7 @@
       },
       {
         "id": "b",
-        "text": "サービス運営会社が発行する広告タグを埋め込んだ Web サイトを訪れた利用者に対して、そのWebサイトのコンテンツに関連した広告を自動的に表示する。"
+        "text": "サービス運営会社が発行する広告タグを埋め込んだ Web サイトを訪れた利用者に対して、その Web サイトのコンテンツに関連した広告を自動的に表示する。"
       },
       {
         "id": "c",
@@ -1795,9 +1653,7 @@
         "text": "利用者の Web サイトの検索履歴、アクセスしたページや購買履歴から利用者の興味・関心を解析し、関連した広告を利用者が見ている Web サイトに表示する。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 73,
@@ -1820,9 +1676,7 @@
         "text": "取引をしている下請企業"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 74,
@@ -1834,7 +1688,7 @@
       },
       {
         "id": "b",
-        "text": "従業員1人当たりの労働時間を短縮したり仕事の配分方法を見直したりするなど、労働者間で労働を分かち合うことで雇用維持・創出を図る。"
+        "text": "従業員 1 人当たりの労働時間を短縮したり仕事の配分方法を見直したりするなど、労働者間で労働を分かち合うことで雇用維持・創出を図る。"
       },
       {
         "id": "c",
@@ -1845,9 +1699,7 @@
         "text": "能力主義と実績主義の徹底,経営参加意識の醸成,業績向上へのインセンティブなどを目的に、職務と能力,業績を基準に報酬を決める。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 75,
@@ -1870,13 +1722,11 @@
         "text": "発注量には経済的発注量を用いると効果的である。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 76,
-    "text": "いずれも時価100円の株式A~Dのうち、一つの株式に投資したい。経済の成長を高,中,低の三つに区分したときのそれぞれの株式の予想値上がり幅は、表のとおりである。マクシミン原理に従うとき、どの株式に投資することになるか。\n[表参照]",
+    "text": "いずれも時価 100 円の株式 A~D のうち、一つの株式に投資したい。経済の成長を高,中,低の三つに区分したときのそれぞれの株式の予想値上がり幅は、表のとおりである。マクシミン原理に従うとき、どの株式に投資することになるか。\n\n| 株式 | 高 | 中 | 低 |\n|---|---|---|---|\n| A | 20 | 10 | 15 |\n| B | 25 | 5 | 20 |\n| C | 30 | 20 | 5 |\n| D | 40 | 10 | -10 |",
     "options": [
       {
         "id": "a",
@@ -1895,9 +1745,7 @@
         "text": "D"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 77,
@@ -1920,9 +1768,7 @@
         "text": "変動費率が変わらないとき,固定費が小さくなると損益分岐点は高くなる。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 78,
@@ -1945,9 +1791,7 @@
         "text": "特定の分野ごとに Web ページの URL を収集し、独自の解釈を付けたリンク集は、著作権法で保護され得る。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 79,
@@ -1970,9 +1814,7 @@
         "text": "プロバイダ責任制限法"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 80,
@@ -1988,15 +1830,13 @@
       },
       {
         "id": "c",
-        "text": "指揮命令権は発注者になく、発注者の事業所での作業を実施可能にするために、受注者に所属する作業者は、新たな雇用契約を発注者と結ぶ。"
+        "text": "指揮命令権は発注者にないが、発注者の事業所での作業を実施可能にするために、受注者に所属する作業者は、新たな雇用契約を発注者と結ぶ。"
       },
       {
         "id": "d",
         "text": "指揮命令権は発注者になく、受注者に所属する作業者は、新たな雇用契約を発注者と結ぶことなく、発注者の事業所で作業を実施する。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   }
 ]

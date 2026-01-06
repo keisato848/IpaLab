@@ -454,6 +454,36 @@
     /* For popup positioning */
 }
 
+.bookmarkBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.bookmarkBtn:hover {
+    background: var(--bg-primary);
+    border-color: var(--border-color);
+}
+
+.bookmarkBtn.active {
+    color: #f59e0b;
+    /* Amber-500 */
+    font-weight: 600;
+}
+
+.bookmarkBtn svg {
+    font-size: 1.1rem;
+}
+
 .statsContainer {
     display: flex;
     align-items: center;

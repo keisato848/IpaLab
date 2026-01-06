@@ -20,13 +20,11 @@
         "text": "物質の結晶ができる物理現象を模倣した方法であり、温度に見立てたパラメタを制御して,大ざっぱな解の候補から厳密な解の候補に変化させる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 2,
-    "text": "表は、文字A~Eを符号化したときのビット表記と,それぞれの文字の出現確率を表したものである。1文字当たりの平均ビット数は幾らか。[表参照]",
+    "text": "表は、文字A~Eを符号化したときのビット表記と,それぞれの文字の出現確率を表したものである。1文字当たりの平均ビット数は幾らか。\n\n| 文字 | ビット表記 | 出現確率(%) |\n|---|---|---|\n| A | 0 | 50 |\n| B | 10 | 30 |\n| C | 110 | 10 |\n| D | 1110 | 5 |\n| E | 1111 | 5 |",
     "options": [
       {
         "id": "a",
@@ -45,13 +43,11 @@
         "text": "2.8"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 3,
-    "text": "ハミング符号とは、データに冗長ビットを付加して,1ビットの誤りを訂正できるようにしたものである。ここでは、X1, X2, X3, X4の4ビットから成るデータに、3ビットの冗長ビット P3, P2, P₁を付加したハミング符号 X1 X2 X3 P3 X4 P2 P1を考える。付加したビット P1, P2, P3は、それぞれ X1 ⊕ X3 ⊕ X4 ⊕ P1 = 0, X1 ⊕ X2 ⊕ X4 ⊕ P2 = 0, X1 ⊕ X2 ⊕ X3 ⊕ P3 = 0 となるように決める。ここで、⊕は排他的論理和を表す。ハミング符号 1110011 には1ビットの誤りが存在する。誤りビットを訂正したハミング符号はどれか。",
+    "text": "ハミング符号とは、データに冗長ビットを付加して,1ビットの誤りを訂正できるようにしたものである。ここでは、X1, X2, X3, X4の4ビットから成るデータに、3ビットの冗長ビット P3, P2, P₁を付加したハミング符号 X1 X2 X3 P3 X4 P2 P1を考える。付加したビット P1, P2, P3は、それぞれ $X_1 \oplus X_3 \oplus X_4 \oplus P_1 = 0$, $X_1 \oplus X_2 \oplus X_4 \oplus P_2 = 0$, $X_1 \oplus X_2 \oplus X_3 \oplus P_3 = 0$となるように決める。ここで、$\oplus$は排他的論理和を表す。ハミング符号 1110011 には1ビットの誤りが存在する。誤りビットを訂正したハミング符号はどれか。",
     "options": [
       {
         "id": "a",
@@ -70,9 +66,7 @@
         "text": "1110111"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 4,
@@ -95,13 +89,11 @@
         "text": "640"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 5,
-    "text": "非負の整数m, nに対して次のとおりに定義された関数 Ack (m, n)がある。Ack (1, 3)の値はどれか。\nAck (m, n) = {\n  Ack (m-1, Ack (m, n-1)) (m>0かつn>0のとき)\n  Ack (m-1, 1) (m>0かつn=0のとき)\n  n+1 (m=0のとき)\n}",
+    "text": "非負の整数m, nに対して次のとおりに定義された関数 Ack (m, n)がある。Ack (1,3)の値はどれか。\n$$ Ack(m, n) = \\begin{cases} Ack(m-1, Ack(m, n-1)) & (m>0 \\text{ かつ } n>0 \\text{ のとき}) \\\\ Ack(m-1, 1) & (m>0 \\text{ かつ } n=0 \\text{ のとき}) \\\\ n+1 & (m=0 \\text{ のとき}) \\end{cases} $$",
     "options": [
       {
         "id": "a",
@@ -120,21 +112,19 @@
         "text": "6"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 6,
-    "text": "異なるn個のデータが昇順に整列された表がある。この表をm個のデータごとのブロックに分割し,各ブロックの最後尾のデータだけを線形探索することによって、目的のデータの存在するブロックを探し出す。次に、当該ブロック内を線形探索して目的のデータを探し出す。このときの平均比較回数を表す式はどれか。ここで、m は十分に大きく,nはmの倍数とし、目的のデータは必ず表の中に存在するものとする。",
+    "text": "異なるn個のデータが昇順に整列された表がある。この表をm個のデータごとのブロックに分割し,各ブロックの最後尾のデータだけを線形探索することによって、目的のデータの存在するブロックを探し出す。次に、当該ブロック内を線形探索して目的のデータを探し出す。このときの平均比較回数を表す式はどれか。ここで、mは十分に大きく,nはmの倍数とし、目的のデータは必ず表の中に存在するものとする。",
     "options": [
       {
         "id": "a",
-        "text": "$m+\\frac{n}{m}$"
+        "text": "$m + \\frac{n}{m}$"
       },
       {
         "id": "b",
-        "text": "$\\frac{m}{2}+\\frac{n}{2m}$"
+        "text": "$\\frac{m}{2} + \\frac{n}{2m}$"
       },
       {
         "id": "c",
@@ -145,9 +135,7 @@
         "text": "$\\frac{n}{2m}$"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 7,
@@ -170,9 +158,7 @@
         "text": "汎化"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 8,
@@ -195,9 +181,7 @@
         "text": "LRU"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 9,
@@ -220,9 +204,7 @@
         "text": "VLIW"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 10,
@@ -245,9 +227,7 @@
         "text": "ページ単位で書込み及び読出しを行う。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 11,
@@ -270,9 +250,7 @@
         "text": "主記憶を複数のバンクに分けて, CPU からのアクセス要求を並列的に処理できるようにする。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 12,
@@ -284,7 +262,7 @@
       },
       {
         "id": "b",
-        "text": "Wireless USB に対応している。"
+        "text": "Wireless USBに対応している。"
       },
       {
         "id": "c",
@@ -295,13 +273,11 @@
         "text": "ピン数が9本に増えたので, USB 2.0 のケーブルは挿すことができない。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 13,
-    "text": "PC をシンクライアント端末として利用する際の特徴として、適切なものはどれか。",
+    "text": "PCをシンクライアント端末として利用する際の特徴として、適切なものはどれか。",
     "options": [
       {
         "id": "a",
@@ -320,9 +296,7 @@
         "text": "必要なアプリケーションをクライアント端末にインストールしているので、サーバに接続できない環境でも、アプリケーションを利用することができる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 14,
@@ -345,9 +319,7 @@
         "text": "サーバのメモリを増設することによって、単位時間当たりの処理能力を向上させること"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 15,
@@ -370,13 +342,11 @@
         "text": "利用者が決められた順序でしか入力できないようにするなどして、単純なミスが起こらないようにする。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 16,
-    "text": "4種類の装置で構成される次のシステムの稼働率は、およそ幾らか。ここで、アプリケーションサーバとデータベースサーバの稼働率は 0.8 であり、それぞれのサーバのどちらかが稼働していればシステムとして稼働する。また、負荷分散装置と磁気ディスク装置は、故障しないものとする。[図参照]",
+    "text": "4種類の装置で構成される次のシステムの稼働率は、およそ幾らか。ここで、アプリケーションサーバとデータベースサーバの稼働率は 0.8 であり、それぞれのサーバのどちらかが稼働していればシステムとして稼働する。また、負荷分散装置と磁気ディスク装置は、故障しないものとする。",
     "options": [
       {
         "id": "a",
@@ -396,12 +366,11 @@
       }
     ],
     "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "figure": "```mermaid\ngraph TD\n    A[負荷分散装置]\n    F[磁気ディスク装置]\n\n    subgraph Stack 1 (AS1 + DB1)\n        AS1[アプリケーションサーバ]\n        DB1[データベースサーバ]\n        AS1 --> DB1\n    end\n\n    subgraph Stack 2 (AS2 + DB2)\n        AS2[アプリケーションサーバ]\n        DB2[データベースサーバ]\n        AS2 --> DB2\n    end\n\n    A --> AS1\n    A --> AS2\n\n    DB1 --> F\n    DB2 --> F\n```"
   },
   {
     "qNo": 17,
-    "text": "三つのタスク A~Cの優先度と各タスクを単独で実行した場合の CPU と入出力 (I/O)装置の動作順序と処理時間は、表のとおりである。優先順位方式のタスクスケジューリングを行う OS の下で、三つのタスクが同時に実行可能状態になってから、タスクCが終了するまでに、タスク Cが実行可能状態にある時間は延べ何ミリ秒か。ここで、I/O は競合せず、OS のオーバヘッドは考慮しないものとする。また, 表中の()内の数字は処理時間を示すものとする。[表参照]",
+    "text": "三つのタスク A~Cの優先度と各タスクを単独で実行した場合の CPU と入出力 (I/O)装置の動作順序と処理時間は、表のとおりである。優先順位方式のタスクスケジューリングを行う OS の下で、三つのタスクが同時に実行可能状態になってから、タスク Cが終了するまでに、タスク Cが実行可能状態にある時間は延べ何ミリ秒か。ここで、I/O は競合せず、OS のオーバヘッドは考慮しないものとする。また,表中の( )内の数字は処理時間を示すものとする。\n\n| タスク | 優先度 | 単独実行時の動作順序と処理時間 (ミリ秒) |\n|---|---|---|\n| A | 高 | CPU(2) → I/O(6) → CPU(4) |\n| B | 中 | CPU(2) → I/O(4) → CPU(2) |\n| C | 低 | CPU(2) → I/O(2) → CPU(3) |",
     "options": [
       {
         "id": "a",
@@ -420,9 +389,7 @@
         "text": "12"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 18,
@@ -445,9 +412,7 @@
         "text": "セグメンテーションを実現する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 19,
@@ -470,9 +435,7 @@
         "text": "プログラムの実行開始時には、プログラムのデータ領域とコード領域のうち,少なくとも全てのコード領域に主記憶が割り当てられる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 20,
@@ -495,38 +458,35 @@
         "text": "微小な無線チップによる人又は物の識別及び管理"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 21,
-    "text": "図の論理回路と等価な回路はどれか。[図参照]",
+    "text": "図の論理回路と等価な回路はどれか。",
     "options": [
       {
         "id": "a",
-        "text": "A, Bを入力とする排他的論理和(XOR)回路"
+        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option A\n        A(A) --> G1(\u2227) & Y(Y)\n        B(B) --> G1\n        G1:::xor_gate\n    end\n```"
       },
       {
         "id": "b",
-        "text": "A, Bを入力とする否定論理積(NAND)回路"
+        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option I\n        A(A) --> G1(\u2227) & Y(Y)\n        B(B) --> G1\n        G1:::xnor_gate\n    end\n```"
       },
       {
         "id": "c",
-        "text": "A, Bの否定を入力とする論理和(OR)回路"
+        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option U\n        A(A) --> G1(\u2227) & Y(Y)\n        B(B) --> G1\n        G1:::nor_gate\n    end\n```"
       },
       {
         "id": "d",
-        "text": "Aの否定, Bを入力とする否定論理和(NOR)回路"
+        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option E\n        A(A) --> G1(\u2227) & Y(Y)\n        B(B) --> G1\n        G1:::nand_gate\n    end\n```"
       }
     ],
     "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "figure": "```mermaid\ngraph LR\n    A[A] --> N1(NAND)\n    B[B] --> N1\n    A --> N2(NOR)\n    B --> N2\n    N1 --> O(OR)\n    N2 --> O\n    O --> Y[Y]\n    style N1 fill:#fff,stroke:#000\n    style N2 fill:#fff,stroke:#000\n    style O fill:#fff,stroke:#000\n```"
   },
   {
     "qNo": 22,
-    "text": "クロックの立上りエッジで、データを入力の最下位ビットに取り込んで上位方向ヘシフトし、ストローブの立上りエッジで値を確定する 8ビットのシリアル入力パラレル出力シフトレジスタがある。各信号の波形を観測した結果が図のとおりであるとき,確定後のシフトレジスタの値はどれか。ここで、数値は16進数で表記している。[図参照]",
+    "text": "クロックの立上りエッジで、データを入力の最下位ビットに取り込んで上位方向ヘシフトし、ストローブの立上りエッジで値を確定する 8ビットのシリアル入力パラレル出力シフトレジスタがある。各信号の波形を観測した結果が図のとおりであるとき,確定後のシフトレジスタの値はどれか。ここで、数値は16進数で表記している。\n\n(Waveform diagram showing Data, Strobe, and Clock signals over time. Data sampled at the 8 rising clock edges prior to Strobe activation is interpreted as 1, 1, 0, 0, 1, 1, 0, 1, from C1 to C8.)",
     "options": [
       {
         "id": "a",
@@ -545,13 +505,11 @@
         "text": "C6"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 23,
-    "text": "ワンチップマイコンにおける内部クロック発生器のブロック図を示す。15MHzの発振器と,内部のPLL1, PLL2及び分周器の組合せでCPUに 240 MHz, シリアル通信(SIO) に 115 kHz のクロック信号を供給する場合の分周器の値は幾らか。ここで、シリアル通信のクロック精度は±5%以内に収まればよいものとする。[図参照]",
+    "text": "ワンチップマイコンにおける内部クロック発生器のブロック図を示す。15MHz の発振器と,内部のPLL1, PLL2及び分周器の組合せでCPUに 240 MHz, シリアル通信(SIO) に 115 kHz のクロック信号を供給する場合の分周器の値は幾らか。ここで、シリアル通信のクロック精度は±5%以内に収まればよいものとする。",
     "options": [
       {
         "id": "a",
@@ -571,8 +529,7 @@
       }
     ],
     "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "figure": "```mermaid\ngraph LR\n    A[発振器 15 MHz] --> PLL1(PLL1 8逓倍)\n    PLL1 --> PLL2(PLL2 2逓倍)\n    PLL2 --> CPU[CPU 240 MHz]\n    PLL2 --> D(分周器)\n    D --> SIO[SIO 115 kHz (±5%)]\n```"
   },
   {
     "qNo": 24,
@@ -592,12 +549,10 @@
       },
       {
         "id": "d",
-        "text": "ハイパリンク先の内容が推測できるように、ハイパリンク画像の alt 属性にリンク先のURLを付記する。"
+        "text": "ハイパリンク先の内容が推測できるように、ハイパリンク画像の alt 属性にリンク先の URL を付記する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 25,
@@ -620,38 +575,35 @@
         "text": "物体を、メタボールと呼ぶ構造を使い、球体を変形させることによって得られる曲面で表現する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 26,
-    "text": "関係データベースのテーブルにレコードを1件追加したところ、インデックスとして使う、図のB+木のリーフノードCがノード C1とC2に分割された。ノード分割後の B+木構造はどれか。ここで、矢印はノードへのポインタとする。また、中間ノードAには十分な空きがあるものとする。[図参照]",
+    "text": "関係データベースのテーブルにレコードを1件追加したところ、インデックスとして使う、図のB+木のリーフノードCがノード C1とC2に分割された。ノード分割後の B+木構造はどれか。ここで、矢印はノードへのポインタとする。また、中間ノードAには十分な空きがあるものとする。",
     "options": [
       {
         "id": "a",
-        "text": "[図ア参照]"
+        "text": "```mermaid\ngraph TD\n    A[A] --> B[B]\n    A --> C1[C1]\n    A --> C2[C2]\n    A --> D[D]\n```"
       },
       {
         "id": "b",
-        "text": "[図イ参照]"
+        "text": "```mermaid\ngraph TD\n    A[A] --> B[B]\n    A --> C1[C1]\n    A --> C2[C2]\n    A --> D[D]\n```"
       },
       {
         "id": "c",
-        "text": "[図ウ参照]"
+        "text": "```mermaid\ngraph TD\n    A[A] --> B[B]\n    A --> C1[C1]\n    A --> D[D]\n    A --> C2[C2]\n```"
       },
       {
         "id": "d",
-        "text": "[図エ参照]"
+        "text": "```mermaid\ngraph TD\n    A[A] --> B[B]\n    A --> C1[C1]\n    A --> D[D]\n    C1 --> C2[C2]\n```"
       }
     ],
     "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "figure": "```mermaid\ngraph TD\n    A[A]\n    A --> B[B]\n    A --> C[C]\n    A --> D[D]\n```"
   },
   {
     "qNo": 27,
-    "text": "関係Rと関係Sに対して、関係Xを求める関係演算はどれか。[表参照]",
+    "text": "関係Rと関係Sに対して、関係Xを求める関係演算はどれか。\n\nR:\n| ID | A | B |\n|---|---|---|\n| 0001 | a | 100 |\n| 0002 | b | 200 |\n| 0003 | d | 300 |\n\nS:\n| ID | A | B |\n|---|---|---|\n| 0001 | a | 100 |\n| 0002 | a | 200 |\n\nX:\n| ID | A | B |\n|---|---|---|\n| 0001 | a | 100 |\n| 0002 | a | 200 |\n| 0002 | b | 200 |\n| 0003 | d | 300 |",
     "options": [
       {
         "id": "a",
@@ -670,34 +622,30 @@
         "text": "和"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 28,
-    "text": "SQL において、A表の主キーがB表の外部キーによって参照されている場合,各表の行を追加・削除する操作の参照制約に関する制限について、正しく整理した図はどれか。ここで,△印は操作が拒否される場合があることを表し、○印は制限なしに操作ができることを表す。[表参照]",
+    "text": "SQL において、A表の主キーがB表の外部キーによって参照されている場合,各表の行を追加・削除する操作の参照制約に関する制限について、正しく整理した図はどれか。ここで,△印は操作が拒否される場合があることを表し、○印は制限なしに操作ができることを表す。\n\n**Note**: A is Parent (PK), B is Child (FK referencing A).",
     "options": [
       {
         "id": "a",
-        "text": "A表(追加:△, 削除:△), B表(追加:△, 削除:○)"
+        "text": "| | 追加 | 削除 |\n|---|---|---|\n| A表 | O | Δ |\n| B表 | Δ | O |"
       },
       {
         "id": "b",
-        "text": "A表(追加:○, 削除:△), B表(追加:○, 削除:△)"
+        "text": "| | 追加 | 削除 |\n|---|---|---|\n| A表 | O | Δ |\n| B表 | O | Δ |"
       },
       {
         "id": "c",
-        "text": "A表(追加:○, 削除:△), B表(追加:△, 削除:○)"
+        "text": "| | 追加 | 削除 |\n|---|---|---|\n| A表 | Δ | O |\n| B表 | O | Δ |"
       },
       {
         "id": "d",
-        "text": "A表(追加:○, 削除:△), B表(追加:△, 削除:△)"
+        "text": "| | 追加 | 削除 |\n|---|---|---|\n| A表 | Δ | Δ |\n| B表 | O | O |"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 29,
@@ -720,9 +668,7 @@
         "text": "表の列に付けられたインデックスの値"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 30,
@@ -745,13 +691,11 @@
         "text": "データ項目の名称や形式など、データそのものの特性を表すメタ情報を管理するデータベース"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 31,
-    "text": "100M ビット/秒の LAN を使用し,1件のレコード長が 1,000 バイトの電文を1,000 件連続して伝送するとき,伝送時間は何秒か。ここで、LAN の伝送効率は50%とする。",
+    "text": "100M ビット/秒の LAN を使用し,1件のレコード長が 1,000 バイトの電文を 1,000 件連続して伝送するとき,伝送時間は何秒か。ここで、LAN の伝送効率は 50%とする。",
     "options": [
       {
         "id": "a",
@@ -770,9 +714,7 @@
         "text": "1.6"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 32,
@@ -795,9 +737,7 @@
         "text": "プレースとトランジションと呼ばれる2種類のノードをもつ有向グラフであり、システムの並列性や競合性の分析などに利用される。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 33,
@@ -820,9 +760,7 @@
         "text": "$3.33\\times 10^{-4}$"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 34,
@@ -845,9 +783,7 @@
         "text": "プライベートIPアドレスとグローバルIPアドレスを相互に変換する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 35,
@@ -870,9 +806,7 @@
         "text": "192.168.3.0/23"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 36,
@@ -895,9 +829,7 @@
         "text": "社内の利用者が、インターネット上の特定の Web サーバにアクセスしようとすると、本来とは異なる Web サーバに誘導される。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 37,
@@ -920,9 +852,7 @@
         "text": "パス名を推定することによって、本来は認証された後にしかアクセスが許可されないページに直接ジャンプする。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 38,
@@ -945,9 +875,7 @@
         "text": "入力文字列からアクセスするファイル名を組み立てるアプリケーションに対して、攻撃者が、上位のディレクトリを意味する文字列を入力して、非公開のファイルにアクセスする。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 39,
@@ -970,9 +898,7 @@
         "text": "ルートキットを利用して、マルウェアに感染していないように見せかけることによって、マルウェアを隠蔽する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 40,
@@ -995,9 +921,7 @@
         "text": "無線LANの盗聴"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 41,
@@ -1017,12 +941,10 @@
       },
       {
         "id": "d",
-        "text": "Web サイトからの受信データを全てIPsec でカプセル化し、PCに送信する。"
+        "text": "Web サイトからの受信データを全て IPsec でカプセル化し、PCに送信する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 42,
@@ -1045,9 +967,7 @@
         "text": "ネットワーク上を流れるパケットを収集し,そのプロトコルヘッダやデータを解析して、あらかじめ登録された攻撃パターンと一致した場合は不正アクセスと判断する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 43,
@@ -1070,9 +990,7 @@
         "text": "Web ブラウザにおいてセッションIDをディスクに格納する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 44,
@@ -1095,9 +1013,7 @@
         "text": "不特定多数のIoT機器から大量のHTTPリクエストを送り付けるDDoS攻撃"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 45,
@@ -1120,9 +1036,7 @@
         "text": "ログデータを一元的に管理し、監視者へのセキュリティイベントの通知や相関分析を行うシステム"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 46,
@@ -1145,9 +1059,7 @@
         "text": "ソフトウェア方式設計プロセス"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 47,
@@ -1170,9 +1082,7 @@
         "text": "派生開発を、変更プロセスと追加プロセスとに分けて開発を行うこと"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 48,
@@ -1195,9 +1105,7 @@
         "text": "毎日行う“朝会”"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 49,
@@ -1220,9 +1128,7 @@
         "text": "品質の向上や知識の共有を図るために、2人のプログラマがペアとなり、その場で相談したりレビューしたりしながら、一つのプログラムの開発を行う。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 50,
@@ -1245,9 +1151,7 @@
         "text": "特許で保護された技術を使っていないソフトウェアであっても、使用許諾することは可能である。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 51,
@@ -1270,9 +1174,7 @@
         "text": "割り当てたテスト担当者が期待した成果を出せなかったので、経験豊富なテスト担当者と交代した。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 52,
@@ -1288,16 +1190,14 @@
       },
       {
         "id": "c",
-        "text": "楽観値,悲観值,最可能値を使って、個々のアクティビティのコストを見積もる。"
+        "text": "楽観値,悲観値,最可能値を使って、個々のアクティビティのコストを見積もる。"
       },
       {
         "id": "d",
         "text": "類似のプロジェクトにおける過去のコスト実績を使って、プロジェクトのコストを見積もる。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 53,
@@ -1320,13 +1220,11 @@
         "text": "プロジェクトの完遂に必要な能力をもったプロジェクトチームのメンバを招集し、人的資源を得る。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 54,
-    "text": "あるソフトウェア開発部門では、開発工数 E(人月)と開発規模 L (キロ行)との関係を、E=5.2L0.98 としている。L=10としたときの生産性(キロ行/人月)は,およそ幾らか。",
+    "text": "あるソフトウェア開発部門では、開発工数 E(人月)と開発規模 L (キロ行)との関係を、$E=5.2L^{0.98}$ としている。L=10としたときの生産性(キロ行/人月)は,およそ幾らか。",
     "options": [
       {
         "id": "a",
@@ -1345,9 +1243,7 @@
         "text": "5.2"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 55,
@@ -1370,9 +1266,7 @@
         "text": "方針,目的,計画及びサービスの要求事項について, SMS 及びサービスを監視,測定及びレビューし、それらの結果を報告する。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 56,
@@ -1395,9 +1289,7 @@
         "text": "変更管理方針で定義された構成品目に対する変更要求の管理"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 57,
@@ -1409,7 +1301,7 @@
       },
       {
         "id": "b",
-        "text": "入力原票の記入内容に誤りがある場合は、誤りの内容が明らかなときに限り,情報システム部門の判断で入力原票を修正し、入力処理する。"
+        "text": "入力原票の記入内容に誤りがある場合は、誤りの内容が明らかなときに限り、情報システム部門の判断で入力原票を修正し、入力処理する。"
       },
       {
         "id": "c",
@@ -1417,12 +1309,10 @@
       },
       {
         "id": "d",
-        "text": "入力済みの入力原票は、不正使用や機密情報の漏えいなどを防止するために、入力後直ちに廃棄する。"
+        "text": "入力済みの入力原票は、不正使用や機密情報の漏えいを防止するために、入力後直ちに廃棄する。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 58,
@@ -1445,9 +1335,7 @@
         "text": "退職・異動したシステム利用者に付与されていたアクセス権の削除・変更は、定期人事異動がある年度初めに全てまとめて行われていた。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 59,
@@ -1470,9 +1358,7 @@
         "text": "被監査部門の長"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 60,
@@ -1495,9 +1381,7 @@
         "text": "マスタファイルへのデータ入力チェック機能が、システムに盛り込まれていること"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 61,
@@ -1520,9 +1404,7 @@
         "text": "必要なハードウェアやソフトウェアを記述した最上位レベルのシステム方式"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 62,
@@ -1545,13 +1427,11 @@
         "text": "事業の中断・阻害に対応し、事業を復旧し、再開し、あらかじめ定められたレベルに回復するための手順を規定したもの"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 63,
-    "text": "定性的な評価項目を定量化するために評価点を与える方法がある。表に示す4段階評価を用いた場合,重み及び判定内容から評価されるシステム全体の目標達成度は何%となるか。[表参照]",
+    "text": "定性的な評価項目を定量化するために評価点を与える方法がある。表に示す4段階評価を用いた場合,重み及び判定内容から評価されるシステム全体の目標達成度は何%となるか。\n\n| 評価項目 | 重み | 判定内容 |\n|---|---|---|\n| 省力化効果 | 5 | 目標どおりの効果があった |\n| 期間の短縮 | 8 | 従来と変わらない |\n| 情報の統合化 | 12 | 部分的には改善された |\n| 4段階評価点 | 3: 目標どおり, 2: ほぼ目標どおり, 1: 部分改善, 0: 変わらず | |",
     "options": [
       {
         "id": "a",
@@ -1570,9 +1450,7 @@
         "text": "52"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 64,
@@ -1595,9 +1473,7 @@
         "text": "組織体として一貫し、効率的な開発作業を確実に遂行するために、組織体として標準化された開発方法に基づいて策定する開発手順"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 65,
@@ -1620,9 +1496,7 @@
         "text": "生産設備をもつ企業が、他社からの委託を受けて電子機器を製造する。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 66,
@@ -1645,9 +1519,7 @@
         "text": "調達者から供給者に対して、双方の役割分担などを確認し、契約の締結を要請すること"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 67,
@@ -1670,9 +1542,7 @@
         "text": "市場成長率が低く、相対的市場占有率が低い事業"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 68,
@@ -1695,9 +1565,7 @@
         "text": "デルファイ法"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 69,
@@ -1709,7 +1577,7 @@
       },
       {
         "id": "b",
-        "text": "顧客層,時間帯,場所など市場セグメントごとに異なった価格を決定する。"
+        "text": "顧客層,時間帯、場所など市場セグメントごとに異なった価格を決定する。"
       },
       {
         "id": "c",
@@ -1720,9 +1588,7 @@
         "text": "リサーチなどによる消費者の値頃感に基づいて価格を決定する。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 70,
@@ -1734,7 +1600,7 @@
       },
       {
         "id": "b",
-        "text": "卸売業・メーカが小売店の経営活動を支援することによって、自社との取引量の拡大につながる手法・概念である。"
+        "text": "卸売業・メーカが小売店の経営活動を支援することによって、自社との取引量の拡大につなげる手法・概念である。"
       },
       {
         "id": "c",
@@ -1745,9 +1611,7 @@
         "text": "消費者向けや企業間の商取引を、インターネットなどの電子的なネットワークを活用して行う手法・概念である。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 71,
@@ -1770,13 +1634,11 @@
         "text": "ダイバーシティ社会"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 72,
-    "text": "図は、製品 Aの構成部品を示し、括弧内の数字は上位の製品・部品1個当たりの所要数量である。この製品Aを10個生産する場合,部品Cは、少なくとも何個発注する必要があるか。ここで、現在の部品Bの在庫は0個,部品Cの在庫は5個である。[図参照]",
+    "text": "図は、製品 Aの構成部品を示し、括弧内の数字は上位の製品・部品1個当たりの所要数量である。この製品Aを10個生産する場合,部品Cは、少なくとも何個発注する必要があるか。ここで、現在の部品Bの在庫は0個,部品Cの在庫は5個である。",
     "options": [
       {
         "id": "a",
@@ -1796,8 +1658,7 @@
       }
     ],
     "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "figure": "```mermaid\ngraph TD\n    A[A] --> B(B(2))\n    A --> C0(C(1))\n    B --> D(D(1))\n    B --> E(E(1))\n    E --> C1(C(1))\n    style C0 stroke:#000, fill:#fff\n    style C1 stroke:#000, fill:#fff\n```"
   },
   {
     "qNo": 73,
@@ -1820,13 +1681,11 @@
         "text": "ロングテール"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 74,
-    "text": "図は、ある製品ロットの抜取り検査の結果を表す OC 曲線(検査特性曲線)である。この図に関する記述のうち、適切なものはどれか。[図参照]",
+    "text": "図は、ある製品ロットの抜取り検査の結果を表す OC 曲線(検査特性曲線)である。この図に関する記述のうち、適切なものはどれか。\n\n(Diagram shows an OC curve plotting Probability of Acceptance (Y axis, L1, L2) against Defect Rate % (X axis, p1, p2).)",
     "options": [
       {
         "id": "a",
@@ -1845,13 +1704,11 @@
         "text": "p2%よりも小さい不良率のロットが不合格となる確率は,L2よりも小さい。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 75,
-    "text": "ビッグデータ分析の手法の一つであるデシジョンツリーを活用してマーケティング施策の判断に必要な事象を整理し、発生確率の精度を向上させた上で二つのマーケティング施策a, bの選択を行う。マーケティング施策を実行した場合の利益増加額(売上増加額-費用)の期待値が最大となる施策と、そのときの利益増加額の期待値の組合せはどれか。[図参照]",
+    "text": "ビッグデータ分析の手法の一つであるデシジョンツリーを活用してマーケティング施策の判断に必要な事象を整理し、発生確率の精度を向上させた上で二つのマーケティング施策a, bの選択を行う。マーケティング施策を実行した場合の利益増加額(売上増加額-費用)の期待値が最大となる施策と、そのときの利益増加額の期待値の組合せはどれか。",
     "options": [
       {
         "id": "a",
@@ -1871,8 +1728,7 @@
       }
     ],
     "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "figure": "```mermaid\ngraph TD\n    start((意思決定の分岐点)) --> a[マーケティング施策a 初期費用30億円]\n    start --> b[マーケティング施策b 初期費用40億円]\n\n    a --> a1(発生確率 0.4)\n    a --> a2(発生確率 0.6)\n\n    a1 --> a1_1[追加費用 60億円]\n    a2 --> a2_1[追加費用 なし]\n\n    a1_1 --> a1_1_p1(発生確率 0.3)\n    a1_1 --> a1_1_p2(発生確率 0.7)\n\n    a1_1_p1 --> R1[売上増加額 200億円]\n    a1_1_p2 --> R2[売上増加額 100億円]\n\n    a2_1 --> R3[売上増加額 120億円]\n\n    b --> b1(発生確率 0.3)\n    b --> b2(発生確率 0.7)\n\n    b1 --> b1_1[追加費用 40億円]\n    b2 --> b2_1[追加費用 なし]\n\n    b1_1 --> b1_1_p1(発生確率 0.4)\n    b1_1 --> b1_1_p2(発生確率 0.6)\n\n    b2_1 --> b2_1_p1(発生確率 0.3)\n    b2_1 --> b2_1_p2(発生確率 0.7)\n\n    b1_1_p1 --> R4[売上増加額 150億円]\n    b1_1_p2 --> R5[売上増加額 100億円]\n\n    b2_1_p1 --> R6[売上増加額 70億円]\n    b2_1_p2 --> R7[売上増加額 140億円]\n```"
   },
   {
     "qNo": 76,
@@ -1895,13 +1751,11 @@
         "text": "17.0"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 77,
-    "text": "損益計算資料から求められる損益分岐点売上高は、何百万円か。[表参照]",
+    "text": "損益計算資料から求められる損益分岐点売上高は、何百万円か。\n\n| 単位: 百万円 |\n|---|\n| 売上高 | 500 |\n| 材料費(変動費) | 200 |\n| 外注費(変動費) | 100 |\n| 製造固定費 | 100 |\n| 総利益 | 100 |\n| 販売固定費 | 80 |\n| 利益 | 20 |",
     "options": [
       {
         "id": "a",
@@ -1920,9 +1774,7 @@
         "text": "480"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 78,
@@ -1945,13 +1797,11 @@
         "text": "提供している IT サービスのうち、ヘルプデスクサービスが SLA を満たす品質になく、顧客から多大なクレームを受けた。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 79,
-    "text": "企業の Web サイトに接続して Web ページを改ざんし、システムの使用目的に反する動作をさせて業務を妨害する行為を処罰の対象とする法律はどれか。",
+    "text": "企業の Web サイトに接続して Webページを改ざんし、システムの使用目的に反する動作をさせて業務を妨害する行為を処罰の対象とする法律はどれか。",
     "options": [
       {
         "id": "a",
@@ -1970,9 +1820,7 @@
         "text": "プロバイダ責任制限法"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 80,
@@ -1995,8 +1843,6 @@
         "text": "不特定の者に対する代金の支払に使用可能で、電子的に記録・移転でき,法定通貨やプリペイドカードではない財産的価値である。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   }
 ]
