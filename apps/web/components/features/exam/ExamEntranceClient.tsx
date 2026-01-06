@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { guestManager } from '@/lib/guest-manager';
-import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
-import { getLearningRecords, LearningRecord, Question } from '@/lib/api';
+import { FaCheckCircle, FaTimesCircle, FaBookmark } from 'react-icons/fa';
+import { getLearningRecords, LearningRecord, Question, getExamProgress } from '@/lib/api';
 import styles from './ExamEntranceClient.module.css';
 
 interface ExamEntranceClientProps {
@@ -35,8 +35,9 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
         router.push(newUrl.toString());
     };
 
-    // State for learning status
+    // State for learning status & bookmarks
     const [statusMap, setStatusMap] = useState<Record<string, 'correct' | 'incorrect'>>({});
+    const [bookmarks, setBookmarks] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         async function fetchProgress() {
@@ -47,42 +48,60 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
             };
 
             try {
-                const records = await getLearningRecords(userId, examId);
-                const answeredQIds = new Set(records.map(r => r.questionId));
+                // Parallel Fetch: History & Progress
+                const [records, examProgress] = await Promise.all([
+                    getLearningRecords(userId, examId),
+                    getExamProgress(userId, examId)
+                ]);
 
-                // Build status map
+                // 1. Process Bookmarks
+                if (examProgress?.bookmarks) {
+                    setBookmarks(new Set(examProgress.bookmarks));
+                }
+
+                // 2. Build Status Map (Merge History & Progress)
+                // Priority: ExamProgress (Snapshot) > LearningRecords (History)
                 const newStatusMap: Record<string, 'correct' | 'incorrect'> = {};
 
-                // Group records by questionId
+                // A. Base processing from History
                 const recordsByQ: Record<string, LearningRecord[]> = {};
                 records.forEach(r => {
                     if (!recordsByQ[r.questionId]) recordsByQ[r.questionId] = [];
                     recordsByQ[r.questionId].push(r);
                 });
-
                 Object.keys(recordsByQ).forEach(qId => {
-                    const qRecords = recordsByQ[qId];
-                    // If ANY correct, mark as correct (Optimistic)
-                    // Or prioritize latest? Let's use ANY correct for "Done" feel.
-                    const hasCorrect = qRecords.some(r => r.isCorrect);
+                    // Logic: If any correct, correct. Else incorrect.
+                    const hasCorrect = recordsByQ[qId].some(r => r.isCorrect);
                     newStatusMap[qId] = hasCorrect ? 'correct' : 'incorrect';
                 });
+
+                // B. Override/Augment with ExamProgress
+                if (examProgress?.statusMap) {
+                    Object.entries(examProgress.statusMap).forEach(([qId, status]) => {
+                        newStatusMap[qId] = status.isCorrect ? 'correct' : 'incorrect';
+                    });
+                }
+
                 setStatusMap(newStatusMap);
 
-                // ... existing nextQNo logic ...
+                // Determine Next Question (First Unanswered)
+                const answeredQIds = new Set([...Object.keys(newStatusMap)]);
+
                 let firstUnanswered: number = 1;
                 for (const q of questions) {
                     if (!answeredQIds.has(q.id)) {
                         firstUnanswered = q.qNo;
                         break;
                     }
-                    firstUnanswered = q.qNo + 1;
+                    if (q.qNo >= firstUnanswered) firstUnanswered = q.qNo + 1;
                 }
                 if (firstUnanswered > questions.length) firstUnanswered = 1;
-                if (answeredQIds.size === questions.length) firstUnanswered = 1;
+                // If all answered, loop back to 1 (or stay at end?)
+                if (answeredQIds.size >= questions.length && firstUnanswered > questions.length) firstUnanswered = 1;
 
                 setNextQNo(firstUnanswered);
                 setProgress({ completed: answeredQIds.size, total: questions.length });
+
             } catch (e) {
                 console.error("Failed to fetch progress", e);
             } finally {
@@ -93,6 +112,7 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
         fetchProgress();
     }, [session, examId, questions]);
 
+    // ... (btnText, linkHref, mockSettings same)
     const btnText = (progress.completed > 0 && progress.completed < progress.total)
         ? `続きから開始 (Q${nextQNo})`
         : "練習モードで開始";
@@ -106,23 +126,15 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
     })();
 
     const displayQuestions = questions.filter(q => {
-        // Filter out ghost data/placeholders
         if (q.qNo >= 99) return false;
-
         if (!categoryFilter || categoryFilter === 'ALL') return true;
 
-        // Check both category and subCategory
-        // q.subCategory might be standardized Japanese e.g. "テクノロジ系"
-        // categoryFilter is English e.g. "Technology"
-
-        // Simple mapping for filter:
         const map: Record<string, string> = {
             'Technology': 'テクノロジ系',
             'Management': 'マネジメント系',
             'Strategy': 'ストラテジ系'
         };
         const targetJp = map[categoryFilter];
-
         return (q.subCategory === targetJp) || (q.category === categoryFilter) || (q.subCategory === categoryFilter);
     });
 
@@ -150,32 +162,17 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                         value={categoryFilter || 'ALL'}
                         onChange={(e) => {
                             const val = e.target.value;
-                            // Update URL query param to keep state on refresh
-                            // Since this is a client component, we can use router.push or window.history
-                            // But cleaner to just reload or push state. Next.js router is best.
-                            // We need 'useRouter'
                             const newUrl = new URL(window.location.href);
                             if (val === 'ALL') newUrl.searchParams.delete('category');
                             else newUrl.searchParams.set('category', val);
-                            window.history.pushState(null, '', newUrl.toString());
-                            // Trigger re-render by local state or router?
-                            // next/navigation searchParams is reactive?
-                            // Actually better to use useRouter().push()
+                            const routerMethod = router.push; // Using router push
+                            routerMethod(newUrl.toString());
                         }}
-                    // Actually let's use a simpler approach: Local State driven + Sync to URL?
-                    // Or just fully local state?
-                    // Requirement: "Move filter" implies keeping it persistent?
-                    // User said: "Select from dynamic list if possible"
                     >
                         <option value="ALL">指定なし (すべて表示)</option>
-                        {/* TODO: Generate dynamic options? Strict requirement "Dynamic or Constant". 
-                             Constants are easier for now: Technology, Management, Strategy.
-                             Or extract unique from questions? */}
                         <option value="Technology">テクノロジ系</option>
                         <option value="Management">マネジメント系</option>
                         <option value="Strategy">ストラテジ系</option>
-                        {/* Dynamic unique subcategories from questions if available? */}
-                        {/* Let's append unique ones not in constant? */}
                     </select>
                 </div>
 
@@ -202,38 +199,40 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                 ) : (
                     <div className={styles.grid}>
                         {displayQuestions.map(q => {
-                            const status = statusMap[q.id]; // 'correct' | 'incorrect' | undefined
-                            const statusClass = status === 'correct' ? styles.correct
-                                : status === 'incorrect' ? styles.incorrect
-                                    : '';
+                            const status = statusMap[q.id];
+                            const isBookmarked = bookmarks.has(q.id);
 
+                            // Class logic: Status + Bookmark
+                            let statusClass = '';
+                            if (status === 'correct') statusClass = styles.correct;
+                            else if (status === 'incorrect') statusClass = styles.incorrect;
+
+                            // Helper for item
                             return (
                                 <Link
                                     href={`/exam/${year}/${type}/${q.qNo}?mode=practice`}
                                     key={q.id}
-                                    className={`${styles.qItem} ${statusClass}`}
+                                    className={`${styles.qItem} ${statusClass} ${isBookmarked ? styles.bookmarkedItem : ''}`}
+                                    style={isBookmarked ? { border: '2px solid #f59e0b' } : {}}
                                 >
-                                    <span className={styles.qNo}>
+                                    <span className={styles.qNo} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                         Q{q.qNo}
                                         {status === 'correct' && <FaCheckCircle className={styles.iconCorrect} />}
                                         {status === 'incorrect' && <FaTimesCircle className={styles.iconIncorrect} />}
+                                        {isBookmarked && <FaBookmark color="#f59e0b" />}
                                     </span>
 
                                     <p className={styles.qSummary}>{(q.text || "").substring(0, 40)}...</p>
 
-                                    {/* Accessibility and Subcategory Badge */}
                                     <div className={styles.badgeContainer}>
-                                        {/* Subcategory Badge */}
                                         {(q.subCategory || q.category) && (
                                             <span className={styles.subcategoryBadge}>
                                                 {q.subCategory || q.category}
                                             </span>
                                         )}
-
-                                        {/* Status Badge */}
                                         {status && (
                                             <span className={styles.statusBadge}>
-                                                {status === 'correct' ? '済: 正解' : '済: 不正解'}
+                                                {status === 'correct' ? '正解' : '不正解'}
                                             </span>
                                         )}
                                     </div>

@@ -173,3 +173,63 @@ export async function syncLearningRecords(records: LearningRecord[]): Promise<vo
         throw error;
     }
 }
+
+// --- Exam Progress API ---
+
+export interface ExamProgress {
+    id: string; // "userId-examId"
+    userId: string;
+    examId: string;
+    bookmarks: string[]; // List of Question IDs
+    statusMap: Record<string, {
+        isCorrect: boolean;
+        answeredAt: string;
+    }>;
+    updatedAt: string;
+}
+
+export async function getExamProgress(userId: string, examId: string): Promise<ExamProgress | null> {
+    try {
+        const params = new URLSearchParams({ userId, examId });
+        const res = await fetch(`${API_BASE}/exam-progress?${params.toString()}`, {
+            cache: 'no-store'
+        });
+
+        if (!res.ok) {
+            // 404 is valid (no progress yet)
+            if (res.status === 404) return null;
+            console.error(`API Error: ${res.status}`);
+            return null;
+        }
+
+        return await res.json();
+    } catch (error) {
+        console.error("Failed to fetch exam progress:", error);
+        return null;
+    }
+}
+
+export async function saveExamProgress(
+    userId: string,
+    examId: string,
+    data: { bookmarks?: string[]; statusUpdate?: { questionId: string; isCorrect: boolean } }
+): Promise<ExamProgress | null> {
+    try {
+        const res = await fetch(`${API_BASE}/exam-progress`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId, examId, ...data })
+        });
+
+        if (!res.ok) {
+            console.error(`Failed to save progress: ${res.status}`);
+            return null;
+        }
+        return await res.json();
+    } catch (error) {
+        console.error("Failed to save exam progress:", error);
+        return null; // Don't throw to avoid blocking UI
+    }
+}

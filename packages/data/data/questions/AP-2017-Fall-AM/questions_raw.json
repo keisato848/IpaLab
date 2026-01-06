@@ -20,13 +20,11 @@
         "text": "無相関のときは、相関係数が-1になる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 2,
-    "text": "次のBNF において非終端記号〈A〉から生成される文字列はどれか。\n<R₀>::=0|3|6|9\n<R₁> ::= 1|4|7\n<R₂>::= 2|5|8\n<A> ::= <R₀> | <A〉 〈R₀〉 | 〈B〉 〈R₂〉 | 〈C〉 〈R₁>\n<B> ::= <R₁> | <A〉 〈R₁> | 〈B〉 〈R₀〉 | 〈C〉 〈R₂>\n<C> ::= <R₂> | <A〉 〈R₂> | <B> <R₁> | 〈C〉 〈R₀〉",
+    "text": "次のBNF において非終端記号〈A〉から生成される文字列はどれか。\n\n<R0> ::= 0 | 3 | 6 | 9\n<R1> ::= 1 | 4 | 7\n<R2> ::= 2 | 5 | 8\n<A> ::= <R0> | <A> <R0> | <B> <R2> | <C> <R1>\n<B> ::= <R1> | <A> <R1> | <B> <R0> | <C> <R2>\n<C> ::= <R2> | <A> <R2> | <B> <R1> | <C> <R0>",
     "options": [
       {
         "id": "a",
@@ -45,13 +43,11 @@
         "text": "128"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 3,
-    "text": "四つのアルファベット a~dから成るテキストがあり、各アルファベットは2ビットの固定長 2進符号で符号化されている。このテキストにおける各アルファベットの出現確率を調べたところ、表のとおりであった。各アルファベットの符号を表のような可変長2進符号に変換する場合、符号化されたテキストの、変換前に対する変換後のビット列の長さの比は、およそ幾つか。\n[表参照: アルファベット a/b/c/d, 出現確率(%) 40/30/20/10, 可変長2進符号 0/10/110/111]",
+    "text": "四つのアルファベット a~dから成るテキストがあり、各アルファベットは2ビットの固定長 2進符号で符号化されている。このテキストにおける各アルファベットの出現確率を調べたところ、表のとおりであった。各アルファベットの符号を表のような可変長2進符号に変換する場合、符号化されたテキストの、変換前に対する変換後のビット列の長さの比は、およそ幾つか。\n\n| アルファベット | a | b | c | d |\n|---|---|---|---|---|\n| 出現確率(%) | 40 | 30 | 20 | 10 |\n| 可変長2進符号 | 0 | 10 | 110 | 111 |",
     "options": [
       {
         "id": "a",
@@ -70,9 +66,7 @@
         "text": "0.95"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 4,
@@ -95,9 +89,7 @@
         "text": "各符号位置が4バイトの固定長で表現される符号化形式である。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 5,
@@ -120,9 +112,7 @@
         "text": "幅優先探索"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 6,
@@ -130,24 +120,22 @@
     "options": [
       {
         "id": "a",
-        "text": "01001, 10100, 01010, 00101, 10010 [図参照]"
+        "text": "01001\n10100\n01010\n00101\n10010"
       },
       {
         "id": "b",
-        "text": "01001, 10110, 01000, 01000, 10000 [図参照]"
+        "text": "01001\n10110\n01000\n01000\n10000"
       },
       {
         "id": "c",
-        "text": "01010, 10100, 01011, 10100, 00100 [図参照]"
+        "text": "01010\n10100\n01011\n10100\n00100"
       },
       {
         "id": "d",
-        "text": "01100, 10100, 11011, 00101, 00110 [図参照]"
+        "text": "01100\n10100\n11011\n00101\n00110"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 7,
@@ -170,9 +158,7 @@
         "text": "if n=0 then return 1 else return n× fact (n+1)"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 8,
@@ -180,24 +166,22 @@
     "options": [
       {
         "id": "a",
-        "text": "命令1 F D E, 命令2 (遅れて) F D E, 命令3 (さらに遅れて) F D E [図参照]"
+        "text": "命令1: F D E\n命令2:   F D E\n命令3:     F D E"
       },
       {
         "id": "b",
-        "text": "命令1 D F E, 命令2 (遅れて) D F E, 命令3 (さらに遅れて) D F E [図参照]"
+        "text": "命令1: D F E\n命令2:   D F E\n命令3:     D F E"
       },
       {
         "id": "c",
-        "text": "命令1 F D E, 命令2 F D E, 命令3 F D E (Pipelined FDE) [図参照]"
+        "text": "命令1: F D E\n命令2: F D E\n命令3: F D E"
       },
       {
         "id": "d",
-        "text": "命令1 D F E, 命令2 D F E, 命令3 D F E (Pipelined DFE) [図参照]"
+        "text": "命令1: D F E\n命令2: D F E\n命令3: D F E"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 9,
@@ -220,9 +204,7 @@
         "text": "主記憶を複数の独立したグループに分けて、各グループに交互にアクセスすることによって、主記憶へのアクセスの高速化を図る。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 10,
@@ -245,9 +227,7 @@
         "text": "バッテリ消費量が少なく、一つの基地局で広範囲をカバーできる無線通信技術であり、複数のセンサが同時につながるネットワークに適している。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 11,
@@ -255,24 +235,22 @@
     "options": [
       {
         "id": "a",
-        "text": "((1-r) * a / (a+b)) * x + (r * b / (a+b)) * y"
+        "text": "$ \\frac{(1-r) \\cdot a}{a+b} \\cdot x + \\frac{r \\cdot b}{a+b} \\cdot y $"
       },
       {
         "id": "b",
-        "text": "(1-r) * x + r * y"
+        "text": "$ (1-r) \\cdot x + r \\cdot y $"
       },
       {
         "id": "c",
-        "text": "(r * a / (a+b)) * x + ((1-r) * b / (a+b)) * y"
+        "text": "$ \\frac{r \\cdot a}{a+b} \\cdot x + \\frac{(1-r) \\cdot b}{a+b} \\cdot y $"
       },
       {
         "id": "d",
-        "text": "r * x + (1-r) * y"
+        "text": "$ r \\cdot x + (1-r) \\cdot y $"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 12,
@@ -295,9 +273,7 @@
         "text": "モノリシックカーネル"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 13,
@@ -320,13 +296,11 @@
         "text": "予防保守"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 14,
-    "text": "次のシステムにおいて、ピーク時間帯の CPU 使用率は何%か。ここで、トランザクションはレコードアクセス処理と計算処理から成り、レコードアクセスは CPU 処理だけで I/O は発生せず、OSのオーバヘッドは考慮しないものとする。また、1日のうち発生するトランザクション数が最大になる 1時間をピーク時間帯と定義する。\n〔システムの概要〕\n(1) CPU数:1個\n(2) 1日に発生する平均トランザクション数:54,000件\n(3) 1日のピーク時間帯におけるトランザクション数の割合:20%\n(4) 1トランザクション当たりの平均レコードアクセス数:100 レコード\n(5) 1レコードアクセスに必要な平均 CPU 時間:1ミリ秒\n(6) 1トランザクション当たりの計算処理に必要な平均 CPU時間:100ミリ秒",
+    "text": "次のシステムにおいて、ピーク時間帯の CPU 使用率は何%か。ここで、トランザクションはレコードアクセス処理と計算処理から成り、レコードアクセスは CPU 処理だけで I/O は発生せず、OSのオーバヘッドは考慮しないものとする。また、1日のうち発生するトランザクション数が最大になる 1時間をピーク時間帯と定義する。\n\n〔システムの概要〕\n(1) CPU数: 1個\n(2) 1日に発生する平均トランザクション数: 54,000件\n(3) 1日のピーク時間帯におけるトランザクション数の割合: 20%\n(4) 1トランザクション当たりの平均レコードアクセス数: 100 レコード\n(5) 1レコードアクセスに必要な平均 CPU 時間: 1ミリ秒\n(6) 1トランザクション当たりの計算処理に必要な平均 CPU時間: 100ミリ秒",
     "options": [
       {
         "id": "a",
@@ -345,13 +319,11 @@
         "text": "60"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 15,
-    "text": "ジョブの多重度が1で、到着順にジョブが実行されるシステムにおいて, 表に示す状態のジョブA~Cを処理するとき、ジョブCが到着してから実行が終了するまでのターンアラウンドタイムは何秒か。ここで、OS のオーバヘッドは考慮しないものとする。\n[表参照: ジョブ A/B/C, 到着時刻 0/2/3, 処理時間 5/6/3 (単位:秒)]",
+    "text": "ジョブの多重度が1で、到着順にジョブが実行されるシステムにおいて、表に示す状態のジョブA~Cを処理するとき、ジョブCが到着してから実行が終了するまでのターンアラウンドタイムは何秒か。ここで、OS のオーバヘッドは考慮しないものとする。\n\n単位秒\n| ジョブ | 到着時刻 | 処理時間 (単独実行時) |\n|---|---|---|\n| A | 0 | 5 |\n| B | 2 | 6 |\n| C | 3 | 3 |",
     "options": [
       {
         "id": "a",
@@ -370,9 +342,7 @@
         "text": "14"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 16,
@@ -395,9 +365,7 @@
         "text": "待ち状態"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 17,
@@ -420,9 +388,7 @@
         "text": "ページフォールト"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 18,
@@ -445,9 +411,7 @@
         "text": "タスクに優先順位を付けることによって、容易に実現することができる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 19,
@@ -470,9 +434,7 @@
         "text": "大規模なデータを分散処理するためのソフトウェアライブラリ"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 20,
@@ -495,9 +457,7 @@
         "text": "メモリセルにフリップフロップを用いてデータを保存する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 21,
@@ -505,24 +465,22 @@
     "options": [
       {
         "id": "a",
-        "text": "電圧が不規則に変化するアナログ的な波形 [図参照]"
+        "text": "不規則な周波数と振幅変調を持つ波形。"
       },
       {
         "id": "b",
-        "text": "振幅一定、デューティ比が変化する方形波 [図参照]"
+        "text": "一定の周波数を持つ方形波で、パルス幅（デューティ比）が時間経過とともに変化する波形。"
       },
       {
         "id": "c",
-        "text": "電圧が緩やかに変化するアナログ的な波形 [図参照]"
+        "text": "振幅変調されたアナログ信号のような波形。"
       },
       {
         "id": "d",
-        "text": "振幅一定、周波数が変化する方形波 [図参照]"
+        "text": "一定の周波数を持つ方形波で、振幅（パルス高）が時間経過とともに変化する波形。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 22,
@@ -545,34 +503,30 @@
         "text": "システムが一定時間異常であった場合、上位の管理プログラムを呼び出す。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 23,
-    "text": "入力G=0 のときはX=A, Y=B を出力し,G=1のときは X = $\\bar{A}$, Y = $\\bar{B}$を出力する回路はどれか。",
+    "text": "入力G=0 のときはX=A, Y=B を出力し,G=1のときは X = $\\bar{A}$, Y = $\\bar{B}$ を出力する回路はどれか。",
     "options": [
       {
         "id": "a",
-        "text": "A, BをGの反転入力とANDする回路 [図参照]"
+        "text": "AとGの入力をANDゲートに入れXを出力し、BとGの入力をANDゲートに入れYを出力する回路。"
       },
       {
         "id": "b",
-        "text": "A, BをGの反転入力とANDする回路 (ただしG=1で出力0) [図参照]"
+        "text": "AとGの入力をXORゲートに入れXを出力し、BとGの入力をXORゲートに入れYを出力する回路。\n\n```mermaid\ngraph LR\n    A -- Input --> XA{XOR}\n    B -- Input --> XB{XOR}\n    G -- Control --> XA\n    G -- Control --> XB\n    XA --> X\n    XB --> Y\n```"
       },
       {
         "id": "c",
-        "text": "A, BそれぞれとGをXOR演算する回路 [図参照]"
+        "text": "AとGの入力をORゲートに入れXを出力し、BとGの入力をORゲートに入れYを出力する回路。"
       },
       {
         "id": "d",
-        "text": "AをGの反転とAND、BをGの反転とANDしたものをNOTする回路 [図参照]"
+        "text": "AとGの入力をANDゲートに入れXを出力し、Bを入力したNOTゲートの出力とGの入力をNANDゲートに入れYを出力する回路。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 24,
@@ -595,9 +549,7 @@
         "text": "平均的能力をもった人々に対して、標準的なアクセシビリティが達成できるようにする。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 25,
@@ -620,9 +572,7 @@
         "text": "TIFF"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 26,
@@ -645,9 +595,7 @@
         "text": "データが格納されているディスク装置へのI/O 回数を減少させる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 27,
@@ -670,13 +618,11 @@
         "text": "冗長性が排除され、データの整合性を保ちやすくなる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 28,
-    "text": "関係R(ID, A, B, C)のA, Cへの射影の結果と SQL 文で求めた結果が同じになるように、aに入れるべき字句はどれか。ここで、関係Rを表Tで実現し、表 Tに各行を格納したものを次に示す。\n[表T参照]\n[SQL文] SELECT a A, C FROM T",
+    "text": "関係R(ID, A, B, C)のA, Cへの射影の結果と SQL 文で求めた結果が同じになるように、aに入れるべき字句はどれか。ここで、関係Rを表Tで実現し、表 Tに各行を格納したものを次に示す。\n\nT\n| ID | A | B | C |\n|---|---|---|---|\n| 001 | a1 | b1 | c1 |\n| 002 | a1 | b1 | c2 |\n| 003 | a1 | b2 | c1 |\n| 004 | a2 | b1 | c2 |\n| 005 | a2 | b2 | c2 |\n\n[SQL文]\nSELECT a A, C FROM T",
     "options": [
       {
         "id": "a",
@@ -695,13 +641,11 @@
         "text": "REFERENCES"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 29,
-    "text": "トランザクション A~G の待ちグラフにおいて、永久待ちの状態になっているトランザクション全てを列挙したものはどれか。ここで、待ちグラフの X→Y は、トランザクションXはトランザクション Yがロックしている資源のアンロックを待っていることを表す。\n[トランザクションA~Gの待ちグラフ 図参照]",
+    "text": "トランザクション A~G の待ちグラフにおいて、永久待ちの状態になっているトランザクション全てを列挙したものはどれか。ここで、待ちグラフの X→Y は、トランザクションXはトランザクション Yがロックしている資源のアンロックを待っていることを表す。\n\n〔トランザクションA~Gの待ちグラフ〕\n```mermaid\ngraph TD\n    A --> D\n    B --> C\n    C --> D\n    D --> B\n    E --> F\n    F --> E\n    G --> F\n```",
     "options": [
       {
         "id": "a",
@@ -720,9 +664,7 @@
         "text": "C, D, E, F, G"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 30,
@@ -745,9 +687,7 @@
         "text": "ニューラルネットワークや統計解析などの手法を使って、大量に蓄積されているデータから、特徴あるパターンを探し出す。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 31,
@@ -770,13 +710,11 @@
         "text": "最長32オクテットのホスト識別子であり、ネットワーク上で一意である。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 32,
-    "text": "設置場所が異なるクライアントとサーバ間で、次の条件で通信を行う場合の応答時間は何秒か。ここで、クライアントの送信処理の始まりから受信処理の終了までを応答時間とし、距離による遅延は考慮しないものとする。\n[条件: クライアントとサーバ間の回線速度 8Mビット/秒, 伝送効率 60%, 電文長 上り1Mバイト、下り2Mバイト, クライアントの処理時間 送信、受信を合わせて0.4秒, サーバの処理時間 送信、受信を合わせて0.4秒]",
+    "text": "設置場所が異なるクライアントとサーバ間で、次の条件で通信を行う場合の応答時間は何秒か。ここで、クライアントの送信処理の始まりから受信処理の終了までを応答時間とし、距離による遅延は考慮しないものとする。\n\n[条件]\n| 項目 | 値 |\n|---|---|\n| クライアントとサーバ間の回線速度 | 8Mビット/秒 |\n| 伝送効率 | 60% |\n| 電文長 | 上り1Mバイト、下り2Mバイト |\n| クライアントの処理時間 | 送信、受信を合わせて0.4秒 |\n| サーバの処理時間 | 送信、受信を合わせて0.4秒 |",
     "options": [
       {
         "id": "a",
@@ -795,9 +733,7 @@
         "text": "5.8"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 33,
@@ -820,9 +756,7 @@
         "text": "フレームとしては任意長のビットが直列に送出されるので、フレーム長がオクテットの整数倍である必要はない。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 34,
@@ -845,9 +779,7 @@
         "text": "RARP"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 35,
@@ -870,9 +802,7 @@
         "text": "ネットワーク制御機能とデータ転送機能を論理的に分離し,コントローラと呼ばれるソフトウェアで,データ転送機能をもつネットワーク機器の集中制御を可能とするアーキテクチャ"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 36,
@@ -895,9 +825,7 @@
         "text": "有効期限切れで失効したディジタル証明書は、所有者が新たなディジタル証明書を取得するまでの間,CRL に登録される。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 37,
@@ -920,9 +848,7 @@
         "text": "ネットワークを流れるパケットから、侵入のパターンに合致するものを検出して、管理者への通知や、検出した内容の記録を行う。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 38,
@@ -945,9 +871,7 @@
         "text": "複数のサーバやネットワーク機器のログを収集分析し、不審なアクセスを検知する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 39,
@@ -955,24 +879,22 @@
     "options": [
       {
         "id": "a",
-        "text": "$M^n$"
+        "text": "$ M^n $"
       },
       {
         "id": "b",
-        "text": "$M!/(M-n)!$"
+        "text": "$ \\frac{M!}{(M-n)!} $"
       },
       {
         "id": "c",
-        "text": "$M!/(n!(M-n)!)$"
+        "text": "$ \\frac{M!}{n!(M-n)!} $"
       },
       {
         "id": "d",
-        "text": "$(M+n-1)!/(n!(M-1)!)$"
+        "text": "$ \\frac{(M+n-1)!}{n!(M-1)!} $"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 40,
@@ -995,9 +917,7 @@
         "text": "利用者が Web サイトを閲覧したとき、利用者に気付かれないように、利用者のPCに不正プログラムを転送させる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 41,
@@ -1020,9 +940,7 @@
         "text": "ディジタル署名に公開鍵暗号方式が使用されることはなく、共通鍵暗号方式が使用される。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 42,
@@ -1045,9 +963,7 @@
         "text": "標的型サイバー攻撃を受けた組織や個人から提供された情報を分析し、社会や産業に重大な被害を及ぼしかねない標的型サイバー攻撃の把握,被害の分析,対策の早期着手の支援を行う。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 43,
@@ -1070,9 +986,7 @@
         "text": "TLS"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 44,
@@ -1095,9 +1009,7 @@
         "text": "利用者認証に IC カードを利用している業務システムにおいて、退職者のICカードは業務システム側で利用を停止して、他の利用者が使用できないようにする。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 45,
@@ -1120,9 +1032,7 @@
         "text": "ファイルのマルウェア感染を監視し検出する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 46,
@@ -1138,16 +1048,14 @@
       },
       {
         "id": "c",
-        "text": "二つの機能 A, B のコードは重複する部分が多いので, A, B を一つのモジュールにまとめ、A,Bの機能を使い分けるための引数を設けた。"
+        "text": "二つの機能 A, B のコードは重複する部分が多いので, A, B を一つのモジュールにまとめ、A, Bの機能を使い分けるための引数を設けた。"
       },
       {
         "id": "d",
-        "text": "二つの機能 A, Bは必ず A, B の順番に実行され、しかも A で計算した結果をBで使うことがあるので、一つのモジュールにまとめた。"
+        "text": "二つの機能 A, Bは必ず A, B の順番に実行され、しかも A で計算した結果を Bで使うことがあるので、一つのモジュールにまとめた。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 47,
@@ -1170,9 +1078,7 @@
         "text": "ドライバは、引数を渡してテスト対象モジュールを呼び出す。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 48,
@@ -1195,9 +1101,7 @@
         "text": "リファクタリング"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 49,
@@ -1220,9 +1124,7 @@
         "text": "プロジェクトの成熟度に応じてソフトウェア開発の手順を定義したモデルである。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 50,
@@ -1230,24 +1132,22 @@
     "options": [
       {
         "id": "a",
-        "text": "残作業量が時間とともに減少するグラフ [図参照]"
+        "text": "残作業量が時間経過とともに減少していく図。"
       },
       {
         "id": "b",
-        "text": "発生不具合数が時間とともにU字型に変化するグラフ [図参照]"
+        "text": "発生不具合数が時間経過とともに増加していく図。"
       },
       {
         "id": "c",
-        "text": "累積バグ数が時間とともにS字型に増加するグラフ [図参照]"
+        "text": "累積バグ数が時間経過とともにS字カーブを描いて増加していく図。"
       },
       {
         "id": "d",
-        "text": "要員数が時間とともに階段状に変化するグラフ [図参照]"
+        "text": "要員数が時間経過とともに増減していく図。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 51,
@@ -1270,9 +1170,7 @@
         "text": "プロジェクト組織の編成"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 52,
@@ -1280,7 +1178,7 @@
     "options": [
       {
         "id": "a",
-        "text": "コスト,スケジュール"
+        "text": "コスト, スケジュール"
       },
       {
         "id": "b",
@@ -1292,37 +1190,33 @@
       },
       {
         "id": "d",
-        "text": "品質,リスク"
+        "text": "品質, リスク"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 53,
-    "text": "次のプレシデンスダイアグラムで表現されたプロジェクトスケジュールネットワーク図を、アローダイアグラムに書き直したものはどれか。ここで、プレシデンスダイアグラムの依存関係は全てFS関係とする。 [プレシデンスダイアグラム 図参照]",
+    "text": "次のプレシデンスダイアグラムで表現されたプロジェクトスケジュールネットワーク図を、アローダイアグラムに書き直したものはどれか。ここで、プレシデンスダイアグラムの依存関係は全てFS 関係とする。",
     "options": [
       {
         "id": "a",
-        "text": "A, C, E, GとB, D, F, Hがそれぞれ直列につながる単純なAOA [図参照]"
+        "text": "A, Bから始まり、AからC、CからE、EからGへ、BからD、DからF、FからHへ進む直列のAD図。相互依存を示すダミーアクティビティはなし。"
       },
       {
         "id": "b",
-        "text": "一部の依存関係が無視されたAOA [図参照]"
+        "text": "A, Bから始まり、CはA後、DはB後。EとFはC, D両方後。GはE後。HはE, F両方後。この依存関係をダミーアクティビティ（E終了イベントからF終了イベントへ）を使って正確に表現したAD図。"
       },
       {
         "id": "c",
-        "text": "全ての依存関係(E: A, C; F: B, D; G: A, E; H: B, F)をダミー活動で正しく表現したAOA [図参照]"
+        "text": "A, Bから始まり、CはA後、DはB後。CとDが合流するイベントがあるが、ダミーアクティビティ2->3があるAD図。"
       },
       {
         "id": "d",
-        "text": "ダミー活動が不適切に配置されたAOA [図参照]"
+        "text": "A, Bから始まり、CはA後、DはB後。CとDが合流するイベントがあるが、ダミーアクティビティ2->5があるAD図。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 54,
@@ -1345,13 +1239,11 @@
         "text": "(利用者からの改良要求件数)÷(出荷後の経過月数)"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 55,
-    "text": "サービス提供時間帯が毎日6~20時のシステムにおいて、ある月の停止時間,修復時間及びシステムメンテナンス時間は次のとおりであった。この月の可用性は何%か。ここで、1か月の稼働日数は30日,可用性(%)は小数第2位を四捨五入するものとする。\n〔停止時間,修復時間及びシステムメンテナンス時間〕\n・システム障害によるサービス提供時間内の停止時間:7時間\n・システム障害に対処するサービス提供時間外の修復時間:3時間\n・サービス提供時間外のシステムメンテナンス時間:8時間",
+    "text": "サービス提供時間帯が毎日6~20時のシステムにおいて、ある月の停止時間,修復時間及びシステムメンテナンス時間は次のとおりであった。この月の可用性は何%か。ここで、1か月の稼働日数は30日,可用性(%)は小数第2位を四捨五入するものとする。\n\n〔停止時間,修復時間及びシステムメンテナンス時間〕\n・システム障害によるサービス提供時間内の停止時間:7時間\n・システム障害に対処するサービス提供時間外の修復時間:3時間\n・サービス提供時間外のシステムメンテナンス時間:8時間",
     "options": [
       {
         "id": "a",
@@ -1370,9 +1262,7 @@
         "text": "99.0"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 56,
@@ -1395,13 +1285,11 @@
         "text": "フルバックアップ方式に比べ、バックアップに要する時間が長い。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 57,
-    "text": "空調計画における冷房負荷には、“外気負荷”,“室內負荷”,“伝熱負荷”,“日射負荷”などがある。冷房負荷の軽減策のうち、“伝熱負荷”の軽減策として、最も適切なものはどれか。",
+    "text": "空調計画における冷房負荷には、“外気負荷”,“室内負荷”,“伝熱負荷”,“日射負荷”などがある。冷房負荷の軽減策のうち、“伝熱負荷”の軽減策として、最も適切なものはどれか。",
     "options": [
       {
         "id": "a",
@@ -1413,16 +1301,14 @@
       },
       {
         "id": "c",
-        "text": "日光が当たる南に面したガラス窓をむやみに大きなものにしない。"
+        "text": "日光が当たる南に面したガラス窓をむやみと大きなものにしない。"
       },
       {
         "id": "d",
         "text": "屋根や壁面の断熱をおろそかにしない。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 58,
@@ -1445,13 +1331,11 @@
         "text": "遅れを取り戻すための要員の追加を,人事部長に要求する。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 59,
-    "text": "開発プロジェクトにおいて、開発検討フェーズ,プログラムテストフェーズ,移行判定フェーズを対象とし、それぞれのフェーズ終了時に監査を実施する場合,移行判定フェーズで実施することが適切な監査手続はどれか。",
+    "text": "開発プロジェクトにおいて、開発検討フェーズ,プログラムテストフェーズ、移行判定フェーズを対象とし、それぞれのフェーズ終了時に監査を実施する場合,移行判定フェーズで実施することが適切な監査手続はどれか。",
     "options": [
       {
         "id": "a",
@@ -1470,9 +1354,7 @@
         "text": "テスト計画が策定された上でプログラムテストに着手されたことを確認するために、プログラムテスト計画書を閲覧する。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 60,
@@ -1495,9 +1377,7 @@
         "text": "入庫及び出庫記録に対して、自動的に連番を付与していること"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 61,
@@ -1520,9 +1400,7 @@
         "text": "データモデル"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 62,
@@ -1545,9 +1423,7 @@
         "text": "年間運用計画"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 63,
@@ -1570,9 +1446,7 @@
         "text": "自社環境で動く情報システムに格納されたデータとソフトウェアを、クラウドサービスを用いてバックアップすることによって、事業継続性を担保した。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 64,
@@ -1595,9 +1469,7 @@
         "text": "利害関係者のニーズの抽出"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 65,
@@ -1620,9 +1492,7 @@
         "text": "ユーザ及びベンダのそれぞれの役割分担を、システムライフサイクルプロセスに応じて、あらかじめ詳細に決定しておくため"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 66,
@@ -1645,34 +1515,30 @@
         "text": "製品の企画、設計及び開発は行うが、半導体製造の工場は所有しない。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 67,
-    "text": "営業部門で設定する KPIとKGIの適切な組合せはどれか。\n[表参照: KPI/KGI 組合せ]",
+    "text": "営業部門で設定する KPIとKGIの適切な組合せはどれか。\n\n| | KPI | KGI |\n|---|---|---|\n| ア | 既存顧客売上高 | 新規顧客売上高 |\n| イ | 既存顧客訪問件数 | 新規顧客訪問件数 |\n| ウ | 新規顧客売上高 | 新規顧客訪問件数 |\n| エ | 新規顧客訪問件数 | 新規顧客売上高 |",
     "options": [
       {
         "id": "a",
-        "text": "KPI: 既存顧客売上高, KGI: 新規顧客売上高"
+        "text": "既存顧客売上高, 新規顧客売上高"
       },
       {
         "id": "b",
-        "text": "KPI: 既存顧客訪問件数, KGI: 新規顧客訪問件数"
+        "text": "既存顧客訪問件数, 新規顧客訪問件数"
       },
       {
         "id": "c",
-        "text": "KPI: 新規顧客売上高, KGI: 新規顧客訪問件数"
+        "text": "新規顧客売上高, 新規顧客訪問件数"
       },
       {
         "id": "d",
-        "text": "KPI: 新規顧客訪問件数, KGI: 新規顧客売上高"
+        "text": "新規顧客訪問件数, 新規顧客売上高"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 68,
@@ -1695,9 +1561,7 @@
         "text": "生産,在庫,購買,販売,物流などの全ての情報をリアルタイムに交換することによって、サプライチェーン全体の効率を大幅に向上させる経営手法である。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 69,
@@ -1720,13 +1584,11 @@
         "text": "輸出先国の国内標準及び国内法規の規制を受けることなく製品を輸出できる。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 70,
-    "text": "構成表の製品 Aを300個出荷しようとするとき、部品bの正味所要量は何個か。ここで、A, a, b, c の在庫量は在庫表のとおりとする。また、他の仕掛残、注文残,引当残などはないものとする。\n[構成表/在庫表 参照]",
+    "text": "構成表の製品 Aを300個出荷しようとするとき、部品bの正味所要量は何個か。ここで、A, a, b, c の在庫量は在庫表のとおりとする。また、他の仕掛残、注文残,引当残などはないものとする。\n\n構成表 単位 個\n| 品名 | 構成部品 a | 構成部品 b | 構成部品 c |\n|---|---|---|---|\n| A | 3 | 2 | 0 |\n| a | 1 | 1 | 2 |\n\n在庫表 単位 個\n| 品名 | 在庫量 |\n|---|---|\n| A | 100 |\n| a | 100 |\n| b | 300 |\n| c | 400 |",
     "options": [
       {
         "id": "a",
@@ -1745,9 +1607,7 @@
         "text": "1,500"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 71,
@@ -1770,9 +1630,7 @@
         "text": "超音波センサ"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 72,
@@ -1795,9 +1653,7 @@
         "text": "周りの環境から微小なエネルギーを収穫して、電力に変換する。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 73,
@@ -1820,9 +1676,7 @@
         "text": "物流業務に加え、流通加工なども含めたアウトソーシングサービスを行い、また荷主企業の物流企画も代行する。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 74,
@@ -1845,13 +1699,11 @@
         "text": "複数の専門家へのアンケートの繰返しによる回答の収束によって将来を予測する。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 75,
-    "text": "本社から工場まで車で行くのに、一般道路では80分掛かる。高速道路を利用すると、混雑していなければ50分,混雑していれば100分掛かる。高速道路の交通情報が“順調”ならば高速道路を利用し、“渋滞”ならば一般道路を利用するとき,期待できる平均所要時間は約何分か。ここで、高速道路の混雑具合の確率は、混雑している状態が 0.4, 混雑していない状態が0.6 とし,高速道路の真の状態に対する交通情報の発表の確率は表のとおりとする。[表参照]",
+    "text": "本社から工場まで車で行くのに、一般道路では80分掛かる。高速道路を利用すると、混雑していなければ50分,混雑していれば100分掛かる。高速道路の交通情報が“順調”ならば高速道路を利用し、“渋滞”ならば一般道路を利用するとき,期待できる平均所要時間は約何分か。ここで、高速道路の混雑具合の確率は、混雑している状態が 0.4, 混雑していない状態が0.6 とし,高速道路の真の状態に対する交通情報の発表の確率は表のとおりとする。\n\n| 高速道路の真の状態 | 混雑している | 混雑していない |\n|---|---|---|\n| 交通情報 渋滞 | 0.9 | 0.2 |\n| 交通情報 順調 | 0.1 | 0.8 |",
     "options": [
       {
         "id": "a",
@@ -1870,9 +1722,7 @@
         "text": "72"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 76,
@@ -1895,13 +1745,11 @@
         "text": "パレート図"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 77,
-    "text": "今年度の事業損益実績は表のとおりである。来年度の営業利益目標を 240 百万円としたとき、来年度の目標売上高は何百万円か。ここで、来年度の変動費率は今年度と同じであり、製造固定費と販売固定費は今年度に比べそれぞれ 80百万円,20百万円の増加を見込む。\n[今年度の事業損益実績 表参照]",
+    "text": "今年度の事業損益実績は表のとおりである。来年度の営業利益目標を 240 百万円としたとき、来年度の目標売上高は何百万円か。ここで、来年度の変動費率は今年度と同じであり、製造固定費と販売固定費は今年度に比べそれぞれ 80百万円,20百万円の増加を見込む。\n\n〔今年度の事業損益実績〕 単位 百万円\n| 項目 | 金額 |\n|---|---|\n| 売上高 | 1,600 |\n| 材料費(変動費) | 720 |\n| 外注費(変動費) | 240 |\n| 製造固定費 | 380 |\n| 粗利益 | 260 |\n| 販売固定費 | 100 |\n| 営業利益 | 160 |",
     "options": [
       {
         "id": "a",
@@ -1920,9 +1768,7 @@
         "text": "2,050"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 78,
@@ -1945,9 +1791,7 @@
         "text": "請負の場合は発注元に帰属し、派遣の場合は派遣元に帰属する。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 79,
@@ -1970,9 +1814,7 @@
         "text": "漏えいして不正に用いられるおそれがあると認められる場合に限り、本人の申請又は市区町村長の職権によってマイナンバーは変更できる。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 80,
@@ -1995,8 +1837,6 @@
         "text": "利用者によってネットワークからダウンロードされたデータ"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   }
 ]

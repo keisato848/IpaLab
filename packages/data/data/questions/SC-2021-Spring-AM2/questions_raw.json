@@ -20,8 +20,7 @@
         "text": "IPsec, SSL, TLS"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 2,
@@ -44,8 +43,7 @@
         "text": "有効期限が切れたディジタル証明書の更新処理の進捗状況を確認する。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 3,
@@ -68,8 +66,7 @@
         "text": "衝突発見困難性とは、ハッシュ値が一致する二つのメッセージの発見に要する計算量が大きいことによる、発見の困難性のことである。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 4,
@@ -92,8 +89,7 @@
         "text": "サイズが大きい電子メールや大量の電子メールを攻撃対象に送り付ける。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 5,
@@ -116,8 +112,7 @@
         "text": "無線LANのアクセスポイントを不正に設置し、チャネル間の干渉を発生させることによって、通信を妨害する攻撃"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 6,
@@ -140,8 +135,7 @@
         "text": "パケットフィルタリングを拡張した方式であり、過去に通過したパケットから通信セッションを認識し、受け付けたパケットを通信セッションの状態に照らし合わせて通過させるか遮断するかを判断する。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 7,
@@ -164,8 +158,7 @@
         "text": "暗号化処理単位のブロック長よりも32ビット短くする。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 8,
@@ -188,8 +181,7 @@
         "text": "セキュリティ製品の種別を識別するための識別子"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 9,
@@ -212,8 +204,7 @@
         "text": "標的型サイバー攻撃などに関する情報を参加組織間で共有し,高度なサイバー攻撃対策につなげる取組"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 10,
@@ -236,8 +227,7 @@
         "text": "不正なサーバ証明書の発行を防ぐ。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 11,
@@ -245,7 +235,7 @@
     "options": [
       {
         "id": "a",
-        "text": "クラウドサービスプロバイダが,運用しているクラウドサービスに対して DDoS 攻撃対策を行うことによって、クラウドサービスの可用性低下を緩和できる。"
+        "text": "クラウドサービスプロバイダが, 運用しているクラウドサービスに対して DDoS 攻撃対策を行うことによって、クラウドサービスの可用性低下を緩和できる。"
       },
       {
         "id": "b",
@@ -253,15 +243,14 @@
       },
       {
         "id": "c",
-        "text": "クラウドサービス利用組織の管理者が,組織で利用しているクラウドサービスに対して脆弱性診断を行うことによって、脆弱性を特定できる。"
+        "text": "クラウドサービス利用組織の管理者が, 組織で利用しているクラウドサービスに対して脆弱性診断を行うことによって、脆弱性を特定できる。"
       },
       {
         "id": "d",
         "text": "クラウドサービス利用組織の管理者が、組織の利用者が利用している全てのクラウドサービスの利用状況の可視化を行うことによって、許可を得ずにクラウドサービスを利用している者を特定できる。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 12,
@@ -284,8 +273,7 @@
         "text": "セッションハイジャック | 利用者ごとに固定のセッションIDを使用する。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 13,
@@ -305,11 +293,10 @@
       },
       {
         "id": "d",
-        "text": "マルウェアの感染や発病によって生じるデータの読込みの動作、書込みの動作,通信などを監視して、マルウェアを検出する。"
+        "text": "マルウェアの感染や発病によって生じるデータの読込みの動作、書込みの動作, 通信などを監視して、マルウェアを検出する。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 14,
@@ -317,7 +304,7 @@
     "options": [
       {
         "id": "a",
-        "text": "ISP 管理外のネットワークに対する ISP 管理下のネットワークからの ICMP パケットによる DDoS 攻撃を遮断する。"
+        "text": "ISP 管理外のネットワークに対する ISP 管理下のネットワークからの ICMP パケットによるDDoS 攻撃を遮断する。"
       },
       {
         "id": "b",
@@ -325,15 +312,14 @@
       },
       {
         "id": "c",
-        "text": "ISP 管理下のネットワークに対する ISP 管理外のネットワークからの ICMP パケットによる DDoS 攻撃を遮断する。"
+        "text": "ISP 管理下のネットワークに対する ISP 管理外のネットワークからの ICMP パケットによるDDoS攻撃を遮断する。"
       },
       {
         "id": "d",
         "text": "ISP 管理下のネットワークに向けて ISP 管理外のネットワークから送信されるスパムメールを制限する。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 15,
@@ -356,8 +342,7 @@
         "text": "信頼性が高いサーバ証明書を有する Web サイトとの HTTPS 通信では、Webブラウザに鍵マークを表示する。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 16,
@@ -365,11 +350,11 @@
     "options": [
       {
         "id": "a",
-        "text": "PC と VDI サーバ間は、VDIの画面転送プロトコル及びファイル転送を利用する。"
+        "text": "PCとVDI サーバ間は、VDIの画面転送プロトコル及びファイル転送を利用する。"
       },
       {
         "id": "b",
-        "text": "PC と VDI サーバ間は, VDIの画面転送プロトコルだけを利用する。"
+        "text": "PCとVDI サーバ間は, VDIの画面転送プロトコルだけを利用する。"
       },
       {
         "id": "c",
@@ -380,8 +365,7 @@
         "text": "VDI サーバが、プロキシサーバとして VDI の画面転送プロトコルだけを中継する。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 17,
@@ -404,8 +388,7 @@
         "text": "WPA3"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 18,
@@ -428,8 +411,7 @@
         "text": "ロードバランサ、スイッチ、ルータなどの専用機器を使って、VLAN, VPN などの仮想ネットワークを実現する。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 19,
@@ -452,8 +434,7 @@
         "text": "リンクアグリゲーション"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 20,
@@ -476,8 +457,7 @@
         "text": "デフォルトゲートウェイのアドレスとして使用される。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 21,
@@ -500,12 +480,11 @@
         "text": "複数レコードを更新するときにロックを掛ける順番を決めておき、全てのバッチ処理がこれに従って処理するように設計する。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 22,
-    "text": "JIS X 25010:2013 (システム及びソフトウェア製品の品質要求及び評価(SQuaRE) -システム及びソフトウェア品質モデル)で定義されたシステム及び/又はソフトウェア製品の品質特性に関する説明のうち、適切なものはどれか。",
+    "text": "JIS X 25010:2013 (システム及びソフトウェア製品の品質要求及び評価 (SQuaRE) -システム及びソフトウェア品質モデル)で定義されたシステム及び/又はソフトウェア製品の品質特性に関する説明のうち、適切なものはどれか。",
     "options": [
       {
         "id": "a",
@@ -524,8 +503,7 @@
         "text": "保守性とは、明示された時間帯で、明示された条件下に、システム、製品又は構成要素が明示された機能を実行する度合いのことである。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 23,
@@ -548,8 +526,7 @@
         "text": "プログラムを書く前にテストコードを記述する。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 24,
@@ -572,8 +549,7 @@
         "text": "ロールフォワード"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   },
   {
     "qNo": 25,
@@ -596,7 +572,6 @@
         "text": "パッケージソフトウェアを活用した開発において、セキュリティ確保の観点から、パッケージソフトウェアの変更は必要な変更に限定している。"
       }
     ],
-    "correctOption": null,
-    "subCategory": "その他"
+    "correctOption": null
   }
 ]

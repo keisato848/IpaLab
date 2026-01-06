@@ -20,13 +20,11 @@
         "text": "{(1.0)2×2^5-(1.0)2×2^-4}+(1.1)2×2^-3"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 2,
-    "text": "全体集合S内に異なる部分集合AとBがあるとき, A∩Bに等しいものはどれか。ここで、A∪BはAとBの和集合, A∩BはAとBの積集合, ĀはSにおけるAの補集合, A-BはAからBを除いた差集合を表す。",
+    "text": "全体集合S内に異なる部分集合AとBがあるとき, A∩\u00afBに等しいものはどれか。ここで、A∪BはAとBの和集合, A∩BはAとBの積集合, \u00afAはSにおけるAの補集合, A-BはAからBを除いた差集合を表す。",
     "options": [
       {
         "id": "a",
@@ -34,7 +32,7 @@
       },
       {
         "id": "b",
-        "text": "(A∪B) - (A∩B)"
+        "text": "(A∪\u00afB) - (A∩B)"
       },
       {
         "id": "c",
@@ -45,9 +43,7 @@
         "text": "S - (A∩B)"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 3,
@@ -70,13 +66,11 @@
         "text": "3.00"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 4,
-    "text": "ハミング符号とは、データに冗長ビットを付加して,1ビットの誤りを訂正できるようにしたものである。ここでは、X1, X2, X3, X4の4ビットから成るデータに,3ビットの冗長ビット P3, P2, P₁を付加したハミング符号 X1 X2 X3 P3 X4 P2 P1を考える。付加したビット P1, P2, P3は、それぞれX1 ⊕ X3 ⊕ X4 ⊕ P1 = 0, X1 ⊕ X2 ⊕ X4 ⊕ P2 = 0, X1 ⊕ X2 ⊕ X3 ⊕ P3 = 0 となるように決める。ここで、⊕は排他的論理和を表す。ハミング符号1110011には1ビットの誤りが存在する。誤りビットを訂正したハミング符号はどれか。",
+    "text": "ハミング符号とは、データに冗長ビットを付加して,1ビットの誤りを訂正できるようにしたものである。ここでは、X1, X2, X3, X4の4ビットから成るデータに,3ビットの冗長ビット P3, P2, P₁を付加したハミング符号 X1 X2 X3 P3 X4 P2 P1を考える。付加したビット P1, P2, P3は、それぞれ X1 ⊕ X3 ⊕ X4 ⊕ P1 = 0, X1 ⊕ X2 ⊕ X4 ⊕ P2 = 0, X1 ⊕ X2 ⊕ X3 ⊕ P3 = 0 となるように決める。ここで、⊕は排他的論理和を表す。ハミング符号1110011には1ビットの誤りが存在する。誤りビットを訂正したハミング符号はどれか。",
     "options": [
       {
         "id": "a",
@@ -95,9 +89,7 @@
         "text": "1110111"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 5,
@@ -120,9 +112,7 @@
         "text": "リストへの挿入位置が分かる場合には、リストにある実際の要素数にかかわらず、要素の挿入を一定時間で行うことができる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "基礎理論"
+    "correctOption": null
   },
   {
     "qNo": 6,
@@ -145,9 +135,7 @@
         "text": "複数のタスクからの呼出しに対して、並行して実行されても、それぞれのタスクに正しい結果を返す。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 7,
@@ -170,13 +158,11 @@
         "text": "Python"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 8,
-    "text": "プロセッサの高速化技法の一つとして、同時に実行可能な複数の動作を、コンパイルの段階でまとめて一つの複合命令とし、高速化を図る方式はどれか。",
+    "text": "プロセッサの高速化技法の一つとして、同時に実行可能な複数の動作を、コンパイラの段階でまとめて一つの複合命令とし、高速化を図る方式はどれか。",
     "options": [
       {
         "id": "a",
@@ -195,9 +181,7 @@
         "text": "VLIW"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 9,
@@ -216,13 +200,12 @@
         "text": "0.37"
       },
       {
+
         "id": "d",
         "text": "0.95"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 10,
@@ -245,9 +228,7 @@
         "text": "任意のキャッシュメモリのブロックを主記憶のどの部分にも割り当てられる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "アルゴリズムとプログラミング"
+    "correctOption": null
   },
   {
     "qNo": 11,
@@ -270,9 +251,7 @@
         "text": "48"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 12,
@@ -295,9 +274,7 @@
         "text": "並列化できる計算処理の割合が増えると、速度向上比は、プロセッサ数に反比例して減少する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 13,
@@ -320,9 +297,7 @@
         "text": "待機系から現用系に定期的にロードされ実行される診断プログラムが、現用系の障害を検出したとき"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 14,
@@ -345,9 +320,7 @@
         "text": "予防保全"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 15,
@@ -370,13 +343,11 @@
         "text": "0.46"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 16,
-    "text": "ジョブ群と実行の条件が次のとおりであるとき、一時ファイルを作成する磁気ディスクに必要な容量は最低何Mバイトか。[ジョブ群] [図参照] [実行の条件](1) ジョブの実行多重度を2とする。(2) 各ジョブの処理時間は同一であり,他のジョブの影響は受けない。(3) 各ジョブは開始時に50Mバイトの一時ファイルを新たに作成する。(4) X→Y の関係があれば、ジョブ Xの開始時に作成した一時ファイルは、直後のジョブYで参照し、ジョブYの終了時にその一時ファイルを削除する。直後のジョブが複数個ある場合には、最初に生起されるジョブだけが先行ジョブの一時ファイルを参照する。(5) [図参照]はジョブXの終了時に、ジョブ Y, Z のようにジョブXと矢印で結ばれる全てのジョブが、上から記述された順に優先して生起されることを示す。(6) [図参照]は先行するジョブ X, Y 両方が終了したときにジョブ Z が生起されることを示す。(7) ジョブの生起とは実行待ち行列への追加を意味し、各ジョブは待ち行列の順に実行される。(8) OSのオーバヘッドは考慮しない。",
+    "text": "ジョブ群と実行の条件が次のとおりであるとき、一時ファイルを作成する磁気ディスクに必要な容量は最低何Mバイトか。\n\n[ジョブ群]\n```mermaid\ngraph TD\n    A --> B\n    A --> C\n    B --> D\n    C --> E\n    D --> F\n    E --> F\n```\n\n[実行の条件]\n(1) ジョブの実行多重度を2とする。\n(2) 各ジョブの処理時間は同一であり,他のジョブの影響は受けない。\n(3) 各ジョブは開始時に50Mバイトの一時ファイルを新たに作成する。\n(4) X→Y の関係があれば、ジョブ Xの開始時に作成した一時ファイルは、直後のジョブYで参照し、ジョブYの終了時にその一時ファイルを削除する。直後のジョブが複数個ある場合には、最初に生起されるジョブだけが先行ジョブの一時ファイルを参照する。\n(5) \n```mermaid\ngraph TD\n    X --> Y\n    X --> Z\n```\nはジョブXの終了時に、ジョブ Y, Z のようにジョブXと矢印で結ばれる全てのジョブが、上から記述された順に優先して生起されることを示す。\n(6) \n```mermaid\ngraph TD\n    X & Y --> Z\n```\nは先行するジョブ X, Y 両方が終了したときにジョブ Z が生起されることを示す。\n(7) ジョブの生起とは実行待ち行列への追加を意味し、各ジョブは待ち行列の順に実行される。\n(8) OSのオーバヘッドは考慮しない。",
     "options": [
       {
         "id": "a",
@@ -395,13 +366,11 @@
         "text": "250"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 17,
-    "text": "一つの I²C バスに接続された二つのセンサがある。それぞれのセンサ値を読み込む二つのタスクで排他的に制御したい。利用するリアルタイム OS の機能として、適切なものはどれか。",
+    "text": "一つの I\u00b2C バスに接続された二つのセンサがある。それぞれのセンサ値を読み込む二つのタスクで排他的に制御したい。利用するリアルタイム OS の機能として、適切なものはどれか。",
     "options": [
       {
         "id": "a",
@@ -420,9 +389,7 @@
         "text": "ラウンドロビン"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 18,
@@ -445,13 +412,11 @@
         "text": "メモリ領域の獲得と返却の頻度が高いシステムでは、フラグメンテーションの発生を防止するため、メモリ領域が返却されるたびにガーベジコレクションを行う必要がある。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 19,
-    "text": "複数のクライアントから接続されるサーバがある。このサーバのタスクの多重度が2以下の場合、タスク処理時間は常に4秒である。このサーバに1秒間隔で4件の処理要求が到着した場合,全ての処理が終わるまでの時間はタスクの多重度が1のときと2のときとで、何秒の差があるか。",
+    "text": "複数のクライアントから接続されるサーバがある。このサーバのタスクの多重度が2以下の場合、タスク処理時間は常に4秒である。このサーバに1秒間隔で4件の処理要求が到着した場合、全ての処理が終わるまでの時間はタスクの多重度が1のときと2のときとで、何秒の差があるか。",
     "options": [
       {
         "id": "a",
@@ -470,9 +435,7 @@
         "text": "9"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 20,
@@ -495,13 +458,11 @@
         "text": "論理回路を基板上に実装した後で再プログラムできる集積回路"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 21,
-    "text": "次の方式で画素にメモリを割り当てる 640×480 のグラフィック LCD モジュールがある。始点(5, 4) から終点 (9, 8) まで直線を描画するとき、直線上の x=7 の画素に割り当てられたメモリのアドレスの先頭は何番地か。ここで、画素の座標は(x, y)で表すものとする。〔方式〕・メモリは0番地から昇順に使用する。・1画素は16ビットとする。・座標(0, 0)から座標 (639, 479) までメモリを連続して割り当てる。・各画素は、x=0から×軸の方向にメモリを割り当てていく。・x=639の次はx=0とし、yを1増やす。[図参照]",
+    "text": "次の方式で画素にメモリを割り当てる 640×480 のグラフィック LCD モジュールがある。始点(5, 4) から終点 (9,8) まで直線を描画するとき、直線上の x=7 の画素に割り当てられたメモリのアドレスの先頭は何番地か。ここで、画素の座標は(x, y)で表すものとする。\n\n〔方式〕\n・メモリは0番地から昇順に使用する。\n・1画素は16ビットとする。\n・座標(0,0)から座標 (639, 479) までメモリを連続して割り当てる。\n・各画素は、x=0から×軸の方向にメモリを割り当てていく。\n・x=639の次はx=0とし、yを1増やす。",
     "options": [
       {
         "id": "a",
@@ -520,9 +481,7 @@
         "text": "8978"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 22,
@@ -545,9 +504,7 @@
         "text": "マイクロフォン,センサなどが出力する微小な電気信号を増幅する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 23,
@@ -570,34 +527,30 @@
         "text": "内部メモリの物理アドレスを整然と配置する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 24,
-    "text": "ユーザインタフェースのユーザビリティを評価するときの、利用者が参加する手法と専門家だけで実施する手法との適切な組みはどれか。[表参照]",
+    "text": "ユーザインタフェースのユーザビリティを評価するときの、利用者が参加する手法と専門家だけで実施する手法との適切な組みはどれか。",
     "options": [
       {
         "id": "a",
-        "text": "利用者が参加する手法: アンケート, 専門家だけで実施する手法: 回顧法"
+        "text": "アンケート / 回顧法"
       },
       {
         "id": "b",
-        "text": "利用者が参加する手法: 回顧法, 専門家だけで実施する手法: 思考発話法"
+        "text": "回顧法 / 思考発話法"
       },
       {
         "id": "c",
-        "text": "利用者が参加する手法: 思考発話法, 専門家だけで実施する手法: ヒューリスティック評価法"
+        "text": "思考発話法 / ヒューリスティック評価法"
       },
       {
         "id": "d",
-        "text": "利用者が参加する手法: 認知的ウォークスルー法, 専門家だけで実施する手法: ヒューリスティック評価法"
+        "text": "認知的ウォークスルー法 / ヒューリスティック評価法"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 25,
@@ -620,13 +573,11 @@
         "text": "描画の対象となる物体の各面をピクセルに分割し、ピクセルごとに視点までの距離を計算し、その最小値を作業領域に保持することによって、視点までの距離が最小となる面を求める。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "コンピュータシステム"
+    "correctOption": null
   },
   {
     "qNo": 26,
-    "text": "CAP 定理におけるAとPの特性をもつ分散システムの説明として、適切なものはどれか。",
+    "text": "CAP 定理における A と P の特性をもつ分散システムの説明として、適切なものはどれか。",
     "options": [
       {
         "id": "a",
@@ -645,9 +596,7 @@
         "text": "整合性と分断耐性を満たすが可用性を満たさない。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 27,
@@ -670,38 +619,34 @@
         "text": "データの冗長性を排除し、更新の一貫性と効率性を保持するための正規化"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 28,
-    "text": "第1,第2,第3正規形とリレーションの特徴 a, b, cの組合せのうち、適切なものはどれか。a: どの非キー属性も、主キーの真部分集合に対して関数従属しない。b: どの非キー属性も、主キーに推移的に関数従属しない。c: 繰返し属性が存在しない。[表参照]",
+    "text": "第1,第2,第3正規形とリレーションの特徴 a, b, cの組合せのうち、適切なものはどれか。\n\na: どの非キー属性も、主キーの真部分集合に対して関数従属しない。\nb: どの非キー属性も、主キーに推移的に関数従属しない。\nc: 繰返し属性が存在しない。",
     "options": [
       {
         "id": "a",
-        "text": "ア (1正規形: a, 2正規形: b, 3正規形: c)"
+        "text": "第1正規形: a, 第2正規形: b, 第3正規形: c"
       },
       {
         "id": "b",
-        "text": "イ (1正規形: a, 2正規形: c, 3正規形: b)"
+        "text": "第1正規形: a, 第2正規形: c, 第3正規形: b"
       },
       {
         "id": "c",
-        "text": "ウ (1正規形: c, 2正規形: a, 3正規形: b)"
+        "text": "第1正規形: c, 第2正規形: a, 第3正規形: b"
       },
       {
         "id": "d",
-        "text": "エ (1正規形: c, 2正規形: b, 3正規形: a)"
+        "text": "第1正規形: c, 第2正規形: b, 第3正規形: a"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 29,
-    "text": "undo/redo 方式を用いた障害回復におけるログ情報の要否として、適切な組合せはどれか。[表参照]",
+    "text": "undo/redo 方式を用いた障害回復におけるログ情報の要否として、適切な組合せはどれか。",
     "options": [
       {
         "id": "a",
@@ -720,9 +665,7 @@
         "text": "更新前情報: 不要, 更新後情報: 不要"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 30,
@@ -745,9 +688,7 @@
         "text": "データを複数のサーバに複製し、性能と可用性を向上させること"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 31,
@@ -767,12 +708,10 @@
       },
       {
         "id": "d",
-        "text": "2001.db8.3ab.ff01"
+        "text": "2001.db8.3ab. ff01"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 32,
@@ -795,9 +734,7 @@
         "text": "PPTP"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 33,
@@ -820,13 +757,11 @@
         "text": "TELNET"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 34,
-    "text": "IPv4で192.168.30.32/28のネットワークに接続可能なホストの最大数はどれか。",
+    "text": "IPv4で 192.168.30.32/28 のネットワークに接続可能なホストの最大数はどれか。",
     "options": [
       {
         "id": "a",
@@ -845,9 +780,7 @@
         "text": "30"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 35,
@@ -870,13 +803,11 @@
         "text": "データ転送機能とネットワーク制御機能を論理的に分離し、ネットワーク制御を集中的に行うことを可能にしたアーキテクチャ"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "技術要素"
+    "correctOption": null
   },
   {
     "qNo": 36,
-    "text": "複数のシステムやサービスの間で利用される SAML (Security Assertion Markup Language)はどれか。",
+    "text": "複数のシステムやサービスの間で利用される SAML (Security Assertion Markup Language) はどれか。",
     "options": [
       {
         "id": "a",
@@ -895,9 +826,7 @@
         "text": "認証や認可に関する情報を交換するための仕様"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 37,
@@ -920,9 +849,7 @@
         "text": "サイバーキルチェーンの2番目の段階をいい、攻撃対象に特化したPDFやドキュメントファイルにマルウェアを仕込む。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 38,
@@ -945,9 +872,7 @@
         "text": "利用者が入力したパスワードと、サーバから受け取ったランダムなデータとをクライアントで演算し、その結果をサーバに送信して、サーバで検証する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 39,
@@ -970,9 +895,7 @@
         "text": "送信者がメッセージに固定文字列を付加し、更に送信者の署名鍵を使って暗号化することによって、受信者がメッセージの改ざん部位を特定できるようになる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 40,
@@ -988,20 +911,18 @@
       },
       {
         "id": "c",
-        "text": "ファーストパーティ cookie を承諾する設定によって,当該 Web ブラウザが Webサイトの改ざんを cookieのハッシュ値を用いて検知できるようになる。"
+        "text": "ファーストパーティ cookie を承諾する設定によって,当該 Web ブラウザが Web サイトの改ざんを cookieのハッシュ値を用いて検知できるようになる。"
       },
       {
         "id": "d",
         "text": "ファーストパーティ cookie を承諾する設定によって,当該 Web ブラウザがデジタル証明書の失効情報を入手でき、閲覧中の Web サイトのデジタル証明書の有効性を確認できるようになる。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 41,
-    "text": "クライアント証明書で利用者を認証するリバースプロキシサーバを用いて、複数のWeb サーバにシングルサインオンを行うシステムがある。このシステムに関する記述のうち、適切なものはどれか。",
+    "text": "クライアント証明書で利用者を認証するリバースプロキシサーバを用いて、複数の Web サーバにシングルサインオンを行うシステムがある。このシステムに関する記述のうち、適切なものはどれか。",
     "options": [
       {
         "id": "a",
@@ -1020,9 +941,7 @@
         "text": "利用者IDなどの情報を Web サーバに送信するのは、利用者のPCではなく、リバースプロキシサーバである。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 42,
@@ -1045,9 +964,7 @@
         "text": "利用者の誕生日や電話番号などの個人情報を言葉巧みに聞き出して、パスワードを類推する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 43,
@@ -1070,9 +987,7 @@
         "text": "リスクの重大性を評価するために目安とする条件"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 44,
@@ -1095,9 +1010,7 @@
         "text": "Web サイトからの受信データを受信処理した後、不正なコード列が検知されない場合だけPCに送信する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 45,
@@ -1120,9 +1033,7 @@
         "text": "ネットワーク上を流れるパケットを収集し、そのプロトコルヘッダやペイロードを解析して、あらかじめ登録された攻撃パターンと一致するものを検出する。"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "セキュリティ"
+    "correctOption": null
   },
   {
     "qNo": 46,
@@ -1145,34 +1056,30 @@
         "text": "データ結合"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 47,
-    "text": "次の流れ図において、判定条件網羅(分岐網羅)を満たす最少のテストケースの組みはどれか。[流れ図参照]",
+    "text": "次の流れ図において、判定条件網羅(分岐網羅)を満たす最少のテストケースの組みはどれか。\n\n```mermaid\ngraph TD\n    A[開始] --> B{1 -> C}\n    B --> C{A>0 かつ B=0}\n    C -- Yes --> D{A X C -> C}\n    C -- No --> E{2 -> C}\n    D --> F{A>0 かつ C=1}\n    E --> F\n    F -- Yes --> G{C^2 -> C}\n    F -- No --> G\n    G --> H[終了]\n```",
     "options": [
       {
         "id": "a",
-        "text": "(1) A=0, B=0 (2) A=1, B=1 (3) A=1, B=0"
+        "text": "(1) A=0, B=0, (2) A=1, B=1"
       },
       {
         "id": "b",
-        "text": "(1) A=1, B=0 (2) A=1, B=1 (3) A=1, B=0"
+        "text": "(1) A=1, B=0, (2) A=1, B=1"
       },
       {
         "id": "c",
-        "text": "(1) A=0, B=0 (2) A=1, B=1 (3) A=1, B=1"
+        "text": "(1) A=0, B=0, (2) A=1, B=1, (3) A=1, B=0"
       },
       {
         "id": "d",
-        "text": "(1) A=0, B=0 (2) A=0, B=1 (3) A=1, B=0"
+        "text": "(1) A=0, B=0, (2) A=0, B=1, (3) A=1, B=0"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 48,
@@ -1195,9 +1102,7 @@
         "text": "予防保守"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 49,
@@ -1220,9 +1125,7 @@
         "text": "ベロシティ"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 50,
@@ -1245,13 +1148,11 @@
         "text": "タスクスケジューリングの仕組みなどを提供するソフトウェア"
       }
     ],
-    "correctOption": null,
-    "category": "Technology",
-    "subCategory": "システム開発技術"
+    "correctOption": null
   },
   {
     "qNo": 51,
-    "text": "ある組織では、プロジェクトのスケジュールとコストの管理にアーンドバリューマネジメントを用いている。期間 10日間のプロジェクトの、5日目の終了時点の状況は表のとおりである。この時点でのコスト効率が今後も続くとしたとき、完成時総コスト見積り (EAC) は何万円か。[表参照]",
+    "text": "ある組織では、プロジェクトのスケジュールとコストの管理にアーンドバリューマネジメントを用いている。期間 10日間のプロジェクトの、5日目の終了時点の状況は表のとおりである。この時点でのコスト効率が今後も続くとしたとき、完成時総コスト見積り (EAC) は何万円か。\n\n| 管理項目 | 金額(万円) |\n|---|---|\n| 完成時総予算(BAC) | 100 |\n| プランドバリュー(PV) | 50 |\n| アーンドバリュー(EV) | 40 |\n| 実コスト(AC) | 60 |",
     "options": [
       {
         "id": "a",
@@ -1270,9 +1171,7 @@
         "text": "150"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 52,
@@ -1295,13 +1194,11 @@
         "text": "モンテカルロ法"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 53,
-    "text": "ソフトウェア開発プロジェクトにおいて、表の全ての作業を完了させるために必要な期間は最短で何日間か。[表参照]",
+    "text": "ソフトウェア開発プロジェクトにおいて、表の全ての作業を完了させるために必要な期間は最短で何日間か。\n\n| 作業 | 作業の開始条件 | 所要日数(日) |\n|---|---|---|\n| 要件定義 | なし | 30 |\n| 設計 | 要件定義の完了 | 20 |\n| 製造 | 設計の完了 | 25 |\n| テスト | 製造の完了 | 15 |\n| 利用者マニュアル作成 | 設計の完了 | 20 |\n| 利用者教育 | テストの完了及び利用者マニュアル作成の完了 | 10 |",
     "options": [
       {
         "id": "a",
@@ -1320,9 +1217,7 @@
         "text": "120"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 54,
@@ -1345,13 +1240,11 @@
         "text": "プロジェクトのステークホルダの情報及びコミュニケーションのニーズ"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 55,
-    "text": "あるシステムにおけるデータ復旧の要件が次のとおりであるとき、データのバックアップは最長で何時間ごとに取得する必要があるか。〔データ復旧の要件〕・RTO(目標復旧時間):3時間・RPO(目標復旧時点):12時間前",
+    "text": "あるシステムにおけるデータ復旧の要件が次のとおりであるとき、データのバックアップは最長で何時間ごとに取得する必要があるか。\n\n〔データ復旧の要件〕\n・RTO(目標復旧時間):3時間\n・RPO(目標復旧時点):12時間前",
     "options": [
       {
         "id": "a",
@@ -1370,13 +1263,11 @@
         "text": "15"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 56,
-    "text": "ITIL 2011 edition では、可用性管理における重要業績評価指標(KPI) の例として、“保守性を表す指標値”の短縮を挙げている。保守性を表す指標に該当するものはどれか。",
+    "text": "ITIL 2011 edition では、可用性管理における重要業績評価指標(KPI)の例として、“保守性を表す指標値”の短縮を挙げている。保守性を表す指標に該当するものはどれか。",
     "options": [
       {
         "id": "a",
@@ -1395,9 +1286,7 @@
         "text": "平均サービス回復時間"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 57,
@@ -1420,9 +1309,7 @@
         "text": "システム障害が発生した場合には、データの復旧や整合性のチェックなどを行う。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 58,
@@ -1445,9 +1332,7 @@
         "text": "平時にはBCPを従業員に非公開としている。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 59,
@@ -1470,9 +1355,7 @@
         "text": "監査調書は監査の過程で入手した客観的な事実の記録なので、監査担当者の所見は記述しない。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 60,
@@ -1495,9 +1378,7 @@
         "text": "一つの監査目的に対して、通常は、複数の監査手続を組み合わせて監査を実施する。"
       }
     ],
-    "correctOption": null,
-    "category": "Management",
-    "subCategory": "プロジェクト・サービスマネジメント"
+    "correctOption": null
   },
   {
     "qNo": 61,
@@ -1520,9 +1401,7 @@
         "text": "保管したログは、情報セキュリティインシデントが発生した場合にだけ分析し,分析結果に応じて必要な対策を講じる。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 62,
@@ -1545,9 +1424,7 @@
         "text": "利用者の視点から業務システムの機能を幾つかの独立した部品に分けることによって、業務プロセスとの対応付けや他ソフトウェアとの連携を容易にする手法"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 63,
@@ -1570,9 +1447,7 @@
         "text": "プロジェクトを、戦略との適合性や費用対効果、リスクといった観点から評価を行い、情報化投資のバランスを管理し、最適化を図ること"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 64,
@@ -1595,9 +1470,7 @@
         "text": "ROI (Return On Investment)"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 65,
@@ -1620,9 +1493,7 @@
         "text": "地震などの大規模災害時であっても、144時間以内にシステムを復旧できること"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 66,
@@ -1645,9 +1516,7 @@
         "text": "ユースケース図"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 67,
@@ -1670,9 +1539,7 @@
         "text": "市場成長率が低く、相対的市場占有率が低い事業"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 68,
@@ -1695,9 +1562,7 @@
         "text": "製品ライフサイクルを、導入期,成長期,成熟期,衰退期という四つの段階に分類し、企業にとって最適な戦略を立案する手法である。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 69,
@@ -1720,9 +1585,7 @@
         "text": "人から人へ、プラスの評価が口コミで爆発的に広まりやすいインターネットの特長を生かす手法"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 70,
@@ -1745,9 +1608,7 @@
         "text": "複数の企業から生産だけを専門に請け負い、多くの製品を低コストで生産する。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 71,
@@ -1770,9 +1631,7 @@
         "text": "自治体の住民情報"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 72,
@@ -1795,13 +1654,11 @@
         "text": "より品質が高い部品を調達するために、部品の納入指定業者を複数定め、競争入札で部品を調達する。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 73,
-    "text": "製造業のA社では、NC工作機械を用いて、四つの仕事 a~d を行っている。各仕事間の段取り時間は表のとおりである。合計の段取り時間が最小になるように仕事を行った場合の合計段取り時間は何時間か。ここで、仕事はどの順序で行ってもよく、a~d を一度ずつ行うものとし、FROM からTOへの段取り時間で検討する。[表参照]",
+    "text": "製造業のA社では、NC工作機械を用いて、四つの仕事 a~d を行っている。各仕事間の段取り時間は表のとおりである。合計の段取り時間が最小になるように仕事を行った場合の合計段取り時間は何時間か。ここで、仕事はどの順序で行ってもよく、a~d を一度ずつ行うものとし、FROM からTOへの段取り時間で検討する。\n\n| TO FROM | 仕事a | 仕事b | 仕事 c | 仕事 d |\n|---|---|---|---|---|\n| 仕事 a | - | 2 | 1 | 2 |\n| 仕事 b | 1 | - | 1 | 2 |\n| 仕事 c | 3 | 2 | - | 2 |\n| 仕事 d | 4 | 3 | 2 | - |",
     "options": [
       {
         "id": "a",
@@ -1820,9 +1677,7 @@
         "text": "7"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 74,
@@ -1845,9 +1700,7 @@
         "text": "日程調整,資料準備,議事録作成など、会議運営の事務的作業に特化した支援を行う。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 75,
@@ -1870,13 +1723,11 @@
         "text": "リーダシップの有効性は、リーダがもつパーソナリティと、リーダがどれだけ統制力や影響力を行使できるかという状況要因に依存するとしている。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 76,
-    "text": "新製品の設定価格とその価格での予測需要との関係を表にした。最大利益が見込める新製品の設定価格はどれか。ここで、いずれの場合にも、次の費用が発生するものとする。固定費:1,000,000円, 変動費:600円/個。[表参照]",
+    "text": "新製品の設定価格とその価格での予測需要を表にした。最大利益が見込める新製品の設定価格はどれか。ここで、いずれの場合にも、次の費用が発生するものとする。\n固定費: 1,000,000 円\n変動費: 600 円/個\n\n| 新製品の設定価格(円) | 新製品の予測需要(個) |\n|---|---|\n| 1,000 | 80,000 |\n| 1,200 | 70,000 |\n| 1,400 | 60,000 |\n| 1,600 | 50,000 |",
     "options": [
       {
         "id": "a",
@@ -1895,9 +1746,7 @@
         "text": "1,600"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 77,
@@ -1920,9 +1769,7 @@
         "text": "B社に帰属する。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 78,
@@ -1945,9 +1792,7 @@
         "text": "不正アクセスの目的で、不正に入手した他人の利用者 IDとパスワードをPCに保管する。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 79,
@@ -1970,9 +1815,7 @@
         "text": "B社の従業員が、A社を作業場所として、B社の責任者の指揮命令に従って設計書を作成している。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   },
   {
     "qNo": 80,
@@ -1995,8 +1838,6 @@
         "text": "電気電子製品の生産から処分までの全ての段階で、有害物質が環境及び人の健康に及ぼす危険を最小化する。"
       }
     ],
-    "correctOption": null,
-    "category": "Strategy",
-    "subCategory": "システム戦略・経営戦略"
+    "correctOption": null
   }
 ]

@@ -5,6 +5,8 @@ import * as path from 'path';
 import * as dotenv from 'dotenv';
 import { jsonrepair } from 'jsonrepair';
 import axios from 'axios';
+import { CosmosClient } from '@azure/cosmos';
+import * as https from 'https';
 
 // Load Environment
 const envPaths = [
@@ -57,6 +59,13 @@ async function transformData(examId: string, genAI: GoogleGenerativeAI): Promise
     // Normalize Raw Input
     if (!Array.isArray(rawQuestions) && rawQuestions.questions) rawQuestions = rawQuestions.questions;
     if (!Array.isArray(rawQuestions)) rawQuestions = [rawQuestions];
+
+    // PASS-THROUGH for AM/Multiple Choice (Already structured by Extractor)
+    if (rawQuestions.length > 0 && (rawQuestions[0].options || rawQuestions[0].type === 'AM')) {
+        console.log(`[${examId}] Detected AM/Structured data. Skipping LLM Transformation.`);
+        fs.writeFileSync(outPath, JSON.stringify(rawQuestions, null, 2));
+        return true;
+    }
 
     const promptTemplate = fs.existsSync(PROMPT_FILE_PATH) ? fs.readFileSync(PROMPT_FILE_PATH, 'utf-8') : "";
     if (!promptTemplate) throw new Error("Prompt file missing");
@@ -132,111 +141,121 @@ async function cleanseData(examId: string): Promise<boolean> {
     console.log(`[${examId}] Running Data Cleansing/Normalization...`);
 
     // Logic from cleanse-pm-data.ts (simplified for single file)
-    let data: any = JSON.parse(fs.readFileSync(outPath, 'utf-8'));
-    let modified = false;
+    try {
+        let data: any = JSON.parse(fs.readFileSync(outPath, 'utf-8'));
 
-    // 1. Array Wrapper
-    if (Array.isArray(data)) { data = { questions: data }; modified = true; }
+        // Validation: Verify if data is valid JSON object/array
+        if (!data) throw new Error("Parsed data is null/undefined");
 
-    // 1.5 MERGE DUPLICATES (Fix for fragmented raw/transformed data)
-    if (data.questions && Array.isArray(data.questions)) {
-        const uniqueQ: any[] = [];
-        const byQNo = new Map<string, any>();
+        let modified = false;
 
-        // Group by qNo
-        for (const q of data.questions) {
-            const qNo = String(q.qNo || '1');
-            if (!byQNo.has(qNo)) {
-                byQNo.set(qNo, q);
-                uniqueQ.push(q);
-            } else {
-                // Merge
-                console.log(`[${examId}] Merging fragment for Q${qNo}...`);
-                const base = byQNo.get(qNo);
+        // 1. Array Wrapper
+        if (Array.isArray(data)) { data = { questions: data }; modified = true; }
 
-                // Merge Context (Append Background)
-                if (q.context) {
-                    if (!base.context) base.context = q.context;
-                    else {
-                        if (q.context.background) {
-                            base.context.background = (base.context.background || "") + "\n\n" + q.context.background;
-                        }
-                        if (q.context.diagrams && Array.isArray(q.context.diagrams)) {
-                            base.context.diagrams = [...(base.context.diagrams || []), ...q.context.diagrams];
+        // 1.5 MERGE DUPLICATES (Fix for fragmented raw/transformed data)
+        if (data.questions && Array.isArray(data.questions)) {
+            const uniqueQ: any[] = [];
+            const byQNo = new Map<string, any>();
+
+            // Group by qNo
+            for (const q of data.questions) {
+                const qNo = String(q.qNo || '1');
+                if (!byQNo.has(qNo)) {
+                    byQNo.set(qNo, q);
+                    uniqueQ.push(q);
+                } else {
+                    // Merge
+                    console.log(`[${examId}] Merging fragment for Q${qNo}...`);
+                    const base = byQNo.get(qNo);
+
+                    // Merge Context (Append Background)
+                    if (q.context) {
+                        if (!base.context) base.context = q.context;
+                        else {
+                            if (q.context.background) {
+                                base.context.background = (base.context.background || "") + "\n\n" + q.context.background;
+                            }
+                            if (q.context.diagrams && Array.isArray(q.context.diagrams)) {
+                                base.context.diagrams = [...(base.context.diagrams || []), ...q.context.diagrams];
+                            }
                         }
                     }
-                }
 
-                // Merge SubQuestions
+                    // Merge SubQuestions
+                    if (q.questions && Array.isArray(q.questions)) {
+                        base.questions = [...(base.questions || []), ...q.questions];
+                    }
+
+                    // Merge Description (if Context didn't cover it)
+                    if (q.description && !base.description) base.description = q.description;
+
+                    modified = true;
+                }
+            }
+
+            if (modified) {
+                data.questions = uniqueQ; // Replace with merged list
+            }
+        }
+
+        // 2. Point Alloc
+        if (data.questions) {
+            let totalCount = 0;
+            data.questions.forEach((q: any) => {
+                // subQuestions property name might vary?
+                // Prompt schema says output: "questions: SubQuestion[]" inside ExamQuestion.
+                // Inside SubQuestion, "subQuestions" property might exist if nested.
+                // Usually top level inside 'questions' (ExamQuestion) has 'questions' array (SubQuestions).
+                // But my merge logic used 'q.questions'. 
+                // Let's check schema used in transformation.
+                // Prompt: `questions: SubQuestion[]`.
+                // And my merge logic used `q.questions`. Correct.
+
+                // Point logic calculation:
+                // If `q.questions` (SubQuestions) exists:
                 if (q.questions && Array.isArray(q.questions)) {
-                    base.questions = [...(base.questions || []), ...q.questions];
+                    totalCount += q.questions.length;
+                } else {
+                    totalCount += 1;
                 }
+            });
 
-                // Merge Description (if Context didn't cover it)
-                if (q.description && !base.description) base.description = q.description;
+            const points = totalCount > 0 ? Math.floor(100 / totalCount) : 0;
+            if (totalCount > 0 && points > 0) {
+                // Simple fill if missing
+                data.questions.forEach((q: any) => {
+                    // Iterate SubQuestions
+                    if (q.questions && Array.isArray(q.questions)) {
+                        q.questions.forEach((sq: any) => {
+                            if (!sq.point) sq.point = points;
+                        });
+                    } else {
+                        if (!q.point) q.point = points;
+                    }
 
+                    // Also handle `point` on the ExamQuestion level if flat?
+                    // Usually AP/SC PM has SubQuestions.
+                });
                 modified = true;
             }
         }
 
         if (modified) {
-            data.questions = uniqueQ; // Replace with merged list
+            fs.writeFileSync(outPath, JSON.stringify(data, null, 2));
+            console.log(`[${examId}] Cleansed.`);
         }
+        return true;
+    } catch (e: any) {
+        console.error(`[${examId}] Cleanse Error: ${e.message}`);
+        fs.writeFileSync('cleanse_error.log', `[${examId}] ${e.message}\n${e.stack}\n`);
+        return false;
     }
-
-    // 2. Point Alloc
-    if (data.questions) {
-        let totalCount = 0;
-        data.questions.forEach((q: any) => {
-            // subQuestions property name might vary?
-            // Prompt schema says output: "questions: SubQuestion[]" inside ExamQuestion.
-            // Inside SubQuestion, "subQuestions" property might exist if nested.
-            // Usually top level inside 'questions' (ExamQuestion) has 'questions' array (SubQuestions).
-            // But my merge logic used 'q.questions'. 
-            // Let's check schema used in transformation.
-            // Prompt: `questions: SubQuestion[]`.
-            // And my merge logic used `q.questions`. Correct.
-
-            // Point logic calculation:
-            // If `q.questions` (SubQuestions) exists:
-            if (q.questions && Array.isArray(q.questions)) {
-                totalCount += q.questions.length;
-            } else {
-                totalCount += 1;
-            }
-        });
-
-        const points = totalCount > 0 ? Math.floor(100 / totalCount) : 0;
-        if (totalCount > 0 && points > 0) {
-            // Simple fill if missing
-            data.questions.forEach((q: any) => {
-                // Iterate SubQuestions
-                if (q.questions && Array.isArray(q.questions)) {
-                    q.questions.forEach((sq: any) => {
-                        if (!sq.point) sq.point = points;
-                    });
-                } else {
-                    if (!q.point) q.point = points;
-                }
-
-                // Also handle `point` on the ExamQuestion level if flat?
-                // Usually AP/SC PM has SubQuestions.
-            });
-            modified = true;
-        }
-    }
-
-    if (modified) {
-        fs.writeFileSync(outPath, JSON.stringify(data, null, 2));
-        console.log(`[${examId}] Cleansed.`);
-    }
-    return true;
 }
 
 // --- HELPER: Sync DB ---
 async function syncExamToDB(examId: string): Promise<boolean> {
+    console.error(`[${examId}] DEBUG: Entering syncExamToDB`);
     console.log(`[${examId}] Starting DB Sync...`);
-    const { CosmosClient } = require('@azure/cosmos');
 
     // Env check
     const CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION || process.env.Values_COSMOS_DB_CONNECTION;
@@ -244,18 +263,13 @@ async function syncExamToDB(examId: string): Promise<boolean> {
         console.error(`[${examId}] Sync Failed: COSMOS_DB_CONNECTION missing.`);
         return false;
     }
-    console.log(`[${examId}] DB Connection Configured.`);
+    console.error(`[${examId}] DEBUG: Connection string found (length: ${CONNECTION_STRING.length})`);
 
     // Client Setup
     const isLocal = CONNECTION_STRING.includes('localhost') || CONNECTION_STRING.includes('127.0.0.1');
     let clientOptions: any = { connectionString: CONNECTION_STRING };
     if (isLocal) {
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-        // Need to import https for Agent if generic fetch not used by Cosmos SDK?
-        // Cosmos SDK usually handles it, but let's be safe if strictly needed.
-        // Actually locally we can just set rejectUnauthorized: false via Agent if exposed.
-        // For simplicity, just strict SSL disable is often enough for local emulator + SDK.
-        const https = require('https');
         clientOptions.agent = new https.Agent({ rejectUnauthorized: false });
     }
 
@@ -285,6 +299,7 @@ async function syncExamToDB(examId: string): Promise<boolean> {
         if (typeStr.includes('AM2')) type = 'AM2';
         else if (typeStr.includes('PM1')) type = 'PM1';
         else if (typeStr.includes('PM2')) type = 'PM2';
+        else if (typeStr.includes('AM')) type = 'AM1';
 
         const examItem = {
             id: examId,
@@ -354,6 +369,8 @@ async function verifyApp(examId: string): Promise<boolean> {
     let type = 'PM';
     if (examId.endsWith('PM1')) type = 'PM1';
     if (examId.endsWith('PM2')) type = 'PM2';
+    if (examId.endsWith('AM') || examId.endsWith('AM1')) type = 'AM1';
+    if (examId.endsWith('AM2')) type = 'AM2';
 
     const url = `${WEB_BASE_URL}/exam/${examId}/${type}/1`;
 
@@ -392,8 +409,9 @@ async function main() {
     const targetPrefix = process.argv[2] || 'SC'; // Default SC
 
     const allDirs = fs.readdirSync(DATA_DIR);
-    // Find matching directories (e.g. SC-*-PM*)
-    const targets = allDirs.filter(d => d.startsWith(targetPrefix) && (d.includes('-PM') || d.includes('PM1') || d.includes('PM2')));
+    // Find matching directories
+    // Includes PM, PM1, PM2, and AM, AM1, AM2
+    const targets = allDirs.filter(d => d.startsWith(targetPrefix));
 
     targets.sort().reverse(); // Newest first
 
@@ -440,4 +458,7 @@ async function main() {
     console.log(`\nAll ${successCount}/${targets.length} exams processed successfully.`);
 }
 
-main();
+main().catch(err => {
+    console.error("[FATAL] Unhandled Error:", err);
+    process.exit(1);
+});

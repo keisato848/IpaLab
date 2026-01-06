@@ -12,21 +12,14 @@ import rehypeRaw from 'rehype-raw';
 // @ts-ignore
 import he from 'he';
 import styles from './QuestionClient.module.css';
-import { Question, saveLearningRecord, LearningRecord, getLearningRecords } from '@/lib/api';
-import { guestManager } from '@/lib/guest-manager';
-import { useSession } from 'next-auth/react';
-import { useTheme } from '@/components/providers/ThemeProvider';
-import { v4 as uuidv4 } from 'uuid';
-import { getExamLabel } from '@/lib/exam-utils';
-import dynamic from 'next/dynamic';
+import { Question, saveLearningRecord, LearningRecord, getLearningRecords, saveExamProgress, getExamProgress } from '@/lib/api';
+// ... (imports)
+import { FaRegBookmark, FaBookmark } from 'react-icons/fa'; // Import icons (Assuming react-icons is available, else use emoji)
 
 const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false });
-// ... imports
 import ExamSummary from './ExamSummary';
 import AIAnswerBox from './AIAnswerBox';
 import SCPMExamView from './SCPMExamView';
-
-
 
 interface QuestionClientProps {
     question: Question;
@@ -55,7 +48,6 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const [examStats, setExamStats] = useState<{ total: number; correct: number } | null>(null);
     const [allExamRecords, setAllExamRecords] = useState<LearningRecord[]>([]);
 
-
     // Mock Mode Logic
     const isMock = mode === 'mock';
     const [timeLeft, setTimeLeft] = useState(150 * 60); // 150 minutes in seconds
@@ -72,51 +64,88 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     // AI Score Persistence State
     const [descriptiveHistory, setDescriptiveHistory] = useState<Record<string, { answer: string; result: any }>>({});
 
-    // Load history on mount or question change
+    // Review Later State
+    const [isBookmarked, setIsBookmarked] = useState(false);
+
+    // Load history & progress on mount
     useEffect(() => {
         if (!session?.user?.id) return;
 
-        // Fetch records for this exam to populate history
-        async function fetchHistory() {
+        async function fetchHistoryAndProgress() {
             try {
                 const userId = session?.user?.id || guestManager.getGuestId();
                 if (!userId) return;
 
+                // 1. Fetch History (Logs)
                 const records = await getLearningRecords(userId, question.examId);
+                // ... (existing historyMap logic) ...
                 const historyMap: Record<string, { answer: string; result: any }> = {};
-
                 records.forEach(r => {
+                    // ... existing logic ...
                     if (r.isDescriptive && r.userAnswer && r.questionId) {
-                        // Map by questionId (need to ensure questionId matches sub-question ID generation logic)
-                        // Current logic uses constructed IDs for sub-questions? 
-                        // Wait, sub-questions don't have unique IDs in the raw data usually, unless we construct them.
-                        // For saving, we need a consistent ID strategy.
-                        // Let's assume we construct ID as `${question.id}-${subQIndex}-${sqIndex}` if needed, or just match by exact logic?
-                        // The API expects `questionId`.
-                        // Using the unique ID stored in record.
                         historyMap[r.questionId] = {
                             answer: r.userAnswer,
                             result: {
                                 score: r.aiScore || 0,
                                 radarChartData: r.aiRadarData || [],
                                 feedback: r.aiFeedback || '',
-                                mermaidDiagram: undefined, // Not typically saved/needed to restore immediately? Or save it? Schema has no mermaid field yet?
-                                // Wait, schema didn't have mermaidDiagram string.
-                                // If we want to restore mermaid, we need to save it or regenerate it?
-                                // User req didn't explicitly ask for mermaid persistence, but "CLKS data structure".
-                                // I'll skip mermaid restoration for now or mock it if needed.
-                                // Update: I can add mermaid to schema if I want, but I'll stick to requested fields.
+                                mermaidDiagram: undefined,
                             }
                         };
                     }
                 });
                 setDescriptiveHistory(historyMap);
+
+                // 2. Fetch Progress (Bookmarks)
+                const progress = await getExamProgress(userId, question.examId);
+                if (progress && progress.bookmarks.includes(question.id)) {
+                    setIsBookmarked(true);
+                } else {
+                    setIsBookmarked(false);
+                }
+
             } catch (e) {
-                console.error("Failed to load history", e);
+                console.error("Failed to load history/progress", e);
             }
         }
-        fetchHistory();
+        fetchHistoryAndProgress();
     }, [question.id, session?.user?.id, question.examId]);
+
+    // Handle Bookmark Toggle
+    const toggleBookmark = async () => {
+        const userId = session?.user?.id || guestManager.getGuestId();
+        if (!userId) return;
+
+        const newState = !isBookmarked;
+        setIsBookmarked(newState); // Optimistic Update
+
+        // Fetch current bookmarks to update list
+        // Actually, creating a full list update might be race-condition prone if we don't have the full list.
+        // API `saveExamProgress` expects the *new list* of bookmarks.
+        // So we need to fetch, modify, save? Or should API handle toggle?
+        // Proposal: Frontend maintains locally loaded bookmarks? No, we only loaded *this* question's state.
+        // We need to fetch current progress first to get full list, then modify.
+        // Or assume we fetched it in parent? We didn't.
+        // Better Strategy: `saveExamProgress` should ideally accept "add/remove" or we fetch-modify-save.
+        // Let's do fetch-modify-save for now.
+
+        try {
+            const current = await getExamProgress(userId, question.examId);
+            let newBookmarks = current?.bookmarks || [];
+
+            if (newState) {
+                if (!newBookmarks.includes(question.id)) newBookmarks.push(question.id);
+            } else {
+                newBookmarks = newBookmarks.filter(id => id !== question.id);
+            }
+
+            await saveExamProgress(userId, question.examId, { bookmarks: newBookmarks });
+        } catch (e) {
+            console.error("Failed to save bookmark", e);
+            setIsBookmarked(!newState); // Revert
+        }
+    };
+
 
     // Reset state when question changes
     useEffect(() => {
@@ -198,6 +227,10 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         try {
             if (session?.user?.id) {
                 await saveLearningRecord(record);
+                // [NEW] Sync Progress Snapshot immediately
+                await saveExamProgress(session.user.id, question.examId, {
+                    statusUpdate: { questionId: qId, isCorrect: (data.result.score || 0) >= 60 }
+                });
             } else {
                 guestManager.saveHistory(record);
             }
@@ -244,9 +277,15 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             timeTakenSeconds: timeTaken,
         };
 
-        if (session) {
+        if (session && session.user?.id) {
             try {
-                await saveLearningRecord(record);
+                // Parallel Save: Log & Snapshot
+                await Promise.all([
+                    saveLearningRecord(record),
+                    saveExamProgress(session.user.id, question.examId, {
+                        statusUpdate: { questionId: question.id, isCorrect }
+                    })
+                ]);
             } catch (e) {
                 console.error("Failed to save to API", e);
             }
@@ -494,8 +533,32 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     <span className={`${styles.modeBadge} ${isMock ? styles.mockBadge : ''} ${styles.mobileHidden}`}>
                         {isPractice ? '練習モード' : '模擬試験モード'}
                     </span>
-                    {/* Header Stats / Settings Toggle */}
+                    {/* Header Controls: Bookmark & Stats */}
                     <div className={styles.headerControls}>
+                        {/* Bookmark Button */}
+                        <button
+                            className={`${styles.bookmarkBtn} ${isBookmarked ? styles.active : ''}`}
+                            onClick={toggleBookmark}
+                            title="あとで見直す"
+                            aria-label="Review Later"
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '0.9rem',
+                                color: isBookmarked ? '#f59e0b' : '#64748b',
+                                marginRight: '1rem'
+                            }}
+                        >
+                            {isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
+                            <span className={styles.mobileHidden}>
+                                {isBookmarked ? '見直す' : 'あとで見直す'}
+                            </span>
+                        </button>
+
                         {/* Desktop: Show Stats inline if enabled */}
                         <div className={`${styles.statsContainer} ${styles.mobileHidden}`}>
                             {showExamStats && (
