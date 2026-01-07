@@ -64,12 +64,18 @@ export default function DashboardClient() {
             }
 
             const lastRecord = records[0];
+            if (!lastRecord.examId || !lastRecord.questionId) {
+                // Bad data protection
+                return;
+            }
+
             const parts = lastRecord.examId.split('-'); // AP-2023-Fall-AM
             const typeSuffix = parts[parts.length - 1]; // "AM"
             const yearPart = parts.slice(0, parts.length - 1).join('-'); // "AP-2023-Fall"
             const typeUrl = typeSuffix === 'AM' ? 'AM1' : typeSuffix;
 
-            const lastQNo = parseInt(lastRecord.questionId.split('-').pop() || '0');
+            const qIdParts = lastRecord.questionId.split('-');
+            const lastQNo = parseInt(qIdParts[qIdParts.length - 1] || '0');
             const nextQNo = lastQNo + 1;
 
             try {
