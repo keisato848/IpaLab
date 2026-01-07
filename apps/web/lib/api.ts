@@ -13,6 +13,7 @@ export interface Question {
     options: { id: string; text: string }[];
     correctOption: string;
     explanation?: string;
+    diagram?: string; // Markdown/Mermaid content
     // PM specific fields
     isPM?: boolean;
     subQuestions?: any[];
