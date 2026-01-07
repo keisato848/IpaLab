@@ -101,11 +101,26 @@ async function main() {
         const dataDir = path.resolve(__dirname, '../../data/questions');
         const questionFiles = glob.sync('**/questions_raw.json', { cwd: dataDir });
 
-        console.log(`Found ${questionFiles.length} question files.`);
+        // Filter by argument if provided (e.g. --exam AP-2024-Fall-AM)
+        const args = process.argv.slice(2);
+        const examArgIdx = args.indexOf('--exam');
+        const targetExam = examArgIdx !== -1 ? args[examArgIdx + 1] : null;
+
+        if (targetExam) {
+            console.log(`Filtering for exam: ${targetExam}`);
+        }
+
+        console.log(`Found ${questionFiles.length} question files (filtering for ${targetExam || 'ALL'}).`);
 
         for (const file of questionFiles) {
             const dir = path.dirname(file);
             const folderName = dir.split(path.sep).pop()!;
+
+            if (targetExam && folderName !== targetExam) {
+                continue;
+            }
+
+
 
             let yearStr = "2024";
             let seasonStr = "S";
@@ -301,6 +316,9 @@ async function main() {
                                     type: type,
                                     qNo: resolvedQNo,
                                     text: q.text,
+                                    category: classificationMap.get(resolvedQNo)?.category || examPrefix,
+                                    subCategory: classificationMap.get(resolvedQNo)?.subCategory || undefined,
+                                    diagram: q.diagram, // Fix for Issue #22
                                     options: q.options,
                                     correctOption: q.correctOption,
                                     explanation: q.explanation
