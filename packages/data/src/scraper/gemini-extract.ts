@@ -251,17 +251,15 @@ async function main() {
     const outDir = path.resolve(__dirname, '../../data/questions');
 
     const files = await fs.readdir(rawDir);
-    // Filter for Question PDFs (exclude -Ans.pdf) AND specific target: AP Afternoon Exams
+    // Filter for Question PDFs (exclude -Ans.pdf) AND specific target: Morning Exams (AP, PM, SC, IP)
     let examFiles = files.filter(f =>
         f.endsWith('.pdf') &&
         !f.endsWith('-Ans.pdf') &&
         (
-            f.includes('2025') ||
-            f.startsWith('FE-') ||
-            (f.startsWith('AP-') && f.includes('-PM')) ||
-            (f.startsWith('PM-') && (f.includes('-PM1') || f.includes('-PM2'))) ||
-            (f.startsWith('SC-') && (f.includes('-AM2') || f.includes('-PM') || f.includes('-PM1') || f.includes('-PM2'))) ||
-            (f.startsWith('IP-'))
+            (f.startsWith('AP-') && f.includes('-AM')) ||
+            (f.startsWith('PM-') && f.includes('-AM2')) ||
+            (f.startsWith('SC-') && f.includes('-AM2')) ||
+            (f.startsWith('IP-') && f.includes('-AM'))
         )
     );
 
