@@ -49,15 +49,22 @@ export async function getExamDataFS(examId: string): Promise<any[]> {
         const jsonData = JSON.parse(content);
 
         // Normalize to array
-        // Normalize to array
+        let questions: any[] = [];
         if (Array.isArray(jsonData)) {
-            return jsonData;
+            questions = jsonData;
         } else if (jsonData.questions && Array.isArray(jsonData.questions)) {
             // Fix: Return the inner questions array, not the wrapper object
-            return jsonData.questions;
+            questions = jsonData.questions;
+        } else {
+            questions = [jsonData];
         }
 
-        return [jsonData];
+        // Inject examId into each question if missing (Critical for SSG)
+        return questions.map(q => ({
+            ...q,
+            examId: q.examId || examId,
+            type: q.type || (examId.includes('AM') ? 'AM' : 'PM') // Fallback type injection
+        }));
     } catch (error) {
         console.warn(`[SSG] Data not found for ${examId}:`, error);
         return [];

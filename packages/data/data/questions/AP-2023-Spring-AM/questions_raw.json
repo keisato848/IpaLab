@@ -20,7 +20,8 @@
         "text": "(n+1) OR 256"
       }
     ],
-    "correctOption": null
+    "correctOption": "b",
+    "explanation": "正解は「イ」です。\n可用性（Availability）とは、システムがいつでも利用可能であることを意味します。ハードウェアの二重化（冗長化）は、障害発生時でもサービスを継続させるための対策です。"
   },
   {
     "qNo": 2,

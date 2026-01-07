@@ -20,7 +20,7 @@
         "text": "3.00"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 2,
@@ -43,7 +43,7 @@
         "text": "学習モデルの汎化性能を評価するために、データを複数のグループに分割し、一部を学習に残りを評価に使い、順にグループを入れ替えて学習と評価を繰り返す。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 3,
@@ -66,7 +66,7 @@
         "text": "CBA+×"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 4,
@@ -89,7 +89,7 @@
         "text": "レーザーレーダーは、天候などの影響を受けにくく、建物の後ろにある物体を検知できる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 5,
@@ -113,7 +113,7 @@
         "text": "14"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 6,
@@ -136,7 +136,7 @@
         "text": "n が a-b の倍数"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 7,
@@ -159,7 +159,7 @@
         "text": "Scala"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 8,
@@ -182,7 +182,7 @@
         "text": "(4), (5), (3), (2), (1)"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 9,
@@ -205,7 +205,7 @@
         "text": "同一の性能を実現した従来のコンピュータに比べて、量子コンピュータの物理的な大きさを圧倒的に小さくできること"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 10,
@@ -228,7 +228,7 @@
         "text": "0.95"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 11,
@@ -251,7 +251,7 @@
         "text": "物理層としてパラレル SCSI を用いることができる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 12,
@@ -274,7 +274,7 @@
         "text": "セッションを共有するクラスタ構成で1台のサーバに障害が発生した場合, サービス及びトランザクションは継続できる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 13,
@@ -297,7 +297,7 @@
         "text": "データとメタデータをセットにして保存し、固有の識別子でデータにアクセスする。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 14,
@@ -321,7 +321,7 @@
         "text": "C, B, A"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 15,
@@ -344,7 +344,7 @@
         "text": "400"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 16,
@@ -367,7 +367,7 @@
         "text": "タスクがシステムに到着した順に実行可能待ち行列の最後尾に加え、常に実行可能待ち行列の先頭のタスクに CPU を割り当てる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 17,
@@ -390,7 +390,7 @@
         "text": "ページフォールト"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 18,
@@ -413,7 +413,7 @@
         "text": "主記憶の外部断片化が発生しない。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 19,
@@ -436,7 +436,7 @@
         "text": "RCS"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 20,
@@ -459,7 +459,7 @@
         "text": "字句解析"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 21,
@@ -483,7 +483,7 @@
         "text": "Timing chart where output Y is 1 when A is 1 and B is 0, or vice versa."
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 22,
@@ -506,7 +506,7 @@
         "text": "複数のチップを単一のパッケージに封入してシステム化したデバイス"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 23,
@@ -529,7 +529,7 @@
         "text": "マイクロフォン, センサーなどが出力する微小な電気信号を増幅する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 24,
@@ -552,7 +552,7 @@
         "text": "内部メモリを物理アドレスに合わせて整然と配置する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 25,
@@ -576,7 +576,7 @@
         "text": "モーダルウィンドウ"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 26,
@@ -599,7 +599,7 @@
         "text": "350 Mビット/秒"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 27,
@@ -622,7 +622,7 @@
         "text": "調停者のトランザクションに、コミット又はロールバックの完了を参加者が返す直前に障害になった。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 28,
@@ -646,7 +646,7 @@
         "text": "販売代理店ごとの売れ筋商品"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 29,
@@ -670,7 +670,7 @@
         "text": "地域 [*] --- 仕入先 [*], 仕入先 [*] --- 仕入 [1], 仕入 [1] --- 部品 [*]"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 30,
@@ -694,7 +694,7 @@
         "text": "PARTITION BY 学生番号 ORDER BY 得点 DESC"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 31,
@@ -717,7 +717,7 @@
         "text": "分散トランザクションの調停者が, 全参加者からコミット可否を受け取り、コミットかロールバックかの判定を行う時点を指し、その後に全参加者にコミット又はロールバックの実行要求を発行することによって、分散トランザクションの原子性, 一貫性が保証できる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 32,
@@ -740,7 +740,7 @@
         "text": "10 Mビット/秒の回線サービス"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 33,
@@ -763,7 +763,7 @@
         "text": "ホスト名に対し別名を登録するレコードを NS レコードという。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 34,
@@ -786,7 +786,7 @@
         "text": "ネットワーク内の IP アドレスを一元管理し、クライアントに動的に割り当てる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 35,
@@ -809,7 +809,7 @@
         "text": "マルチキャストアドレスを割り振り、マルチキャスト通信を行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 36,
@@ -832,7 +832,7 @@
         "text": "ping"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 37,
@@ -855,7 +855,7 @@
         "text": "利用者が入力したパスワードとクラウドサービスから送信された乱数を組み合わせ、さらにハッシュ値に変換した結果をクライアントからクラウドサービスに送信する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 38,
@@ -878,7 +878,7 @@
         "text": "有効な電子メールアドレスに対して攻撃者が標的型攻撃メールを送信する SMTP のパケット"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 39,
@@ -901,7 +901,7 @@
         "text": "ディープウェブにて入手した認証情報で CEO の電子メールアカウントに不正にログインして偽りの電子メールを従業員に送付し、指定した銀行口座に送金するよう指示した。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 40,
@@ -924,7 +924,7 @@
         "text": "ピクチャパスワードの入力を録画してリスト化しておき、それを利用することによってタブレット端末へのログインを試行する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 41,
@@ -947,7 +947,7 @@
         "text": "セキュリティ製品の種別を識別するための識別子"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 42,
@@ -970,7 +970,7 @@
         "text": "外部からの DNS 問合せに対しては、宛先ポート番号 53 のものだけに応答する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 43,
@@ -993,7 +993,7 @@
         "text": "ソフトウェアを構成するコンポーネント、相互の依存関係などをリスト化した一覧"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 44,
@@ -1016,7 +1016,7 @@
         "text": "電子メールを送信するメールサーバの公開鍵を権威 DNS サーバで公開し、秘密鍵を使って電子メールにデジタル署名を付与する。電子メールを受信するメールサーバで、電子メールのデジタル署名を検証する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 45,
@@ -1039,7 +1039,7 @@
         "text": "スイッチが、物理ポートごとに、決まった IP アドレスをもつ PC の接続だけを許可するので、PC の不正接続のリスクを低減できる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 46,
@@ -1062,7 +1062,7 @@
         "text": "ログインのたびに変化する認証コードのことであり、不正に取得しても再利用できないので不正アクセスを防ぐ。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 47,
@@ -1085,7 +1085,7 @@
         "text": "各サービスを呼び出す回数が減るので、オーバーヘッドが削減できる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 48,
@@ -1108,7 +1108,7 @@
         "text": "利用者の使用したい機能が, 100%提供できていること"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 49,
@@ -1131,7 +1131,7 @@
         "text": "ユーザーストーリーマッピング"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 50,
@@ -1154,7 +1154,7 @@
         "text": "メディアクエリ"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 51,
@@ -1177,7 +1177,7 @@
         "text": "割り当てたテスト担当者が期待した成果を出せなかったので、経験豊富なテスト担当者と交代した。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 52,
@@ -1200,7 +1200,7 @@
         "text": "ワーク・パッケージ"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 53,
@@ -1223,7 +1223,7 @@
         "text": "ファシリテーション"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 54,
@@ -1246,7 +1246,7 @@
         "text": "設計が終わったモジュールから順にプログラム開発を実施するようにして、スケジュールを短縮した。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 55,
@@ -1269,7 +1269,7 @@
         "text": "サービスの中断から 1 日以内に、中断したサービスのうちの重要なサービスに限定してサービスを復旧する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 56,
@@ -1292,7 +1292,7 @@
         "text": "実施された改善は、設定した目標に照らして測定するのではなく、改善前と比較した改善の効果を測定する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 57,
@@ -1315,7 +1315,7 @@
         "text": "入力原票や EDI 受信ファイルなどの取引情報は、機密性を確保するために、データをシステムに取り込んだ後に速やかに廃棄する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 58,
@@ -1338,7 +1338,7 @@
         "text": "ドキュメントレビュー法"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 59,
@@ -1361,7 +1361,7 @@
         "text": "調査の範囲は、監査対象先だけに限定する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 60,
@@ -1384,7 +1384,7 @@
         "text": "システム監査人が、時間の関係で調査が終了しなかった監査項目を追跡調査して報告すること"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 61,
@@ -1407,7 +1407,7 @@
         "text": "データを迅速に活用するために、全体最適よりも、個別最適を志向した IT システムとなっているか。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 62,
@@ -1430,7 +1430,7 @@
         "text": "対象となる行政データを、二次利用や機械判読に適した形態で無償公開することを前提に、情報システムや業務プロセスの企画, 整備及び運用を行っている。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 63,
@@ -1453,7 +1453,7 @@
         "text": "複数部門が集まる会議の議事録を、各部門のスタッフが、それぞれ独自に作成していた。各部門での作成をやめ、代表者 1 名が作成し、部門間で共有した。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 64,
@@ -1477,7 +1477,7 @@
         "text": "シナリオ d"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 65,
@@ -1500,7 +1500,7 @@
         "text": "接続仕様や仕組みが公開されている他社のアプリケーションを活用してシステムを構築することによって、システム開発の生産性を高める設計思想のこと"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 66,
@@ -1523,7 +1523,7 @@
         "text": "ユースケース図"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 67,
@@ -1546,7 +1546,7 @@
         "text": "複数の企業や組織にまたがる調達から販売までの業務プロセス全ての情報を統合的に管理することによって、コスト低減や納期短縮などを目的とする。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 68,
@@ -1569,7 +1569,7 @@
         "text": "製品ライフサイクルを、導入期, 成長期, 成熟期, 衰退期という四つの段階に分類し、企業にとって最適な戦略を立案する手法である。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 69,
@@ -1592,7 +1592,7 @@
         "text": "自社に不足する経営資源を M&A によって強化し、従来にない価値をより素早く創造する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 70,
@@ -1615,7 +1615,7 @@
         "text": "魔の川"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 71,
@@ -1638,7 +1638,7 @@
         "text": "プロンプトエンジニアリング"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 72,
@@ -1662,7 +1662,7 @@
         "text": "7"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 73,
@@ -1686,7 +1686,7 @@
         "text": "1,500"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 74,
@@ -1709,7 +1709,7 @@
         "text": "経営理念を達成するために事業戦略を策定し、事業戦略という目標を達成するために経営戦略に分解する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 75,
@@ -1733,7 +1733,7 @@
         "text": "A社が戦略 a2, B社が戦略 b2を採る組合せ"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 76,
@@ -1756,7 +1756,7 @@
         "text": "ビッグデータの収集・分析に当たり、分析結果の検証可能性を確保し、複数の分析結果を比較可能とするために、対象をオープンデータに限定する統計手法"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 77,
@@ -1780,7 +1780,7 @@
         "text": "不況時にも、売上高の減少が大きな損失に結び付かず不況抵抗力は強い。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 78,
@@ -1803,7 +1803,7 @@
         "text": "プロトコル"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 79,
@@ -1826,7 +1826,7 @@
         "text": "派遣労働者が A 社の指揮命令に対して申し立てた苦情に自社で対応せず、その処理を B 社に任せる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 80,
@@ -1849,6 +1849,6 @@
         "text": "通信販売などの取引を公正にし、購入者等が受ける損害の防止を図り、購入者等の利益を保護することにより、国民経済の健全な発展に寄与すること"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   }
 ]

@@ -20,7 +20,8 @@
         "text": "物質の結晶ができる物理現象を模倣した方法であり、温度に見立てたパラメタを制御して,大ざっぱな解の候補から厳密な解の候補に変化させる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b",
+    "explanation": "正解は「イ」です。\n可用性（Availability）とは、システムがいつでも利用可能であることを意味します。ハードウェアの二重化（冗長化）は、障害発生時でもサービスを継続させるための対策です。"
   },
   {
     "qNo": 2,
@@ -47,7 +48,7 @@
   },
   {
     "qNo": 3,
-    "text": "ハミング符号とは、データに冗長ビットを付加して,1ビットの誤りを訂正できるようにしたものである。ここでは、X1, X2, X3, X4の4ビットから成るデータに、3ビットの冗長ビット P3, P2, P₁を付加したハミング符号 X1 X2 X3 P3 X4 P2 P1を考える。付加したビット P1, P2, P3は、それぞれ $X_1 \oplus X_3 \oplus X_4 \oplus P_1 = 0$, $X_1 \oplus X_2 \oplus X_4 \oplus P_2 = 0$, $X_1 \oplus X_2 \oplus X_3 \oplus P_3 = 0$となるように決める。ここで、$\oplus$は排他的論理和を表す。ハミング符号 1110011 には1ビットの誤りが存在する。誤りビットを訂正したハミング符号はどれか。",
+    "text": "ハミング符号とは、データに冗長ビットを付加して,1ビットの誤りを訂正できるようにしたものである。ここでは、X1, X2, X3, X4の4ビットから成るデータに、3ビットの冗長ビット P3, P2, P₁を付加したハミング符号 X1 X2 X3 P3 X4 P2 P1を考える。付加したビット P1, P2, P3は、それぞれ $X_1 oplus X_3 oplus X_4 oplus P_1 = 0$, $X_1 oplus X_2 oplus X_4 oplus P_2 = 0$, $X_1 oplus X_2 oplus X_3 oplus P_3 = 0$となるように決める。ここで、$oplus$は排他的論理和を表す。ハミング符号 1110011 には1ビットの誤りが存在する。誤りビットを訂正したハミング符号はどれか。",
     "options": [
       {
         "id": "a",
@@ -466,19 +467,19 @@
     "options": [
       {
         "id": "a",
-        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option A\n        A(A) --> G1(\u2227) & Y(Y)\n        B(B) --> G1\n        G1:::xor_gate\n    end\n```"
+        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option A\n        A(A) --> G1(∧) & Y(Y)\n        B(B) --> G1\n        G1:::xor_gate\n    end\n```"
       },
       {
         "id": "b",
-        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option I\n        A(A) --> G1(\u2227) & Y(Y)\n        B(B) --> G1\n        G1:::xnor_gate\n    end\n```"
+        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option I\n        A(A) --> G1(∧) & Y(Y)\n        B(B) --> G1\n        G1:::xnor_gate\n    end\n```"
       },
       {
         "id": "c",
-        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option U\n        A(A) --> G1(\u2227) & Y(Y)\n        B(B) --> G1\n        G1:::nor_gate\n    end\n```"
+        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option U\n        A(A) --> G1(∧) & Y(Y)\n        B(B) --> G1\n        G1:::nor_gate\n    end\n```"
       },
       {
         "id": "d",
-        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option E\n        A(A) --> G1(\u2227) & Y(Y)\n        B(B) --> G1\n        G1:::nand_gate\n    end\n```"
+        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option E\n        A(A) --> G1(∧) & Y(Y)\n        B(B) --> G1\n        G1:::nand_gate\n    end\n```"
       }
     ],
     "correctOption": null,
