@@ -1,8 +1,8 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-// Path to packages/data/data/questions relative to apps/web
-const DATA_DIR = path.join(process.cwd(), '../../packages/data/data/questions');
+// Path to apps/web/data/questions (Copied via prebuild script)
+const DATA_DIR = path.join(process.cwd(), 'data/questions');
 
 export interface SSGExamParams {
     year: string;
@@ -49,11 +49,12 @@ export async function getExamDataFS(examId: string): Promise<any[]> {
         const jsonData = JSON.parse(content);
 
         // Normalize to array
+        // Normalize to array
         if (Array.isArray(jsonData)) {
             return jsonData;
         } else if (jsonData.questions && Array.isArray(jsonData.questions)) {
-            // Return root object as a single item (for nested structures)
-            return [jsonData];
+            // Fix: Return the inner questions array, not the wrapper object
+            return jsonData.questions;
         }
 
         return [jsonData];

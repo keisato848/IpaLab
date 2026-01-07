@@ -139,3 +139,4 @@ dist
 .turbo/daemon/*
 .turbo/daemon/d8c58441361eedb2-turbo.log.2025-12-20
 packages/data/data/raw_pdfs/
+apps/web/data/questions/
