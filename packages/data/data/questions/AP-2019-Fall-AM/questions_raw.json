@@ -434,4 +434,4 @@
     "options": [
       { "id": "a", "text": "可用性" },
       { "id": "b", "text": "効率性" },
-      { "id
+      { "id":null}]}]
