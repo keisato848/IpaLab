@@ -15,12 +15,12 @@ envPaths.forEach(envPath => {
 });
 
 // Load API Keys
-const apiKey = process.env.GEMINI_API_KEY_2;
+const apiKey = process.env.GEMINI_API_KEY_2 || process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
 if (!apiKey) {
-    throw new Error('GEMINI_API_KEY_2 (Paid Key) not found in environment variables.');
+    throw new Error('No valid Gemini API Key found (GEMINI_API_KEY_2, GEMINI_API_KEY, or GOOGLE_GENERATIVE_AI_API_KEY).');
 }
 
-console.log('Using PAID KEY (GEMINI_API_KEY_2) exclusively for high speed parallel processing.');
+console.log('Using API Key for processing.');
 
 // Client factory (Single key mode)
 function getGeminiClient() {
@@ -94,31 +94,52 @@ async function main() {
     const questionsDir = path.resolve(__dirname, '../../data/questions');
 
     // Target AP-*-AM, FE-*-AM, PM-*-AM2, SC-*-AM2, and IP-*-AM
+    // Target AP-*-AM mainly for now to fix user report
     const dirs = fs.readdirSync(questionsDir).filter(d =>
-        (d.startsWith('AP-') && d.endsWith('-AM')) ||
-        (d.startsWith('FE-') && d.endsWith('-AM')) ||
-        (d.startsWith('PM-') && d.endsWith('-AM2')) ||
-        (d.startsWith('SC-') && d.endsWith('-AM2')) ||
-        (d.startsWith('IP-') && d.endsWith('-AM'))
+        d.startsWith('AP-') && d.endsWith('-AM')
     );
 
     // Sort to process newest first (usually most relevant)
     dirs.sort().reverse();
+
+    // Limit to top 5 for Agent Execution (Prevent 30m timeout)
+    const targetDirs = dirs.slice(0, 5);
+    console.log(`Found ${dirs.length} AP exams. Processing top 5: ${targetDirs.join(', ')}`);
 
     console.log(`Found ${dirs.length} exams to check.`);
 
     const model = getGeminiClient();
     const BATCH_SIZE = 15; // Parallel requests
 
-    for (const dir of dirs) {
-        const jsonPath = path.join(questionsDir, dir, 'questions_raw.json');
-        if (!fs.existsSync(jsonPath)) continue;
+    for (const dir of targetDirs) {
+        // Prefer transformed JSON as it likely has answers merged
+        const transformedPath = path.join(questionsDir, dir, 'questions_transformed.json');
+        const rawPath = path.join(questionsDir, dir, 'questions_raw.json');
 
-        console.log(`Processing ${dir}...`);
+        let targetPath = fs.existsSync(transformedPath) ? transformedPath : rawPath;
+        if (!fs.existsSync(targetPath)) continue;
 
-        let content = fs.readFileSync(jsonPath, 'utf-8');
+        console.log(`Processing ${dir} using ${path.basename(targetPath)}...`);
+
+        let content = fs.readFileSync(targetPath, 'utf-8');
         let data = JSON.parse(content);
-        let questions = Array.isArray(data) ? data : data.questions;
+        let questions = Array.isArray(data) ? data : (data.questions || []);
+
+        // If using RAW, try to load answers (backup)
+        if (targetPath === rawPath) {
+            const answersPath = path.join(questionsDir, dir, 'answers_raw.json');
+            if (fs.existsSync(answersPath)) {
+                try {
+                    const answerData = JSON.parse(fs.readFileSync(answersPath, 'utf-8'));
+                    const answers = Array.isArray(answerData) ? answerData : (answerData.answers || []);
+                    const ansMap = new Map(answers.map((a: any) => [a.qNo, a.correctOption]));
+                    questions.forEach((q: any) => {
+                        if (!q.correctOption && ansMap.has(q.qNo)) q.correctOption = ansMap.get(q.qNo);
+                    });
+                } catch (e) { }
+            }
+        }
+
         let updateCount = 0;
         let modifiedInFile = false;
 
@@ -138,7 +159,8 @@ async function main() {
 
             // Save after every batch to keep progress safe
             if (modifiedInFile) {
-                fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2));
+                fs.writeFileSync(targetPath, JSON.stringify(data, null, 2));
+                // Optional: Sync back to raw if we updated transformed? Not strictly necessary for SSG.
             }
 
             // Tiny delay to be safe
