@@ -11,10 +11,15 @@ import 'katex/dist/katex.min.css';
 import rehypeRaw from 'rehype-raw';
 // @ts-ignore
 import he from 'he';
+import dynamic from 'next/dynamic';
+import { useSession } from 'next-auth/react';
+import { v4 as uuidv4 } from 'uuid';
+import { guestManager } from '@/lib/guest-manager';
+import { useTheme } from '@/components/providers/ThemeProvider';
+import { getExamLabel } from '@/lib/exam-utils';
 import styles from './QuestionClient.module.css';
 import { Question, saveLearningRecord, LearningRecord, getLearningRecords, saveExamProgress, getExamProgress } from '@/lib/api';
-// ... (imports)
-import { FaRegBookmark, FaBookmark } from 'react-icons/fa'; // Import icons (Assuming react-icons is available, else use emoji)
+import { FaRegBookmark, FaBookmark } from 'react-icons/fa';
 
 const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false });
 import ExamSummary from './ExamSummary';
@@ -593,8 +598,18 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                             {question.text}
                         </ReactMarkdown>
                     </div>
+                    {/* Mermaid Diagram Injection for Issue #22 */}
+                    {question.diagram && (
+                        <div className="mt-6 mb-6 p-4 bg-white dark:bg-zinc-950 rounded-lg border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+                            <div className="text-xs font-bold text-gray-400 mb-2 uppercase tracking-wide">Diagram / Table</div>
+                            <div className="overflow-x-auto">
+                                <Mermaid chart={question.diagram.replace(/```mermaid/g, '').replace(/```/g, '')} />
+                            </div>
+                        </div>
+                    )}
                     <div className={styles.sourceParams}>
                         出典：{examLabel} 問{qNo}
+
                         {pastStats && (
                             <span style={{ marginLeft: '1rem', color: '#666', fontSize: '0.9em' }}>
                                 (過去の正答率: {Math.round((pastStats.correct / pastStats.total) * 100)}% - {pastStats.correct}/{pastStats.total}回)

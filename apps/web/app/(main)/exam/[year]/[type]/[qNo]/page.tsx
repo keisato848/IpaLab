@@ -11,7 +11,7 @@ import { generateAllExamParams, getExamDataFS } from '@/lib/ssg-helper';
 
 // Enable SSG for ALL exams
 export async function generateStaticParams() {
-    console.log('[SSG] Generating params for ALL questions...');
+    // console.log('[SSG] Generating params for ALL questions...');
 
     // 1. Get all exams
     const examParams = await generateAllExamParams();
@@ -31,7 +31,7 @@ export async function generateStaticParams() {
         allParams = allParams.concat(qParams);
     }
 
-    console.log(`[SSG] Generated ${allParams.length} static pages.`);
+    // console.log(`[SSG] Generated ${allParams.length} static pages.`);
     return allParams;
 }
 
@@ -45,15 +45,14 @@ export default async function ExamQuestionPage({ params }: { params: { year: str
     const typeSuffix = type === 'AM1' ? 'AM' : type;
     const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
 
-    // Fetch Questions with caching enabled for SSG/ISR
-    // We explicitly set cache to undefined to override the default 'no-store' in getQuestions.
+    // Fetch Questions
     let questions: Question[] = [];
     try {
-        questions = await getQuestions(examId, { cache: undefined, next: { revalidate: 3600 } });
+        // Build Optimization: Use FS directly
+        const fsData = await getExamDataFS(examId);
+        questions = fsData as unknown as Question[];
     } catch (e) {
-        console.warn(`[Page] API failed for ${examId} during render/build. Returning empty.`);
-        // Note: In strict SSG build, this might mean the page is generated empty?
-        // Ideally we would use FS here too if API fails, but let's assume API is available OR rely on revalidate
+        // console.warn(`[Page] Data load failed for ${examId}.`);
     }
 
     // Find current question by qNo
