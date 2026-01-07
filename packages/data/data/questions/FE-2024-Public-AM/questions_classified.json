@@ -1,0 +1,102 @@
+[
+  {
+    "qNo": 1,
+    "category": "Technology",
+    "subCategory": "基礎理論"
+  },
+  {
+    "qNo": 2,
+    "category": "Technology",
+    "subCategory": "基礎理論"
+  },
+  {
+    "qNo": 3,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
+  },
+  {
+    "qNo": 4,
+    "category": "Technology",
+    "subCategory": "コンピュータシステム"
+  },
+  {
+    "qNo": 5,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 6,
+    "category": "Technology",
+    "subCategory": "技術要素"
+  },
+  {
+    "qNo": 7,
+    "category": "Technology",
+    "subCategory": "データベース"
+  },
+  {
+    "qNo": 8,
+    "category": "Technology",
+    "subCategory": "ネットワーク"
+  },
+  {
+    "qNo": 9,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
+  },
+  {
+    "qNo": 10,
+    "category": "Technology",
+    "subCategory": "セキュリティ"
+  },
+  {
+    "qNo": 11,
+    "category": "Technology",
+    "subCategory": "開発技術"
+  },
+  {
+    "qNo": 12,
+    "category": "Technology",
+    "subCategory": "開発技術"
+  },
+  {
+    "qNo": 13,
+    "category": "Management",
+    "subCategory": "プロジェクトマネジメント"
+  },
+  {
+    "qNo": 14,
+    "category": "Management",
+    "subCategory": "サービスマネジメント"
+  },
+  {
+    "qNo": 15,
+    "category": "Strategy",
+    "subCategory": "システム戦略"
+  },
+  {
+    "qNo": 16,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 17,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 18,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 19,
+    "category": "Strategy",
+    "subCategory": "経営戦略"
+  },
+  {
+    "qNo": 20,
+    "category": "Strategy",
+    "subCategory": "企業と法務"
+  }
+]
