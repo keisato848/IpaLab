@@ -20,7 +20,7 @@
         "text": "ニュートン法"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 2,
@@ -43,7 +43,7 @@
         "text": "$\\frac{2\\rho}{1-2\\rho} \\times T_s$"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 3,
@@ -66,7 +66,7 @@
         "text": "生物の進化を模倣した方法であり、与えられた問題の解の候補を記号列で表現して、それらを遺伝子に見立てて突然変異,交配,とう汰を繰り返して逐次的により良い解に近づける。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 4,
@@ -89,7 +89,7 @@
         "text": "4"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "diagram": "| | Data | | | | Parity |\n|---|---|---|---|---|---|\n| Data | 1 | 0 | 0 | 0 | 1 |\n| Data | 0 | 1 | 1 | 0 | 0 |\n| Data | 0 | 0 | 1 | 0 | 1 |\n| Data | 1 | 1 | 0 | 1 | 1 |\n| Parity | 0 | 0 | 0 | 1 | (Shaded) |"
   },
   {
@@ -113,7 +113,7 @@
         "text": "未整列の部分を順序木にし、そこから最小値を取り出して整列済の部分に移す。この操作を繰り返して、未整列の部分を縮めていく。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 6,
@@ -136,7 +136,7 @@
         "text": "再配置可能なプログラムは、実行の都度,主記憶装置上の定まった領域で実行される。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 7,
@@ -159,7 +159,7 @@
         "text": "VBScript"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 8,
@@ -182,7 +182,7 @@
         "text": "$x1$と$x2$の符号が異なる場合"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 9,
@@ -205,7 +205,7 @@
         "text": "主記憶を複数のバンクに分けて, CPUからのアクセス要求を並列的に処理できるようにする。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 10,
@@ -228,7 +228,7 @@
         "text": "長方形のシェル内に、中央に5つの長方形の接点が一定の間隔で並んだ構造。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 11,
@@ -251,7 +251,7 @@
         "text": "21.0"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "diagram": "| | 仕様 |\n|---|---|\n| 回転数 | 6,000回転/分 |\n| 平均シーク時間 | 10ミリ秒 |\n| 転送速度 | 10Mバイト/秒 |"
   },
   {
@@ -275,7 +275,7 @@
         "text": "低い処理能力の CPU への交換やメモリの削減などによって、システムとしてのリソースを最適化し、無駄なコストを削減する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 13,
@@ -298,7 +298,7 @@
         "text": "動作中の機械から一定の範囲内に人間が立ち入ったことをセンサが感知したとき,機械の動作を停止させる仕組み"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 14,
@@ -321,7 +321,7 @@
         "text": "ホストOSで仮想化ソフトウェアを動かし、その上で複数のゲスト OS を稼働させるので、物理サーバへアクセスするにはホストOSを経由する必要がある。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 15,
@@ -344,7 +344,7 @@
         "text": "1,200"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 16,
@@ -367,7 +367,7 @@
         "text": "ページフォールト"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 17,
@@ -390,7 +390,7 @@
         "text": "$1\\times 10^{-4}$"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 18,
@@ -413,7 +413,7 @@
         "text": "RCS"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 19,
@@ -436,7 +436,7 @@
         "text": "主記憶のバックアップとして、主記憶の内容を格納する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 20,
@@ -459,7 +459,7 @@
         "text": "赤外線でデータ通信する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 21,
@@ -482,7 +482,7 @@
         "text": "システムが一定時間異常であった場合、上位の管理プログラムを呼び出す。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 22,
@@ -506,7 +506,7 @@
         "text": "XがAND素子、YがOR素子で構成された回路図。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 23,
@@ -529,7 +529,7 @@
         "text": "汎用入出力ポートから読み出した値と16進数の48との論理和"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 24,
@@ -552,7 +552,7 @@
         "text": "文字を任意の倍率に拡大して表示する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 25,
@@ -575,7 +575,7 @@
         "text": "レイトレーシングは、形状が定義された物体の表面に、別に定義された模様を張り付けて画像を作成する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 26,
@@ -598,7 +598,7 @@
         "text": "和"
       }
     ],
-    "correctOption": null,
+    "correctOption": "d",
     "diagram": "R:\n| ID | A | B |\n|---|---|---|\n| 0001 | a | 100 |\n| 0002 | b | 200 |\n| 0003 | d | 300 |\n\nS:\n| ID | A | B |\n|---|---|---|\n| 0001 | a | 100 |\n| 0002 | a | 200 |\n\nX:\n| ID | A | B |\n|---|---|---|\n| 0001 | a | 100 |\n| 0002 | a | 200 |\n| 0002 | b | 200 |\n| 0003 | d | 300 |"
   },
   {
@@ -622,7 +622,7 @@
         "text": "トランザクション処理プログラムがデータベースの更新中に異常終了した場合には、ログファイルの更新後情報を使用してデータの回復処理を行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 28,
@@ -645,7 +645,7 @@
         "text": "第3正規形である。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "diagram": "| 受注日 | 受注番号 | 得意先コード | 項番 | 商品コード | 数量 | 単価 |\n|---|---|---|---|---|---|---|\n| 2021-03-05 | 995867 | 0256 | 1 | 20121 | 20 | 20,000 |\n| 2021-03-05 | 995867 | 0256 | 2 | 24005 | 10 | 15,000 |\n| 2021-03-05 | 995867 | 0256 | 3 | 28007 | 5 | 5,000 |"
   },
   {
@@ -669,7 +669,7 @@
         "text": "SELECT A. 部門コード、'第1期'AS期,A.第1期売上 AS 売上 FROM 部門別売上 A INNER JOIN (SELECT B.部門コード,'第2期'AS期,B.第2期売上 AS 売上 FROM 部門別売上 B) T ON A. 部門コード = T. 部門コード ORDER BY 部門コード,期"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "diagram": "部門別売上:\n| 部門コード | 第1期売上 | 第2期売上 |\n|---|---|---|\n| D01 | 1,000 | 4,000 |\n| D02 | 2,000 | 5,000 |\n| D03 | 3,000 | 8,000 |\n\n問合せ結果:\n| 部門コード | 期 | 売上 |\n|---|---|---|\n| D01 | 第1期 | 1,000 |\n| D01 | 第2期 | 4,000 |\n| D02 | 第1期 | 2,000 |\n| D02 | 第2期 | 5,000 |\n| D03 | 第1期 | 3,000 |\n| D03 | 第2期 | 8,000 |"
   },
   {
@@ -693,7 +693,7 @@
         "text": "複数のサーバに一つの表が重複して存在しても、プログラムは表の重複を意識する必要がない。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 31,
@@ -716,7 +716,7 @@
         "text": "同一セグメント内の選択された複数のノードに対して、送信元が順番にデータを伝送する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 32,
@@ -739,7 +739,7 @@
         "text": "端末に対して動的にIPアドレスを割り当てるためのプロトコルである。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 33,
@@ -762,7 +762,7 @@
         "text": "送信元のポート番号と送信元のIPアドレス"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 34,
@@ -785,7 +785,7 @@
         "text": "チェックサム"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 35,
@@ -808,7 +808,7 @@
         "text": "サブネットマスクの各ビットを反転したものと IP アドレスとの論理和を取る。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 36,
@@ -831,7 +831,7 @@
         "text": "マルウェア検知機能"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 37,
@@ -854,7 +854,7 @@
         "text": "PDCA サイクル の実施, 組織として IoT システムやサービスの リスクの認識,対策を行う体制の構築"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 38,
@@ -877,7 +877,7 @@
         "text": "脆弱性の対応状況をJVNに書き込み、公表する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 39,
@@ -900,7 +900,7 @@
         "text": "利用者の行動と意図した結果とが一貫性をもつ。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 40,
@@ -923,7 +923,7 @@
         "text": "IoT デバイスにメモリカードリーダを実装して、IoTデバイスの故障時にはメモリカードを IoT デバイスの予備機に差し替えることによって, IoTデバイスを復旧できる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 41,
@@ -946,7 +946,7 @@
         "text": "PMS"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 42,
@@ -969,7 +969,7 @@
         "text": "セキュリティコードの入力によって券面認証する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 43,
@@ -992,7 +992,7 @@
         "text": "XML暗号"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 44,
@@ -1015,7 +1015,7 @@
         "text": "設定の不備によって、正規の利用者以外からの電子メールや Web サイトへのアクセス要求を受け付けるプロキシを悪用し、送信元を偽った迷惑メールの送信を行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 45,
@@ -1038,7 +1038,7 @@
         "text": "定期的にソフトウェアをアップデートする機器に対して、情報ネットワークから入手したアップデートソフトウェアを提供するパッチ管理サーバ"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 46,
@@ -1061,7 +1061,7 @@
         "text": "データをエンティティ,関連及び属性の三つの構成要素でモデル化したものであり、業務で扱うエンティティの相互関係を示すことができる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 47,
@@ -1084,7 +1084,7 @@
         "text": "一つのオブジェクトの状態がイベントの発生や時間の経過とともにどのように変化するかを表現する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 48,
@@ -1109,7 +1109,7 @@
         "text": "図形から四つの具象クラスが継承され、太線クラスが図形クラスから独立して継承された構造。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 49,
@@ -1132,7 +1132,7 @@
         "text": "縦軸が要求数、横軸が時間であり、階段状のステップ関数で推移を示すグラフ。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 50,
@@ -1155,7 +1155,7 @@
         "text": "プロダクトバックログの優先順位を決定する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 51,
@@ -1178,7 +1178,7 @@
         "text": "プロジェクトのパフォーマンスや進捗状況を評価して、プロジェクトの継続や中止を判断する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 52,
@@ -1202,7 +1202,7 @@
         "text": "A, Bが開始点から始まり、複数のダミーがA, B, Dの終了イベントからC, D, Fの開始イベントに向けて接続されている構造。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 53,
@@ -1225,7 +1225,7 @@
         "text": "プロジェクトの全体リスクの要因だけでなくプロジェクトの個別リスクの要因も特定し、それぞれの特性を文書化する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 54,
@@ -1248,7 +1248,7 @@
         "text": "問題を特定するために、インシデントのデータ及び傾向を分析する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 55,
@@ -1271,7 +1271,7 @@
         "text": "15"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 56,
@@ -1294,7 +1294,7 @@
         "text": "16"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 57,
@@ -1317,7 +1317,7 @@
         "text": "不特定多数の利害関係者の情報を取り扱う情報システムに対しては、保証型の監査を定期的に実施し、その結果を開示することが有用である。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 58,
@@ -1340,7 +1340,7 @@
         "text": "全ての開発作業が完了した後に、本番環境へのリリース計画を策定していること"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 59,
@@ -1363,7 +1363,7 @@
         "text": "ペネトレーションテスト法"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 60,
@@ -1386,7 +1386,7 @@
         "text": "システム監査人が、監査対象部門の改善実施状況を確認する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 61,
@@ -1409,7 +1409,7 @@
         "text": "対面での会議開催が困難な場合に、ネットワークを介して対面と同じようなコミュニケーションができるツール"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 62,
@@ -1432,7 +1432,7 @@
         "text": "MBO (Management by Objectives)の導入"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "diagram": "mermaid\nflowchart TD\n    A[物流コストの削減活動の開始]\n    A --> a[a]\n    a --> b[b]\n    b --> c[c]\n    c --> D[改善活動の実施]\n    D --> E[成果の計測と目標値とのギャップ分析]\n\n    subgraph 目標の設定例\n        a_goal[10%の物流コストの削減]\n        b_goal1[在庫の削減]\n        b_goal2[誤出荷の削減]\n        c_goal1[在庫日数7日以内]\n        c_goal2[誤出荷率3%以内]\n    end"
   },
   {
@@ -1456,7 +1456,7 @@
         "text": "リスクを最小化するように支援する専門組織を設けることによって、組織全体のプロジェクトマネジメントの能力と品質の向上を図る。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 64,
@@ -1479,7 +1479,7 @@
         "text": "1,260"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "diagram": "テレワークで削減可能な費用, テレワークに必要な費用\n| 費用/削減 | 平均単価 |\n|---|---|\n| 通勤費の削減額 | 平均10万円/年・人 |\n| オフィススペース・光熱費の削減額 | 12万円/年・人 |\n| 中途採用費用の削減額 | 50万円/人 |\n| テレワーク用PCの購入費用 | 初期費用8万円/台 |\n| リモートアクセスツールの費用 | 初期費用1万円/人 |\n| リモートアクセスツールの費用 | 運用費用2万円/年・人 |\n| インターネット回線費用 | 運用費用6万円/年・人 |"
   },
   {
@@ -1503,7 +1503,7 @@
         "text": "要件定義との整合性を図り、利用者と開発要員及び運用要員の共有物とするために、業務処理の概要,入出力情報の一覧,データフローなどをまとめた文書"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 66,
@@ -1526,7 +1526,7 @@
         "text": "他社からの製造委託を受けて、半導体製品の製造を行う。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 67,
@@ -1549,7 +1549,7 @@
         "text": "商品やサービスを、誰に、何を、どのように提供するかを分析し,事業領域を明確にする手法"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 68,
@@ -1572,7 +1572,7 @@
         "text": "スケールメリットとシナジー効果がともにない。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "b",
     "diagram": "予想値上がり幅 (単位:円)\n| 組合せ | ビール (万本) | 清涼飲料水 (万本) | コスト (万円) |\n|---|---|---|---|\n| A | 20 | 0 | 1,500 |\n| B | 40 | 0 | 3,300 |\n| C | 0 | 10 | 500 |\n| D | 0 | 20 | 1,100 |\n| E | 20 | 10 | 1,900 |\n| F | 40 | 20 | 4,200 |"
   },
   {
@@ -1596,7 +1596,7 @@
         "text": "実用最小限の製品・サービスを短期間で作り、構築・計測・学習というフィードバックループで改良や方向転換をして、継続的にイノベーションを行う手法"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 70,
@@ -1619,7 +1619,7 @@
         "text": "消費者向けや企業間の商取引を、インターネットなどの電子的なネットワークを活用して行う手法・概念である。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 71,
@@ -1642,7 +1642,7 @@
         "text": "ディジタル空間に現実世界と同等な世界を、様々なセンサで収集したデータを用いて構築し、現実世界では実施できないようなシミュレーションを行うこと"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 72,
@@ -1665,7 +1665,7 @@
         "text": "トークンエコノミー"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 73,
@@ -1688,7 +1688,7 @@
         "text": "周りの環境から微小なエネルギーを収穫して、電力に変換する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 74,
@@ -1711,7 +1711,7 @@
         "text": "リーダシップの有効性は、リーダがもつパーソナリティと、リーダがどれだけ統制力や影響力を行使できるかという状況要因に依存するとしている。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 75,
@@ -1734,7 +1734,7 @@
         "text": "D"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "diagram": "予想値上がり幅 (単位:円)\n| 株式 | 経済の成長：高 | 経済の成長：中 | 経済の成長：低 |\n|---|---|---|---|\n| A | 20 | 10 | 15 |\n| B | 25 | 5 | 20 |\n| C | 30 | 20 | 5 |\n| D | 40 | 10 | -10 |"
   },
   {
@@ -1758,7 +1758,7 @@
         "text": "60"
       }
     ],
-    "correctOption": null,
+    "correctOption": "c",
     "diagram": "部品数 (単位:個)\n| 部品 | 製品 X | 製品 Y |\n|---|---|---|\n| A | 3 | 2 |\n| B | 1 | 2 |"
   },
   {
@@ -1782,7 +1782,7 @@
         "text": "不況時にも、売上高の減少が大きな損失に結び付かず不況抵抗力は強い。"
       }
     ],
-    "correctOption": null,
+    "correctOption": "a",
     "diagram": "売上高・費用・利益 (単位 億円)\n| | A社 | B社 |\n|---|---|---|\n| 売上高 | 1,000 | 1,000 |\n| 変動費 | 500 | 800 |\n| 固定費 | 400 | 100 |\n| 営業利益 | 100 | 100 |"
   },
   {
@@ -1806,7 +1806,7 @@
         "text": "プロバイダ責任制限法"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 79,
@@ -1829,7 +1829,7 @@
         "text": "原則としてオプトイン方式を利用する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 80,
@@ -1852,6 +1852,6 @@
         "text": "慢性的な人手不足なので、増員を実施し,その効果を想定して1年間を期限とし、特別条項を適用した。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   }
 ]

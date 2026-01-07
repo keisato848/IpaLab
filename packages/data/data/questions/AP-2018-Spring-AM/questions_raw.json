@@ -20,7 +20,8 @@
         "text": "物質の結晶ができる物理現象を模倣した方法であり、温度に見立てたパラメタを制御して,大ざっぱな解の候補から厳密な解の候補に変化させる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b",
+    "explanation": "正解は「イ」です。\n可用性（Availability）とは、システムがいつでも利用可能であることを意味します。ハードウェアの二重化（冗長化）は、障害発生時でもサービスを継続させるための対策です。"
   },
   {
     "qNo": 2,
@@ -466,19 +467,19 @@
     "options": [
       {
         "id": "a",
-        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option A\n        A(A) --> G1(\u2227) & Y(Y)\n        B(B) --> G1\n        G1:::xor_gate\n    end\n```"
+        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option A\n        A(A) --> G1(∧) & Y(Y)\n        B(B) --> G1\n        G1:::xor_gate\n    end\n```"
       },
       {
         "id": "b",
-        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option I\n        A(A) --> G1(\u2227) & Y(Y)\n        B(B) --> G1\n        G1:::xnor_gate\n    end\n```"
+        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option I\n        A(A) --> G1(∧) & Y(Y)\n        B(B) --> G1\n        G1:::xnor_gate\n    end\n```"
       },
       {
         "id": "c",
-        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option U\n        A(A) --> G1(\u2227) & Y(Y)\n        B(B) --> G1\n        G1:::nor_gate\n    end\n```"
+        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option U\n        A(A) --> G1(∧) & Y(Y)\n        B(B) --> G1\n        G1:::nor_gate\n    end\n```"
       },
       {
         "id": "d",
-        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option E\n        A(A) --> G1(\u2227) & Y(Y)\n        B(B) --> G1\n        G1:::nand_gate\n    end\n```"
+        "text": "```mermaid\ngraph LR\n    A & B --> Y\n    style A stroke-width:0px,fill:none\n    style B stroke-width:0px,fill:none\n    subgraph Option E\n        A(A) --> G1(∧) & Y(Y)\n        B(B) --> G1\n        G1:::nand_gate\n    end\n```"
       }
     ],
     "correctOption": null,
