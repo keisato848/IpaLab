@@ -95,16 +95,17 @@ async function main() {
 
     // Target AP-*-AM, FE-*-AM, PM-*-AM2, SC-*-AM2, and IP-*-AM
     // Target FE-*-AM mainly for now as AP is done/imported
+    // Target ALL exams
     const dirs = fs.readdirSync(questionsDir).filter(d =>
-        d.startsWith('FE-') && d.endsWith('-AM')
+        d.match(/^[A-Z]{2,4}-\d{4}/)
     );
 
     // Sort to process newest first (usually most relevant)
     dirs.sort().reverse();
 
-    // Limit to top 5 for Agent Execution (Prevent 30m timeout)
-    const targetDirs = dirs.slice(0, 5);
-    console.log(`Found ${dirs.length} AP exams. Processing top 5: ${targetDirs.join(', ')}`);
+    // Process ALL exams (User required check for ALL)
+    const targetDirs = dirs;
+    console.log(`Found ${dirs.length} exams. Processing all of them...`);
 
     console.log(`Found ${dirs.length} exams to check.`);
 
