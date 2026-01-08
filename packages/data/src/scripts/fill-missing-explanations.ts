@@ -94,9 +94,9 @@ async function main() {
     const questionsDir = path.resolve(__dirname, '../../data/questions');
 
     // Target AP-*-AM, FE-*-AM, PM-*-AM2, SC-*-AM2, and IP-*-AM
-    // Target AP-*-AM mainly for now to fix user report
+    // Target FE-*-AM mainly for now as AP is done/imported
     const dirs = fs.readdirSync(questionsDir).filter(d =>
-        d.startsWith('AP-') && d.endsWith('-AM')
+        d.startsWith('FE-') && d.endsWith('-AM')
     );
 
     // Sort to process newest first (usually most relevant)
@@ -125,13 +125,22 @@ async function main() {
         let data = JSON.parse(content);
         let questions = Array.isArray(data) ? data : (data.questions || []);
 
-        // If using RAW, try to load answers (backup)
-        if (targetPath === rawPath) {
+        // Always try to load answers (backup for FE/AP)
+        if (true) {
             const answersPath = path.join(questionsDir, dir, 'answers_raw.json');
             if (fs.existsSync(answersPath)) {
                 try {
                     const answerData = JSON.parse(fs.readFileSync(answersPath, 'utf-8'));
-                    const answers = Array.isArray(answerData) ? answerData : (answerData.answers || []);
+                    let answers: any[] = [];
+                    if (Array.isArray(answerData)) {
+                        answers = answerData;
+                    } else if (answerData.answers) {
+                        answers = answerData.answers;
+                    } else {
+                        // Support Object Map {"1": "a"}
+                        answers = Object.keys(answerData).map(k => ({ qNo: parseInt(k), correctOption: answerData[k] }));
+                    }
+
                     const ansMap = new Map(answers.map((a: any) => [a.qNo, a.correctOption]));
                     questions.forEach((q: any) => {
                         if (!q.correctOption && ansMap.has(q.qNo)) q.correctOption = ansMap.get(q.qNo);
