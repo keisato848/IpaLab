@@ -18,7 +18,8 @@ function main() {
     console.log("Importing explanations from q*.json files...");
 
     const dirs = fs.readdirSync(DATA_DIR).filter(d =>
-        d.startsWith('AP-') && d.endsWith('AM')
+        // Target all exams with potential backups
+        d.match(/^[A-Z]{2,4}-\d{4}/)
     );
 
     // Sort newest
