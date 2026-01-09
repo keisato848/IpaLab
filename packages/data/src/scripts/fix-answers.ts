@@ -17,7 +17,7 @@ async function fixAnswers() {
     console.log(`Found ${EXAM_LIST.length} exams in list.`);
     let processedCount = 0;
 
-    for (const exam of EXAM_LIST.filter(e => e.category === 'FE')) {
+    for (const exam of EXAM_LIST.filter(e => ['FE', 'AP', 'SC', 'PM', 'AU', 'NW', 'IP'].includes(e.category))) {
         try {
             processedCount++;
             // Check for answerUrl or deduce it logic below

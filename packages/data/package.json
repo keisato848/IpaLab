@@ -5,6 +5,10 @@
     "main": "./src/index.ts",
     "types": "./src/index.ts",
     "scripts": {
+        "repair-json": "ts-node src/scripts/repair-json-files.ts",
+        "clean-fe": "ts-node src/scripts/clean-fe-json.ts",
+        "fix-answers": "ts-node src/scripts/fix-answers.ts",
+        "fill-explanations": "ts-node src/scripts/fill-missing-explanations.ts",
         "scrape": "ts-node src/scraper/index.ts",
         "download": "ts-node src/scraper/download.ts",
         "parse": "ts-node src/scraper/parse.ts",

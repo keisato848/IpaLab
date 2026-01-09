@@ -257,6 +257,7 @@ async function main() {
         !f.endsWith('-Ans.pdf') &&
         (
             (f.startsWith('AP-') && f.includes('-AM')) ||
+            (f.startsWith('FE-') && f.includes('-AM')) ||
             (f.startsWith('PM-') && f.includes('-AM2')) ||
             (f.startsWith('SC-') && f.includes('-AM2')) ||
             (f.startsWith('IP-') && f.includes('-AM'))

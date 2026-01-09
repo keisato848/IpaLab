@@ -1,4 +1,5 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+
+import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
@@ -14,20 +15,7 @@ envPaths.forEach(envPath => {
     dotenv.config({ path: envPath });
 });
 
-// Load API Keys
-const apiKey = process.env.GEMINI_API_KEY_2 || process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-if (!apiKey) {
-    throw new Error('No valid Gemini API Key found (GEMINI_API_KEY_2, GEMINI_API_KEY, or GOOGLE_GENERATIVE_AI_API_KEY).');
-}
-
-console.log('Using API Key for processing.');
-
-// Client factory (Single key mode)
-function getGeminiClient() {
-    return new GoogleGenerativeAI(apiKey!).getGenerativeModel({
-        model: "gemini-flash-latest",
-    });
-}
+console.log('Using @google/genai SDK with Gemini 2.0 Flash Exp.');
 
 const SYSTEM_PROMPT = `
 あなたは情報処理技術者試験（応用情報技術者試験・AP）の学習メンターです。
@@ -42,7 +30,7 @@ const SYSTEM_PROMPT = `
 - 「### 解説」などの見出しは不要です。本文のみを出力してください。
 `;
 
-async function generateExplanation(model: any, question: any) {
+async function generateExplanationWithFallback(question: any) {
     const prompt = `
 # 問題
 ${question.text}
@@ -56,21 +44,44 @@ ${question.correctOption}
 この問題の解説を作成してください。
 `;
 
-    try {
-        const result = await model.generateContent([
-            { text: SYSTEM_PROMPT },
-            { text: prompt }
-        ]);
-        return result.response.text();
-    } catch (e: any) {
-        if (e.status === 429 || e.message?.includes('429')) {
-            throw new Error('RateLimit');
+    // Configuration for Fallback
+    // Prioritize gemini-2.0-flash-exp as it was confirmed working
+    const keys = [
+        { key: process.env.GEMINI_API_KEY_2 || process.env.GEMINI_API_KEY, type: 'Primary', model: 'gemini-2.5-flash' },
+        { key: process.env.GEMINI_API_KEY, type: 'Backup', model: 'gemini-2.5-flash' }
+    ];
+
+    for (const config of keys) {
+        if (!config.key) continue;
+
+        try {
+            const ai = new GoogleGenAI({ apiKey: config.key });
+            const result = await ai.models.generateContent({
+                model: config.model,
+                contents: {
+                    role: "user",
+                    parts: [
+                        { text: SYSTEM_PROMPT + "\n" + prompt }
+                    ]
+                }
+            });
+
+            if (result && result.text) {
+                return result.text;
+            } else {
+                throw new Error("Empty response text");
+            }
+
+        } catch (e: any) {
+            console.warn(`    ! Failed with ${config.type} (${config.model}): ${e.message}`);
+            if (e.cause) console.warn('      Cause:', e.cause);
+            // Continue to next key
         }
-        throw e;
     }
+    throw new Error('All fallbacks failed');
 }
 
-async function processQuestion(model: any, q: any) {
+async function processQuestion(q: any) {
     // Skip if explanation exists and is long enough
     if (q.explanation && q.explanation.length > 20) {
         return false; // Skipped
@@ -81,7 +92,7 @@ async function processQuestion(model: any, q: any) {
     }
 
     try {
-        const explanation = await generateExplanation(model, q);
+        const explanation = await generateExplanationWithFallback(q);
         q.explanation = explanation.trim();
         return true; // Success
     } catch (e: any) {
@@ -93,45 +104,62 @@ async function processQuestion(model: any, q: any) {
 async function main() {
     const questionsDir = path.resolve(__dirname, '../../data/questions');
 
-    // Target AP-*-AM, FE-*-AM, PM-*-AM2, SC-*-AM2, and IP-*-AM
-    // Target AP-*-AM mainly for now to fix user report
     const dirs = fs.readdirSync(questionsDir).filter(d =>
-        d.startsWith('AP-') && d.endsWith('-AM')
+        d.match(/^[A-Z]{2,4}-\d{4}/)
     );
 
-    // Sort to process newest first (usually most relevant)
-    dirs.sort().reverse();
-
-    // Limit to top 5 for Agent Execution (Prevent 30m timeout)
-    const targetDirs = dirs.slice(0, 5);
-    console.log(`Found ${dirs.length} AP exams. Processing top 5: ${targetDirs.join(', ')}`);
+    // Sort to process newest first, but prioritize FE due to user request
+    dirs.sort((a, b) => {
+        const isFE_A = a.startsWith('FE');
+        const isFE_B = b.startsWith('FE');
+        if (isFE_A && !isFE_B) return -1;
+        if (!isFE_A && isFE_B) return 1;
+        return a.localeCompare(b) * -1; // Reverse alphabetical for others
+    });
 
     console.log(`Found ${dirs.length} exams to check.`);
 
-    const model = getGeminiClient();
-    const BATCH_SIZE = 15; // Parallel requests
+    const BATCH_SIZE = 5; // Restore parallelism for Gemini 2.5 Flash
 
-    for (const dir of targetDirs) {
-        // Prefer transformed JSON as it likely has answers merged
+    for (const dir of dirs) {
         const transformedPath = path.join(questionsDir, dir, 'questions_transformed.json');
         const rawPath = path.join(questionsDir, dir, 'questions_raw.json');
 
         let targetPath = fs.existsSync(transformedPath) ? transformedPath : rawPath;
         if (!fs.existsSync(targetPath)) continue;
 
-        console.log(`Processing ${dir} using ${path.basename(targetPath)}...`);
-
+        // Load content to check if work is needed
         let content = fs.readFileSync(targetPath, 'utf-8');
         let data = JSON.parse(content);
         let questions = Array.isArray(data) ? data : (data.questions || []);
 
-        // If using RAW, try to load answers (backup)
-        if (targetPath === rawPath) {
+        // Quick check: any missing explanations?
+        const needsWork = questions.some((q: any) =>
+            q.text && q.options && q.correctOption && (!q.explanation || q.explanation.length <= 20)
+        );
+
+        if (!needsWork) {
+            // console.log(`[SKIP] ${dir} - All done.`);
+            continue;
+        }
+
+        console.log(`Processing ${dir} using ${path.basename(targetPath)}...`);
+
+        // Always try to load answers (backup for FE/AP) if needed - logic preserved
+        if (true) {
             const answersPath = path.join(questionsDir, dir, 'answers_raw.json');
             if (fs.existsSync(answersPath)) {
                 try {
                     const answerData = JSON.parse(fs.readFileSync(answersPath, 'utf-8'));
-                    const answers = Array.isArray(answerData) ? answerData : (answerData.answers || []);
+                    let answers: any[] = [];
+                    if (Array.isArray(answerData)) {
+                        answers = answerData;
+                    } else if (answerData.answers) {
+                        answers = answerData.answers;
+                    } else {
+                        answers = Object.keys(answerData).map(k => ({ qNo: parseInt(k), correctOption: answerData[k] }));
+                    }
+
                     const ansMap = new Map(answers.map((a: any) => [a.qNo, a.correctOption]));
                     questions.forEach((q: any) => {
                         if (!q.correctOption && ansMap.has(q.qNo)) q.correctOption = ansMap.get(q.qNo);
@@ -146,7 +174,7 @@ async function main() {
         // Process in batches
         for (let i = 0; i < questions.length; i += BATCH_SIZE) {
             const batch = questions.slice(i, i + BATCH_SIZE);
-            const promises = batch.map((q: any) => processQuestion(model, q));
+            const promises = batch.map((q: any) => processQuestion(q));
 
             const results = await Promise.all(promises);
             const successCount = results.filter((r: boolean) => r).length;
@@ -154,17 +182,14 @@ async function main() {
             if (successCount > 0) {
                 updateCount += successCount;
                 modifiedInFile = true;
-                process.stdout.write(`.`); // Progress dot
+                process.stdout.write(`.`);
             }
 
-            // Save after every batch to keep progress safe
             if (modifiedInFile) {
                 fs.writeFileSync(targetPath, JSON.stringify(data, null, 2));
-                // Optional: Sync back to raw if we updated transformed? Not strictly necessary for SSG.
             }
 
-            // Tiny delay to be safe
-            await new Promise(r => setTimeout(r, 500));
+            await new Promise(r => setTimeout(r, 1000)); // Standard delay
         }
         console.log(`\n  Completed ${dir}. New Explanations: ${updateCount}`);
     }
