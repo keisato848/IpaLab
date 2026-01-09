@@ -20,7 +20,7 @@
         "text": "A・B̄・D + B・D̄"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 2,
@@ -43,7 +43,7 @@
         "text": "80"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 3,
@@ -66,7 +66,7 @@
         "text": "全データのうち、実際に正しく予測できなかったデータの割合"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 4,
@@ -89,7 +89,7 @@
         "text": "送信側と受信側では、異なる生成多項式が用いられる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 5,
@@ -112,7 +112,7 @@
         "text": "空きブロックをアドレスの昇順に管理しているので、隣接する空きブロックを簡単に見つけられ、より大きな空きブロックにまとめることができる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 6,
@@ -135,7 +135,7 @@
         "text": "m/2 + n/(2m)"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 7,
@@ -158,7 +158,7 @@
         "text": "変数の型が、参照する実際の値によって実行時に決定される動的型付け言語である。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 8,
@@ -181,7 +181,7 @@
         "text": "VLIW"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 9,
@@ -204,7 +204,7 @@
         "text": "表示リフレッシュが不要である。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 10,
@@ -227,7 +227,7 @@
         "text": "5,000"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 11,
@@ -250,7 +250,7 @@
         "text": "ノード数: 4,000, 総理論ピーク演算性能 (TFLOPS): 640"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 12,
@@ -273,7 +273,7 @@
         "text": "利用者は、OS, アプリケーションなどの任意のソフトウェアをインフラストラクチャに手動で実装し、操作することができる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 13,
@@ -296,7 +296,7 @@
         "text": "MTTR は、システムの故障が回復した時点から次に故障が起きるまでの平均時間を表す。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 14,
@@ -319,7 +319,7 @@
         "text": "パフォーマンスの問題はリソースの過剰使用によって発生するので、特定のリソースの有効利用を向上させることである。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 15,
@@ -342,7 +342,7 @@
         "text": "11"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 16,
@@ -365,7 +365,7 @@
         "text": "メモリプール"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 17,
@@ -388,7 +388,7 @@
         "text": "スレッドの競合が発生したときに、アプリケーションを安全に停止させる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 18,
@@ -411,7 +411,7 @@
         "text": "両方のタスクの優先度を同じにする。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 19,
@@ -434,7 +434,7 @@
         "text": "LRU"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 20,
@@ -457,7 +457,7 @@
         "text": "100"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 21,
@@ -480,7 +480,7 @@
         "text": "ā + b"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 22,
@@ -503,7 +503,7 @@
         "text": "XNORゲート"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 23,
@@ -526,7 +526,7 @@
         "text": "300"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 24,
@@ -549,7 +549,7 @@
         "text": "ポップアップメニュー"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 25,
@@ -572,7 +572,7 @@
         "text": "50"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 26,
@@ -595,7 +595,7 @@
         "text": "ノード間のネットワークが分断されると、クライアントからの処理要求を受け付けなくなる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 27,
@@ -618,7 +618,7 @@
         "text": "利用者IDが '1001' の売上を検索する。<利用者 ID>"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 28,
@@ -641,7 +641,7 @@
         "text": "和両立な二つの表に対し、和集合演算を用いてビューを定義することはできない。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 29,
@@ -664,7 +664,7 @@
         "text": "共有ロック"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 30,
@@ -687,7 +687,7 @@
         "text": "800"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 31,
@@ -710,7 +710,7 @@
         "text": "内部ネットワークのPCからインターネットへの通信を、中継するために利用される。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 32,
@@ -733,7 +733,7 @@
         "text": "NAPT"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 33,
@@ -756,7 +756,7 @@
         "text": "チェックサム"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 34,
@@ -779,7 +779,7 @@
         "text": "スパニングツリープロトコル"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 35,
@@ -802,7 +802,7 @@
         "text": "120"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 36,
@@ -825,7 +825,7 @@
         "text": "標的とする組織の従業員にマルウェアを添付した電子メールを送りつける。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 37,
@@ -848,7 +848,7 @@
         "text": "サーバ証明書"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 38,
@@ -871,7 +871,7 @@
         "text": "無線LANのアクセスポイントを不正に設置し、チャネル間の干渉を発生させることによって、通信を妨害する攻撃"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 39,
@@ -894,7 +894,7 @@
         "text": "認証局は、有効期限内のデジタル証明書が失効されたとき、そのシリアル番号を CRL に記載する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 40,
@@ -917,7 +917,7 @@
         "text": "組織の従業員の個人情報を管理するシステムにおいて発生したセキュリティインシデント"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 41,
@@ -940,7 +940,7 @@
         "text": "真正性: d, 信頼性: c"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 42,
@@ -963,7 +963,7 @@
         "text": "ファイアウォール, マルウェア検知などのセキュリティ機能を統合し、パッケージとして提供するクラウドサービス。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 43,
@@ -986,7 +986,7 @@
         "text": "ポートに UDP パケットを送信してメッセージ “ICMP port unreachable” を受信したとき、対象ポートが開いていると判定する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 44,
@@ -1009,7 +1009,7 @@
         "text": "プログラムを実行する際に、プログラムファイルのハッシュ値と脅威情報とを突き合わせることによって、プログラムがマルウェアかどうかを検査する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 45,
@@ -1032,7 +1032,7 @@
         "text": "SPF"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 46,
@@ -1055,7 +1055,7 @@
         "text": "ペルソナ"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 47,
@@ -1078,7 +1078,7 @@
         "text": "ユースケース図"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 48,
@@ -1101,7 +1101,7 @@
         "text": "56"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 49,
@@ -1124,7 +1124,7 @@
         "text": "ブラウザが実行するサービスワーカーの機能を用いて、Web アプリケーションをオフラインで起動させたり、バックグラウンドでデータを同期させたりして、ネイティブアプリケーションであるかのように Web アプリケーションを使えるようにする。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 50,
@@ -1147,7 +1147,7 @@
         "text": "納品されたソフトウェアを委託先の了解なく委託元で修正できなくなること, 又は他の会社に修正を依頼できなくなることを防ぐ。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 51,
@@ -1170,7 +1170,7 @@
         "text": "予算の作成"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 52,
@@ -1193,7 +1193,7 @@
         "text": "動乱期 (Storming)"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 53,
@@ -1216,7 +1216,7 @@
         "text": "700"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 54,
@@ -1239,7 +1239,7 @@
         "text": "64"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 55,
@@ -1262,7 +1262,7 @@
         "text": "単一障害点分析(SPOF分析)"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 56,
@@ -1285,7 +1285,7 @@
         "text": "リリースの検証"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 57,
@@ -1308,7 +1308,7 @@
         "text": "c, d"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 58,
@@ -1331,7 +1331,7 @@
         "text": "独立性とは、第三者から不当な影響や圧力等を受けていない状態のことである。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 59,
@@ -1354,7 +1354,7 @@
         "text": "改善提案の内容を監査対象部門に示した上で改善計画を策定する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 60,
@@ -1377,7 +1377,7 @@
         "text": "新技術や技術革新を経営戦略推進のために適時適切に利活用できているか。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 61,
@@ -1400,7 +1400,7 @@
         "text": "リスクを最小化するように支援する専門組織を設けることによって、組織全体のプロジェクトマネジメントの能力と品質の向上を図る。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 62,
@@ -1423,7 +1423,7 @@
         "text": "利用者の視点から業務システムの機能を幾つかの独立した部品に分けることによって、業務プロセスとの対応付けや他ソフトウェアとの連携を容易にする手法"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 63,
@@ -1446,7 +1446,7 @@
         "text": "多数の変数の情報(観測変数)をできるだけ少ない指標や次元(合成変数)で要約する。データのもつ情報をできる限り損なわずに全体の傾向を可視化することができる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 64,
@@ -1469,7 +1469,7 @@
         "text": "ほかの意思決定手法である NPV 法や IRR 法と同様に割引率を用いる手法である。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 65,
@@ -1492,7 +1492,7 @@
         "text": "52"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 66,
@@ -1515,7 +1515,7 @@
         "text": "B社及びC社"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 67,
@@ -1538,7 +1538,7 @@
         "text": "利便性 (Convenience)"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 68,
@@ -1561,7 +1561,7 @@
         "text": "どのような顧客層に対して、どのような経営資源を使用し、どのような製品・サービスを提供するのかを表現したもの"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 69,
@@ -1584,7 +1584,7 @@
         "text": "商品が市場に投入されてから、次第に売れなくなり姿を消すまでのプロセスを, 導入期, 成長期, 成熟(市場飽和)期, 衰退期の4段階で表現して、その市場における製品の寿命を検討すること"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 70,
@@ -1607,7 +1607,7 @@
         "text": "販売実績がないある国の商習慣に合う製品を一から開発し、その国で販売する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 71,
@@ -1630,7 +1630,7 @@
         "text": "計画層・実行層・制御層"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 72,
@@ -1653,7 +1653,7 @@
         "text": "部品の供給から製品の販売までの一連のプロセスの情報をリアルタイムで交換することによって、在庫の削減とリードタイムの短縮を実現する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 73,
@@ -1676,7 +1676,7 @@
         "text": "有線のシリアル通信であり、同じ基板上の回路及びLSI間の通信に適している。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 74,
@@ -1699,7 +1699,7 @@
         "text": "1,000"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 75,
@@ -1722,7 +1722,7 @@
         "text": "60"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 76,
@@ -1745,7 +1745,7 @@
         "text": "35"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 77,
@@ -1768,7 +1768,7 @@
         "text": "18,750,000"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 78,
@@ -1791,7 +1791,7 @@
         "text": "プログラム言語や規約(プログラム言語の用法についての特別の約束)"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 79,
@@ -1814,7 +1814,7 @@
         "text": "独自のビジネスモデル"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 80,
@@ -1837,6 +1837,6 @@
         "text": "労働組合と使用者との団体交渉が労働条件改善の基本的な方策であると示し、労働組合活動を総合的に推進することを義務付けている。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   }
 ]

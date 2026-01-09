@@ -20,7 +20,7 @@
         "text": "| X | Y | X□Y |\n|---|---|---|\n| 0 | 0 | 1 |\n| 0 | 1 | 1 |\n| 1 | 0 | 1 |\n| 1 | 1 | 0 |"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 2,
@@ -43,7 +43,7 @@
         "text": "dとx"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 3,
@@ -66,7 +66,7 @@
         "text": "0.96"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 4,
@@ -89,7 +89,7 @@
         "text": "80"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 5,
@@ -112,7 +112,7 @@
         "text": "利用者がマウスのドラッグで地図を操作した際に, Web ページ全体ではなく一部を読み直すことによって地図をスクロールして表示する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 6,
@@ -135,7 +135,7 @@
         "text": "バンプマッピング"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 7,
@@ -158,7 +158,7 @@
         "text": "一つのトランザクションの処理結果は,他のトランザクション処理の影響を受けない。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 8,
@@ -181,7 +181,7 @@
         "text": "ルータは, MAC アドレスを基にしてフレームを中継する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 9,
@@ -204,7 +204,7 @@
         "text": "内部ネットワークのサーバやネットワーク機器の IPFIX 情報から,各 PC の通信に異常な振る舞いがないかどうかを確認する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 10,
@@ -227,7 +227,7 @@
         "text": "プレースホルダを使って命令文を組み立てる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 11,
@@ -250,7 +250,7 @@
         "text": "ドライバ"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 12,
@@ -273,7 +273,7 @@
         "text": "デイリースクラム"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 13,
@@ -296,7 +296,7 @@
         "text": "125"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 14,
@@ -319,7 +319,7 @@
         "text": "開発部門は運用テストを実施して,運用マニュアルを作成し,運用部門に引き渡す。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 15,
@@ -342,7 +342,7 @@
         "text": "ソーシャルメディアの口コミを機械学習によって単語ごとに分解し,要約を作り,分析可能なデータに加工し,関係データベースに保管する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 16,
@@ -365,7 +365,7 @@
         "text": "他社との競争優位の源泉となる経営資源及び企業能力"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 17,
@@ -388,7 +388,7 @@
         "text": "製品開発したものを市場化する過程に横たわっている障壁"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 18,
@@ -411,7 +411,7 @@
         "text": "採用,育成,評価,配属などの人事領域の業務を対象に,ビッグデータ解析や AI などの最新 ICT を活用して,業務改善と社員満足度向上を図るソリューション"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 19,
@@ -434,7 +434,7 @@
         "text": "xとyの相関係数は負である。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 20,
@@ -457,6 +457,6 @@
         "text": "実用新案権,商標権,著作権,特許権"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   }
 ]
