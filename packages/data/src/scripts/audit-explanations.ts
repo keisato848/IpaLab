@@ -1,66 +1,57 @@
 
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'fs';
+import path from 'path';
 
-const DATA_DIR = path.resolve(__dirname, '../../data/questions');
+const questionsDir = path.resolve(__dirname, '../../data/questions');
+const dirs = fs.readdirSync(questionsDir).filter(d => d.match(/^[A-Z]{2,4}-\d{4}/));
 
-function main() {
-    console.log("Starting Comprehensive Exam Data Audit...\n");
-    console.log("| Exam ID | Q Count | Missing Expl | Missing Ans | Has Backups | Has AnsFile |");
-    console.log("|---|---|---|---|---|---|");
+// Sort for consistent output
+dirs.sort();
 
-    const dirs = fs.readdirSync(DATA_DIR);
-    dirs.sort().reverse();
+const summary: Record<string, { totalQuestions: number, missingExplanations: number, exams: string[] }> = {};
 
-    let totalMissingExpl = 0;
+console.log(`Scanning ${dirs.length} exams...\n`);
 
-    for (const dir of dirs) {
-        if (!fs.statSync(path.join(DATA_DIR, dir)).isDirectory()) continue;
+for (const dir of dirs) {
+    const category = dir.split('-')[0];
+    if (!summary[category]) summary[category] = { totalQuestions: 0, missingExplanations: 0, exams: [] };
 
-        const examDir = path.join(DATA_DIR, dir);
+    const transformedPath = path.join(questionsDir, dir, 'questions_transformed.json');
+    const rawPath = path.join(questionsDir, dir, 'questions_raw.json');
+    // Prefer transformed if exists, else raw
+    const targetPath = fs.existsSync(transformedPath) ? transformedPath : rawPath;
 
-        // Check files
-        const transformedPath = path.join(examDir, 'questions_transformed.json');
-        const rawPath = path.join(examDir, 'questions_raw.json');
-        const answersPath = path.join(examDir, 'answers_raw.json');
-        const backupFiles = fs.readdirSync(examDir).filter(f => f.match(/^q\d+\.json$/));
+    if (!fs.existsSync(targetPath)) continue;
 
-        let data = [];
-        let source = "None";
+    try {
+        const content = fs.readFileSync(targetPath, 'utf-8');
+        const data = JSON.parse(content);
+        const questions = Array.isArray(data) ? data : (data.questions || []);
 
-        if (fs.existsSync(transformedPath)) {
-            try {
-                const content = JSON.parse(fs.readFileSync(transformedPath, 'utf-8'));
-                data = Array.isArray(content) ? content : (content.questions || []);
-                source = "Transformed";
-            } catch (e) { }
-        } else if (fs.existsSync(rawPath)) {
-            try {
-                const content = JSON.parse(fs.readFileSync(rawPath, 'utf-8'));
-                data = Array.isArray(content) ? content : (content.questions || []);
-                source = "Raw";
-            } catch (e) { }
+        // Logic matches fill-missing-explanations.ts
+        const missingCount = questions.filter((q: any) =>
+            q.text && q.options && q.correctOption && (!q.explanation || q.explanation.length <= 20)
+        ).length;
+
+        summary[category].totalQuestions += questions.length;
+
+        if (missingCount > 0) {
+            summary[category].missingExplanations += missingCount;
+            // Format: ExamName (Missing/Total)
+            summary[category].exams.push(`${dir}: ${missingCount} / ${questions.length} missing`);
         }
-
-        if (data.length === 0) {
-            console.log(`| ${dir} | 0 | - | - | ${backupFiles.length > 0} | ${fs.existsSync(answersPath)} |`);
-            continue;
-        }
-
-        let missingExpl = 0;
-        let missingAns = 0;
-
-        data.forEach((q: any) => {
-            if (!q.explanation || q.explanation.length < 10) missingExpl++;
-            if (!q.correctOption) missingAns++;
-        });
-
-        if (missingExpl > 0 || missingAns > 0) {
-            console.log(`| ${dir} | ${data.length} | ${missingExpl} | ${missingAns} | ${backupFiles.length > 0 ? 'YES (' + backupFiles.length + ')' : 'NO'} | ${fs.existsSync(answersPath) ? 'YES' : 'NO'} |`);
-            totalMissingExpl += missingExpl;
-        }
+    } catch (e: any) {
+        console.error(`Error reading ${dir}: ${e.message}`);
     }
-    console.log(`\nTotal Missing Explanations: ${totalMissingExpl}`);
 }
 
-main();
+console.log('--- Explanation Audit Report ---');
+Object.keys(summary).sort().forEach(cat => {
+    const info = summary[cat];
+    if (info.missingExplanations > 0) {
+        console.log(`\n## ${cat} (Total Missing: ${info.missingExplanations})`);
+        info.exams.forEach(e => console.log(` - ${e}`));
+    } else {
+        console.log(`\n## ${cat} (Complete)`);
+    }
+});
