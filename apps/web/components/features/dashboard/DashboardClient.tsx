@@ -202,7 +202,7 @@ export default function DashboardClient() {
                                 <li key={i} className={styles.historyItem}>
                                     <div className={styles.historyMain}>
                                         <span className={styles.tag}>{r.category || '未分類'}</span>
-                                        <span className={styles.examName}>{getExamLabel(r.examId)} Q{r.questionId.split('-').pop()}</span>
+                                        <span className={styles.examName}>{getExamLabel(r.examId)} Q{r.questionId?.split('-').pop() || '?'}</span>
                                     </div>
                                     <div className={styles.historyMeta}>
                                         <span className={`${styles.result} ${r.isCorrect ? styles.correct : styles.incorrect}`}>

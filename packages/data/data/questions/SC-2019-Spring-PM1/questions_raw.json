@@ -1,0 +1,53 @@
+[
+  {
+    "qNo": 1,
+    "theme": "Webサイトのセキュリティ（CORS、JSONP、同一オリジンポリシー）",
+    "description": "## 問1 Webサイトのセキュリティに関する次の記述を読んで、設問1〜3に答えよ。\n\nM社は、従業員数200名の小売業である。コーポレートサイトであるWebサイトA（URLは、https://site-a.m-sha.co.jp/）と、自社の特定のブランドを取り扱うECサイト（以下、ブランドサイトという）を複数運営している。現在運営しているブランドサイトは、WebサイトBからWebサイトFの五つである。Webサイトの開発や運用は自社の開発部で行っている。\n\nWebサイトAは、ブランドサイト全体のポータルサイトでもあり、各ブランドのキャンペーン情報などを掲載している。会員専用の機能は有していない。\n\nWebサイトB（URLは、https://site-b.m-sha.co.jp/）は、ブランドBの商品を扱うECサイトで、会員数は10万名である。WebサイトBでは、Cookieを利用したセッション管理を行っている。\n\n会員情報は、各ブランドサイトで個別に管理している。\n\n### 〔各ブランドサイトからWebサイトAへの情報連携〕\n今回、各ブランドサイトの売上数を基にした、ブランド別の売れ筋商品情報を、WebサイトA上で表示するとともに、希望があれば、各ブランドサイトの会員に電子メールも定期的に配信することにし、そのために売れ筋商品情報及び会員情報を取得する機能（以下、情報連携機能という）を実装することにした。具体的な機能は次のとおりである。\n\n- **機能1**: WebサイトAが各ブランドサイトの売れ筋商品情報を取得する。\n- **機能2**: 希望する会員に電子メールを配信するために、WebサイトAは、当該会員の会員情報を取得する。\nなお、配信の申込みは、WebサイトA上で行う。\n\n情報連携機能の実装は、開発部のCさんが中心になって進めることになった。まず初めにWebサイトBからWebサイトAへの情報連携を行うために、次の二つのWeb APIをWebサイトBに実装することにした。\n\n- WebサイトBの売れ筋商品情報を取得可能とするためのWeb API（以下、API-Xという）\n- WebサイトBの会員情報を取得可能とするためのWeb API（以下、API-Yという）\n\nなお、Web APIで受け渡されるデータは、JSON（JavaScript Object Notation）形式にする。Cさんは、API-Yからブランドサイトの会員情報を取得する際、配信を希望する会員の同意を得たいと考えた。そこで、会員情報の取得には、会員のWebブラウザを経由して行う方式を採用することにした。\n\nWebサイトBからWebサイトAへの情報連携機能を図1に示す。\n\n#### 図1 WebサイトBからWebサイトAへの情報連携機能\n```mermaid\nsequenceDiagram\n    participant Browser as Webブラウザ\n    participant SiteA as WebサイトA\n    participant SiteB as WebサイトB\n    participant APIX as API-X\n    participant APIY as API-Y\n\n    Note over SiteA: (X-1) 売れ筋商品情報取得リクエスト (注1)\n    SiteA->>APIX: リクエスト\n    APIX-->>SiteA: (X-2) 売れ筋商品情報が返される\n\n    Note over Browser: (Y-1) 会員が売れ筋商品情報配信の申込ページにアクセス (注2)\n    Browser->>SiteA: アクセス\n    SiteA-->>Browser: (Y-2) 申込ページに加え、WebサイトBのAPI-Yを呼び出すスクリプトZが返される\n\n    Note over Browser: (Y-3) 会員が申込みを行う\n    Browser->>APIY: (Y-4) 会員情報を取得するリクエストがスクリプトZから送られる\n    APIY-->>Browser: (Y-5) 会員情報が返される (注3)\n    Note over Browser: (Y-6) 会員情報がWebブラウザに表示される (注4)\n    Browser->>SiteA: (Y-7) 申込情報と会員情報がWebサイトAに送られ、保存される\n```\n注1）API-Xでは、WebサイトAからだけアクセスできるように、接続元のIPアドレスを制限する。\n注2）会員がWebサイトBにログインした状態のときにアクセスする。\n注3）会員情報が得られない場合、エラーを返す。\n注4）(Y-5)でエラーが返ってきた場合、WebサイトBにログイン後再度操作を行うよう促す。\n\n### 〔情報連携機能の実装についての検討〕\nスクリプトZは、[ a ] ポリシーによって、[ b ]、[ c ]、[ d ] のいずれかが異なるリソースへのアクセスが制限される。そこで、Cさんは、この制限をう回するために JSONP (JavaScript Object Notation with Padding) を用いることを開発部のD課長に提案した。次は、その時の会話である。\n\n**Cさん**: API-Yからの会員情報の取得に JSONP を用いるつもりです。\n**D課長**: JSONPは、アクセス先を制限する機能をもたないので、その実装では問題がある。例えば、まず、会員情報を窃取するように攻撃者がスクリプトZを変更して、攻撃者のWebサイトのページに置く。次に、被害者に①特定の操作をさせた上で、そのページにアクセスさせると、攻撃者が被害者の会員情報を窃取できてしまう。\n**Cさん**: JSONPの代わりに何の技術を用いればよいでしょうか。\n**D課長**: CORS (Cross-Origin Resource Sharing) を用いるのがよいだろう。\n\n### 〔CORSの概要〕\nCORSとは、あるWebサイトから他のWebサイトへのアクセスを制御することができる仕組みである。XMLHttpRequestを使って\"https://test2.example.com/test\"にリクエストを送るスクリプトの例を図2に示す。\n\n#### 図2 XMLHttpRequestを使ったスクリプトの例\n```javascript\nvar xhr = new XMLHttpRequest();\nxhr.open('GET', 'https://test2.example.com/test', true);\nxhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');\nxhr.send(null);\n```\n\nWebブラウザが\"https://test1.example.com/\"にアクセスし、図2のスクリプトを含むページを読み込んだとする。図2のスクリプトが実行されると、最初にWebブラウザは\"https://test2.example.com/test\"にプリフライトリクエストと呼ばれるリクエストを送る。そうすると、実際のリクエスト（以下、メインリクエストという）で許可されるメソッド名やヘッダフィールド名などがレスポンスとして返る。その後、メインリクエストを送り、レスポンスが返る。この一連の動作を図3に、また、図3中の (iii) 〜 (vi) のリクエストとレスポンスの先頭部分の例を図4 〜 図7に示す。\n\n#### 図3 一連の動作\n```mermaid\nsequenceDiagram\n    participant Browser as Webブラウザ\n    participant Server1 as test1.example.com\n    participant Server2 as test2.example.com\n\n    Browser->>Server1: (i) アクセス\n    Server1-->>Browser: (ii) スクリプト\n    \n    Note over Browser, Server2: プリフライトリクエスト/レスポンス\n    Browser->>Server2: (iii) プリフライトリクエスト\n    Server2-->>Browser: (iv) レスポンス\n\n    Note over Browser, Server2: メインリクエスト/レスポンス\n    Browser->>Server2: (v) メインリクエスト\n    Server2-->>Browser: (vi) レスポンス\n```\n\n#### 図4 (iii)のリクエストの先頭部分の例（抜粋）\n```\nOPTIONS /test HTTP/1.1\nHost: test2.example.com\nAccess-Control-Request-Method: GET (注1)\nAccess-Control-Request-Headers: x-requested-with (注2)\nOrigin: https://test1.example.com (注3)\n```\n注1）Access-Control-Request-Methodには、メインリクエストで利用したいメソッド名を指定する。\n注2）Access-Control-Request-Headersには、メインリクエストで利用したいヘッダフィールド名を指定する。\n注3）Originは、スクリプトを含むページのオリジンであり、Webブラウザが付与している。\n\n#### 図5 (iv)のレスポンスの先頭部分の例（抜粋）\n```\nHTTP/1.1 200 OK\nAccess-Control-Allow-Origin: https://test1.example.com (注1)\nAccess-Control-Allow-Methods: GET, POST, OPTIONS (注2)\nAccess-Control-Allow-Headers: x-requested-with (注3)\n```\n注1）Access-Control-Allow-Originには、Webサイトが許可するオリジンが返される。\n注2）Access-Control-Allow-Methodsには、Webサイトが許可するメソッド名が返される。\n注3）Access-Control-Allow-Headersには、Webサイトが許可するヘッダフィールド名が返される。\n\n#### 図6 (v)のリクエストの先頭部分の例（抜粋）\n```\nGET /test HTTP/1.1\nHost: test2.example.com\nX-Requested-With: XMLHttpRequest\nOrigin: https://test1.example.com\n```\n\n#### 図7 (vi)のレスポンスの先頭部分の例（抜粋）\n```\nHTTP/1.1 200 OK\nAccess-Control-Allow-Origin: https://test1.example.com\n```\n\nまた、CORSでは通常、Webブラウザは、スクリプトを読み込んだページのオリジンだけに Cookie や、ベーシック認証の情報を送る。図2では設定していないが、XMLHttpRequestのプロパティの withCredentials の値が true に設定されている場合、図3であれば、[ e ] の動作の際に、test2.example.com から発行された Cookie が送られる。\n\n### 〔CORSを利用した実装〕\nCさんは、スクリプトZの実装にCORSを用いたときの一連の動作を検討し、表1にまとめた。\n\n#### 表1 スクリプトZの実装にCORSを用いたときの一連の動作\n| No. | 内容 |\n| :--- | :--- |\n| 1 | Webブラウザは、WebサイトAの売れ筋商品情報配信の申込ページにアクセスする。 |\n| 2 | WebサイトAは、WebサイトBのAPI-Yを呼び出すスクリプトZを含むページをレスポンスとして返す。 |\n| 3 | Webブラウザは、会員が申込みを行うと、WebサイトBにプリフライトリクエストを送る。プリフライトリクエストは、OPTIONSメソッドの呼出しであり、Originヘッダフィールドには \"https://site-a.m-sha.co.jp\" が設定されている。 |\n| 4 | API-Yは、送られてきたリクエストにOriginヘッダフィールドが存在する場合、Access-Control-Allow-Originヘッダフィールドを付加し、レスポンスを返す。Access-Control-Allow-Originヘッダフィールドの値は、「 [ f ] 」である。Originヘッダフィールドが存在しない場合、エラーを返す。 |\n| 5 | Webブラウザは、[ g ] とAccess-Control-Allow-Originヘッダフィールドの値を照合し、アクセスが許可されていることを確認する。許可されている場合は、次の処理に進む。確認できない場合は、メインリクエストを送らずに終了する。 |\n| ... | ... |\n| 9 | スクリプトZは、受け取ったJSON形式の値を変数に格納し、表示する。さらに、受け取った値はWebサイトAに送られ、保存される。 |\n\nCさんは、表1についてD課長に確認した。次は、その時のD課長とCさんの会話である。\n\n**D課長**: 今後、他のシステムでもCORSを利用することが考えられるので、コーディング規約も併せてまとめておきたい。Access-Control-Allow-Originヘッダフィールドに指定できるオリジンは一つだけなので、複数のオリジンからのアクセスを許可するような仕様であった場合に、No. 4の内容では不十分である。Web APIのプログラム内に、許可するオリジンのリストを用意しておく必要がある。プリフライトリクエスト又はメインリクエストがWeb APIに送られてきたときに、そのリクエスト中の [ h ] を、[ i ] と突合し、[ j ] した値があればその値をAccess-Control-Allow-Originヘッダフィールドに設定するという内容もコーディング規約に含めればよいだろう。\n**Cさん**: 分かりました。",
+    "questions": [
+      {
+        "subQNo": "設問1",
+        "text": "〔情報連携機能の実装についての検討〕について、(1)〜(3)に答えよ。",
+        "explanation": "CORS（Cross-Origin Resource Sharing）と同一オリジンポリシー（Same-Origin Policy）に関する基本的な理解を問う問題です。\n\n### 解法のポイント\n- **同一オリジンポリシー**: ブラウザのセキュリティ機能で、「スキーム（プロトコル）」「ホスト（ドメイン名・FQDN）」「ポート番号」の3つがすべて一致する場合を「同一オリジン」とみなします。\n- **JSONPの脆弱性**: JSONPは`<script>`タグを利用して制限を回避しますが、認証情報（Cookieなど）が自動的に送信されるため、被害者が対象サイトにログイン済みの場合、攻撃者のサイトからでも機密情報を取得できてしまうリスク（CSRFに似た構造）があります。",
+        "subQuestions": [
+          {
+            "label": "(1)",
+            "text": "本文中の [ a ] に入れる適切な字句を答えよ。"
+          },
+          {
+            "label": "(2)",
+            "text": "本文中の [ b ] 〜 [ d ] に入れる適切な字句を解答群の中から選び、記号で答えよ。\n解答群：ア Cookie、イ FQDN、ウ Locationヘッダフィールド、エ Refererヘッダフィールド、オ User-Agentヘッダフィールド、カ 時刻、キ スキーム、ク ポート番号"
+          },
+          {
+            "label": "(3)",
+            "text": "本文中の下線①について、操作の具体的な内容を、20文字以内で答えよ。"
+          }
+        ]
+      },
+      {
+        "subQNo": "設問2",
+        "text": "本文中の [ e ] に入れる適切な記号を、(iii)〜(vi)の中から選び、答えよ。",
+        "explanation": "### CORSにおけるCookie送信\nCORSにおいて、別ドメインにCookieを送信するためには、クライアント側（JavaScript）で `withCredentials = true` を設定する必要があります。Cookieはプリフライトリクエストではなく、実際のリクエストである「メインリクエスト」において送信されます。\n\n```mermaid\ngraph LR\n    A[Browser] -- \"(v) メインリクエスト<br/>(Cookie含む)\" --> B[Server2]\n```",
+        "subQuestions": []
+      },
+      {
+        "subQNo": "設問3",
+        "text": "〔CORSを利用した実装〕について、(1)〜(3)に答えよ。",
+        "explanation": "CORSのヘッダ制御に関する応用的な実装方法についての問題です。\n\n### 複数オリジンの許可方法\n`Access-Control-Allow-Origin` ヘッダには、原則として一つのオリジンしか記述できません。複数のサイトを許可したい場合、サーバ側で「リクエストのOriginヘッダ」を確認し、それが「許可リスト」に含まれていれば、その値をそのままレスポンスの `Access-Control-Allow-Origin` にセットして返す動的な処理が必要になります。",
+        "subQuestions": [
+          {
+            "label": "(1)",
+            "text": "表1中の [ f ] に入れる適切なURLを答えよ。"
+          },
+          {
+            "label": "(2)",
+            "text": "表1中の [ g ] に入れる適切な字句を、30文字以内で答えよ。"
+          },
+          {
+            "label": "(3)",
+            "text": "本文中の [ h ] 、 [ i ] に入れる適切な字句を、それぞれ20文字以内で、本文中の [ j ] に入れる適切な字句を、5文字以内で答えよ。"
+          }
+        ]
+      }
+    ]
+  }
+]
