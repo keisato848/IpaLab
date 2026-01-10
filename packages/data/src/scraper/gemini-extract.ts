@@ -37,7 +37,7 @@ function getGeminiClient() {
     return {
         fileManager: new GoogleAIFileManager(key),
         model: new GoogleGenerativeAI(key).getGenerativeModel({
-            model: "gemini-flash-latest",
+            model: "gemini-2.5-flash",
             generationConfig: {
                 responseMimeType: "application/json"
             }
@@ -256,10 +256,10 @@ async function main() {
         f.endsWith('.pdf') &&
         !f.endsWith('-Ans.pdf') &&
         (
-            (f.startsWith('AP-') && f.includes('-AM')) ||
-            (f.startsWith('FE-') && f.includes('-AM')) ||
-            (f.startsWith('PM-') && f.includes('-AM2')) ||
-            (f.startsWith('SC-') && f.includes('-AM2')) ||
+            (f.startsWith('AP-') && (f.includes('-AM') || f.includes('-PM'))) ||
+            (f.startsWith('FE-') && (f.includes('-AM') || f.includes('-PM'))) ||
+            (f.startsWith('PM-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
+            (f.startsWith('SC-') && (f.includes('-AM2') || f.includes('-PM') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('IP-') && f.includes('-AM'))
         )
     );

@@ -1,0 +1,100 @@
+[
+  {
+    "qNo": 1,
+    "theme": "マルウェア感染と対策に関する記述",
+    "description": "N社は、従業員数 5,000 名の化学メーカであり、総務部、営業部、製造部及び情報システム部（以下、情シスという）がある。また、国内に工場がある。N社の LAN 構成を図1に示す。\n\n### 図1 N社のLAN構成\n```mermaid\ngraph TD\n    Internet((インターネット)) --- FW1[FW1]\n    FW1 --- DMZ[DMZセグメント]\n    FW1 --- FW2[FW2]\n    FW1 --- GeneralAffairs[総務部セグメント]\n\n    subgraph DMZ\n        L2SW1[L2SW] --- Proxy[プロキシサーバ]\n        L2SW1 --- ExtDNS[外部DNSサーバ]\n        L2SW1 --- ExtMail[外部メールサーバ]\n    end\n\n    subgraph GeneralAffairs\n        L2SW6[L2SW] --- WAP((W-AP))\n        WAP -.-> Tablet[タブレットPC]\n        L2SW6 --- InquiryPC[問合せ用PC]\n        L2SW6 --- DHCPSrv[DHCPサーバ]\n    end\n\n    FW2 --- InternalServer[内部サーバセグメント]\n    FW2 --- SalesSeg[営業部セグメント]\n    FW2 --- MfgSeg[製造部セグメント]\n    FW2 --- ITSSeg[情シスセグメント]\n\n    subgraph InternalServer\n        L2SW2[L2SW] --- FileSrv[ファイルサーバ]\n        L2SW2 --- IntMail[内部メールサーバ]\n        L2SW2 --- IntDNS[内部DNSサーバ]\n        L2SW2 --- AuthSrv[認証サーバ]\n        L2SW2 --- IntraPortal[イントラポータルサーバ]\n    end\n\n    subgraph SalesSeg\n        L2SW3[L2SW] --- DPC1[D-PC]\n    end\n\n    subgraph MfgSeg\n        L2SW4[L2SW] --- DPC2[D-PC]\n    end\n\n    subgraph ITSSeg\n        L2SW5[L2SW] --- DPC3[D-PC]\n    end\n\n    Router[ルータ] --- Internet\n    Router --- Factory[工場]\n\n    style DMZ fill:#f9f,stroke:#333\n    style GeneralAffairs fill:#bbf,stroke:#333\n```\n\n[システムの概要]\n- プロキシサーバでは、各機器からの全てのアクセスについてアクセスログを取得している。\n- クラウドサービスを利用したWebサイトを運用している。Webサイトには問合せフォームが用意されている。\n- 問合せ用PCは、回答メールを返信するための専用のD-PCである。\n\n### 表1 FW1のルール\n| 項番 | 送信元 | 宛先 | サービス | 動作 | ログ取得 |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| 1 | インターネット | 外部DNSサーバ | DNS | 許可 | する |\n| 2 | インターネット | 外部メールサーバ | SMTP, SMTPS | 許可 | する |\n| 3 | 外部DNSサーバ | インターネット | DNS | 許可 | する |\n| 4 | 外部メールサーバ | インターネット | SMTP, SMTPS | 許可 | する |\n| 5 | 外部メールサーバ | 内部メールサーバ | SMTP | 許可 | する |\n| 6 | 内部メールサーバ | 外部メールサーバ | SMTP | 許可 | する |\n| 7 | 内部IP | プロキシサーバ | 代替HTTP | 許可 | する |\n| 8 | プロキシサーバ | インターネット | HTTP, HTTPS, FTP | 許可 | する |\n| 15 | 全て | 全て | 全て | 拒否 | する |\n\n[インシデント発生]\n4月12日 13:00頃、セキュリティ情報共有団体からC&Cサーバとの通信記録の連絡があった。提供された情報は以下の通り。\n\n### 表3 提供された情報（抜粋）\n| 項目 | 内容 |\n| :--- | :--- |\n| 送信元IPアドレス | aaa.bbb.ccc.ddd |\n| 宛先IPアドレス | C&CサーバのIPアドレス |\n| 宛先TCPポート番号 | 443 |\n| 通信が開始された時刻 | 4月10日 14:00:00 |\n\n注1) aaa.bbb.ccc.dddは、図1中のプロキシサーバのIPアドレスである。\n\n[暗号モード]\n図3にECBモードとCTRモードの仕組みを示す。\n\n### 図3 ECBモードとCTRモードの仕組み\n```mermaid\ngraph TD\n    subgraph ECB_Mode\n        P1[平文ブロック m1] --- Enc1[暗号化処理]\n        K1[暗号鍵] --> Enc1\n        Enc1 --- C1[暗号文ブロック e1]\n    end\n    subgraph CTR_Mode\n        Counter[カウンタ c] --- Enc2[暗号化処理]\n        K2[暗号鍵] --> Enc2\n        Enc2 --- XOR[XOR]\n        P2[平文ブロック m1] --- XOR\n        XOR --- C2[暗号文ブロック e1]\n    end\n```",
+    "questions": [
+      {
+        "subQNo": "設問1",
+        "text": "本文中の [ a ]、[ b ] に入れる最も適切な機器名を、図1の中から選び答えよ。",
+        "explanation": "表3の情報から、送信元がプロキシサーバであることが判明しているため、まず調査すべきはプロキシサーバのログ(a)です。次に、プロキシサーバを経由した通信の詳細をL7FW（アプリケーション層での通信挙動を分析できる機能を持つFW1）のログ(b)で確認します。"
+      },
+      {
+        "subQNo": "設問2",
+        "text": "本文中の下線①について、P君がこのようにコピーしたのは、何をどのような手段で調査することを想定したからか。調査する内容を20文字以内で、調査の手法を25文字以内で具体的に述べよ。",
+        "explanation": "ファイル単位のコピーでは、削除されたファイルや未使用領域に隠されたデータを復元・調査することができません。セクタ単位の複製を行うことで、削除済みファイルやファイルシステムの隙間に残るデータのフォレンジック調査が可能になります。\n- 調査内容：削除されたファイルや、隠しデータの有無\n- 手法：専用ツールを用いた、物理セクタごとのコピー作業"
+      },
+      {
+        "subQNo": "設問3",
+        "text": "〔無線LANの脆弱性〕について答えよ。",
+        "subQuestions": [
+          {
+            "label": "(1)",
+            "text": "本文中の下線②について、知ることができる理由を、30文字以内で述べよ。",
+            "explanation": "無線LANのMACアドレスは、通信のヘッダに含まれており、暗号化されずに送信されるためです。"
+          },
+          {
+            "label": "(2)",
+            "text": "本文中の下線③について、具体的な方法を、55文字以内で述べよ。",
+            "explanation": "正規のW-APと同一のSSIDを設定した偽のW-APを設置し、KRACKsを悪用して端末を偽のW-APに接続させる。"
+          }
+        ]
+      },
+      {
+        "subQNo": "設問4",
+        "text": "〔暗号モード〕について答えよ。",
+        "subQuestions": [
+          {
+            "label": "(1)",
+            "text": "本文中の下線④について、TCP/IPパケットの特徴を、40文字以内で述べよ。",
+            "explanation": "ヘッダの一部や固定的なフィールドなど、同一内容のデータが繰り返し現れる特徴。"
+          },
+          {
+            "label": "(2)",
+            "text": "本文中の [ c ] 〜 [ e ] に入れる適切な字句を答えよ。",
+            "explanation": "ECBモードでは同一の「平文ブロック」(c)が同一の暗号文になります。CTRモードでは「カウンタ値」(d)を暗号化し、平文と「排他的論理和」(e)をとります。"
+          }
+        ]
+      },
+      {
+        "subQNo": "設問5",
+        "text": "〔未知マルウェア対策の改良〕について答えよ。",
+        "subQuestions": [
+          {
+            "label": "(1)",
+            "text": "本文中の [ f ] に入れる字句を答えよ。",
+            "explanation": "HTTP通信の場合、プロキシサーバは通信内容を「解析（または閲覧・取得）」することができます。"
+          },
+          {
+            "label": "(2)",
+            "text": "本文中の [ g ]、[ h ] に入れる適切な字句を解答群の中から選べ。",
+            "explanation": "CONNECTメソッドでは「ホスト」(g)名が渡されますが、パス(h)部分は暗号化されるため指定できません。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "qNo": 2,
+    "theme": "情報セキュリティ対策の強化",
+    "description": "A社は、従業員数 200 名の金型加工業者である。金型加工に必要な情報を収めたファイル（以下、設計情報ファイルという）を、DVD-R 又は電子メールを使って、発注元との間でやり取りする。\n\n### 表1 営業秘密に関する管理規則（概要）\n| 要件名 | 管理規則（概要） |\n| :--- | :--- |\n| 秘密性 [ a ] | 営業秘密を含む文書は、全てのページに A社秘密情報と記載すること。閲覧できる者を、A社の業務上必要な従業員に制限すること。 |\n| 完全性 [ b ] | A社で開発し、A社の事業に必要な金型加工技術の情報を、営業秘密とすること。 |\n| 可用性 [ c ] | 営業秘密は、一般的に知られた状態にならないように、業界誌などの刊行物に掲載しないこと。 |\n\n### 図1 A社のネットワーク構成\n```mermaid\ngraph TD\n    Internet((インターネット)) --- Cloud[クラウドサービスT]\n    Internet --- L3SW1[L3SW1]\n    L3SW1 --- FW[FW]\n    FW --- DMZ[DMZ]\n    subgraph DMZ\n        L2SW1[L2SW1] --- CacheDNS[A社キャッシュDNSサーバ]\n        L2SW1 --- Proxy[プロキシサーバ]\n    end\n    FW --- InternalLAN[内部システムLAN]\n    subgraph InternalLAN\n        L2SW2[L2SW2] --- DesignMgmt[設計情報管理サーバ]\n        L2SW2 --- MfgMgmt[製造情報管理サーバ]\n        L2SW2 --- DHCPSrv[DHCPサーバ]\n    end\n    L3SW1 --- AdminLAN[管理部LAN]\n    L3SW1 --- DesignLAN[設計部LAN]\n    L3SW1 --- MfgLAN[製造部LAN]\n    L3SW1 --- L3SW2[L3SW2]\n    L3SW2 --- SalesBase[営業拠点]\n    L3SW2 --- Factory[工場]\n```",
+    "questions": [
+      {
+        "subQNo": "設問1",
+        "text": "表1中の [ a ] 〜 [ c ] に入れる適切な字句を答えよ。",
+        "explanation": "情報セキュリティの三要素（機密性・完全性・可用性）に関する要件です。\na: 機密性, b: 完全性, c: 可用性 (※表の記述に対応)"
+      },
+      {
+        "subQNo": "設問2",
+        "text": "(1) 表2中の [ d ] に入れる適切な字句を10文字以内で答えよ。(2) 下線①について、接続を許可するネットワークアドレスを答えよ。",
+        "explanation": "d: 第三者中継（オープンリレー）の対策です。①: 特定のネットワークからの接続のみを許可する設定です（x1.y1.z1.16/29など）。"
+      },
+      {
+        "subQNo": "設問3",
+        "text": "表4、表5及び本文中の空欄 [ e ] 〜 [ i ] に入れる適切な字句を答えよ。",
+        "explanation": "e: 許可するIPアドレス、f: NTP（時刻同期プロトコル）、g: AES（暗号アルゴリズム）、h: CRYPTREC、i: ハッシュ値。"
+      },
+      {
+        "subQNo": "設問5",
+        "text": "情報漏えいの調査及び一時的な対処について答えよ。",
+        "subQuestions": [
+          {
+            "label": "(1)",
+            "text": "下線②について、不十分な理由を55文字以内で述べよ。",
+            "explanation": "IPアドレスの割当履歴だけでは、DHCPで動的に変更されるIPアドレスをいつ誰が利用していたか特定できないため。"
+          }
+        ]
+      }
+    ]
+  }
+]
