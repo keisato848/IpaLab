@@ -1,0 +1,438 @@
+/* Container: Full height layout */
+.container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 64px);
+    max-height: calc(100vh - 64px);
+    overflow: hidden;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Mobile Tab Navigation (Visible only on small screens) */
+.mobileNav {
+    display: none;
+    flex: none;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+}
+
+.mobileNavButton {
+    flex: 1;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.2s;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.mobileNavButton:hover {
+    color: var(--text-primary);
+    background: var(--bg-primary);
+}
+
+.mobileNavButton.active {
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
+    background: var(--bg-primary);
+}
+
+/* Split View Container (Desktop) */
+.splitContainer {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Pane Common Styles */
+.pane {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+.pane.active {
+    display: flex;
+}
+
+/* Left Pane: Context (60% on Desktop) */
+.contextPane {
+    width: 100%;
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+}
+
+/* Right Pane: Questions & Answers (40% on Desktop) */
+.answerPane {
+    width: 100%;
+    padding: 1.5rem;
+    background: var(--bg-primary);
+}
+
+/* Context Header */
+.contextHeader {
+    margin-bottom: 1.5rem;
+}
+
+.contextTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.contextBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+/* Context Content */
+.contextContent {
+    line-height: 1.75;
+    color: var(--text-primary);
+}
+
+/* Answer Pane Header */
+.answerPaneHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    padding-top: 0;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    background: var(--bg-primary);
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.answerPaneTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.answerPaneSubtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.scoreDisplay {
+    text-align: right;
+}
+
+.scoreLabel {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.scoreValue {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.scoreMax {
+    font-size: 0.875rem;
+    color: var(--text-tertiary);
+}
+
+/* Radar Chart Container */
+.radarContainer {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+}
+
+.radarTitle {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.radarChart {
+    height: 200px;
+    width: 100%;
+}
+
+/* Questions List */
+.questionsList {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+/* Desktop Layout: Split View */
+@media (min-width: 1024px) {
+    .mobileNav {
+        display: none;
+    }
+
+    .splitContainer {
+        display: flex;
+    }
+
+    .contextPane {
+        width: 60%;
+        display: block;
+    }
+
+    .answerPane {
+        width: 40%;
+        display: block;
+    }
+
+    .pane {
+        height: 100%;
+    }
+}
+
+/* Mobile Layout: Tab View */
+@media (max-width: 1023px) {
+    .mobileNav {
+        display: flex;
+    }
+
+    .splitContainer {
+        flex-direction: column;
+        position: relative;
+    }
+
+    .pane {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .pane.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .contextPane {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+}
+
+/* Sub Question Block */
+.subQuestionBlock {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 2rem;
+}
+
+.subQuestionBlock:last-child {
+    border-bottom: none;
+}
+
+.subQuestionHeader {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.subQuestionNumber {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.subQuestionText {
+    flex: 1;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Sub-sub Questions */
+.subQuestionsList {
+    margin-left: 1.5rem;
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.subQuestionItem {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.subQuestionItemHeader {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.subQuestionLabel {
+    font-size: 0.875rem;
+    font-weight: 700;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    background: var(--accent-color);
+    color: white;
+}
+
+.subQuestionItemText {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+}
+
+/* Explanation Toggle */
+.explanationToggle {
+    margin-top: 0.75rem;
+}
+
+.explanationButton {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    border-radius: 9999px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+}
+
+.explanationButton:hover {
+    background: var(--accent-color);
+    color: white;
+}
+
+.explanationContent {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    border-left: 4px solid #fbbf24;
+    background: rgba(251, 191, 36, 0.1);
+    font-size: 0.875rem;
+}
+
+.explanationHeader {
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.explanationAnswer {
+    font-family: monospace;
+    font-size: 1.125rem;
+}
+
+.explanationBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    background: rgba(251, 191, 36, 0.2);
+    color: #92400e;
+}
+
+.explanationText {
+    margin-top: 0.5rem;
+    color: var(--text-secondary);
+}
+
+/* Markdown Content */
+.markdownContent {
+    color: var(--text-primary);
+}
+
+.markdownContent :global(p) {
+    margin-bottom: 1rem;
+}
+
+.markdownContent :global(h1),
+.markdownContent :global(h2),
+.markdownContent :global(h3) {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+}
+
+.markdownContent :global(ul),
+.markdownContent :global(ol) {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.markdownContent :global(li) {
+    margin-bottom: 0.5rem;
+}
+
+.markdownContent :global(code) {
+    background: var(--bg-primary);
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+
+.markdownContent :global(pre) {
+    background: var(--bg-primary);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+/* Diagram Container */
+.diagramContainer {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--bg-primary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.diagramLabel {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.diagramContent {
+    overflow-x: auto;
+}
+
+/* Error Message */
+.errorMessage {
+    padding: 1rem;
+    color: #ef4444;
+    background: #fef2f2;
+    border-radius: 0.5rem;
+    margin: 1rem;
+}
