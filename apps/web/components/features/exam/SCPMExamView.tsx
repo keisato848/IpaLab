@@ -29,10 +29,10 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Responsi
 export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descriptiveHistory }: SCPMExamViewProps) {
     const { context, questions } = question;
     const [selectedDiagram, setSelectedDiagram] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState<'context' | 'questions'>('context');
+    const [activeTab, setActiveTab] = useState<'context' | 'answer'>('context');
 
     if (!context) {
-        return <div className="p-4 text-red-500">Error: No context data found for this PM question.</div>;
+        return <div className={styles.errorMessage}>Error: No context data found for this PM question.</div>;
     }
 
     // Process background text to replace {{diagram:id}} with interactive buttons or placeholders
@@ -57,34 +57,34 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                 const diagramId = match[1];
                 const diagram = context.diagrams?.find(d => d.id === diagramId);
 
-                if (!diagram) return <div key={index} className="text-red-400">[Missing Diagram: {diagramId}]</div>;
+                if (!diagram) return <div key={index} className={styles.errorMessage}>[Missing Diagram: {diagramId}]</div>;
 
                 return (
-                    <div key={index} className="my-6 border rounded-lg p-4 bg-white dark:bg-zinc-900 shadow-sm">
-                        <div className="text-sm font-semibold text-gray-500 mb-2">{diagram.label}</div>
-                        {diagram.type === 'mermaid' ? (
-                            <div className="overflow-x-auto">
+                    <div key={index} className={styles.diagramContainer}>
+                        <div className={styles.diagramLabel}>{diagram.label}</div>
+                        <div className={styles.diagramContent}>
+                            {diagram.type === 'mermaid' ? (
                                 <Mermaid chart={diagram.content} />
-                            </div>
-                        ) : diagram.type === 'markdown' ? (
-                            <div className="overflow-x-auto prose dark:prose-invert max-w-none">
-                                <ReactMarkdown remarkPlugins={[remarkGfm] as any} rehypePlugins={[rehypeRaw] as any}>
-                                    {diagram.content}
-                                </ReactMarkdown>
-                            </div>
-                        ) : (
-                            <div className="p-4 bg-gray-100 text-gray-800 rounded">
-                                [Image/Other Diagram Type: {diagram.type}]
-                                <pre className="text-xs mt-2">{diagram.content}</pre>
-                            </div>
-                        )}
+                            ) : diagram.type === 'markdown' ? (
+                                <div className={styles.markdownContent}>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm] as any} rehypePlugins={[rehypeRaw] as any}>
+                                        {diagram.content}
+                                    </ReactMarkdown>
+                                </div>
+                            ) : (
+                                <div className={styles.errorMessage}>
+                                    [Image/Other Diagram Type: {diagram.type}]
+                                    <pre style={{ fontSize: '0.75rem', marginTop: '0.5rem' }}>{diagram.content}</pre>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 );
             }
 
             // Standard Text
             return (
-                <div key={index} className="prose dark:prose-invert max-w-none">
+                <div key={index} className={styles.markdownContent}>
                     <ReactMarkdown remarkPlugins={[remarkGfm] as any} rehypePlugins={[rehypeRaw] as any}>
                         {part}
                     </ReactMarkdown>
@@ -147,67 +147,69 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
 
 
     return (
-        <div className="flex flex-col h-screen max-h-[calc(100vh-64px)] overflow-hidden">
+        <div className={styles.container}>
             {/* Mobile Tab Navigation (Visible only on small screens) */}
-            <div className="lg:hidden flex border-b bg-white dark:bg-zinc-900 flex-none">
+            <div className={styles.mobileNav}>
                 <button
                     onClick={() => setActiveTab('context')}
-                    className={`flex-1 py-3 text-sm font-semibold text-center transition-colors border-b-2 ${activeTab === 'context' ? 'border-blue-600 text-blue-600 bg-blue-50/50 dark:bg-blue-900/10' : 'border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-gray-300'}`}
+                    className={`${styles.mobileNavButton} ${activeTab === 'context' ? styles.active : ''}`}
                 >
-                    問題文 (Context)
+                    📖 問題文
                 </button>
                 <button
-                    onClick={() => setActiveTab('questions')}
-                    className={`flex-1 py-3 text-sm font-semibold text-center transition-colors border-b-2 ${activeTab === 'questions' ? 'border-blue-600 text-blue-600 bg-blue-50/50 dark:bg-blue-900/10' : 'border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-gray-300'}`}
+                    onClick={() => setActiveTab('answer')}
+                    className={`${styles.mobileNavButton} ${activeTab === 'answer' ? styles.active : ''}`}
                 >
-                    設問 (Questions)
+                    ✏️ 解答用紙
                 </button>
             </div>
 
-            <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
+            <div className={styles.splitContainer}>
                 {/* Left Pane: Context (Scrollable) */}
-                <div className={`lg:w-1/2 w-full h-full overflow-y-auto border-r border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-950 p-6 scroll-smooth ${activeTab === 'context' ? 'block' : 'hidden lg:block'}`}>
-                    <div className="mb-6">
-                        <h1 className="text-xl font-bold mb-2">{context.title}</h1>
-                        <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 mb-4 bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                <div className={`${styles.pane} ${styles.contextPane} ${activeTab === 'context' ? styles.active : ''}`}>
+                    <div className={styles.contextHeader}>
+                        <h1 className={styles.contextTitle}>{context.title}</h1>
+                        <span className={styles.contextBadge}>
                             PM / SC Exam Context
                         </span>
                     </div>
 
-                    <div className="space-y-4 text-base leading-relaxed text-gray-800 dark:text-gray-200 font-serif lg:font-sans">
+                    <div className={styles.contextContent}>
                         {renderContextWithDiagrams(context.background)}
                     </div>
                 </div>
 
                 {/* Right Pane: Questions (Scrollable) */}
-                <div className={`lg:w-1/2 w-full h-full overflow-y-auto bg-white dark:bg-zinc-900 p-6 ${activeTab === 'questions' ? 'block' : 'hidden lg:block'}`}>
-                    <div className="mb-4 border-b pb-2 flex justify-between items-center">
+                <div className={`${styles.pane} ${styles.answerPane} ${activeTab === 'answer' ? styles.active : ''}`}>
+                    <div className={styles.answerPaneHeader}>
                         <div>
-                            <h2 className="text-lg font-semibold">設問一覧</h2>
-                            <p className="text-sm text-gray-500">全{questions?.length || 0}問</p>
+                            <h2 className={styles.answerPaneTitle}>設問一覧</h2>
+                            <p className={styles.answerPaneSubtitle}>全{questions?.length || 0}問</p>
                         </div>
                         {/* Total Score Display */}
-                        <div className="text-right">
-                            <div className="text-xs text-gray-500">総合スコア (目安)</div>
-                            <div className="text-xl font-bold text-blue-600">{totalScore} <span className="text-sm text-gray-400">/ {questions ? questions.length * 100 : 0}</span></div>
+                        <div className={styles.scoreDisplay}>
+                            <div className={styles.scoreLabel}>総合スコア (目安)</div>
+                            <div className={styles.scoreValue}>
+                                {totalScore} <span className={styles.scoreMax}>/ {questions ? questions.length * 100 : 0}</span>
+                            </div>
                         </div>
                     </div>
 
                     {/* Global Radar Chart Area */}
                     {totalScore > 0 && (
-                        <div className="mb-8 p-4 bg-white dark:bg-zinc-800 rounded-xl border shadow-sm">
-                            <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">回答傾向分析 (全設問平均)</h3>
-                            <div className="h-[200px] w-full">
+                        <div className={styles.radarContainer}>
+                            <h3 className={styles.radarTitle}>回答傾向分析 (全設問平均)</h3>
+                            <div className={styles.radarChart}>
                                 <ResponsiveContainer width="100%" height="100%">
                                     <RadarChart cx="50%" cy="50%" outerRadius="80%" data={aggregatedData}>
-                                        <PolarGrid stroke="#e5e7eb" />
-                                        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: '#6b7280' }} />
+                                        <PolarGrid stroke="var(--border-color)" />
+                                        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} />
                                         <PolarRadiusAxis angle={30} domain={[0, 10]} hide />
                                         <Radar
                                             name="Average"
                                             dataKey="A"
-                                            stroke="#3b82f6"
-                                            fill="#3b82f6"
+                                            stroke="var(--accent-color)"
+                                            fill="var(--accent-color)"
                                             fillOpacity={0.5}
                                         />
                                     </RadarChart>
@@ -216,7 +218,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                         </div>
                     )}
 
-                    <div className="space-y-12">
+                    <div className={styles.questionsList}>
                         {questions?.map((q, idx) => (
                             <SubQuestionBlock
                                 key={q.id || idx}
@@ -224,13 +226,6 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                                 index={idx}
                                 parentContext={context}
                                 onGrade={onGrade ? (data) => onGrade(data, idx) : undefined}
-                                // Pass history for this specific sub-question
-                                // ID strategy: we need to match how QuestionClient stores it.
-                                // QuestionClient fetches by DB record.
-                                // record.questionId.
-                                // If we don't have exact IDs, assume idx-based?
-                                // Actually, `descriptiveHistory` is keyed by questionId.
-                                // q.id should be the key if available.
                                 initialData={descriptiveHistory ? descriptiveHistory[q.id || `sq-${idx}`] : undefined}
                             />
                         ))}
@@ -243,19 +238,18 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
 }
 
 function SubQuestionBlock({ question, index, parentContext, onGrade, initialData }: { question: any, index: number, parentContext: any, onGrade?: (data: any) => void, initialData?: any }) {
-    // State moved to SubQuestionItem
     return (
-        <div className="border-b last:border-0 pb-8">
-            <div className="flex items-baseline gap-2 mb-3">
-                <span className="text-lg font-bold text-blue-600">Q{question.subQNo || index + 1}</span>
-                <div className="prose dark:prose-invert max-w-none text-gray-900 dark:text-gray-100 font-medium">
+        <div className={styles.subQuestionBlock}>
+            <div className={styles.subQuestionHeader}>
+                <span className={styles.subQuestionNumber}>Q{question.subQNo || index + 1}</span>
+                <div className={`${styles.markdownContent} ${styles.subQuestionText}`}>
                     <ReactMarkdown>{question.text}</ReactMarkdown>
                 </div>
             </div>
 
             {/* Sub-sub questions if any */}
             {question.subQuestions && question.subQuestions.length > 0 && (
-                <div className="ml-6 space-y-6 mt-4">
+                <div className={styles.subQuestionsList}>
                     {question.subQuestions.map((sq: any, sIdx: number) => (
                         <SubQuestionItem
                             key={sIdx}
@@ -275,49 +269,47 @@ function SubQuestionItem({ sq, sIdx, onGrade, initialData }: { sq: any, sIdx: nu
     const [showExplanation, setShowExplanation] = useState(false);
 
     return (
-        <div className="bg-gray-50 dark:bg-zinc-800/50 p-4 rounded-lg">
-            <div className="flex gap-2 items-center mb-2">
-                <span className="text-sm font-bold bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100 px-2 py-0.5 rounded">
+        <div className={styles.subQuestionItem}>
+            <div className={styles.subQuestionItemHeader}>
+                <span className={styles.subQuestionLabel}>
                     {sq.label}
                 </span>
-                <div className="text-sm prose dark:prose-invert">
+                <div className={`${styles.markdownContent} ${styles.subQuestionItemText}`}>
                     <ReactMarkdown>{sq.text}</ReactMarkdown>
                 </div>
             </div>
 
             {/* AI Grading Box */}
-            <div className="mt-4">
+            <div style={{ marginTop: '1rem' }}>
                 <AIAnswerBox
                     questionText={`[${sq.label}] ${sq.text}`}
                     modelAnswer={sq.answer}
                     onSave={onGrade}
                     initialAnswer={initialData?.answer}
                     initialResult={initialData?.result}
-                    hideChart={true} // Hide individual chart
+                    hideChart={true}
                 />
             </div>
 
-            <div className="mt-3">
+            <div className={styles.explanationToggle}>
                 <button
                     onClick={() => setShowExplanation(!showExplanation)}
-                    className="text-xs px-3 py-1.5 border border-blue-500 text-blue-600 rounded-full hover:bg-blue-50 transition-colors font-semibold"
+                    className={styles.explanationButton}
                 >
                     {showExplanation ? "解答例を隠す" : "解答例を表示"}
                 </button>
 
                 {showExplanation && (
-                    <div className="mt-3 p-3 border-l-4 border-amber-400 bg-amber-50 dark:bg-amber-900/10 text-sm">
-                        <div className="font-bold flex items-center gap-2 mb-1">
+                    <div className={styles.explanationContent}>
+                        <div className={styles.explanationHeader}>
                             <span>解答例:</span>
-                            <span className="font-mono text-lg">{sq.answer}</span>
+                            <span className={styles.explanationAnswer}>{sq.answer}</span>
                         </div>
-                        <div className="mt-2 text-gray-600 dark:text-gray-300">
-                            <div className="flex items-center gap-2 mb-1">
-                                <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100">
-                                    AIによる解説
-                                </span>
-                            </div>
-                            <p>{sq.explanation}</p>
+                        <div className={styles.explanationText}>
+                            <span className={styles.explanationBadge}>
+                                AIによる解説
+                            </span>
+                            <p style={{ marginTop: '0.5rem' }}>{sq.explanation}</p>
                         </div>
                     </div>
                 )}

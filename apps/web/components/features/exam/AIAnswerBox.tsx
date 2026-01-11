@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import remarkGfm from 'remark-gfm';
@@ -46,6 +46,16 @@ export default function AIAnswerBox({
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<ScoreResult | null>(initialResult || null);
     const [error, setError] = useState<string | null>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    // Auto-resize textarea
+    useEffect(() => {
+        const textarea = textareaRef.current;
+        if (textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = `${textarea.scrollHeight}px`;
+        }
+    }, [answer]);
 
     const handleScore = async () => {
         if (!answer.trim()) return;
@@ -90,6 +100,7 @@ export default function AIAnswerBox({
         <div className={styles.container}>
             <div className={styles.inputWrapper}>
                 <textarea
+                    ref={textareaRef}
                     className={styles.textarea}
                     value={answer}
                     onChange={(e) => setAnswer(e.target.value)}

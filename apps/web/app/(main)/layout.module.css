@@ -238,3 +238,11 @@
     display: block;
   }
 }
+
+/* PC Specific Tweaks - ensuring full width */
+@media (min-width: 769px) {
+  .mainContent {
+    max-width: none;
+    /* Remove any previous constraints */
+  }
+}

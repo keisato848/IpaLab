@@ -54,6 +54,40 @@ export interface LearningRecord {
     aiRadarData?: any[]; // Ideally Typed, but using any for now or specific type if defined
 }
 
+// Async Job Interface
+export interface StudyPlanJob {
+    id: string; // "job-{userId}-{timestamp}"
+    type: "studyPlanJob";
+    userId: string;
+    targetExam: string;
+    status: "pending" | "completed" | "failed";
+    requestData: any;
+    resultData?: StudyPlan;
+    createdAt: string;
+    completedAt?: string;
+}
+
+export interface StudyPlan {
+    title: string;
+    examDate: string;
+    monthlyGoal: string; // Current month's goal (summary)
+    weeklySchedule: {
+        weekNumber: number;
+        startDate: string; // ISO Date
+        endDate: string; // ISO Date
+        goal: string;
+        dailyTasks: {
+            date: string; // ISO Date "YYYY-MM-DD"
+            goal: string;
+            questionCount: number;
+            targetCategory?: string; // e.g. "Security"
+            targetExamId?: string; // e.g. "AP-2023-Fall"
+        }[];
+        focus?: string; // "Weakness Reinforcement"
+    }[];
+    generatedAt: string;
+}
+
 // Exam Interface
 export interface Exam {
     id: string;
@@ -232,5 +266,34 @@ export async function saveExamProgress(
     } catch (error) {
         console.error("Failed to save exam progress:", error);
         return null; // Don't throw to avoid blocking UI
+    }
+}
+
+
+// --- Job System API ---
+
+export async function createStudyPlanJob(userId: string, data: any): Promise<StudyPlanJob | null> {
+    try {
+        const res = await fetch(`${API_BASE}/ai/jobs`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, ...data })
+        });
+        if (!res.ok) throw new Error(res.statusText);
+        return await res.json();
+    } catch (e) {
+        console.error("Failed to create job:", e);
+        return null;
+    }
+}
+
+export async function getLatestStudyPlanJob(userId: string): Promise<StudyPlanJob | null> {
+    try {
+        const res = await fetch(`${API_BASE}/ai/jobs?userId=${userId}`, { cache: 'no-store' });
+        if (!res.ok) return null;
+        return await res.json();
+    } catch (e) {
+        console.error("Failed to get job:", e);
+        return null;
     }
 }

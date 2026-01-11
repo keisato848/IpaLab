@@ -1,0 +1,133 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
+import { containers } from '@/lib/cosmos';
+import { v4 as uuidv4 } from 'uuid';
+
+// Initialize Gemini
+const apiKey = process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY_1 || '';
+const genAI = new GoogleGenerativeAI(apiKey);
+
+export const runtime = 'nodejs'; // Use Node runtime for stability
+
+interface PlanRequest {
+    userId?: string;
+    targetExam: string;
+    examDate: string;
+    studyTimeWeekday: number;
+    studyTimeWeekend: number;
+    scores: Record<string, number>;
+}
+
+// Define the schema for Gemini to strictly follow
+const planSchema = {
+    type: SchemaType.OBJECT,
+    properties: {
+        title: { type: SchemaType.STRING },
+        examDate: { type: SchemaType.STRING },
+        monthlyGoal: { type: SchemaType.STRING },
+        weeklySchedule: {
+            type: SchemaType.ARRAY,
+            items: {
+                type: SchemaType.OBJECT,
+                properties: {
+                    weekNumber: { type: SchemaType.NUMBER },
+                    startDate: { type: SchemaType.STRING },
+                    endDate: { type: SchemaType.STRING },
+                    goal: { type: SchemaType.STRING },
+                    dailyTasks: {
+                        type: SchemaType.ARRAY,
+                        items: {
+                            type: SchemaType.OBJECT,
+                            properties: {
+                                date: { type: SchemaType.STRING },
+                                goal: { type: SchemaType.STRING },
+                                questionCount: { type: SchemaType.NUMBER },
+                                targetCategory: { type: SchemaType.STRING },
+                                targetExamId: { type: SchemaType.STRING, nullable: true }
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        generatedAt: { type: SchemaType.STRING }
+    },
+    required: ["title", "examDate", "monthlyGoal", "weeklySchedule", "generatedAt"]
+};
+
+export async function POST(req: NextRequest) {
+    const startTime = Date.now();
+    try {
+        if (!apiKey) {
+            return NextResponse.json({ error: 'API Key not configured' }, { status: 500 });
+        }
+
+        const body: PlanRequest = await req.json();
+        const { targetExam, examDate, studyTimeWeekday, studyTimeWeekend, scores } = body;
+
+        const today = new Date().toISOString().split('T')[0];
+
+        const model = genAI.getGenerativeModel({
+            model: "gemini-2.5-flash",
+            generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: planSchema
+            }
+        });
+
+        // Refined prompt based on user feedback
+        const prompt = `
+        You are an elite IT Exam Strategy Coach.
+        Create a winning study plan for the "${targetExam}" exam.
+
+        # Context
+        - Exam Date: ${examDate}
+        - Current Date: ${today}
+        - Study Time: Weekday ${studyTimeWeekday}h, Weekend ${studyTimeWeekend}h
+        - Self Assessment: ${JSON.stringify(scores)} (Focus on reinforcing weak areas)
+
+        # Rules
+        1. **Title**: Create a catchy, motivating title (e.g., "AP合格 徹底攻略プラン").
+        2. **Strategies**:
+           - Calculate "questionCount" roughly assuming 15 minutes per question (review included).
+             - Example: 2 hours -> ~8 questions.
+           - Assign specific categories based on weak points in early weeks.
+           - Use "targetExamId" (e.g., "AP-2023-Fall") for practice exam days (usually weekends).
+        3. **Scope Restriction**:
+           - Generate "weeklySchedule" for the entire period up to the exam (or max 12 weeks).
+           - **IMPORTANT: Only generate detailed "dailyTasks" for the FIRST 4 WEEKS.**
+           - For weeks 5+, provide the weekly "goal" but leave "dailyTasks" empty or minimal to save token space.
+        4. **Validation**:
+           - "date" must be YYYY-MM-DD.
+           - "generatedAt" must be ISO string of now.
+        `;
+
+        const result = await model.generateContent(prompt);
+        // The result is guaranteed to be valid JSON matching the schema
+        const plan = result.response.text();
+
+        // Calculate and Save Metrics
+        const duration = Date.now() - startTime;
+
+        // Fire-and-forget saving to Cosmos to not block response too much, 
+        // OR await it if we want to be safe. Since this is Node runtime, await is better.
+        try {
+            await containers.metrics.items.create({
+                id: uuidv4(),
+                type: 'plan_generation',
+                userId: body.userId || 'guest',
+                targetExam,
+                duration,
+                createdAt: new Date().toISOString()
+            });
+        } catch (metricErr) {
+            console.error('Failed to save metric:', metricErr);
+        }
+
+        return NextResponse.json(JSON.parse(plan));
+
+    } catch (error) {
+        console.error('Plan generation failed:', error);
+        return NextResponse.json({ error: 'Failed to generate plan' }, { status: 500 });
+    }
+}
