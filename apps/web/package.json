@@ -16,6 +16,7 @@
         "@azure/cosmos": "^4.9.0",
         "@google/generative-ai": "^0.24.1",
         "@types/uuid": "^10.0.0",
+        "applicationinsights": "^3.12.1",
         "he": "^1.2.0",
         "katex": "^0.16.27",
         "mermaid": "^11.12.2",
