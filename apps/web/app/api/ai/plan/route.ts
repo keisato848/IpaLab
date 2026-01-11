@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType, Schema } from '@google/generative-ai';
 import { containers } from '@/lib/cosmos';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -19,7 +19,7 @@ interface PlanRequest {
 }
 
 // Define the schema for Gemini to strictly follow
-const planSchema = {
+const planSchema: Schema = {
     type: SchemaType.OBJECT,
     properties: {
         title: { type: SchemaType.STRING },
