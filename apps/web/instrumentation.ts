@@ -1,4 +1,7 @@
 
 export async function register() {
-    // Database initialization is now lazy/manual to prevent cold start timeouts in SWA
+    if (process.env.NEXT_RUNTIME === 'nodejs') {
+        const { initAppInsights } = await import('./lib/appinsights');
+        initAppInsights();
+    }
 }
