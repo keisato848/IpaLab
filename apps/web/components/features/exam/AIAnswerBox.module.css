@@ -19,8 +19,10 @@
     border-radius: 8px;
     font-size: 1rem;
     line-height: 1.5;
-    resize: vertical;
-    transition: border-color 0.2s;
+    resize: none;
+    overflow-y: hidden;
+    min-height: 120px;
+    transition: border-color 0.2s, height 0.1s;
 }
 
 .charCounter {
@@ -43,6 +45,7 @@
 .actions {
     display: flex;
     justify-content: flex-end;
+    margin-top: 0.5rem;
 }
 
 .scoreBtn {
