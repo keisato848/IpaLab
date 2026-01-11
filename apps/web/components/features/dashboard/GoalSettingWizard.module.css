@@ -13,7 +13,7 @@
 }
 
 .modal {
-    background: var(--bg-card);
+    background: var(--bg-secondary);
     border-radius: 16px;
     width: 90%;
     max-width: 600px;
