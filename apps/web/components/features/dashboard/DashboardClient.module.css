@@ -106,8 +106,19 @@
     }
 
     .heatmapCard {
-        grid-column: span 8;
+        grid-column: span 4;
     }
+
+    .fullWidthCard {
+        grid-column: span 12;
+    }
+}
+
+/* Header Actions (Date + Theme) */
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 @media (max-width: 768px) {
@@ -120,6 +131,18 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
+    }
+
+    .headerActions {
+        width: 100%;
+        justify-content: space-between;
+        /* Spread out on mobile */
+    }
+
+    .dateDisplay {
+        flex: 1;
+        /* Allow date to take space */
+        text-align: center;
     }
 }
 

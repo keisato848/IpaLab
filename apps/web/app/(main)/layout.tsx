@@ -50,6 +50,14 @@ export default function DashboardLayout({
             ダッシュボード
           </Link>
           <Link
+            href="/plan"
+            className={`${styles.navItem} ${isActive('/plan') ? styles.active : ''}`}
+            onClick={closeSidebar}
+          >
+            <span className={styles.icon}>📅</span>
+            学習計画
+          </Link>
+          <Link
             href="/exam"
             className={`${styles.navItem} ${isActive('/exam') ? styles.active : ''}`}
             onClick={closeSidebar}

@@ -28,4 +28,5 @@ export const containers = {
     get accounts() { return getContainer("Accounts"); },
     get sessions() { return getContainer("Sessions"); },
     get learningRecords() { return getContainer("LearningRecords"); },
+    get metrics() { return getContainer("Metrics"); },
 };
