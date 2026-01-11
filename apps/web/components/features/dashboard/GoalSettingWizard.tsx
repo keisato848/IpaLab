@@ -186,7 +186,7 @@ export default function GoalSettingWizard({ onClose, onSave, initialExamId }: Go
                             <div className={styles.inputGroup}>
                                 <label className={styles.label}>目標の試験区分</label>
                                 <div className={styles.optionsGrid}>
-                                    {['IP', 'FE', 'AP', 'SC', 'PM', 'NW'].map(exam => (
+                                    {['IP', 'FE', 'AP', 'SC', 'PM', 'NW', 'SA', 'ST'].map(exam => (
                                         <button
                                             key={exam}
                                             className={`${styles.optionButton} ${targetExam === exam ? styles.selected : ''}`}
@@ -245,6 +245,7 @@ export default function GoalSettingWizard({ onClose, onSave, initialExamId }: Go
                                         <div style={{ textAlign: 'right', fontWeight: 'bold' }}>{hoursWeekend} 時間</div>
                                     </div>
                                 </div>
+
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: '0.5rem' }}>
                                     <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', background: 'var(--bg-secondary)', padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid var(--border-color)' }}>
                                         <span style={{ fontWeight: 'bold' }}>💡 一般的な学習時間の目安:</span><br />
@@ -256,6 +257,8 @@ export default function GoalSettingWizard({ onClose, onSave, initialExamId }: Go
                                                 'SC': '約500時間〜',
                                                 'PM': '約500時間〜',
                                                 'NW': '約500時間〜',
+                                                'SA': '約500時間〜',
+                                                'ST': '約500時間〜',
                                             };
                                             return RECOMMENDED_HOURS[targetExam] || '不明';
                                         })()}
@@ -264,6 +267,76 @@ export default function GoalSettingWizard({ onClose, onSave, initialExamId }: Go
                                         現在の設定: 約 {totalHoursWeek} 時間 / 週
                                     </div>
                                 </div>
+
+                                {/* Feasibility Visualization */}
+                                {examDate && (
+                                    <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                                        {(() => {
+                                            const today = new Date();
+                                            const examDateObj = new Date(examDate);
+                                            const diffTime = Math.max(0, examDateObj.getTime() - today.getTime());
+                                            const daysUntilExam = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                            const weeksUntilExam = daysUntilExam / 7;
+                                            const projectedTotalHours = Math.round(totalHoursWeek * weeksUntilExam);
+
+                                            const RECOMMENDED_HOURS_NUM: Record<string, number> = {
+                                                'IP': 100, 'FE': 200, 'AP': 500, 'SC': 500, 'PM': 500, 'NW': 500, 'SA': 500, 'ST': 500
+                                            };
+                                            const recommended = RECOMMENDED_HOURS_NUM[targetExam] || 500;
+                                            const progressPercent = Math.min(100, (projectedTotalHours / recommended) * 100);
+
+                                            // Determine color based on progress
+                                            let progressBarColor = '#ef4444'; // red
+                                            if (progressPercent >= 100) progressBarColor = '#10b981'; // green
+                                            else if (progressPercent >= 80) progressBarColor = '#f59e0b'; // yellow/orange
+
+                                            return (
+                                                <>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                                                        <span>
+                                                            予測総学習時間: <strong style={{ fontSize: '1.2rem', color: 'var(--text-primary)' }}>{projectedTotalHours}</strong> 時間
+                                                        </span>
+                                                        <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                                                            試験まであと {daysUntilExam} 日
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Progress Bar Container */}
+                                                    <div style={{ position: 'relative', height: '18px', background: 'var(--border-color)', borderRadius: '9px', overflow: 'hidden', marginBottom: '0.5rem' }}>
+                                                        {/* Goal Marker (if progress < 100, the bar represents progress towards goal, so full bar is goal) */}
+                                                        <div style={{
+                                                            width: `${progressPercent}%`,
+                                                            height: '100%',
+                                                            background: progressBarColor,
+                                                            transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
+                                                        }} />
+
+                                                        <div style={{
+                                                            position: 'absolute',
+                                                            top: 0,
+                                                            right: '10px',
+                                                            height: '100%',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            fontSize: '0.75rem',
+                                                            color: 'var(--text-secondary)',
+                                                            textShadow: '0 0 2px rgba(255,255,255,0.8)'
+                                                        }}>
+                                                            目標: {recommended}h
+                                                        </div>
+                                                    </div>
+
+                                                    <div style={{ fontSize: '0.85rem', color: progressPercent >= 100 ? 'var(--success-text)' : 'var(--text-secondary)' }}>
+                                                        {progressPercent >= 100
+                                                            ? '✨ 十分な学習時間を確保できそうです！この調子で頑張りましょう。'
+                                                            : `⚠️ 目標まであと ${recommended - projectedTotalHours} 時間不足しています。学習時間を増やすか、効率化を検討してください。`
+                                                        }
+                                                    </div>
+                                                </>
+                                            );
+                                        })()}
+                                    </div>
+                                )}
                             </div>
 
                             <div className={styles.inputGroup}>

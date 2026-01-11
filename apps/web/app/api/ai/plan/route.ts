@@ -104,7 +104,9 @@ export async function POST(req: NextRequest) {
 
         const result = await model.generateContent(prompt);
         // The result is guaranteed to be valid JSON matching the schema
-        const plan = result.response.text();
+        const validPlan = JSON.parse(plan);
+        // Force the generated date to be today to strictly prevent hallucination
+        validPlan.generatedAt = today;
 
         // Calculate and Save Metrics
         const duration = Date.now() - startTime;
@@ -124,7 +126,7 @@ export async function POST(req: NextRequest) {
             console.error('Failed to save metric:', metricErr);
         }
 
-        return NextResponse.json(JSON.parse(plan));
+        return NextResponse.json(validPlan);
 
     } catch (error) {
         console.error('Plan generation failed:', error);
