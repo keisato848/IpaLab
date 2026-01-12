@@ -14,6 +14,10 @@
   --error-bg: #fef2f2;
   --error-text: #b91c1c;
   --header-bg: rgba(255, 255, 255, 0.8);
+  /* Mapped Primary Colors */
+  --primary-color: var(--accent-color);
+  --primary-dark: var(--accent-hover);
+  --primary-color-alpha: rgba(0, 112, 243, 0.2);
 }
 
 [data-theme='dark'] {
@@ -32,6 +36,10 @@
   --error-bg: #7f1d1d;
   --error-text: #fca5a5;
   --header-bg: rgba(26, 32, 44, 0.8);
+  /* Mapped Primary Colors */
+  --primary-color: var(--accent-color);
+  --primary-dark: var(--accent-hover);
+  --primary-color-alpha: rgba(59, 130, 246, 0.2);
 }
 
 body {

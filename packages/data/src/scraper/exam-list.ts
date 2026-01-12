@@ -168,4 +168,74 @@ export const EXAM_LIST = [
     { category: "IP", year: "2018", term: "Spring", type: "AM", url: "https://www3.jitec.ipa.go.jp/JitesCbt/html/openinfo/pdf/questions/2018h30_ip_qs.pdf", answerUrl: "https://www3.jitec.ipa.go.jp/JitesCbt/html/openinfo/pdf/questions/2018h30_ip_ans.pdf" },
     { category: "IP", year: "2017", term: "Spring", type: "AM", url: "https://www3.jitec.ipa.go.jp/JitesCbt/html/openinfo/pdf/questions/2017h29_ip_qs.pdf", answerUrl: "https://www3.jitec.ipa.go.jp/JitesCbt/html/openinfo/pdf/questions/2017h29_ip_ans.pdf" },
     { category: "IP", year: "2016", term: "Spring", type: "AM", url: "https://www3.jitec.ipa.go.jp/JitesCbt/html/openinfo/pdf/questions/2016h28_ip_qs.pdf", answerUrl: "https://www3.jitec.ipa.go.jp/JitesCbt/html/openinfo/pdf/questions/2016h28_ip_ans.pdf" },
+
+    // SA (Systems Architect)
+    // 2024 Spring
+    { category: "SA", year: "2024", term: "Spring", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_sa_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_sa_am2_ans.pdf" },
+    { category: "SA", year: "2024", term: "Spring", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_sa_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_sa_pm1_ans.pdf" },
+    { category: "SA", year: "2024", term: "Spring", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_sa_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_sa_pm2_ans.pdf" },
+    // 2023 Spring
+    { category: "SA", year: "2023", term: "Spring", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_sa_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_sa_am2_ans.pdf" },
+    { category: "SA", year: "2023", term: "Spring", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_sa_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_sa_pm1_ans.pdf" },
+    { category: "SA", year: "2023", term: "Spring", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_sa_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_sa_pm2_ans.pdf" },
+    // 2022 Spring
+    { category: "SA", year: "2022", term: "Spring", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_sa_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_sa_am2_ans.pdf" },
+    { category: "SA", year: "2022", term: "Spring", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_sa_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_sa_pm1_ans.pdf" },
+    { category: "SA", year: "2022", term: "Spring", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_sa_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_sa_pm2_ans.pdf" },
+    // 2021 Spring
+    { category: "SA", year: "2021", term: "Spring", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_sa_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_sa_am2_ans.pdf" },
+    { category: "SA", year: "2021", term: "Spring", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_sa_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_sa_pm1_ans.pdf" },
+    { category: "SA", year: "2021", term: "Spring", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_sa_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_sa_pm2_ans.pdf" },
+    // Legacy Restoration (2016-2019) - SA was Fall
+    // 2019 Fall (Reiwa 1)
+    { category: "SA", year: "2019", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000dict-att/2019r01a_sa_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000dict-att/2019r01a_sa_am2_ans.pdf" },
+    { category: "SA", year: "2019", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000dict-att/2019r01a_sa_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000dict-att/2019r01a_sa_pm1_ans.pdf" },
+    { category: "SA", year: "2019", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000dict-att/2019r01a_sa_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000dict-att/2019r01a_sa_pm2_ans.pdf" },
+    // 2018 Fall (Heisei 30)
+    { category: "SA", year: "2018", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000f01f-att/2018h30a_sa_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000f01f-att/2018h30a_sa_am2_ans.pdf" },
+    { category: "SA", year: "2018", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000f01f-att/2018h30a_sa_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000f01f-att/2018h30a_sa_pm1_ans.pdf" },
+    { category: "SA", year: "2018", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000f01f-att/2018h30a_sa_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000f01f-att/2018h30a_sa_pm2_ans.pdf" },
+    // 2017 Fall (Heisei 29)
+    { category: "SA", year: "2017", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000fqpm-att/2017h29a_sa_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000fqpm-att/2017h29a_sa_am2_ans.pdf" },
+    { category: "SA", year: "2017", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000fqpm-att/2017h29a_sa_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000fqpm-att/2017h29a_sa_pm1_ans.pdf" },
+    { category: "SA", year: "2017", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000fqpm-att/2017h29a_sa_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000fqpm-att/2017h29a_sa_pm2_ans.pdf" },
+    // 2016 Fall (Heisei 28)
+    { category: "SA", year: "2016", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000g6fw-att/2016h28a_sa_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000g6fw-att/2016h28a_sa_am2_ans.pdf" },
+    { category: "SA", year: "2016", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000g6fw-att/2016h28a_sa_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000g6fw-att/2016h28a_sa_pm1_ans.pdf" },
+    { category: "SA", year: "2016", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000g6fw-att/2016h28a_sa_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000g6fw-att/2016h28a_sa_pm2_ans.pdf" },
+
+    // ST (IT Strategist)
+    // 2024 Spring
+    { category: "ST", year: "2024", term: "Spring", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_st_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_st_am2_ans.pdf" },
+    { category: "ST", year: "2024", term: "Spring", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_st_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_st_pm1_ans.pdf" },
+    { category: "ST", year: "2024", term: "Spring", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_st_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/m42obm000000afqx-att/2024r06h_st_pm2_ans.pdf" },
+    // 2023 Spring
+    { category: "ST", year: "2023", term: "Spring", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_st_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_st_am2_ans.pdf" },
+    { category: "ST", year: "2023", term: "Spring", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_st_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_st_pm1_ans.pdf" },
+    { category: "ST", year: "2023", term: "Spring", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_st_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/ps6vr70000010d6y-att/2023r05h_st_pm2_ans.pdf" },
+    // 2022 Spring
+    { category: "ST", year: "2022", term: "Spring", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_st_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_st_am2_ans.pdf" },
+    { category: "ST", year: "2022", term: "Spring", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_st_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_st_pm1_ans.pdf" },
+    { category: "ST", year: "2022", term: "Spring", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_st_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt80000009sgk-att/2022r04h_st_pm2_ans.pdf" },
+    // 2021 Spring
+    { category: "ST", year: "2021", term: "Spring", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_st_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_st_am2_ans.pdf" },
+    { category: "ST", year: "2021", term: "Spring", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_st_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_st_pm1_ans.pdf" },
+    { category: "ST", year: "2021", term: "Spring", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_st_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000d5ru-att/2021r03h_st_pm2_ans.pdf" },
+    // Legacy Restoration (2016-2019) - ST was Fall
+    // 2019 Fall (Reiwa 1)
+    { category: "ST", year: "2019", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000dict-att/2019r01a_st_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000dict-att/2019r01a_st_am2_ans.pdf" },
+    { category: "ST", year: "2019", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000dict-att/2019r01a_st_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000dict-att/2019r01a_st_pm1_ans.pdf" },
+    { category: "ST", year: "2019", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000dict-att/2019r01a_st_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000dict-att/2019r01a_st_pm2_ans.pdf" },
+    // 2018 Fall (Heisei 30)
+    { category: "ST", year: "2018", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000f01f-att/2018h30a_st_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000f01f-att/2018h30a_st_am2_ans.pdf" },
+    { category: "ST", year: "2018", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000f01f-att/2018h30a_st_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000f01f-att/2018h30a_st_pm1_ans.pdf" },
+    { category: "ST", year: "2018", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000f01f-att/2018h30a_st_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000f01f-att/2018h30a_st_pm2_ans.pdf" },
+    // 2017 Fall (Heisei 29)
+    { category: "ST", year: "2017", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000fqpm-att/2017h29a_st_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000fqpm-att/2017h29a_st_am2_ans.pdf" },
+    { category: "ST", year: "2017", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000fqpm-att/2017h29a_st_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000fqpm-att/2017h29a_st_pm1_ans.pdf" },
+    { category: "ST", year: "2017", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000fqpm-att/2017h29a_st_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000fqpm-att/2017h29a_st_pm2_ans.pdf" },
+    // 2016 Fall (Heisei 28)
+    { category: "ST", year: "2016", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000g6fw-att/2016h28a_st_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000g6fw-att/2016h28a_st_am2_ans.pdf" },
+    { category: "ST", year: "2016", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000g6fw-att/2016h28a_st_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000g6fw-att/2016h28a_st_pm1_ans.pdf" },
+    { category: "ST", year: "2016", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000g6fw-att/2016h28a_st_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/gmcbt8000000g6fw-att/2016h28a_st_pm2_ans.pdf" },
 ];

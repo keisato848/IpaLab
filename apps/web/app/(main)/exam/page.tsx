@@ -101,24 +101,34 @@ export default function ExamListPage() {
                     {/* Category Filters */}
                     <div className={styles.filterGroup}>
                         <span className={styles.filterLabel}>区分:</span>
-                        <div className={styles.filterButtons}>
-                            <button onClick={() => setFilter('ALL')} className={`${styles.filterBtn} ${filter === 'ALL' ? styles.filterBtnSelected : ''}`}>すべて</button>
-                            <button onClick={() => setFilter('FE')} className={`${styles.filterBtn} ${filter === 'FE' ? styles.filterBtnSelected : ''}`}>基本情報 (FE)</button>
-                            <button onClick={() => setFilter('AP')} className={`${styles.filterBtn} ${filter === 'AP' ? styles.filterBtnSelected : ''}`}>応用情報 (AP)</button>
-                            <button onClick={() => setFilter('SC')} className={`${styles.filterBtn} ${filter === 'SC' ? styles.filterBtnSelected : ''}`}>安全確保支援士 (SC)</button>
-                            <button onClick={() => setFilter('PM')} className={`${styles.filterBtn} ${filter === 'PM' ? styles.filterBtnSelected : ''}`}>プロマネ (PM)</button>
-                            <button onClick={() => setFilter('IP')} className={`${styles.filterBtn} ${filter === 'IP' ? styles.filterBtnSelected : ''}`}>ITパスポート (IP)</button>
-                        </div>
+                        <select
+                            className={styles.dropdown}
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
+                        >
+                            <option value="ALL">すべて</option>
+                            <option value="FE">基本情報 (FE)</option>
+                            <option value="AP">応用情報 (AP)</option>
+                            <option value="SC">安全確保支援士 (SC)</option>
+                            <option value="PM">プロマネ (PM)</option>
+                            <option value="IP">ITパスポート (IP)</option>
+                            <option value="SA">システムアーキテクト (SA)</option>
+                            <option value="ST">ITストラテジスト (ST)</option>
+                        </select>
                     </div>
 
                     {/* Time Filters */}
                     <div className={styles.filterGroup}>
                         <span className={styles.filterLabel}>時間帯:</span>
-                        <div className={styles.filterButtons}>
-                            <button onClick={() => setTimeFilter('ALL')} className={`${styles.filterBtn} ${timeFilter === 'ALL' ? styles.filterBtnSelected : ''}`}>すべて</button>
-                            <button onClick={() => setTimeFilter('AM')} className={`${styles.filterBtn} ${timeFilter === 'AM' ? styles.filterBtnSelected : ''}`}>午前 (AM)</button>
-                            <button onClick={() => setTimeFilter('PM')} className={`${styles.filterBtn} ${timeFilter === 'PM' ? styles.filterBtnSelected : ''}`}>午後 (PM)</button>
-                        </div>
+                        <select
+                            className={styles.dropdown}
+                            value={timeFilter}
+                            onChange={(e) => setTimeFilter(e.target.value)}
+                        >
+                            <option value="ALL">すべて</option>
+                            <option value="AM">午前 (AM)</option>
+                            <option value="PM">午後 (PM)</option>
+                        </select>
                     </div>
                 </div>
             </div>
