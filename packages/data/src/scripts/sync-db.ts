@@ -195,6 +195,8 @@ async function main() {
                 else if (examPrefix === 'FE') titlePrefix = "基本情報技術者";
                 else if (examPrefix === 'PM') titlePrefix = "プロジェクトマネージャ";
                 else if (examPrefix === 'SC') titlePrefix = "情報処理安全確保支援士";
+                else if (examPrefix === 'SA') titlePrefix = "システムアーキテクト";
+                else if (examPrefix === 'ST') titlePrefix = "ITストラテジスト";
                 else if (examPrefix === 'IP') titlePrefix = "ITパスポート";
 
                 let termStr = seasonStr === 'S' ? "春期" : "秋期";

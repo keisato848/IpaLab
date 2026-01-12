@@ -10,7 +10,8 @@ function cleanseData() {
     console.log(`Starting Data Cleansing in ${DATA_DIR}...`);
 
     // Find all PM questions
-    const files = glob.sync('**/*PM*/questions_raw.json', { cwd: DATA_DIR });
+    // Find all Advanced questions (PM, SC, SA, ST, etc.)
+    const files = glob.sync('**/*{PM,SC,SA,ST}*/questions_raw.json', { cwd: DATA_DIR });
     console.log(`Found ${files.length} PM question files.`);
 
     // Helper to strip markdown

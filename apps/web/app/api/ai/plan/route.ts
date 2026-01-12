@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
         const today = new Date().toISOString().split('T')[0];
 
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash",
+            model: "gemini-3-flash-preview",
             generationConfig: {
                 responseMimeType: "application/json",
                 responseSchema: planSchema
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
 
         const result = await model.generateContent(prompt);
         // The result is guaranteed to be valid JSON matching the schema
-        const validPlan = JSON.parse(plan);
+        const validPlan = JSON.parse(result.response.text());
         // Force the generated date to be today to strictly prevent hallucination
         validPlan.generatedAt = today;
 

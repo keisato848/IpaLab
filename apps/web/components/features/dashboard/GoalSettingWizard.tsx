@@ -185,17 +185,15 @@ export default function GoalSettingWizard({ onClose, onSave, initialExamId }: Go
                         <div className={styles.stepContainer}>
                             <div className={styles.inputGroup}>
                                 <label className={styles.label}>目標の試験区分</label>
-                                <div className={styles.optionsGrid}>
+                                <select
+                                    className={styles.select}
+                                    value={targetExam}
+                                    onChange={(e) => setTargetExam(e.target.value)}
+                                >
                                     {['IP', 'FE', 'AP', 'SC', 'PM', 'NW', 'SA', 'ST'].map(exam => (
-                                        <button
-                                            key={exam}
-                                            className={`${styles.optionButton} ${targetExam === exam ? styles.selected : ''}`}
-                                            onClick={() => setTargetExam(exam)}
-                                        >
-                                            {exam}
-                                        </button>
+                                        <option key={exam} value={exam}>{exam}</option>
                                     ))}
-                                </div>
+                                </select>
                             </div>
 
                             <div className={styles.inputGroup}>
