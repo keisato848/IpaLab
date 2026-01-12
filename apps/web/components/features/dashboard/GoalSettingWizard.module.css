@@ -116,28 +116,7 @@
     box-shadow: 0 0 0 2px var(--primary-color-alpha);
 }
 
-.optionsGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 0.8rem;
-}
 
-.optionButton {
-    padding: 0.8rem;
-    border: 1px solid var(--border-color);
-    background: var(--bg-secondary);
-    border-radius: 8px;
-    cursor: pointer;
-    text-align: center;
-    color: var(--text-primary);
-    transition: all 0.2s;
-}
-
-.optionButton.selected {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-}
 
 .actions {
     display: flex;
