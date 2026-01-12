@@ -37,6 +37,7 @@ interface QuestionClientProps {
 export default function QuestionClient({ question, year, type, qNo, totalQuestions }: QuestionClientProps) {
     const searchParams = useSearchParams();
     const mode = searchParams.get('mode') || 'practice';
+    const sessionId = searchParams.get('sessionId'); // [NEW] Get Session ID
     const router = useRouter();
     const { data: session } = useSession();
     const { showExamStats, toggleShowExamStats } = useTheme();
@@ -71,6 +72,8 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
     // Review Later State
     const [isBookmarked, setIsBookmarked] = useState(false);
+    // [NEW] Session Flag State
+    const [isFlagged, setIsFlagged] = useState(false);
 
     // Load history & progress on mount
     useEffect(() => {
@@ -109,12 +112,21 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     setIsBookmarked(false);
                 }
 
+                // 3. Restore Flag State (if in same session)
+                if (sessionId) {
+                    // Filter records for this session and question
+                    const sessionRecord = records.find(r => r.sessionId === sessionId && r.questionId === question.id);
+                    if (sessionRecord?.isFlagged) {
+                        setIsFlagged(true);
+                    }
+                }
+
             } catch (e) {
                 console.error("Failed to load history/progress", e);
             }
         }
         fetchHistoryAndProgress();
-    }, [question.id, session?.user?.id, question.examId]);
+    }, [question.id, session?.user?.id, question.examId, sessionId]);
 
     // Handle Bookmark Toggle
     const toggleBookmark = async () => {
@@ -123,16 +135,6 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
         const newState = !isBookmarked;
         setIsBookmarked(newState); // Optimistic Update
-
-        // Fetch current bookmarks to update list
-        // Actually, creating a full list update might be race-condition prone if we don't have the full list.
-        // API `saveExamProgress` expects the *new list* of bookmarks.
-        // So we need to fetch, modify, save? Or should API handle toggle?
-        // Proposal: Frontend maintains locally loaded bookmarks? No, we only loaded *this* question's state.
-        // We need to fetch current progress first to get full list, then modify.
-        // Or assume we fetched it in parent? We didn't.
-        // Better Strategy: `saveExamProgress` should ideally accept "add/remove" or we fetch-modify-save.
-        // Let's do fetch-modify-save for now.
 
         try {
             const current = await getExamProgress(userId, question.examId);
@@ -151,11 +153,43 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         }
     };
 
+    // [NEW] Toggle Flag Logic
+    const toggleFlag = () => {
+        const newState = !isFlagged;
+        setIsFlagged(newState);
+        // Note: Flags are typically saved with the record. 
+        // If we want to persist "Flag only" without answering, we might need a special record type or update logic.
+        // For now, we'll assume flags are attached to the answer attempt or saved when navigating?
+        // OR, simply save a "Flag Update" record?
+        // Simpler approach: Just local state until Answer.
+        // BUT user might "Flag and Skip".
+        // If "Flag and Skip", we should probably save a record with `answeredAt` but maybe `isSkipped: true` or just `isFlagged: true`.
+        // Let's autosave if sessionId exists.
+        if (sessionId) {
+            // Background save for flag state
+            const record: LearningRecord = {
+                id: uuidv4(),
+                userId: session?.user?.id || guestManager.getGuestId() || 'anonymous',
+                questionId: question.id,
+                examId: question.examId,
+                category: question.category,
+                subCategory: question.subCategory,
+                isCorrect: false, // Default if just flagging
+                isFlagged: newState,
+                sessionId,
+                answeredAt: new Date().toISOString(),
+                timeTakenSeconds: 0,
+            };
+            saveLearningRecord(record).catch(e => console.error("Failed to save flag", e));
+        }
+    };
+
 
     // Reset state when question changes
     useEffect(() => {
         setSelectedOption(null);
         setShowExplanation(false);
+        setIsFlagged(false); // Reset Flag
         setStartTime(Date.now());
 
         // Fetch Past Stats (Current Question) & Exam Stats (Current Exam)
@@ -278,6 +312,8 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             category: question.category,
             subCategory: question.subCategory,
             isCorrect,
+            isFlagged, // [NEW]
+            sessionId: sessionId || undefined, // [NEW]
             answeredAt: new Date().toISOString(),
             timeTakenSeconds: timeTaken,
         };
@@ -319,9 +355,9 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         const currentInt = parseInt(qNo);
         if (currentInt < totalQuestions) {
             const nextQ = currentInt + 1;
-            router.push(`/exam/${year}/${type}/${nextQ}?mode=${mode}`);
+            router.push(`/exam/${year}/${type}/${nextQ}?mode=${mode}${sessionId ? `&sessionId=${sessionId}` : ''}`);
         } else {
-            router.push(`/exam/${year}/${type}/result?mode=${mode}`);
+            router.push(`/exam/${year}/${type}/result?mode=${mode}${sessionId ? `&sessionId=${sessionId}` : ''}`);
         }
     };
 
@@ -430,7 +466,14 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     </div>
                 </header>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginTop: '1rem' }}>
+                {/* Guest Warning */}
+                {!session?.user && (
+                    <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', color: '#92400e', padding: '0.5rem 1rem', fontSize: '0.85rem', textAlign: 'center' }}>
+                        ⚠️ ゲストモード：履歴はブラウザに保存され、キャッシュクリア等で消失します。<Link href="/login" style={{ textDecoration: 'underline', fontWeight: 'bold' }}>ログイン</Link>してデータを守りましょう。
+                    </div>
+                )}
+
+                <div className={styles.pmGrid}>
                     {/* Left Panel: Question Text */}
                     <div className={styles.pmPanel}>
                         <h2 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '1rem', borderBottom: '2px solid #eee', paddingBottom: '0.5rem' }}>
@@ -540,12 +583,36 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     </span>
                     {/* Header Controls: Bookmark & Stats */}
                     <div className={styles.headerControls}>
+                        {/* [NEW] Review/Flag Button (Session Specific) */}
+                        <button
+                            className={`${styles.bookmarkBtn} ${isFlagged ? styles.active : ''}`}
+                            onClick={toggleFlag}
+                            title="このセッションで見直す"
+                            aria-label="Flag for Review"
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '0.9rem',
+                                color: isFlagged ? '#eab308' : '#64748b', // Yellow for Flag
+                                marginRight: '1rem'
+                            }}
+                        >
+                            <span style={{ fontSize: '1.2em' }}>{isFlagged ? '🚩' : '🏳️'}</span>
+                            <span className={styles.mobileHidden}>
+                                {isFlagged ? '見直し中' : '見直す'}
+                            </span>
+                        </button>
+
                         {/* Bookmark Button */}
                         <button
                             className={`${styles.bookmarkBtn} ${isBookmarked ? styles.active : ''}`}
                             onClick={toggleBookmark}
-                            title="あとで見直す"
-                            aria-label="Review Later"
+                            title="永久ブックマーク (保存)"
+                            aria-label="Bookmark"
                             style={{
                                 background: 'none',
                                 border: 'none',
@@ -560,7 +627,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                         >
                             {isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
                             <span className={styles.mobileHidden}>
-                                {isBookmarked ? '見直す' : 'あとで見直す'}
+                                {isBookmarked ? '保存' : '保存'}
                             </span>
                         </button>
 
@@ -585,6 +652,13 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     </div>
                 </div>
             </header>
+
+            {/* Guest Warning */}
+            {!session?.user && (
+                <div style={{ background: '#fffbeb', borderBottom: '1px solid #fcd34d', color: '#92400e', padding: '0.5rem 1rem', fontSize: '0.85rem', textAlign: 'center' }}>
+                    ⚠️ ゲストモード：履歴はブラウザに保存され、キャッシュクリア等で消失します。
+                </div>
+            )}
 
             <div className={styles.content}>
                 {/* Left: Question Body */}

@@ -567,3 +567,23 @@
 .mobileOnlyStat {
     display: none;
 }
+
+.pmGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 1rem;
+    flex: 1;
+    overflow: hidden;
+    /* Ensure it doesn't overflow parent */
+    min-height: 0;
+    /* Crucial for flex child scrolling */
+}
+
+@media (max-width: 768px) {
+    .pmGrid {
+        grid-template-columns: 1fr;
+        overflow-y: auto;
+        /* Allow window scroll on mobile */
+    }
+}
