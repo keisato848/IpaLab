@@ -63,34 +63,7 @@
     min-width: 60px;
 }
 
-.filterButtons {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
 
-.filterBtn {
-    padding: 8px 16px;
-    border-radius: 20px;
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-primary);
-    /* Default button bg */
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.2s;
-    font-size: 0.9rem;
-}
-
-.filterBtn:hover {
-    background-color: var(--bg-hover, rgba(0, 0, 0, 0.05));
-}
-
-.filterBtnSelected {
-    background-color: var(--accent-color, #0070f3);
-    color: white;
-    border-color: var(--accent-color, #0070f3);
-}
 
 .grid {
     display: grid;

@@ -16,7 +16,9 @@ if (!API_KEY) {
 }
 
 const genAI = new GoogleGenerativeAI(API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+// Model for complex diagram handling
+const proModel = genAI.getGenerativeModel({ model: "gemini-3-pro-preview" });
 
 const DATA_DIR = path.resolve(__dirname, '../../data/questions');
 const PROMPT_PATH = path.resolve(__dirname, '../../../../docs/prompts/gemini_explanation_prompt.md');
@@ -106,7 +108,15 @@ async function main() {
                     // We use 5000ms to be safe.
                     await delay(5000);
 
-                    const result = await model.generateContent(prompt);
+                    // Check for complex diagram indicators in the question text to switch models
+                    const useProModel = q.text.includes("図") || q.text.includes("表") || q.text.includes("graph") || q.text.includes("chart");
+                    const targetModel = useProModel ? proModel : model;
+
+                    if (useProModel) {
+                        console.log(`[Q${qNo}] Detecting diagrams - Switching to gemini-3-pro-preview`);
+                    }
+
+                    const result = await targetModel.generateContent(prompt);
                     const response = result.response;
                     const text = response.text();
 
