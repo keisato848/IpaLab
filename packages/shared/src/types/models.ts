@@ -75,15 +75,29 @@ export const UserSchema = z.object({
 
 export type User = z.infer<typeof UserSchema>;
 
+// Learning Session Model (Udemy-style attempts)
+export const LearningSessionSchema = z.object({
+    id: z.string().uuid(),
+    userId: z.string(),
+    examId: z.string(),
+    mode: z.enum(['practice', 'mock']),
+    startedAt: z.string().datetime(),
+    completedAt: z.string().datetime().optional(),
+    status: z.enum(['in-progress', 'completed']),
+});
+export type LearningSession = z.infer<typeof LearningSessionSchema>;
+
 // Learning Record Model
 export const LearningRecordSchema = z.object({
     id: z.string().uuid(),
     userId: z.string(), // Partition Key
+    sessionId: z.string().uuid().optional(), // Link to specific attempt
     questionId: z.string(),
     examId: z.string(), // 集計用
     category: z.string(), // 集計用
     subCategory: z.string().optional(), // 分析用
     isCorrect: z.boolean(),
+    isFlagged: z.boolean().default(false), // Review marker
     answeredAt: z.string().datetime(), // ISO string
     timeTakenSeconds: z.number().int().min(0),
     // Spaced Repetition Fields
