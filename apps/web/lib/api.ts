@@ -41,6 +41,8 @@ export interface LearningRecord {
     category: string;
     subCategory?: string;
     isCorrect: boolean;
+    isFlagged?: boolean; // New: Flag for review
+    sessionId?: string; // New: Session Context
     answeredAt: string;
     timeTakenSeconds: number;
     nextReviewAt?: string;
@@ -140,6 +142,22 @@ export async function getQuestions(examId: string, init?: RequestInit): Promise<
     } catch (error) {
         console.error("Failed to fetch questions:", error);
         return [];
+    }
+}
+
+// Session API
+export async function createLearningSession(userId: string, examId: string, mode: 'practice' | 'mock'): Promise<{ id: string } | null> {
+    try {
+        const res = await fetch(`${API_BASE}/session/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, examId, mode })
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return await res.json();
+    } catch (e) {
+        console.error("Failed to create session:", e);
+        return null;
     }
 }
 

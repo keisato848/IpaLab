@@ -45,6 +45,7 @@ export const containers = {
     get users() { return getContainer("Users"); },
     get accounts() { return getContainer("Accounts"); },
     get sessions() { return getContainer("Sessions"); },
+    get learningSessions() { return getContainer("LearningSessions"); },
     get learningRecords() { return getContainer("LearningRecords"); },
     get exams() { return getContainer("Exams"); },
     get examProgress() { return getContainer("ExamProgress"); },
@@ -63,6 +64,7 @@ export const initDatabase = async () => {
     await database.containers.createIfNotExists({ id: "Accounts", partitionKey: "/userId" });
     await database.containers.createIfNotExists({ id: "Sessions", partitionKey: "/sessionToken" });
     await database.containers.createIfNotExists({ id: "LearningRecords", partitionKey: "/userId" });
+    await database.containers.createIfNotExists({ id: "LearningSessions", partitionKey: "/userId" });
     await database.containers.createIfNotExists({ id: "Exams", partitionKey: "/id" });
     await database.containers.createIfNotExists({ id: "ExamProgress", partitionKey: "/userId" });
 };

@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { guestManager } from '@/lib/guest-manager';
 import { FaCheckCircle, FaTimesCircle, FaBookmark } from 'react-icons/fa';
-import { getLearningRecords, LearningRecord, Question, getExamProgress } from '@/lib/api';
+import { getLearningRecords, LearningRecord, Question, getExamProgress, createLearningSession } from '@/lib/api';
 import styles from './ExamEntranceClient.module.css';
 
 interface ExamEntranceClientProps {
@@ -36,7 +36,7 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
     };
 
     // State for learning status & bookmarks
-    const [statusMap, setStatusMap] = useState<Record<string, 'correct' | 'incorrect'>>({});
+    const [statusMap, setStatusMap] = useState<Record<string, 'correct' | 'incorrect' | 'review'>>({});
     const [bookmarks, setBookmarks] = useState<Set<string>>(new Set());
 
     useEffect(() => {
@@ -60,27 +60,44 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                 }
 
                 // 2. Build Status Map (Merge History & Progress)
-                // Priority: ExamProgress (Snapshot) > LearningRecords (History)
-                const newStatusMap: Record<string, 'correct' | 'incorrect'> = {};
+                // Priority: Latest Record Status.
+                const newStatusMap: Record<string, 'correct' | 'incorrect' | 'review'> = {};
 
-                // A. Base processing from History
+                // A. Base processing from History using Latest Record per Question
                 const recordsByQ: Record<string, LearningRecord[]> = {};
                 records.forEach(r => {
                     if (!recordsByQ[r.questionId]) recordsByQ[r.questionId] = [];
                     recordsByQ[r.questionId].push(r);
                 });
-                Object.keys(recordsByQ).forEach(qId => {
-                    // Logic: If any correct, correct. Else incorrect.
-                    const hasCorrect = recordsByQ[qId].some(r => r.isCorrect);
-                    newStatusMap[qId] = hasCorrect ? 'correct' : 'incorrect';
-                });
 
-                // B. Override/Augment with ExamProgress
-                if (examProgress?.statusMap) {
-                    Object.entries(examProgress.statusMap).forEach(([qId, status]) => {
-                        newStatusMap[qId] = status.isCorrect ? 'correct' : 'incorrect';
-                    });
-                }
+                Object.keys(recordsByQ).forEach(qId => {
+                    // Sort by answeredAt desc (Latest first)
+                    const sorted = recordsByQ[qId].sort((a, b) =>
+                        new Date(b.answeredAt).getTime() - new Date(a.answeredAt).getTime()
+                    );
+                    const latest = sorted[0];
+
+                    if (latest) {
+                        if (latest.isFlagged && !latest.isCorrect) {
+                            // "Review" status if flagged and NOT correct (or even if correct? User said "Review" is a status)
+                            // Requirement: "Review/Flagged" state.
+                            // Usually "Review" overrides "Incorrect". Does it override "Correct"?
+                            // User example: "Q1 Correct, Q2 Review, Q3 Incorrect". 
+                            // If I flag a correct answer, it implies I wasn't sure. So "Review" is useful.
+                            // But visual priority: Correct (Green) > Review (Yellow) > Incorrect (Red)?
+                            // Or Review (Yellow) > * ?
+                            // If I'm "Reviewing", I probably want to see it Yellow.
+                            // Let's set priority: Review > Correct > Incorrect?
+                            // Or: Review > Incorrect. Correct > All?
+                            // If I answered correctly but flagged it, I want to review it. So Yellow.
+                            newStatusMap[qId] = 'review';
+                        } else if (latest.isCorrect) {
+                            newStatusMap[qId] = 'correct';
+                        } else {
+                            newStatusMap[qId] = 'incorrect';
+                        }
+                    }
+                });
 
                 setStatusMap(newStatusMap);
 
@@ -140,6 +157,17 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
 
     const displayCount = displayQuestions.length > 0 ? displayQuestions.length : mockSettings.count;
 
+    const startSession = async (startQNo: number, mode: 'practice' | 'mock') => {
+        const userId = session?.user?.id || guestManager.getGuestId();
+        if (!userId) return; // Should handle auth redirect if needed
+
+        const newSession = await createLearningSession(userId, examId, mode);
+        const sessionId = newSession?.id;
+
+        const targetUrl = `/exam/${year}/${type}/${startQNo}?mode=${mode}${sessionId ? `&sessionId=${sessionId}` : ''}`;
+        router.push(targetUrl);
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.breadcrumb}>
@@ -177,14 +205,21 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                 </div>
 
                 <div className={styles.actions}>
-                    <Link href={linkHref} className={`${styles.btn} ${styles.btnPractice}`}>
+                    <button
+                        onClick={() => startSession(nextQNo, 'practice')}
+                        className={`${styles.btn} ${styles.btnPractice}`}
+                        disabled={!isLoaded}
+                    >
                         {isLoaded ? btnText : "読み込み中..."}
                         <span className={styles.btnSub}>即座に解説を表示</span>
-                    </Link>
-                    <Link href={`/exam/${year}/${type}/1?mode=mock`} className={`${styles.btn} ${styles.btnMock}`}>
+                    </button>
+                    <button
+                        onClick={() => startSession(1, 'mock')}
+                        className={`${styles.btn} ${styles.btnMock}`}
+                    >
                         模擬試験モードで開始
                         <span className={styles.btnSub}>{mockSettings.time}分 / {displayCount}問</span>
-                    </Link>
+                    </button>
                 </div>
             </header>
 
@@ -206,6 +241,7 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                             let statusClass = '';
                             if (status === 'correct') statusClass = styles.correct;
                             else if (status === 'incorrect') statusClass = styles.incorrect;
+                            else if (status === 'review') statusClass = styles.review;
 
                             // Helper for item
                             return (
@@ -219,6 +255,7 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                                         Q{q.qNo}
                                         {status === 'correct' && <FaCheckCircle className={styles.iconCorrect} />}
                                         {status === 'incorrect' && <FaTimesCircle className={styles.iconIncorrect} />}
+                                        {status === 'review' && <span title="見直し">🚩</span>}
                                         {isBookmarked && <FaBookmark color="#f59e0b" />}
                                     </span>
 
@@ -231,8 +268,8 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                                             </span>
                                         )}
                                         {status && (
-                                            <span className={styles.statusBadge}>
-                                                {status === 'correct' ? '正解' : '不正解'}
+                                            <span className={`${styles.statusBadge} ${status === 'review' ? styles.statusReview : ''}`}>
+                                                {status === 'correct' ? '正解' : (status === 'review' ? '見直し' : '不正解')}
                                             </span>
                                         )}
                                     </div>

@@ -39,6 +39,35 @@ export async function generateStaticParams() {
 export const dynamicParams = true;
 export const revalidate = 3600;
 
+import { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: { year: string; type: string; qNo: string } }): Promise<Metadata> {
+    const { year, type, qNo } = params;
+    const typeSuffix = type === 'AM1' ? 'AM' : type;
+    const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
+
+    try {
+        const questions = await getExamDataFS(examId);
+        const question = questions.find(q => q.qNo === parseInt(qNo));
+
+        if (!question) return { title: `Not Found - IpaLab` };
+
+        // Safe substring for description
+        const desc = question.text ? question.text.substring(0, 120).replace(/\n/g, ' ') + '...' : `情報処理技術者試験 ${year} ${type} 問${qNo}`;
+
+        return {
+            title: `Q${qNo} ${year} ${type} - IpaLab 過去問道場`,
+            description: desc,
+            openGraph: {
+                title: `Q${qNo} ${year} ${type} (正答率: --%) - IpaLab`,
+                description: desc,
+            }
+        };
+    } catch {
+        return { title: `IpaLab Exam Question` };
+    }
+}
+
 export default async function ExamQuestionPage({ params }: { params: { year: string; type: string; qNo: string } }) {
     const { year, type, qNo } = params;
 

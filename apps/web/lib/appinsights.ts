@@ -14,6 +14,6 @@ export function initAppInsights() {
             .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
             .start();
 
-        console.log('Application Insights started');
+        // console.log('Application Insights started');
     }
 }
