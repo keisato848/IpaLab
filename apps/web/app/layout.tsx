@@ -56,6 +56,8 @@ export const metadata: Metadata = {
 import { NextAuthProvider } from "@/components/providers/NextAuthProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
+import { TelemetryProvider } from "@/components/providers/TelemetryProvider";
+
 export default function RootLayout({
     children,
 }: {
@@ -64,6 +66,7 @@ export default function RootLayout({
     return (
         <html lang="ja">
             <body className={inter.className}>
+                {/* ... script ... */}
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `
@@ -81,11 +84,13 @@ export default function RootLayout({
                         `,
                     }}
                 />
-                <NextAuthProvider>
-                    <ThemeProvider>
-                        {children}
-                    </ThemeProvider>
-                </NextAuthProvider>
+                <TelemetryProvider connectionString={process.env.APPLICATIONINSIGHTS_CONNECTION_STRING}>
+                    <NextAuthProvider>
+                        <ThemeProvider>
+                            {children}
+                        </ThemeProvider>
+                    </NextAuthProvider>
+                </TelemetryProvider>
             </body>
         </html>
     );

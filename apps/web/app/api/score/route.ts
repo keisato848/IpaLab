@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
+import { getAppInsightsClient } from '@/lib/appinsights';
 
 // Initialize Gemini
 const apiKey = process.env.GEMINI_API_KEY;
@@ -74,6 +75,12 @@ export async function POST(req: NextRequest) {
 
     } catch (error: any) {
         console.error("Scoring API Error:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+
+        const client = getAppInsightsClient();
+        if (client) {
+            client.trackException({ exception: error });
+        }
+
+        return NextResponse.json({ error: "Scoring failed" }, { status: 500 });
     }
 }
