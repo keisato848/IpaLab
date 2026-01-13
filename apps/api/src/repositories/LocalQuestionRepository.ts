@@ -66,10 +66,27 @@ export const localQuestionRepository = {
 
             const content = await fs.readFile(path.join(questionsDir, file), 'utf-8');
             try {
-                const q: Question = JSON.parse(content);
-                // Ensure required fields
-                if (q.id && q.text && q.options) {
-                    results.push(q);
+                const json = JSON.parse(content);
+                let items: any[] = [];
+
+                if (Array.isArray(json)) {
+                    items = json;
+                } else if (json.questions && Array.isArray(json.questions)) {
+                    items = json.questions;
+                } else {
+                    items = [json];
+                }
+
+                for (const q of items) {
+                    // PM questions might have description/context instead of simple text
+                    // And might not have options.
+                    if (q.qNo || q.id) {
+                        // Inject Metadata if missing
+                        if (!q.examId) q.examId = examId;
+                        if (!q.id) q.id = `${examId}-${q.qNo}`;
+                        
+                        results.push(q as Question);
+                    }
                 }
             } catch (e) {
                 console.error(`Failed to parse ${file}:`, e);

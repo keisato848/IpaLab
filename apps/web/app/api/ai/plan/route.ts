@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI, SchemaType, Schema } from '@google/generative-ai';
 import { containers } from '@/lib/cosmos';
 import { v4 as uuidv4 } from 'uuid';
+import { getAppInsightsClient } from '@/lib/appinsights'; // Import client
 
-// Initialize Gemini
-const apiKey = process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY_1 || '';
-const genAI = new GoogleGenerativeAI(apiKey);
+// ... (rest of imports/setup)
+
+
 
 export const runtime = 'nodejs'; // Use Node runtime for stability
 
@@ -58,24 +59,18 @@ const planSchema: Schema = {
 export async function POST(req: NextRequest) {
     const startTime = Date.now();
     try {
+        // Simple Key Selection (User requested no rotation)
+        const apiKey = process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY_1 || '';
+
         if (!apiKey) {
             return NextResponse.json({ error: 'API Key not configured' }, { status: 500 });
         }
 
         const body: PlanRequest = await req.json();
         const { targetExam, examDate, studyTimeWeekday, studyTimeWeekend, scores } = body;
-
         const today = new Date().toISOString().split('T')[0];
 
-        const model = genAI.getGenerativeModel({
-            model: "gemini-3-flash-preview",
-            generationConfig: {
-                responseMimeType: "application/json",
-                responseSchema: planSchema
-            }
-        });
-
-        // Refined prompt based on user feedback
+        // Refined prompt
         const prompt = `
         You are an elite IT Exam Strategy Coach.
         Create a winning study plan for the "${targetExam}" exam.
@@ -102,17 +97,46 @@ export async function POST(req: NextRequest) {
            - "generatedAt" must be ISO string of now.
         `;
 
-        const result = await model.generateContent(prompt);
-        // The result is guaranteed to be valid JSON matching the schema
-        const validPlan = JSON.parse(result.response.text());
+        const MODELS = ["gemini-3-flash-preview", "gemini-2.5-flash"];
+        let validPlan: any = null;
+        let lastError: any = null;
+
+        const genAI = new GoogleGenerativeAI(apiKey); // Initialize once
+
+        for (const modelName of MODELS) {
+            try {
+                const model = genAI.getGenerativeModel({
+                    model: modelName,
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: planSchema
+                    }
+                });
+
+                const result = await model.generateContent(prompt);
+                const text = result.response.text();
+
+                if (text) {
+                    validPlan = JSON.parse(text);
+                    break;
+                }
+            } catch (e: any) {
+                lastError = e;
+                console.warn(`Failed with Model ${modelName}: ${e.message}`);
+                // Continue to next model
+            }
+        }
+
+        if (!validPlan) {
+            throw lastError || new Error("All models failed.");
+        }
+
         // Force the generated date to be today to strictly prevent hallucination
         validPlan.generatedAt = today;
 
         // Calculate and Save Metrics
         const duration = Date.now() - startTime;
 
-        // Fire-and-forget saving to Cosmos to not block response too much, 
-        // OR await it if we want to be safe. Since this is Node runtime, await is better.
         try {
             await containers.metrics.items.create({
                 id: uuidv4(),
@@ -128,8 +152,12 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(validPlan);
 
-    } catch (error) {
-        console.error('Plan generation failed:', error);
-        return NextResponse.json({ error: 'Failed to generate plan' }, { status: 500 });
+    } catch (error: any) {
+        console.error('Plan generation failed:', error.message);
+        return NextResponse.json({
+            error: 'Failed to generate plan',
+            details: error.message || String(error),
+            models_tried: ["gemini-3-flash-preview", "gemini-2.5-flash"] // Debug info
+        }, { status: 500 });
     }
 }
