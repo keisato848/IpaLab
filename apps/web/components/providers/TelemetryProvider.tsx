@@ -28,12 +28,14 @@ export function TelemetryProvider({
                     }
                 });
                 appInsights.loadAppInsights();
+                // eslint-disable-next-line no-console
                 console.log('[System] Client-side Application Insights started');
             } else {
+                // eslint-disable-next-line no-console
                 console.warn('[System] Client-side AppInsights skipped: Missing Connection String');
             }
         }
-    }, []);
+    }, [connectionString]);
 
     return <>{children}</>;
 }
