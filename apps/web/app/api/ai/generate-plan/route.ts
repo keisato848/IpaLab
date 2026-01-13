@@ -88,7 +88,6 @@ export async function POST(req: Request) {
         const client = getAppInsightsClient();
         if (client) {
             client.trackException({ exception: error });
-            client.trackTrace({ message: "Plan Generation Failed", severity: 3 });
         }
 
         return NextResponse.json({ error: "Failed to generate plan" }, { status: 500 });
