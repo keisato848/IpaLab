@@ -1,6 +1,7 @@
 {
     "name": "@ipa-lab/shared",
     "version": "0.0.0",
+    "private": true,
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "license": "MIT",
@@ -16,6 +17,6 @@
     },
     "dependencies": {
         "date-fns": "^3.6.0",
-        "zod": "^3.23.8"
+        "zod": "^3.24.1"
     }
 }
