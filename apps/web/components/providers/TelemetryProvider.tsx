@@ -23,7 +23,7 @@ export function TelemetryProvider({
                 appInsights = new ApplicationInsights({
                     config: {
                         connectionString: connectionString,
-                        extensions: [reactPlugin],
+                        extensions: [reactPlugin as any],
                         enableAutoRouteTracking: true, // Track page views
                     }
                 });
