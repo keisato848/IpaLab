@@ -140,6 +140,39 @@
     display: none !important;
 }
 
+/* Resizer Handle */
+.resizer {
+    width: 8px;
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    cursor: col-resize;
+    position: relative;
+    z-index: 20;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.resizer:hover,
+.resizer:active {
+    background: var(--accent-color);
+}
+
+.resizerHandle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 20px;
+    background: var(--text-tertiary);
+    border-radius: 1px;
+}
+
+.resizer:hover .resizerHandle {
+    background: white;
+}
+
 /* Right Pane: Questions & Answers (40% on Desktop) */
 .answerPane {
     width: 100%;
