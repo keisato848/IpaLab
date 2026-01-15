@@ -30,6 +30,8 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
     const { context, questions } = question;
     const [selectedDiagram, setSelectedDiagram] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'context' | 'answer'>('context');
+    // Layout Mode: default (3-col/split), focus (2-col/split no nav), paper (answer only)
+    const [layoutMode, setLayoutMode] = useState<'default' | 'focus' | 'paper'>('default');
 
     if (!context) {
         return <div className={styles.errorMessage}>Error: No context data found for this PM question.</div>;
@@ -147,7 +149,33 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
 
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} ${styles[`layoutMode_${layoutMode}`]}`}>
+            {/* Desktop Layout Toggle (Visible on large screens) */}
+            <div className={styles.layoutControls}>
+                <div className={styles.layoutToggleGroup}>
+                    <button
+                        onClick={() => setLayoutMode('default')}
+                        className={`${styles.layoutToggleBtn} ${layoutMode === 'default' ? styles.active : ''}`}
+                        title="標準 (3カラム)"
+                    >
+                        標準
+                    </button>
+                    <button
+                        onClick={() => setLayoutMode('focus')}
+                        className={`${styles.layoutToggleBtn} ${layoutMode === 'focus' ? styles.active : ''}`}
+                        title="集中 (ナビ非表示)"
+                    >
+                        集中
+                    </button>
+                    <button
+                        onClick={() => setLayoutMode('paper')}
+                        className={`${styles.layoutToggleBtn} ${layoutMode === 'paper' ? styles.active : ''}`}
+                        title="解答のみ (1カラム)"
+                    >
+                        解答のみ
+                    </button>
+                </div>
+            </div>
             {/* Mobile Tab Navigation (Visible only on small screens) */}
             <div className={styles.mobileNav}>
                 <button
