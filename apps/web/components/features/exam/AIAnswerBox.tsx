@@ -43,6 +43,7 @@ export default function AIAnswerBox({
     hideChart = false
 }: AIAnswerBoxProps & { hideChart?: boolean }) {
     const [answer, setAnswer] = useState(initialAnswer);
+    const [isExpanded, setIsExpanded] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<ScoreResult | null>(initialResult || null);
     const [error, setError] = useState<string | null>(null);
@@ -97,7 +98,14 @@ export default function AIAnswerBox({
     };
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} ${isExpanded ? styles.expanded : ''}`}>
+            <button
+                className={styles.expandBtn}
+                onClick={() => setIsExpanded(!isExpanded)}
+                title={isExpanded ? "元のサイズに戻す" : "入力欄を拡大する"}
+            >
+                {isExpanded ? "⤢ 縮小" : "⤢ 拡大"}
+            </button>
             <div className={styles.inputWrapper}>
                 <textarea
                     ref={textareaRef}

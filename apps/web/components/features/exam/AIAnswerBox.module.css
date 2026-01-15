@@ -5,6 +5,45 @@
     gap: 1rem;
 }
 
+/* Expand/Fullscreen Mode */
+.container.expanded {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10000;
+    background: var(--bg-primary, #fff);
+    padding: 2rem;
+    margin: 0;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.container.expanded .textarea {
+    flex: 1;
+    min-height: 50vh;
+}
+
+.expandBtn {
+    background: transparent;
+    border: 1px solid #ccc;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: auto;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary, #666);
+}
+
+.expandBtn:hover {
+    background: #f1f5f9;
+}
+
 /* New Wrapper for relative positioning if needed, or flex layout */
 .inputWrapper {
     display: flex;
