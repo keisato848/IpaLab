@@ -33,6 +33,45 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
     // Layout Mode: default (3-col/split), focus (2-col/split no nav), paper (answer only)
     const [layoutMode, setLayoutMode] = useState<'default' | 'focus' | 'paper'>('default');
 
+    // Split View Resizing
+    const [contextWidth, setContextWidth] = useState(60); // percent
+    const isResizing = useRef(false);
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isResizing.current) return;
+            const container = document.querySelector(`.${styles.splitContainer}`) as HTMLElement;
+            if (!container) return;
+
+            const containerRect = container.getBoundingClientRect();
+            const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+
+            // Limit between 20% and 80%
+            if (newWidth >= 20 && newWidth <= 80) {
+                setContextWidth(newWidth);
+            }
+        };
+
+        const handleMouseUp = () => {
+            isResizing.current = false;
+            document.body.style.cursor = 'default';
+            document.body.style.userSelect = 'auto'; // Re-enable selection
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, []);
+
+    const startResizing = () => {
+        isResizing.current = true;
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none'; // Prevent text selection while dragging
+    };
+
     if (!context) {
         return <div className={styles.errorMessage}>Error: No context data found for this PM question.</div>;
     }
@@ -194,7 +233,10 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
 
             <div className={styles.splitContainer}>
                 {/* Left Pane: Context (Scrollable) */}
-                <div className={`${styles.pane} ${styles.contextPane} ${activeTab === 'context' ? styles.active : ''}`}>
+                <div
+                    className={`${styles.pane} ${styles.contextPane} ${activeTab === 'context' ? styles.active : ''}`}
+                    style={layoutMode !== 'paper' && activeTab === 'context' ? { width: `${contextWidth}%` } : undefined}
+                >
                     <div className={styles.contextHeader}>
                         <h1 className={styles.contextTitle}>{context.title}</h1>
                         <span className={styles.contextBadge}>
@@ -207,8 +249,20 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                     </div>
                 </div>
 
+                {/* Resizer Handle (Desktop only, visible if not paper/mobile) */}
+                <div
+                    className={styles.resizer}
+                    onMouseDown={startResizing}
+                    style={{ display: layoutMode === 'paper' || activeTab !== 'context' ? 'none' : 'block' }} // Hide in paper mode or mobile tab view logic if applicable, though activeTab is mobile only.
+                >
+                    <div className={styles.resizerHandle} />
+                </div>
+
                 {/* Right Pane: Questions (Scrollable) */}
-                <div className={`${styles.pane} ${styles.answerPane} ${activeTab === 'answer' ? styles.active : ''}`}>
+                <div
+                    className={`${styles.pane} ${styles.answerPane} ${activeTab === 'answer' ? styles.active : ''}`}
+                    style={layoutMode !== 'paper' && activeTab === 'context' ? { width: `${100 - contextWidth}%` } : undefined}
+                >
                     <div className={styles.answerPaneHeader}>
                         <div>
                             <h2 className={styles.answerPaneTitle}>設問一覧</h2>
