@@ -125,6 +125,8 @@
 
 .pane.active {
     display: flex;
+    flex-direction: column;
+    /* Ensure flex direction is kept */
 }
 
 /* Left Pane: Context (60% on Desktop) */

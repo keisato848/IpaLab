@@ -25,6 +25,7 @@ interface SCPMExamViewProps {
 }
 // Import logic for chart
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
+import { useRef, useEffect } from 'react';
 
 export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descriptiveHistory }: SCPMExamViewProps) {
     const { context, questions } = question;
