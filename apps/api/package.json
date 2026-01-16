@@ -27,8 +27,6 @@
         "@ipa-lab/config": "*",
         "@ipa-lab/shared": "*",
         "eslint": "^8.0.0",
-        "rimraf": "^5.0.0",
-        "tsup": "^8.5.1",
         "typescript": "^5.0.0"
     }
 }
