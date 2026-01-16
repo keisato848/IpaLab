@@ -1,4 +1,4 @@
-import { Adapter, AdapterUser, AdapterAccount } from "@auth/core/adapters"
+import { Adapter, AdapterUser, AdapterAccount } from "next-auth/adapters"
 import { containers } from "./cosmos"
 import { v4 as uuidv4 } from "uuid"
 
