@@ -4,13 +4,13 @@ import { v4 as uuidv4 } from "uuid"
 
 export function CosmosAdapter(): Adapter {
     return {
-        async createUser(user) {
+        async createUser(user: Omit<AdapterUser, "id">) {
             const id = uuidv4();
             const newUser = { ...user, id };
             await containers.users.items.create(newUser);
             return newUser as AdapterUser;
         },
-        async getUser(id) {
+        async getUser(id: string) {
             try {
                 const { resource } = await containers.users.item(id, id).read();
                 return resource || null;
@@ -18,7 +18,7 @@ export function CosmosAdapter(): Adapter {
                 return null;
             }
         },
-        async getUserByEmail(email) {
+        async getUserByEmail(email: string) {
             try {
                 const querySpec = {
                     query: "SELECT * FROM c WHERE c.email = @email",
@@ -30,7 +30,7 @@ export function CosmosAdapter(): Adapter {
                 return null;
             }
         },
-        async getUserByAccount({ providerAccountId, provider }) {
+        async getUserByAccount({ providerAccountId, provider }: Pick<AdapterAccount, "provider" | "providerAccountId">) {
             try {
                 const querySpec = {
                     query: "SELECT * FROM c WHERE c.providerAccountId = @providerAccountId AND c.provider = @provider",
@@ -50,7 +50,7 @@ export function CosmosAdapter(): Adapter {
                 return null;
             }
         },
-        async updateUser(user) {
+        async updateUser(user: Partial<AdapterUser> & { id: string }) {
             if (!user.id) throw new Error("User ID is required for update");
             // Read existing to merge? Or just upsert?
             // AdapterUser extends User, but might be partial here? Types say Partial<AdapterUser> & { id: string }
@@ -63,12 +63,12 @@ export function CosmosAdapter(): Adapter {
             await containers.users.items.upsert(updated);
             return updated;
         },
-        async deleteUser(userId) {
+        async deleteUser(userId: string) {
             await containers.users.item(userId, userId).delete();
             // Also delete accounts? NextAuth usually expects cascading, creating separate query for accounts
             // We skip cascade for now as it's complex without stored procedure or careful logic
         },
-        async linkAccount(account) {
+        async linkAccount(account: AdapterAccount) {
             // account has userId
             // Account needs PK? Our Accounts container has PK='/userId'
             // But we need to query by providerAccountId/provider usually.
@@ -85,7 +85,7 @@ export function CosmosAdapter(): Adapter {
             // Actually AdapterAccount doesn't have 'id' property usually visible.
             // Let's check type definition if it errors.
         },
-        async unlinkAccount({ providerAccountId, provider }) {
+        async unlinkAccount({ providerAccountId, provider }: Pick<AdapterAccount, "provider" | "providerAccountId">) {
             // We need to find the account item first to delete it.
             const querySpec = {
                 query: "SELECT * FROM c WHERE c.providerAccountId = @providerAccountId AND c.provider = @provider",
