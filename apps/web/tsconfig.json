@@ -1,5 +1,5 @@
 {
-    "extends": "@ipa-lab/config/tsconfig.base.json",
+    "extends": "../../packages/config/tsconfig.base.json",
     "compilerOptions": {
         "lib": [
             "dom",
