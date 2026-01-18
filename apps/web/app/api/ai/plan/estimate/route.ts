@@ -1,26 +1,30 @@
 import { NextResponse } from 'next/server';
 import { containers } from '@/lib/cosmos';
+import { getAppInsightsClient } from '@/lib/appinsights';
 
 export const runtime = 'nodejs';
 
 export async function GET() {
     try {
+        // ... (lines 9-21)
         // Calculate average duration of past successful generations
         const querySpec = {
             query: "SELECT VALUE AVG(c.duration) FROM c WHERE c.type = 'plan_generation'"
         };
 
-        // Note: verify if container exists/initialized. If not, it might throw.
-        // For MVP, we assume container exists or we catch error.
         const { resources } = await containers.metrics.items.query(querySpec).fetchAll();
-
-        // resources[0] will be the average number, or undefined/null if no records
         const avg = resources[0];
-        const estimatedMs = (avg && typeof avg === 'number') ? Math.round(avg) : 5000; // Default 5s
+        const estimatedMs = (avg && typeof avg === 'number') ? Math.round(avg) : 5000;
 
         return NextResponse.json({ estimatedMs });
-    } catch (error) {
+    } catch (error: any) {
         console.error("Failed to get estimate:", error);
+
+        const client = getAppInsightsClient();
+        if (client) {
+            client.trackException({ exception: error });
+        }
+
         return NextResponse.json({ estimatedMs: 5000 }); // Fallback
     }
 }

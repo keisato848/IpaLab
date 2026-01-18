@@ -1,12 +1,18 @@
-import NextAuth from "next-auth"
+import NextAuth, { NextAuthOptions } from "next-auth"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 import { CosmosAdapter } from "@/lib/auth-adapter"
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const authOptions: NextAuthOptions = {
     providers: [
-        GitHub,
-        Google,
+        GitHub({
+            clientId: process.env.AUTH_GITHUB_ID!,
+            clientSecret: process.env.AUTH_GITHUB_SECRET!,
+        }),
+        Google({
+            clientId: process.env.AUTH_GOOGLE_ID!,
+            clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+        }),
     ],
     callbacks: {
         async session({ session, token, user }) {
@@ -27,4 +33,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     adapter: CosmosAdapter(),
     session: { strategy: "jwt" }, // Start with JWT, switch to Database later if needed/compatible with Adapter
-})
+}

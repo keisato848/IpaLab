@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import styles from './page.module.css';
-import { auth } from "@/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/auth";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
-    const session = await auth();
+    const session = await getServerSession(authOptions);
     if (session) {
         redirect('/dashboard');
     }

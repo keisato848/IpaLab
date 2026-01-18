@@ -1,5 +1,5 @@
 {
-    "extends": "@ipa-lab/config/tsconfig.base.json",
+    "extends": "../../packages/config/tsconfig.base.json",
     "compilerOptions": {
         "lib": [
             "dom",
@@ -32,7 +32,8 @@
         "next-env.d.ts",
         "**/*.ts",
         "**/*.tsx",
-        ".next/types/**/*.ts"
+        ".next/types/**/*.ts",
+        "types/**/*.d.ts"
     ],
     "exclude": [
         "node_modules"

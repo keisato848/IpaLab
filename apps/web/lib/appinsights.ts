@@ -14,6 +14,11 @@ export function initAppInsights() {
             .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
             .start();
 
-        // console.log('Application Insights started');
+        // eslint-disable-next-line no-console
+        console.log('[System] Application Insights started');
     }
+}
+
+export function getAppInsightsClient() {
+    return appInsights.defaultClient;
 }

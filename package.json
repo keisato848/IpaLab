@@ -1,26 +1,26 @@
 {
   "name": "ipa-lab",
-  "packageManager": "npm@10.9.2",
+  "version": "0.0.0",
   "private": true,
-  "scripts": {
-    "build": "turbo run build",
-    "postbuild": "npm run sbom",
-    "sbom": "cyclonedx-bom --output-format json --output-file sbom.json",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "test": "turbo run test",
-    "clean": "turbo run clean",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
-  },
-  "engines": {
-    "node": "20"
-  },
-  "devDependencies": {
-    "turbo": "^2.7.2",
-    "prettier": "^3.0.0"
-  },
+  "packageManager": "npm@10.9.2",
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "test": "turbo run test"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5",
+    "turbo": "^2.7.4",
+    "typescript": "^5.4.5",
+    "next": "14.2.15"
+  }
 }
