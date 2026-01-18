@@ -44,17 +44,32 @@ export const localExamRepository = {
 
         for (const dir of dirs) {
             // Check if it's a real exam (not sample)
-            try {
-                const q1Path = path.join(questionsDir, dir, 'q1.json');
-                const q1Content = await fs.readFile(q1Path, 'utf-8');
-                const q1 = JSON.parse(q1Content);
-                if (q1.text && q1.text.includes('【サンプル問題】')) {
-                    continue; // Skip samples
+            // Support multiple file formats (Legacy q1.json, or New Transformed/Raw JSON)
+            let isValid = false;
+            const checkFiles = ['q1.json', 'questions_transformed.json', 'questions_raw.json'];
+            
+            for (const file of checkFiles) {
+                const filePath = path.join(questionsDir, dir, file);
+                if (existsSync(filePath)) {
+                    // Check for sample content only in q1.json for now (legacy)
+                    if (file === 'q1.json') {
+                        try {
+                            const content = await fs.readFile(filePath, 'utf-8');
+                            const json = JSON.parse(content);
+                            if (json.text && json.text.includes('【サンプル問題】')) {
+                                isValid = false; // Explicitly invalid
+                                break;
+                            }
+                        } catch {
+                            continue; // Invalid JSON, try next
+                        }
+                    }
+                    isValid = true;
+                    break;
                 }
-            } catch (e) {
-                // If q1.json is missing or invalid, skip
-                continue;
             }
+
+            if (!isValid) continue;
 
             // Expected format: AP-YYYY-Term-Type (e.g., AP-2016-Fall-AM)
             const parts = dir.split('-');
@@ -79,6 +94,10 @@ export const localExamRepository = {
             let categoryLabel = '応用情報技術者試験'; // Default AP
             if (category === 'PM') categoryLabel = 'プロジェクトマネージャ試験';
             else if (category === 'FE') categoryLabel = '基本情報技術者試験';
+            else if (category === 'SC') categoryLabel = '情報処理安全確保支援士試験';
+            else if (category === 'SA') categoryLabel = 'システムアーキテクト試験';
+            else if (category === 'ST') categoryLabel = 'ITストラテジスト試験';
+            else if (category === 'NW') categoryLabel = 'ネットワークスペシャリスト試験';
 
             const title = `${categoryLabel} ${era} ${term} ${typeLabel}`;
 

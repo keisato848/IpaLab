@@ -7,6 +7,71 @@
     overflow: hidden;
     background-color: var(--bg-primary);
     color: var(--text-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+/* Layout Controls (Desktop) */
+.layoutControls {
+    display: none;
+    /* Hidden on mobile by default */
+    padding: 0.5rem 1rem;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    justify-content: flex-end;
+}
+
+.layoutToggleGroup {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--bg-primary);
+    padding: 0.25rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--border-color);
+}
+
+.layoutToggleBtn {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 0.25rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.layoutToggleBtn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.layoutToggleBtn.active {
+    background: var(--accent-color);
+    color: white;
+}
+
+/* Focus Mode: Full Screen Overlay */
+.layoutMode_focus {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    z-index: 9999;
+    padding-top: 0;
+    /* Override default if needed */
+}
+
+/* Ensure controls are visible in Desktop */
+@media (min-width: 1024px) {
+    .layoutControls {
+        display: flex;
+    }
 }
 
 /* Mobile Tab Navigation (Visible only on small screens) */
@@ -60,6 +125,8 @@
 
 .pane.active {
     display: flex;
+    flex-direction: column;
+    /* Ensure flex direction is kept */
 }
 
 /* Left Pane: Context (60% on Desktop) */
@@ -68,6 +135,44 @@
     padding: 1.5rem;
     background: var(--bg-secondary);
     border-right: 1px solid var(--border-color);
+}
+
+/* Paper Mode (Desktop): Hide Context */
+.layoutMode_paper .contextPane {
+    display: none !important;
+}
+
+/* Resizer Handle */
+.resizer {
+    width: 8px;
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    cursor: col-resize;
+    position: relative;
+    z-index: 20;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.resizer:hover,
+.resizer:active {
+    background: var(--accent-color);
+}
+
+.resizerHandle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 20px;
+    background: var(--text-tertiary);
+    border-radius: 1px;
+}
+
+.resizer:hover .resizerHandle {
+    background: white;
 }
 
 /* Right Pane: Questions & Answers (40% on Desktop) */
@@ -205,6 +310,15 @@
 
     .pane {
         height: 100%;
+    }
+
+    /* Paper Mode Overrides for Desktop */
+    .layoutMode_paper .answerPane {
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+        border-left: 1px solid var(--border-color);
+        border-right: 1px solid var(--border-color);
     }
 }
 
