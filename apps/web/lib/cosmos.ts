@@ -6,21 +6,30 @@ const DATABASE_NAME = "pm-exam-dx-db";
 
 let client: CosmosClient | undefined;
 
-try {
-    if (CONNECTION_STRING) {
+// 遅延初期化のためのクライアント取得関数
+const getClient = (): CosmosClient => {
+    if (client) {
+        return client;
+    }
+    if (!CONNECTION_STRING) {
+        throw new Error("Cosmos DB not initialized (Check COSMOS_DB_CONNECTION)");
+    }
+    try {
         client = new CosmosClient(CONNECTION_STRING);
+        return client;
+    } catch (e: any) {
+        console.error("Failed to create Cosmos Client (Web):", e);
+        const aiClient = getAppInsightsClient();
+        if (aiClient) {
+            aiClient.trackException({ exception: e as Error });
+        }
+        throw new Error("Could not create Cosmos Client instance.");
     }
-} catch (e) {
-    console.warn("Failed to init Cosmos Client (Web):", e);
-    const aiClient = getAppInsightsClient();
-    if (aiClient) {
-        aiClient.trackException({ exception: e as Error });
-    }
-}
+};
+
 
 const getDatabase = () => {
-    if (!client) throw new Error("Cosmos DB not initialized (Check COSMOS_DB_CONNECTION)");
-    return client.database(DATABASE_NAME);
+    return getClient().database(DATABASE_NAME);
 };
 
 const getContainer = (name: string): Container => {
