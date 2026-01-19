@@ -5,17 +5,25 @@ const DATABASE_NAME = "pm-exam-dx-db";
 
 let client: CosmosClient | undefined;
 
-try {
-    if (CONNECTION_STRING) {
-        client = new CosmosClient(CONNECTION_STRING);
+// 遅延初期化のためのクライアント取得関数
+const getClient = (): CosmosClient => {
+    if (client) {
+        return client;
     }
-} catch (e) {
-    console.warn("Failed to init Cosmos Client:", e);
-}
+    if (!CONNECTION_STRING) {
+        throw new Error("Cosmos DB not initialized (Check COSMOS_DB_CONNECTION)");
+    }
+    try {
+        client = new CosmosClient(CONNECTION_STRING);
+        return client;
+    } catch (e) {
+        console.error("Failed to create Cosmos Client:", e);
+        throw new Error("Could not create Cosmos Client instance.");
+    }
+};
 
 const getDatabase = () => {
-    if (!client) throw new Error("Cosmos DB not initialized (Check COSMOS_DB_CONNECTION)");
-    return client.database(DATABASE_NAME);
+    return getClient().database(DATABASE_NAME);
 };
 
 const getContainer = (name: string): Container => {
@@ -31,18 +39,21 @@ export const containers = {
 };
 
 export const initDatabase = async () => {
-    if (!client) {
-        console.warn("Skipping DB init: No client");
-        return;
+    try {
+        const cosmosClient = getClient(); // ここで初めてクライアントが生成される可能性がある
+        const { database } = await cosmosClient.databases.createIfNotExists({ id: DATABASE_NAME });
+
+        // Create containers with PKs
+        await database.containers.createIfNotExists({ id: "Questions", partitionKey: "/examId" });
+        await database.containers.createIfNotExists({ id: "Users", partitionKey: "/id" });
+        await database.containers.createIfNotExists({ id: "Accounts", partitionKey: "/userId" });
+        await database.containers.createIfNotExists({ id: "Sessions", partitionKey: "/sessionToken" });
+        await database.containers.createIfNotExists({ id: "LearningRecords", partitionKey: "/userId" });
+
+        console.log("Database initialized");
+    } catch (e) {
+        // initDatabaseは主にデバッグ用のスクリプトから呼ばれるため、
+        // 起動シーケンスをブロックしないようにエラーをログに記録するに留める。
+        console.warn("Skipping DB init due to an error:", e);
     }
-    const { database } = await client.databases.createIfNotExists({ id: DATABASE_NAME });
-
-    // Create containers with PKs
-    await database.containers.createIfNotExists({ id: "Questions", partitionKey: "/examId" });
-    await database.containers.createIfNotExists({ id: "Users", partitionKey: "/id" });
-    await database.containers.createIfNotExists({ id: "Accounts", partitionKey: "/userId" });
-    await database.containers.createIfNotExists({ id: "Sessions", partitionKey: "/sessionToken" });
-    await database.containers.createIfNotExists({ id: "LearningRecords", partitionKey: "/userId" });
-
-    console.log("Database initialized");
 };
