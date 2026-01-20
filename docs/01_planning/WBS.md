@@ -14,7 +14,7 @@
 | **1.1.1** | **Monorepo環境構築** | `apps/web`, `apps/api`, `packages/shared` の初期化、ESLint/Prettier設定 | リポジトリ初期構成 |
 | **1.1.2** | **Azure環境構築 (IaC)** | Static Web Apps, Functions, Cosmos DB, Entra IDのBicep/Terraformコード作成とデプロイ | Azureリソース群 |
 | **1.1.3** | **CI/CDパイプライン構築** | GitHub Actionsによるビルド・デプロイフローの整備 (Web, API) | `.github/workflows/*` |
-| **1.1.4** | **認証機能実装 (API)** | Entra ID B2C連携、検証用ミドルウェアの実装 | Auth Middleware |
+| **1.1.4** | **認証機能実装 (API)** | NextAuth.js (GitHub/Google) 連携、検証用ミドルウェアの実装 | Auth Middleware |
 | **1.1.5** | **認証画面実装 (Web)** | ログイン、サインアップ、パスワードリセット画面 | 認証UIコンポーネント |
 
 ### 1.2 ドメインロジック & データ (Weeks 3-4)
