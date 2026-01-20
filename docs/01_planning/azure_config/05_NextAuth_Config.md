@@ -25,7 +25,9 @@
 | :---------------------------- | :----------------------------------------------------------- |
 | `NEXTAUTH_URL`                | アプリケーションのベースURL (Local: `http://localhost:3000`) |
 | `NEXTAUTH_SECRET`             | トークン署名・暗号化用のシークレットキー (openssl等で生成)   |
-| `COSMOS_DB_CONNECTION_STRING` | DB接続用 (Adapterが使用)                                     |
+| `AUTH_SECRET`                 | トークン署名・暗号化用のシークレットキー (NextAuth v5 互換用) |
+| `AUTH_TRUST_HOST`             | 信頼できるホストかを指定 (Azure Static Web Appsでは`true`推奨) |
+| `COSMOS_DB_CONNECTION`        | DB接続用 (Adapterが使用)                                     |
 
 ## API連携 (Azure Functions)
 - Webアプリ (Next.js) から API (Functions) を呼び出す際、CookieまたはAccessTokenをヘッダーに付与します。
