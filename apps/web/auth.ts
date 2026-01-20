@@ -1,19 +1,33 @@
-import NextAuth, { NextAuthOptions } from "next-auth"
+import NextAuth, { NextAuthOptions, Provider } from "next-auth"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 import { CosmosAdapter } from "@/lib/auth-adapter"
 
-export const authOptions: NextAuthOptions = {
-    providers: [
+const providers: Provider[] = [];
+
+// Add GitHub provider only if its environment variables are set
+if (process.env.GITHUB_ID && process.env.GITHUB_SECRET) {
+    providers.push(
         GitHub({
-            clientId: process.env.AUTH_GITHUB_ID!,
-            clientSecret: process.env.AUTH_GITHUB_SECRET!,
-        }),
+            clientId: process.env.GITHUB_ID,
+            clientSecret: process.env.GITHUB_SECRET,
+        })
+    );
+}
+
+// Add Google provider only if its environment variables are set
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    providers.push(
         Google({
-            clientId: process.env.AUTH_GOOGLE_ID!,
-            clientSecret: process.env.AUTH_GOOGLE_SECRET!,
-        }),
-    ],
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        })
+    );
+}
+
+
+export const authOptions: NextAuthOptions = {
+    providers: providers,
     callbacks: {
         async session({ session, token, user }) {
             if (session.user) {

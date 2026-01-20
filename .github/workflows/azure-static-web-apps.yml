@@ -17,6 +17,28 @@ jobs:
     permissions:
        id-token: write
        contents: read
+    env:
+      # Vercel, a similar service, sets this to true during build.
+      # We can use it to gate functionality that should only run in production.
+      CI: "true"
+
+      # Keys and Connection Strings
+      COSMOS_DB_CONNECTION: ${{ secrets.COSMOS_DB_CONNECTION }}
+      APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      # Custom Flags
+      START_APP_INSIGHTS: "true" # Enable App Insights in runtime
+
+      # NextAuth Configuration
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+      AUTH_TRUST_HOST: "true" # Required for some environments
+
+      # Auth Providers (GitHub, Google)
+      AUTH_GITHUB_ID: ${{ secrets.AUTH_GITHUB_ID }}
+      AUTH_GITHUB_SECRET: ${{ secrets.AUTH_GITHUB_SECRET }}
+      AUTH_GOOGLE_ID: ${{ secrets.AUTH_GOOGLE_ID }}
+      AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
     steps:
       - uses: actions/checkout@v3
         with:

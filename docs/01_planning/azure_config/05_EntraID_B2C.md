@@ -1,3 +1,6 @@
+> **[廃止] このドキュメントは `docs/01_planning/Auth_Reevaluation_Proposal.md` での決定に基づき、廃止されました。**
+> 現在の認証設計は `docs/01_planning/azure_config/05_NextAuth_Config.md` を参照してください。
+
 # Microsoft Entra ID B2C 設定設計書
 
 ## 基本情報
