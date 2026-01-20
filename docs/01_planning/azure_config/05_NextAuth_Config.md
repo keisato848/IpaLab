@@ -9,8 +9,8 @@
 ## 認証プロバイダ構成
 | プロバイダ           | 環境変数 (Key)                              | 取得元                                              |
 | :------------------- | :------------------------------------------ | :-------------------------------------------------- |
-| **GitHub**           | `GITHUB_ID` / `GITHUB_SECRET`               | GitHub Developer Settings (OAuth Apps)              |
-| **Google**           | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google Cloud Console (APIs & Services)              |
+| **GitHub**           | `AUTH_GITHUB_ID` / `AUTH_GITHUB_SECRET`               | GitHub Developer Settings (OAuth Apps)              |
+| **Google**           | `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Google Cloud Console (APIs & Services)              |
 | **Email (Optional)** | `EMAIL_SERVER` / `EMAIL_FROM`               | SendGrid or SMTP (今回はゲストモード優先のため任意) |
 
 ## セッション設定
