@@ -22,10 +22,10 @@ NextAuth.js 等の動作に必要な環境変数を設定します。
 
 | キー                                       | 備考                |
 | :----------------------------------------- | :------------------ |
-| `NEXTAUTH_URL`                             | 本番URLを設定       |
-| `NEXTAUTH_SECRET`                          | Key Vault参照を推奨 |
-| `GITHUB_ID`, `GITHUB_SECRET`               | OAuth連携用         |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | OAuth連携用         |
+| `AUTH_SECRET`                              | Key Vault参照を推奨 |
+| `AUTH_TRUST_HOST`                          | `'true'` を設定     |
+| `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`     | OAuth連携用         |
+| `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`     | OAuth連携用         |
 
 ## カスタムドメイン
 - **ドメイン:** `pm-exam-dx.com` (仮)
