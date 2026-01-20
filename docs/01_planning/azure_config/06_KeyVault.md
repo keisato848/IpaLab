@@ -21,5 +21,6 @@
 ## 格納シークレット (例)
 - `CosmosDbConnectionString`
 - `BlobStorageConnectionString`
-- `B2CClientSecret`
 - `NextAuthSecret`
+- `GithubSecret` 
+- `GoogleClientSecret`
