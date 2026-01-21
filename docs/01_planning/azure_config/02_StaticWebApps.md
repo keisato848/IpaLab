@@ -14,7 +14,7 @@
 | **ソース**           | GitHub (Other)       | GitHub Actions連携                                          |
 | **ビルド設定**       | Framework: Next.js   |                                                             |
 | **アプリの場所**     | `/apps/web`          | Monorepo構成に従う                                          |
-| **APIの場所**        | (空欄)               | Azure FunctionsをBring Your Own Backendとしてリンクするため |
+| APIの場所        | (空欄)               | Next.js App Router API Routes (Managed Functions) として動作 |
 | **出力先**           | `.next` または `out` | Next.jsの設定に準拠                                         |
 
 ## 環境変数 (Application Settings)
