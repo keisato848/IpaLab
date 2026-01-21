@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { getQuestions, Question } from '@/lib/api';
 import { getExamLabel } from '@/lib/exam-utils';
 import ExamEntranceClient from '@/components/features/exam/ExamEntranceClient';
-import { generateAllExamParams, getExamDataFS } from '@/lib/ssg-helper';
+import { generateAllExamParams, getExamData } from '@/lib/ssg-helper';
 
 /*
 export async function generateStaticParams() {
@@ -24,8 +24,8 @@ export default async function ExamEntrancePage({ params }: { params: { year: str
     // Fetch Data
     let questions: Question[] = [];
     try {
-        const fsData = await getExamDataFS(examId);
-        questions = fsData as unknown as Question[];
+        const data = await getExamData(examId);
+        questions = data as unknown as Question[];
     } catch (e) {
         // Fallback or empty
     }
