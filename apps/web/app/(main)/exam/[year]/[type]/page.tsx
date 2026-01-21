@@ -4,13 +4,11 @@ import { getExamLabel } from '@/lib/exam-utils';
 import ExamEntranceClient from '@/components/features/exam/ExamEntranceClient';
 import { generateAllExamParams, getExamDataFS } from '@/lib/ssg-helper';
 
+/*
 export async function generateStaticParams() {
-    const params = await generateAllExamParams();
-    return params.map(p => ({
-        year: p.year,
-        type: p.type
-    }));
+    return generateAllExamParams();
 }
+*/
 
 export const dynamicParams = true; // Allow new exams not built yet (ISR)
 export const revalidate = 3600;

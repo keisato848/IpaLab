@@ -3,13 +3,11 @@ import { getQuestions, Question } from '@/lib/api';
 import ExamResult from '@/components/features/exam/ExamResult';
 import { generateAllExamParams, getExamDataFS } from '@/lib/ssg-helper';
 
+/*
 export async function generateStaticParams() {
-    const params = await generateAllExamParams();
-    return params.map(p => ({
-        year: p.year,
-        type: p.type
-    }));
+    return generateAllExamParams();
 }
+*/
 
 export const dynamicParams = true;
 
