@@ -1,55 +1,112 @@
-# Shikakuno (シカクノ) - IPA Exam Prep Platform
+# Shikakuno (シカクノ) - IPA 情報処理技術者試験 学習プラットフォーム
 
 [![Azure Static Web Apps CI/CD](https://github.com/hayato-git/IpaLab/actions/workflows/azure-static-web-apps.yml/badge.svg)](https://github.com/hayato-git/IpaLab/actions/workflows/azure-static-web-apps.yml)
 
-**Shikakuno (シカクノ)** is an intelligent learning platform for IPA (Information-technology Promotion Agency) certification exams in Japan. It features a cutting-edge **AI Descriptive Scoring System** that provides instant, analytical feedback for case study questions, helping learners overcome the challenge of self-grading descriptive answers.
+**Shikakuno (シカクノ)** は、IPA（情報処理推進機構）の試験対策に特化したインテリジェントな学習プラットフォームです。最先端の **AI 記述式採点システム** を搭載しており、独学では採点が難しい午後試験の記述式問題に対し、即座に分析的なフィードバックを提供します。
 
-## Table of Contents
+## 目次
 
-- [Key Features](#-key-features)
-- [Technology Stack](#-technology-stack)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [Available Scripts](#-available-scripts)
+- [主な機能](#-主な機能)
+- [技術スタック](#-技術スタック)
+- [システム構成](#-システム構成)
+- [プロジェクト構造](#-プロジェクト構造)
+- [セットアップ](#-セットアップ)
+- [利用可能なスクリプト](#-利用可能なスクリプト)
 
-## ✨ Key Features
+## ✨ 主な機能
 
-- **AI-Powered Scoring**: Utilizes Google's Gemini Pro models to provide instant, multi-faceted feedback on descriptive answers for afternoon (PM) exams.
-- **CLKS Analysis**: Grades answers based on four axes: **C**ontext, **L**ogic, **K**eyword, and **S**pecificity, visualized with a radar chart.
-- **Interactive Practice**: Supports multiple-choice questions for morning (AM) exams with instant answer explanations.
-- **Progress Tracking**: Offers detailed statistics, charts, and history to monitor learning progress and accuracy rates.
-- **Modern UI/UX**: Fully responsive design optimized for both desktop and mobile, complete with a dark mode.
+- **AI 自動採点**: Google Gemini Pro モデルを活用し、午後試験の記述式回答に対して多角的なフィードバックを即座に生成します。
+- **CLKS 分析**: 回答を **C**ontext (文脈)、**L**ogic (論理)、**K**eyword (キーワード)、**S**pecificity (具体性) の4軸で評価し、レーダーチャートで可視化します。
+- **インタラクティブ演習**: 午前試験の多肢選択問題に対応し、即座に正誤判定と解説を確認できます。
+- **学習進捗管理**: 学習履歴、正答率、進捗状況を詳細な統計データとグラフで管理できます。
+- **モダンな UI/UX**: デスクトップ・モバイルの両方に最適化されたレスポンシブデザインとダークモードを搭載しています。
 
-## 🛠️ Technology Stack
+## 🛠️ 技術スタック
 
 - **Framework**: Next.js 14 (App Router)
 - **Monorepo**: Turborepo & npm Workspaces
+- **Backend**: Managed Functions on Azure Static Web Apps (Node.js)
 - **Database**: Azure Cosmos DB (NoSQL)
 - **AI Model**: Google Gemini Pro family
 - **Authentication**: NextAuth.js (Google, GitHub)
 - **Hosting**: Azure Static Web Apps
-- **Styling**: CSS Modules
+- **Styling**: CSS Modules / Tailwind CSS
 
-## 📂 Project Structure
+## 🧩 システム構成
 
-This project is a monorepo managed with Turborepo.
+本システムは、Azure Static Web Apps 上で Next.js アプリケーションと Managed Functions (API) が動作する構成となっています。
 
-- `apps/web`: The main Next.js application. It contains all UI pages, API routes, and frontend logic.
-- `apps/api`: **(Legacy)** A legacy Azure Functions API. Its functionality has been migrated into `apps/web` as Next.js API Routes.
-- `packages/data`: Contains scripts and tools for data scraping, processing, and synchronization with the database.
-- `packages/shared`: Shared TypeScript types, interfaces, and utility functions used across the monorepo.
-- `packages/config`: Shared configurations for tools like ESLint and TypeScript.
+```mermaid
+graph TD
+    subgraph Client [クライアント]
+        Browser[Web Browser]
+    end
 
-## 🚀 Getting Started
+    subgraph Azure_SWA [Azure Static Web Apps]
+        NextJS[Next.js App (SSR)]
+        API[Managed Functions (Node.js)]
+        
+        NextJS -- "API Call / SSR Data" --> API
+    end
 
-### 1. Prerequisites
+    subgraph Azure_Services [Azure Services]
+        CosmosDB[(Azure Cosmos DB)]
+        AppInsights[Application Insights]
+    end
+    
+    subgraph External [外部サービス]
+        Gemini[Google Gemini API]
+        Auth[OAuth Providers<br/>(GitHub/Google)]
+    end
 
-- Node.js v20 or later
-- npm v9 or later
+    Browser -- "HTTPS" --> NextJS
+    API -- "Data Access" --> CosmosDB
+    API -- "AI Analysis" --> Gemini
+    API -- "Telemetry" --> AppInsights
+    NextJS -- "Auth Redirect" --> Auth
+```
 
-### 2. Installation
+### データフロー (AI採点)
 
-Clone the repository and install the dependencies from the root directory:
+```mermaid
+sequenceDiagram
+    autonumber
+    participant User as ユーザー
+    participant NextJS as Next.js (Client)
+    participant API as Managed Function (API)
+    participant Gemini as Google Gemini
+    participant DB as Cosmos DB
+
+    User->>NextJS: 回答を入力して「採点」をクリック
+    NextJS->>API: POST /api/score (回答データ)
+    API->>DB: 問題データ(正解・解説)を取得
+    API->>Gemini: プロンプト(回答+正解)を送信
+    Gemini-->>API: 採点結果・解説・CLKSスコア
+    API->>DB: 学習履歴(LearningRecord)を保存
+    API-->>NextJS: 採点結果(JSON)を返却
+    NextJS-->>User: 結果とチャートを表示
+```
+
+## 📂 プロジェクト構造
+
+Turborepo を使用したモノレポ構成です。
+
+- `apps/web`: メインの Next.js アプリケーション。UI、APIルート、フロントエンドロジックを含みます。
+- `apps/api`: **(Legacy)** 旧 Azure Functions API。機能は `apps/web` の API Routes に統合されました。
+- `packages/data`: 過去問データのスクレイピング、加工、データベース同期用スクリプト。
+- `packages/shared`: モノレポ全体で共有される TypeScript 型定義やユーティリティ関数。
+- `packages/config`: ESLint や TypeScript の共有設定。
+
+## 🚀 セットアップ
+
+### 1. 前提条件
+
+- Node.js v20 以降
+- npm v9 以降
+
+### 2. インストール
+
+リポジトリをクローンし、ルートディレクトリで依存関係をインストールします。
 
 ```bash
 git clone https://github.com/hayato-git/IpaLab.git
@@ -57,58 +114,37 @@ cd IpaLab
 npm install
 ```
 
-### 3. Environment Variables
+### 3. 環境変数
 
-The web application requires environment variables for API keys and database connections.
+Web アプリケーションには API キーやデータベース接続情報が必要です。
 
-1.  Navigate to the web app directory: `cd apps/web`
-2.  Create a local environment file by copying the template:
+1.  Web アプリディレクトリへ移動: `cd apps/web`
+2.  テンプレートからローカル環境変数ファイルを作成:
     ```bash
     cp .env.template .env.local
     ```
-3.  Fill in the variables in `.env.local`. You will need credentials for:
-    - **Authentication (NextAuth.js)**: `AUTH_SECRET`, `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`, etc.
-    - **Database (Azure Cosmos DB)**: `COSMOS_DB_ENDPOINT`, `COSMOS_DB_KEY`
+3.  `.env.local` を編集し、以下の変数を設定してください。
+    - **認証 (NextAuth.js)**: `AUTH_SECRET`, `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET` 等
+    - **データベース (Azure Cosmos DB)**: `COSMOS_DB_ENDPOINT`, `COSMOS_DB_KEY`
     - **AI (Google Gemini)**: `GEMINI_API_KEY`
 
-    Your completed `.env.local` should look something like this:
-    ```env
-    # Auth.js
-    AUTH_SECRET="..."
-    AUTH_GITHUB_ID="..."
-    AUTH_GITHUB_SECRET="..."
-    AUTH_GOOGLE_ID="..."
-    AUTH_GOOGLE_SECRET="..."
+### 4. 開発サーバーの起動
 
-    # Database
-    COSMOS_DB_ENDPOINT="..."
-    COSMOS_DB_KEY="..."
-    
-    # AI
-    GEMINI_API_KEY="..."
-
-    # This is for local dev, pointing to the Azure Functions emulator or a running instance.
-    # When running the Next.js app alone, this can be ignored as API routes are served from the same domain.
-    NEXT_PUBLIC_API_BASE=http://localhost:7074/api
-    ```
-
-### 4. Run the Development Server
-
-Return to the root directory and run the development script:
+プロジェクトルートに戻り、開発用スクリプトを実行します。
 
 ```bash
-# From the project root
+# プロジェクトルートで実行
 npm run dev
 ```
 
-This will start the Next.js development server, typically available at `http://localhost:3000`.
+Next.js 開発サーバーが起動し、通常は `http://localhost:3000` でアクセスできます。
 
-## 📜 Available Scripts
+## 📜 利用可能なスクリプト
 
-The following scripts can be run from the root of the monorepo:
+プロジェクトルートから以下のコマンドを実行できます。
 
-- `npm run dev`: Starts the development server for all apps.
-- `npm run build`: Builds all apps for production.
-- `npm run test`: Runs tests across the project.
-- `npm run lint`: Lints all the code in the project.
-- `npm run format`: Formats all code using Prettier.
+- `npm run dev`: 全アプリケーションの開発サーバーを起動します。
+- `npm run build`: 本番用に全アプリケーションをビルドします。
+- `npm run test`: テストを実行します。
+- `npm run lint`: コードの静的解析を実行します。
+- `npm run format`: Prettier を使用してコードをフォーマットします。
