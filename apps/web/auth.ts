@@ -1,7 +1,9 @@
-import NextAuth, { NextAuthOptions, Provider } from "next-auth"
+import NextAuth, { NextAuthOptions } from "next-auth"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 import { CosmosAdapter } from "@/lib/auth-adapter"
+
+type Provider = NextAuthOptions["providers"][number]
 
 const providers: Provider[] = [];
 
