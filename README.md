@@ -139,6 +139,38 @@ npm run dev
 
 Next.js 開発サーバーが起動し、通常は `http://localhost:3000` でアクセスできます。
 
+## 📊 テストデータ管理
+
+試験データ（過去問、解説など）の管理は `packages/data` パッケージで行います。
+
+### 主なツールとコマンド
+
+`packages/data` ディレクトリで以下のコマンドを実行することで、データの抽出、加工、データベースへの同期を行えます。
+
+- **データ抽出**:
+  ```bash
+  npm run extract -w packages/data
+  ```
+  PDF等のソースからテキストデータを抽出します。
+
+- **データベース同期**:
+  ```bash
+  npm run sync-db -w packages/data
+  ```
+  ローカルのJSONデータを Azure Cosmos DB に同期（Upsert）します。
+
+- **整合性チェック**:
+  ```bash
+  npx ts-node src/scripts/check-duplicates.ts
+  ```
+  データの重複や欠損を確認します。
+
+詳細な手順については、[DATA_IMPORT_SOP.md](packages/data/DATA_IMPORT_SOP.md) を参照してください。
+
+### Webアプリでのデータ利用
+
+`apps/web` のビルド時（`npm run build` または `npm run dev`）に、`packages/data/data/questions` 配下のデータが自動的に `apps/web/data/questions` にコピーされ、アプリケーションから利用可能になります。開発者が手動でファイルをコピーする必要はありません。
+
 ## 📜 利用可能なスクリプト
 
 プロジェクトルートから以下のコマンドを実行できます。
