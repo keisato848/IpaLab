@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { LearningRecord, getLearningRecords, getQuestions } from '@/lib/api';
@@ -150,43 +150,36 @@ export default function DashboardClient() {
         return '';
     };
 
-    // Filter records: If isAllPlans, show all. Else filter by targetExam prefix AND date (start of plan).
-    const filteredRecords = records.filter(r => {
-        if (isAllPlans) return true;
-        if (!studyPlan) return true;
+    const filteredRecords = useMemo(() => {
+        if (isAllPlans) return records;
+        if (!studyPlan) return records;
 
-        // 1. Exam Type Filter
         const target = getTargetExam(studyPlan);
-        if (target && !r.examId.startsWith(target)) return false;
 
-        // 2. Date Filter (Scope to plan duration)
-        // Use weeklySchedule start date (inclusive of the whole start day)
-        // If missing, fallback to generatedAt (which might exclude earlier answers on same day, so prefer Schedule)
+        // Determine the start date for filtering
+        let planStart: Date | null = null;
         const startDateStr = studyPlan.weeklySchedule?.[0]?.startDate;
         if (startDateStr) {
-            // startDateStr is YYYY-MM-DD. 
-            // We want to include everything from that day 00:00:00 onwards.
-            // Since records are stored in UTC/ISO, we need safe comparison.
-            // Simplest: Compare YYYY-MM-DD strings in local time? 
-            // Records.answeredAt is ISO.
-            // Let's assume startDateStr represents user's local start day.
-
-            // Create Midnight Date object for Start Date
-            const planStart = new Date(startDateStr);
+            planStart = new Date(startDateStr);
             planStart.setHours(0, 0, 0, 0);
-
-            const recordDate = new Date(r.answeredAt);
-            if (recordDate < planStart) return false;
         } else if (studyPlan.generatedAt) {
-            const genDate = new Date(studyPlan.generatedAt);
-            // aggressive fallback: start of that day
-            genDate.setHours(0, 0, 0, 0);
-            const recordDate = new Date(r.answeredAt);
-            if (recordDate < genDate) return false;
+            planStart = new Date(studyPlan.generatedAt);
+            planStart.setHours(0, 0, 0, 0);
         }
 
-        return true;
-    });
+        return records.filter(r => {
+            // 1. Exam Type Filter
+            if (target && !r.examId.startsWith(target)) return false;
+
+            // 2. Date Filter
+            if (planStart) {
+                const recordDate = new Date(r.answeredAt);
+                if (recordDate < planStart) return false;
+            }
+
+            return true;
+        });
+    }, [records, studyPlan, isAllPlans]);
 
     // -- Goal Logic --
     let todayTargetCount = 10;
@@ -222,18 +215,15 @@ export default function DashboardClient() {
     ) : null;
 
 
-    const today = new Date().toDateString();
-    const todayRecords = filteredRecords.filter(r => new Date(r.answeredAt).toDateString() === today);
+    const todayRecords = useMemo(() => {
+        const today = new Date().toDateString();
+        return filteredRecords.filter(r => new Date(r.answeredAt).toDateString() === today);
+    }, [filteredRecords]);
     const todayCount = todayRecords.length;
     const progressPercent = Math.min(100, Math.round((todayCount / todayTargetCount) * 100));
 
-    // Use filtered records for stats
-    const statsRecords = filteredRecords;
-
-    // Recent History (Global or filtered based on preference? Usually "Recent Activity" is global log)
-    // User requested "Select plan... filter records". So history list should probably also follow suit?
-    // Let's keep History list consistent with the filtered specific view.
-    const recentRecords = filteredRecords.slice(0, 5);
+    const statsRecords = useMemo(() => filteredRecords, [filteredRecords]);
+    const recentRecords = useMemo(() => filteredRecords.slice(0, 5), [filteredRecords]);
 
     // 4. Quick Start Logic
     const [quickStartUrl, setQuickStartUrl] = useState("/exam");
