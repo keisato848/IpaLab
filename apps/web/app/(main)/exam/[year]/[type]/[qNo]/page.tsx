@@ -10,6 +10,7 @@ import path from 'path';
 import { generateAllExamParams, getExamDataFS } from '@/lib/ssg-helper';
 
 // Enable SSG for ALL exams
+/*
 export async function generateStaticParams() {
     // console.log('[SSG] Generating params for ALL questions...');
 
@@ -34,6 +35,7 @@ export async function generateStaticParams() {
     // console.log(`[SSG] Generated ${allParams.length} static pages.`);
     return allParams;
 }
+*/
 
 // ISR: Revalidate every hour
 export const dynamicParams = true;
