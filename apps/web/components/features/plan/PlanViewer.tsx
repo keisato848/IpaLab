@@ -37,8 +37,17 @@ export default function PlanViewer() {
         setPlans(loadedPlans);
         if (loadedPlans.length > 0) {
             // Default to nearest future or last
-            const sorted = [...loadedPlans].sort((a, b) => new Date(a.examDate).getTime() - new Date(b.examDate).getTime());
-            const future = sorted.filter(p => new Date(p.examDate) >= new Date(new Date().setHours(0, 0, 0, 0)));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayTimestamp = today.getTime();
+
+            const plansWithTimestamp = loadedPlans.map(p => ({
+                ...p,
+                examTimestamp: new Date(p.examDate).getTime()
+            }));
+
+            const sorted = plansWithTimestamp.sort((a, b) => a.examTimestamp - b.examTimestamp);
+            const future = sorted.filter(p => p.examTimestamp >= todayTimestamp);
             const active = future.length > 0 ? future[0] : sorted[sorted.length - 1];
             setSelectedPlanId(active.id);
         }

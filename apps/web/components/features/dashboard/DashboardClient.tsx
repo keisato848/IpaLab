@@ -36,8 +36,12 @@ export default function DashboardClient() {
                     fetchedRecords = guestManager.getHistory();
                 }
                 // Sort by answeredAt desc
-                fetchedRecords.sort((a, b) => new Date(b.answeredAt).getTime() - new Date(a.answeredAt).getTime());
-                setRecords(fetchedRecords);
+                const recordsWithTimestamp = fetchedRecords.map(r => ({
+                    ...r,
+                    answeredTimestamp: new Date(r.answeredAt).getTime()
+                }));
+                recordsWithTimestamp.sort((a, b) => b.answeredTimestamp - a.answeredTimestamp);
+                setRecords(recordsWithTimestamp);
             } catch (error) {
                 console.error("Failed to load dashboard data", error);
             } finally {
@@ -89,9 +93,18 @@ export default function DashboardClient() {
         if (allPlans.length > 0) {
             // For now, just pick the first one or latest created? 
             // Better: Pick the one with closest future date.
-            const sorted = [...allPlans].sort((a, b) => new Date(a.examDate).getTime() - new Date(b.examDate).getTime());
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayTimestamp = today.getTime();
+
+            const plansWithTimestamp = allPlans.map(p => ({
+                ...p,
+                examTimestamp: new Date(p.examDate).getTime()
+            }));
+
+            const sorted = plansWithTimestamp.sort((a, b) => a.examTimestamp - b.examTimestamp);
             // Filter future or today
-            const future = sorted.filter(p => new Date(p.examDate) >= new Date(new Date().setHours(0, 0, 0, 0)));
+            const future = sorted.filter(p => p.examTimestamp >= todayTimestamp);
 
             const active = future.length > 0 ? future[0] : sorted[sorted.length - 1]; // Nearest future or latest past
             setStudyPlan(active);

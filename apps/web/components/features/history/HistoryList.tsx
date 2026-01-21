@@ -26,8 +26,12 @@ export default function HistoryList() {
                 }
 
                 // Sort by answeredAt desc
-                fetchedRecords.sort((a, b) => new Date(b.answeredAt).getTime() - new Date(a.answeredAt).getTime());
-                setRecords(fetchedRecords);
+                const recordsWithTimestamp = fetchedRecords.map(r => ({
+                    ...r,
+                    answeredTimestamp: new Date(r.answeredAt).getTime()
+                }));
+                recordsWithTimestamp.sort((a, b) => b.answeredTimestamp - a.answeredTimestamp);
+                setRecords(recordsWithTimestamp);
             } catch (err) {
                 console.error("Failed to load records", err);
             } finally {
