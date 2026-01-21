@@ -37,6 +37,7 @@
     },
     "devDependencies": {
         "@ipa-lab/config": "*",
+        "@ipa-lab/data": "*",
         "@ipa-lab/shared": "*",
         "@types/node": "^20.0.0",
         "@types/react": "^18.0.0",
