@@ -59,12 +59,14 @@ export const initDatabase = async () => {
     const { database } = await c.databases.createIfNotExists({ id: DATABASE_NAME });
 
     // Create containers with PKs
-    await database.containers.createIfNotExists({ id: "Questions", partitionKey: "/examId" });
-    await database.containers.createIfNotExists({ id: "Users", partitionKey: "/id" });
-    await database.containers.createIfNotExists({ id: "Accounts", partitionKey: "/userId" });
-    await database.containers.createIfNotExists({ id: "Sessions", partitionKey: "/sessionToken" });
-    await database.containers.createIfNotExists({ id: "LearningRecords", partitionKey: "/userId" });
-    await database.containers.createIfNotExists({ id: "LearningSessions", partitionKey: "/userId" });
-    await database.containers.createIfNotExists({ id: "Exams", partitionKey: "/id" });
-    await database.containers.createIfNotExists({ id: "ExamProgress", partitionKey: "/userId" });
+    await Promise.all([
+        database.containers.createIfNotExists({ id: "Questions", partitionKey: "/examId" }),
+        database.containers.createIfNotExists({ id: "Users", partitionKey: "/id" }),
+        database.containers.createIfNotExists({ id: "Accounts", partitionKey: "/userId" }),
+        database.containers.createIfNotExists({ id: "Sessions", partitionKey: "/sessionToken" }),
+        database.containers.createIfNotExists({ id: "LearningRecords", partitionKey: "/userId" }),
+        database.containers.createIfNotExists({ id: "LearningSessions", partitionKey: "/userId" }),
+        database.containers.createIfNotExists({ id: "Exams", partitionKey: "/id" }),
+        database.containers.createIfNotExists({ id: "ExamProgress", partitionKey: "/userId" })
+    ]);
 };
