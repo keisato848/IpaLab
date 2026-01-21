@@ -1,9 +1,9 @@
-import NextAuth, { NextAuthOptions, Provider } from "next-auth"
+import NextAuth, { NextAuthOptions } from "next-auth"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 import { CosmosAdapter } from "@/lib/auth-adapter"
 
-const providers: Provider[] = [];
+const providers = []
 
 // Add GitHub provider only if its environment variables are set
 if (process.env.GITHUB_ID && process.env.GITHUB_SECRET) {
