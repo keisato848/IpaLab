@@ -1,9 +1,32 @@
 import fs from 'fs';
 import path from 'path';
 
-// Define path to data directory relative to apps/web (CWD during build)
-// Structure: root/apps/web -> root/packages/data/data/questions
-const DATA_DIR = path.join(process.cwd(), '../../packages/data/data/questions');
+// Helper to resolve data directory in various environments (local, CI, standalone build)
+function resolveDataDir(): string | null {
+    const cwd = process.cwd();
+    console.log(`[SSG] Current Working Directory: ${cwd}`);
+
+    // Potential paths to packages/data/data/questions
+    // 1. From apps/web root (typical local/CI) -> ../../packages/data...
+    // 2. From repo root (if cwd is root) -> packages/data...
+    // 3. Fallback for different nesting
+    const candidates = [
+        path.join(cwd, '../../packages/data/data/questions'),
+        path.join(cwd, 'packages/data/data/questions'),
+        path.join(cwd, '../packages/data/data/questions'), // Sibling folders?
+        path.resolve(cwd, '../../packages/data/data/questions') // Absolute resolve
+    ];
+
+    for (const candidate of candidates) {
+        if (fs.existsSync(candidate)) {
+            console.log(`[SSG] Resolved Data Directory: ${candidate}`);
+            return candidate;
+        }
+    }
+
+    console.error(`[SSG] CRITICAL: Could not find data directory. Searched in:`, candidates);
+    return null;
+}
 
 export interface SSGExamParams {
     year: string;
@@ -20,11 +43,12 @@ export interface SSGQuestionParams extends SSGExamParams {
  */
 export async function getAllExamIds(): Promise<string[]> {
     try {
-        if (!fs.existsSync(DATA_DIR)) {
-            console.warn(`[SSG] Data directory not found: ${DATA_DIR}`);
+        const dataDir = resolveDataDir();
+        if (!dataDir) {
             return [];
         }
-        const dirents = fs.readdirSync(DATA_DIR, { withFileTypes: true });
+
+        const dirents = fs.readdirSync(dataDir, { withFileTypes: true });
         return dirents
             .filter(dirent => dirent.isDirectory())
             .map(dirent => dirent.name);
@@ -40,7 +64,10 @@ export async function getAllExamIds(): Promise<string[]> {
  */
 export async function getExamData(examId: string): Promise<any[]> {
     try {
-        const filePath = path.join(DATA_DIR, examId, 'questions_raw.json');
+        const dataDir = resolveDataDir();
+        if (!dataDir) return [];
+
+        const filePath = path.join(dataDir, examId, 'questions_raw.json');
         if (!fs.existsSync(filePath)) {
             console.warn(`[SSG] Data file not found for ${examId}: ${filePath}`);
             return [];
@@ -64,7 +91,7 @@ export async function generateAllExamParams(): Promise<SSGExamParams[]> {
         // We use the full ID as 'year' to match previous logic where exam.id was passed as year
         // And extract type from the first segment.
         const parts = examId.split('-');
-        const type = parts[0] || 'FE'; // Default fallback, though should practically always exist
+        const type = parts[0] || 'FE'; // Default fallback
 
         return {
             year: examId,
