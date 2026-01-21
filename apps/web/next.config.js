@@ -4,7 +4,7 @@ const nextConfig = {
     output: 'standalone',
     experimental: {
         outputFileTracingIncludes: {
-            '/**/*': ['./data/**/*'],
+            '/**/*': ['../../packages/data/data/questions/**/*'],
         },
     },
     reactStrictMode: true,

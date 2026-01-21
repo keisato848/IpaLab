@@ -1,3 +1,3 @@
 module.exports = {
-    extends: [require.resolve("../../packages/config/eslint-server")],
+    extends: [require.resolve("../../packages/config/eslint-preset")],
 };
