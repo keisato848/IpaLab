@@ -1,17 +1,7 @@
 /** @type {import('next').NextConfig} */
-const path = require('path');
-
 const nextConfig = {
     transpilePackages: ["@ipa-lab/shared"],
-    output: 'standalone',
     reactStrictMode: true,
-    experimental: {
-        outputFileTracingRoot: path.join(__dirname, '../../'),
-        outputFileTracingIncludes: {
-            // Only include exam data for the exam pages that need it
-            '/exam/**/*': ['packages/data/data/questions/**/*'],
-        },
-    },
     images: {
         remotePatterns: [
             {
