@@ -4,6 +4,7 @@ import path from 'path';
 // Helper to resolve data directory in various environments (local, CI, standalone build)
 function resolveDataDir(): string | null {
     const cwd = process.cwd();
+    // eslint-disable-next-line no-console
     console.log(`[SSG] Current Working Directory: ${cwd}`);
 
     // Potential paths to packages/data/data/questions
@@ -19,6 +20,7 @@ function resolveDataDir(): string | null {
 
     for (const candidate of candidates) {
         if (fs.existsSync(candidate)) {
+            // eslint-disable-next-line no-console
             console.log(`[SSG] Resolved Data Directory: ${candidate}`);
             return candidate;
         }
