@@ -8,7 +8,8 @@ const nextConfig = {
     experimental: {
         outputFileTracingRoot: path.join(__dirname, '../../'),
         outputFileTracingIncludes: {
-            '/**/*': ['packages/data/data/questions/**/*'],
+            // Only include exam data for the exam pages that need it
+            '/exam/**/*': ['packages/data/data/questions/**/*'],
         },
     },
     images: {
