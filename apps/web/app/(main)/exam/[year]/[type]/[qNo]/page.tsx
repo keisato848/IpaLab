@@ -7,9 +7,10 @@ import { Suspense } from 'react';
 import fs from 'fs/promises';
 import path from 'path';
 
-import { generateAllExamParams, getExamDataFS } from '@/lib/ssg-helper';
+import { generateAllExamParams, getExamData } from '@/lib/ssg-helper';
 
 // Enable SSG for ALL exams
+/*
 export async function generateStaticParams() {
     // console.log('[SSG] Generating params for ALL questions...');
 
@@ -20,7 +21,7 @@ export async function generateStaticParams() {
     // 2. Iterate and get questions for each (Chunking might be needed if too large, but start simple)
     // Note: This effectively reads thousands of files during build. That's fine for FS.
     for (const exam of examParams) {
-        const questions = await getExamDataFS(exam.examId);
+        const questions = await getExamData(exam.examId);
 
         const qParams = questions.map((q, idx) => ({
             year: exam.year,
@@ -34,6 +35,7 @@ export async function generateStaticParams() {
     // console.log(`[SSG] Generated ${allParams.length} static pages.`);
     return allParams;
 }
+*/
 
 // ISR: Revalidate every hour
 export const dynamicParams = true;
@@ -47,7 +49,7 @@ export async function generateMetadata({ params }: { params: { year: string; typ
     const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
 
     try {
-        const questions = await getExamDataFS(examId);
+        const questions = await getExamData(examId);
         const question = questions.find(q => q.qNo === parseInt(qNo));
 
         if (!question) return { title: `Not Found - IpaLab` };
@@ -77,9 +79,9 @@ export default async function ExamQuestionPage({ params }: { params: { year: str
     // Fetch Questions
     let questions: Question[] = [];
     try {
-        // Build Optimization: Use FS directly
-        const fsData = await getExamDataFS(examId);
-        questions = fsData as unknown as Question[];
+        // Build Optimization: Use DB directly
+        const data = await getExamData(examId);
+        questions = data as unknown as Question[];
     } catch (e) {
         // console.warn(`[Page] Data load failed for ${examId}.`);
     }
