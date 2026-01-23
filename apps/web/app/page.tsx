@@ -5,7 +5,14 @@ import { authOptions } from "@/auth";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
-    const session = await getServerSession(authOptions);
+    let session = null;
+    try {
+        session = await getServerSession(authOptions);
+    } catch (error) {
+        // SWA warm-up or DB connection failure should not crash the landing page
+        console.error("Failed to fetch session on homepage:", error);
+    }
+
     if (session) {
         redirect('/dashboard');
     }
