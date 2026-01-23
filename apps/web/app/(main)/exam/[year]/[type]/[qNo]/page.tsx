@@ -4,40 +4,9 @@ import { getQuestions, Question } from '@/lib/api';
 import QuestionClient from '@/components/features/exam/QuestionClient';
 import styles from './page.module.css';
 import { Suspense } from 'react';
-import fs from 'fs/promises';
-import path from 'path';
+import { questionRepository } from '@/lib/repositories/questionRepository';
 
-import { generateAllExamParams, getExamData } from '@/lib/ssg-helper';
-
-// Enable SSG for ALL exams
-/*
-export async function generateStaticParams() {
-    // console.log('[SSG] Generating params for ALL questions...');
-
-    // 1. Get all exams
-    const examParams = await generateAllExamParams();
-    let allParams: { year: string; type: string; qNo: string }[] = [];
-
-    // 2. Iterate and get questions for each (Chunking might be needed if too large, but start simple)
-    // Note: This effectively reads thousands of files during build. That's fine for FS.
-    for (const exam of examParams) {
-        const questions = await getExamData(exam.examId);
-
-        const qParams = questions.map((q, idx) => ({
-            year: exam.year,
-            type: exam.type,
-            qNo: (q.qNo !== undefined ? q.qNo : (idx + 1)).toString()
-        }));
-
-        allParams = allParams.concat(qParams);
-    }
-
-    // console.log(`[SSG] Generated ${allParams.length} static pages.`);
-    return allParams;
-}
-*/
-
-// ISR: Revalidate every hour
+// Disable SSG, use SSR/ISR
 export const dynamicParams = true;
 export const revalidate = 3600;
 
@@ -49,8 +18,8 @@ export async function generateMetadata({ params }: { params: { year: string; typ
     const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
 
     try {
-        const questions = await getExamData(examId);
-        const question = questions.find(q => q.qNo === parseInt(qNo));
+        const questions = await questionRepository.listByExamId(examId);
+        const question = questions.find((q: any) => q.qNo === parseInt(qNo));
 
         if (!question) return { title: `Not Found - IpaLab` };
 
@@ -80,7 +49,7 @@ export default async function ExamQuestionPage({ params }: { params: { year: str
     let questions: Question[] = [];
     try {
         // Build Optimization: Use DB directly
-        const data = await getExamData(examId);
+        const data = await questionRepository.listByExamId(examId);
         questions = data as unknown as Question[];
     } catch (e) {
         // console.warn(`[Page] Data load failed for ${examId}.`);
