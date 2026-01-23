@@ -2,13 +2,7 @@ import { Suspense } from 'react';
 import { getQuestions, Question } from '@/lib/api';
 import { getExamLabel } from '@/lib/exam-utils';
 import ExamEntranceClient from '@/components/features/exam/ExamEntranceClient';
-import { generateAllExamParams, getExamData } from '@/lib/ssg-helper';
-
-/*
-export async function generateStaticParams() {
-    return generateAllExamParams();
-}
-*/
+import { questionRepository } from '@/lib/repositories/questionRepository';
 
 export const dynamicParams = true; // Allow new exams not built yet (ISR)
 export const revalidate = 3600;
@@ -24,7 +18,7 @@ export default async function ExamEntrancePage({ params }: { params: { year: str
     // Fetch Data
     let questions: Question[] = [];
     try {
-        const data = await getExamData(examId);
+        const data = await questionRepository.listByExamId(examId);
         questions = data as unknown as Question[];
     } catch (e) {
         // Fallback or empty
