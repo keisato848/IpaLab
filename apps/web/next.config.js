@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     transpilePackages: ["@ipa-lab/shared"],
-    output: 'standalone',
     reactStrictMode: true,
     images: {
         remotePatterns: [
