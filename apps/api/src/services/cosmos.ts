@@ -5,6 +5,11 @@ const DATABASE_NAME = "pm-exam-dx-db";
 
 let client: CosmosClient | undefined;
 
+// For testing purposes
+export const setClient = (c: CosmosClient) => {
+    client = c;
+};
+
 // 遅延初期化のためのクライアント取得関数
 const getClient = (): CosmosClient => {
     if (client) {
@@ -44,11 +49,13 @@ export const initDatabase = async () => {
         const { database } = await cosmosClient.databases.createIfNotExists({ id: DATABASE_NAME });
 
         // Create containers with PKs
-        await database.containers.createIfNotExists({ id: "Questions", partitionKey: "/examId" });
-        await database.containers.createIfNotExists({ id: "Users", partitionKey: "/id" });
-        await database.containers.createIfNotExists({ id: "Accounts", partitionKey: "/userId" });
-        await database.containers.createIfNotExists({ id: "Sessions", partitionKey: "/sessionToken" });
-        await database.containers.createIfNotExists({ id: "LearningRecords", partitionKey: "/userId" });
+        await Promise.all([
+            database.containers.createIfNotExists({ id: "Questions", partitionKey: "/examId" }),
+            database.containers.createIfNotExists({ id: "Users", partitionKey: "/id" }),
+            database.containers.createIfNotExists({ id: "Accounts", partitionKey: "/userId" }),
+            database.containers.createIfNotExists({ id: "Sessions", partitionKey: "/sessionToken" }),
+            database.containers.createIfNotExists({ id: "LearningRecords", partitionKey: "/userId" }),
+        ]);
 
         console.log("Database initialized");
     } catch (e) {

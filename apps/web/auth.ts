@@ -1,4 +1,5 @@
 import NextAuth, { NextAuthOptions } from "next-auth"
+import type { Provider } from "next-auth/providers/index"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 import { CosmosAdapter } from "@/lib/auth-adapter"
