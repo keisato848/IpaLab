@@ -46,6 +46,16 @@ jobs:
           lfs: false
           persist-credentials: false
 
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npx turbo run build --filter=web
+        env:
+          CI: "true"
+          # Build-time secrets needed for static generation (if any) or config
+          NEXT_PUBLIC_API_BASE: ${{ secrets.NEXT_PUBLIC_API_BASE }}
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -55,9 +65,9 @@ jobs:
           action: "upload"
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "/" # App source code path
-          output_location: "apps/web/.next/standalone" # Built app content directory - Optimized for size
-          app_build_command: "npx turbo run build --filter=web"
+          app_location: "apps/web" # Target the specific app directory for deployment context
+          output_location: ".next/standalone" # Deploy the optimized standalone build
+          skip_app_build: true # We built it manually above
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
