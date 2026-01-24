@@ -1,0 +1,10 @@
+# Ignore root node_modules (heavy dev dependencies)
+/node_modules
+
+# Keep standalone node_modules (production dependencies)
+!/.next/standalone/node_modules
+
+# Ignore source files not needed for runtime (optional, but good for size)
+/src
+/tsconfig.json
+/.turbo
