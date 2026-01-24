@@ -7,6 +7,7 @@ import { Suspense } from 'react';
 import { questionRepository } from '@/lib/repositories/questionRepository';
 
 // Disable SSG, use SSR/ISR
+export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 export const revalidate = 3600;
 
