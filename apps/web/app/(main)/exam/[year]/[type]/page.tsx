@@ -4,6 +4,7 @@ import { getExamLabel } from '@/lib/exam-utils';
 import ExamEntranceClient from '@/components/features/exam/ExamEntranceClient';
 import { questionRepository } from '@/lib/repositories/questionRepository';
 
+export const dynamic = 'force-dynamic';
 export const dynamicParams = true; // Allow new exams not built yet (ISR)
 export const revalidate = 3600;
 

@@ -3,6 +3,7 @@ import { getQuestions, Question } from '@/lib/api';
 import ExamResult from '@/components/features/exam/ExamResult';
 import { questionRepository } from '@/lib/repositories/questionRepository';
 
+export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 
 export default async function ExamResultPage({ params }: { params: { year: string; type: string } }) {
