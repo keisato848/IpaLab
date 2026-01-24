@@ -56,12 +56,26 @@ jobs:
           # Build-time secrets needed for static generation (if any) or config
           NEXT_PUBLIC_API_BASE: ${{ secrets.NEXT_PUBLIC_API_BASE }}
 
+      - name: Prepare Standalone Build
+        run: |
+          echo "Copying static assets to standalone..."
+          # フォルダが存在することを確認してからコピー
+          if [ -d "apps/web/.next/static" ]; then
+            mkdir -p apps/web/.next/standalone/apps/web/.next
+            cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/static
+          fi
+          if [ -d "apps/web/public" ]; then
+            mkdir -p apps/web/.next/standalone/apps/web/public
+            cp -r apps/web/public apps/web/.next/standalone/apps/web/public
+          fi
+
       - name: Prune Heavy Files
         run: |
           echo "Pruning heavy files to prevent deploy timeout..."
           
           # 1. Remove root node_modules (heavy dev dependencies)
-          rm -rf node_modules
+          # fix: 依存関係欠落による起動エラーを防ぐためコメントアウト
+          # rm -rf node_modules
           
           # 2. Remove workspace packages (data, shared) - Standalone has what it needs
           # 'packages/data' contains raw_pdfs which might be huge
