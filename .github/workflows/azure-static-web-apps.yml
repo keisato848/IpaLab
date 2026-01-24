@@ -65,8 +65,8 @@ jobs:
           action: "upload"
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "apps/web/.next/standalone" # Target the optimized standalone build directory
-          output_location: "apps/web/public" # Deploy public assets statically (server handles .next/static)
+          app_location: "apps/web" # Target the specific app directory for deployment context
+          output_location: ".next/standalone" # Deploy the optimized standalone build
           skip_app_build: true # We built it manually above
           ###### End of Repository/Build Configurations ######
 
