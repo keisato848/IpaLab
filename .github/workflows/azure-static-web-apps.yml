@@ -59,9 +59,22 @@ jobs:
       - name: Prune Heavy Files
         run: |
           echo "Pruning heavy files to prevent deploy timeout..."
+          
+          # 1. Remove root node_modules (heavy dev dependencies)
           rm -rf node_modules
-          rm -rf apps/web/.next/cache
-          echo "Pruning complete."
+          
+          # 2. Optimize .next folder: Keep ONLY standalone
+          # Move standalone to temp
+          mv apps/web/.next/standalone apps/web/standalone_temp
+          
+          # Remove the rest of .next (cache, server, static, etc.)
+          rm -rf apps/web/.next
+          
+          # Recreate .next and move standalone back
+          mkdir apps/web/.next
+          mv apps/web/standalone_temp apps/web/.next/standalone
+          
+          echo "Pruning complete. .next contains only standalone."
 
       - name: Build And Deploy
         id: builddeploy
