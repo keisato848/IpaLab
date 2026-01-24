@@ -56,6 +56,13 @@ jobs:
           # Build-time secrets needed for static generation (if any) or config
           NEXT_PUBLIC_API_BASE: ${{ secrets.NEXT_PUBLIC_API_BASE }}
 
+      - name: Prune Heavy Files
+        run: |
+          echo "Pruning heavy files to prevent deploy timeout..."
+          rm -rf node_modules
+          rm -rf apps/web/.next/cache
+          echo "Pruning complete."
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
