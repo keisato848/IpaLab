@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { containers } from '@/lib/cosmos';
+import { getContainer } from '@/lib/cosmos';
 import { getAppInsightsClient } from '@/lib/appinsights';
 
 export const runtime = 'nodejs';
@@ -12,7 +12,8 @@ export async function GET() {
             query: "SELECT VALUE AVG(c.duration) FROM c WHERE c.type = 'plan_generation'"
         };
 
-        const { resources } = await containers.metrics.items.query(querySpec).fetchAll();
+        const container = await getContainer("Metrics");
+        const { resources } = await container.items.query(querySpec).fetchAll();
         const avg = resources[0];
         const estimatedMs = (avg && typeof avg === 'number') ? Math.round(avg) : 5000;
 

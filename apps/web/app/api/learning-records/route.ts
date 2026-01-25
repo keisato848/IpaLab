@@ -1,7 +1,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { containers } from '@/lib/services/cosmos';
+import { getContainer } from '@/lib/cosmos';
 import { z } from 'zod';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/auth";
 
 export const dynamic = 'force-dynamic';
 
@@ -36,19 +38,21 @@ const LearningRecordSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     try {
         const { searchParams } = new URL(request.url);
-        const userId = searchParams.get('userId');
+        const userId = searchParams.get('userId'); // This will be ignored in favor of session.user.id
         const examId = searchParams.get('examId');
         const questionId = searchParams.get('questionId');
 
-        if (!userId) {
-            return NextResponse.json({ error: "userId is required" }, { status: 400 });
-        }
+        // Use userId from session for security
+        const actualUserId = session.user.id;
 
-        const container = containers.learningRecords;
+        const container = await getContainer("LearningRecords"); // Updated container call
         let query = "SELECT * FROM c WHERE c.userId = @userId";
-        const parameters = [{ name: "@userId", value: userId }];
+        const parameters = [{ name: "@userId", value: actualUserId }];
 
         if (examId) {
             query += " AND c.examId = @examId";
@@ -78,7 +82,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const container = containers.learningRecords;
+        const container = await getContainer("LearningRecords");
 
         if (Array.isArray(body)) {
             // Bulk Insert
