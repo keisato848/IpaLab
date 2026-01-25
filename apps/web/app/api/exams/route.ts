@@ -1,12 +1,12 @@
 
 import { NextResponse } from 'next/server';
-import { containers } from '@/lib/services/cosmos';
+import { getContainer } from '@/lib/cosmos';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const container = containers.exams;
+        const container = await getContainer("Exams");
 
         // Fetch all exams from the Exams container
         const { resources: exams } = await container.items

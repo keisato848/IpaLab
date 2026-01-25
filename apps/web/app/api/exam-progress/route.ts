@@ -1,6 +1,5 @@
-
 import { NextRequest, NextResponse } from 'next/server';
-import { containers } from '@/lib/services/cosmos';
+import { getContainer } from '@/lib/cosmos';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +27,8 @@ export async function GET(request: NextRequest) {
 
         const id = `${userId}-${examId}`;
         try {
-            const { resource } = await containers.examProgress.item(id, userId).read();
+            const container = await getContainer("ExamProgress");
+            const { resource } = await container.item(id, userId).read();
             if (!resource) {
                 // Return empty progress if not found
                 return NextResponse.json({
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
         }
 
         const id = `${userId}-${examId}`;
-        const container = containers.examProgress;
+        const container = await getContainer("ExamProgress");
 
         // Fetch existing or init
         let progress: ExamProgress;

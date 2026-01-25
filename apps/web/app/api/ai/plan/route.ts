@@ -1,13 +1,16 @@
+
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI, SchemaType, Schema } from '@google/generative-ai';
-import { containers } from '@/lib/cosmos';
+import { getContainer } from '@/lib/cosmos'; // Updated import
 import { v4 as uuidv4 } from 'uuid';
 import { getAppInsightsClient } from '@/lib/appinsights'; // Import client
+import { getServerSession } from "next-auth"; // New import
+import { authOptions } from "@/auth"; // New import
 
 // ... (rest of imports/setup)
 
 
-
+export const maxDuration = 60; // AI generation might take time
 export const runtime = 'nodejs'; // Use Node runtime for stability
 
 interface PlanRequest {
@@ -76,24 +79,24 @@ export async function POST(req: NextRequest) {
         Create a winning study plan for the "${targetExam}" exam.
 
         # Context
-        - Exam Date: ${examDate}
-        - Current Date: ${today}
-        - Study Time: Weekday ${studyTimeWeekday}h, Weekend ${studyTimeWeekend}h
-        - Self Assessment: ${JSON.stringify(scores)} (Focus on reinforcing weak areas)
+    - Exam Date: ${examDate}
+- Current Date: ${today}
+- Study Time: Weekday ${studyTimeWeekday} h, Weekend ${studyTimeWeekend} h
+    - Self Assessment: ${JSON.stringify(scores)} (Focus on reinforcing weak areas)
 
         # Rules
-        1. **Title**: Create a catchy, motivating title (e.g., "AP合格 徹底攻略プラン").
-        2. **Strategies**:
-           - Calculate "questionCount" roughly assuming 15 minutes per question (review included).
+1. ** Title **: Create a catchy, motivating title(e.g., "AP合格 徹底攻略プラン").
+        2. ** Strategies **:
+- Calculate "questionCount" roughly assuming 15 minutes per question(review included).
              - Example: 2 hours -> ~8 questions.
            - Assign specific categories based on weak points in early weeks.
-           - Use "targetExamId" (e.g., "AP-2023-Fall") for practice exam days (usually weekends).
-        3. **Scope Restriction**:
-           - Generate "weeklySchedule" for the entire period up to the exam (or max 12 weeks).
-           - **IMPORTANT: Only generate detailed "dailyTasks" for the FIRST 4 WEEKS.**
-           - For weeks 5+, provide the weekly "goal" but leave "dailyTasks" empty or minimal to save token space.
-        4. **Validation**:
-           - "date" must be YYYY-MM-DD.
+           - Use "targetExamId"(e.g., "AP-2023-Fall") for practice exam days(usually weekends).
+        3. ** Scope Restriction **:
+- Generate "weeklySchedule" for the entire period up to the exam(or max 12 weeks).
+           - ** IMPORTANT: Only generate detailed "dailyTasks" for the FIRST 4 WEEKS.**
+    - For weeks 5 +, provide the weekly "goal" but leave "dailyTasks" empty or minimal to save token space.
+        4. ** Validation **:
+- "date" must be YYYY - MM - DD.
            - "generatedAt" must be ISO string of now.
         `;
 
@@ -122,7 +125,7 @@ export async function POST(req: NextRequest) {
                 }
             } catch (e: any) {
                 lastError = e;
-                console.warn(`Failed with Model ${modelName}: ${e.message}`);
+                console.warn(`Failed with Model ${modelName}: ${e.message} `);
                 // Continue to next model
             }
         }
@@ -138,7 +141,8 @@ export async function POST(req: NextRequest) {
         const duration = Date.now() - startTime;
 
         try {
-            await containers.metrics.items.create({
+            const container = await getContainer("Metrics");
+            await container.items.create({
                 id: uuidv4(),
                 type: 'plan_generation',
                 userId: body.userId || 'guest',
