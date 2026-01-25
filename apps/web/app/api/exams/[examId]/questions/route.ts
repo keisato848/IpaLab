@@ -1,6 +1,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { containers } from '@/lib/services/cosmos';
+import { getContainer } from '@/lib/cosmos';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +22,8 @@ export async function GET(
             ]
         };
 
-        const { resources: questions } = await containers.questions.items.query(querySpec).fetchAll();
+        const container = await getContainer("Questions");
+        const { resources: questions } = await container.items.query(querySpec).fetchAll();
 
         // Safety: Inject category if missing (Critical for AM exams where it might be omitted in raw data)
         const safeQuestions = questions.map((q: any) => ({

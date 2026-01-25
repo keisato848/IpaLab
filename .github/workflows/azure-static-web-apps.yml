@@ -56,6 +56,7 @@ jobs:
           # Build-time secrets needed for static generation (if any) or config
           NEXT_PUBLIC_API_BASE: ${{ secrets.NEXT_PUBLIC_API_BASE }}
 
+      - name: Prepare Clean Deployment Artifact
         run: |
           echo "Preparing Clean Deployment Artifact..."
           
