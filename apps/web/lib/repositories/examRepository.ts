@@ -1,5 +1,19 @@
 import { getContainer } from '@/lib/cosmos';
-import { Exam } from '@ipa-lab/shared';
+// import { Exam } from '@ipa-lab/shared'; // Not available in shared yet
+
+export interface Exam {
+    id: string;
+    title: string;
+    category: string;
+    year: number;
+    term: string;
+    type: string;
+    date: string;
+    stats?: {
+        total: number;
+        correctRate: number;
+    }
+}
 
 export const examRepository = {
     async findAll(): Promise<Exam[]> {
