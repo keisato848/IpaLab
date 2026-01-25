@@ -1,5 +1,5 @@
-import { containers } from '../services/cosmos';
-import { SqlQuerySpec } from '@azure/cosmos';
+import { getContainer } from '@/lib/cosmos';
+// import { Exam } from '@ipa-lab/shared'; // Not available in shared yet
 
 export interface Exam {
     id: string;
@@ -11,22 +11,26 @@ export interface Exam {
     date: string;
     stats?: {
         total: number;
-        completed: number;
         correctRate: number;
     }
 }
 
 export const examRepository = {
-    async getAll(): Promise<Exam[]> {
-        const querySpec: SqlQuerySpec = {
-            query: "SELECT * FROM c ORDER BY c.year DESC, c.term DESC"
-        };
-        const { resources } = await containers.exams.items.query(querySpec).fetchAll();
-        return resources as Exam[];
+    async findAll(): Promise<Exam[]> {
+        const container = await getContainer("Exams");
+        const { resources } = await container.items
+            .query("SELECT * FROM c ORDER BY c.id DESC")
+            .fetchAll();
+        return resources;
     },
 
-    async getById(id: string): Promise<Exam | null> {
-        const { resource } = await containers.exams.item(id, id).read();
-        return (resource as Exam) || null;
+    async findById(id: string): Promise<Exam | null> {
+        const container = await getContainer("Exams");
+        try {
+            const { resource } = await container.item(id, id).read();
+            return resource || null;
+        } catch (e) {
+            return null;
+        }
     }
 };

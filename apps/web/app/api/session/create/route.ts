@@ -1,6 +1,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { containers } from '@/lib/services/cosmos';
+import { getContainer } from '@/lib/cosmos';
 import { LearningSessionSchema } from '@ipa-lab/shared';
 import { z } from 'zod';
 import { getAppInsightsClient } from '@/lib/appinsights';
@@ -14,9 +14,9 @@ const CreateSessionRequest = z.object({
     mode: z.enum(['practice', 'mock']),
 });
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
     try {
-        const body = await request.json();
+        const body = await req.json();
 
         const parseResult = CreateSessionRequest.safeParse(body);
         if (!parseResult.success) {
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
         // Validate against full model just in case
         const sessionData = LearningSessionSchema.parse(newSession);
 
-        const container = containers.learningSessions;
+        const container = await getContainer("LearningSessions");
         const { resource } = await container.items.create(sessionData);
 
         return NextResponse.json(resource, { status: 201 });

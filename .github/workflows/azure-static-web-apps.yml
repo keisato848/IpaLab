@@ -56,47 +56,17 @@ jobs:
           # Build-time secrets needed for static generation (if any) or config
           NEXT_PUBLIC_API_BASE: ${{ secrets.NEXT_PUBLIC_API_BASE }}
 
-        run: |
-          echo "Preparing Clean Deployment Artifact..."
-          
-          # 1. Create a dedicated deployment directory
-          mkdir deploy
-          
-          # 2. Copy the standalone build to the deploy folder
-          # The standalone build is located at apps/web/.next/standalone
-          # We want the content of 'apps/web/.next/standalone' to be the root of our deployment
-          cp -r apps/web/.next/standalone/* deploy/
-          
-          # 3. Copy static assets (which are NOT included in standalone by default)
-          # Standalone structure expectations:
-          # deploy/
-          #   server.js
-          #   apps/web/public
-          #   apps/web/.next/static
-          
-          # Correctly place 'public' folder
-          # In standalone, it expects: apps/web/public
-          mkdir -p deploy/apps/web/public
-          cp -r apps/web/public/* deploy/apps/web/public/
-          
-          # Correctly place '.next/static' folder
-          # In standalone, it expects: apps/web/.next/static
-          mkdir -p deploy/apps/web/.next/static
-          cp -r apps/web/.next/static/* deploy/apps/web/.next/static/
-          
-          echo "Listing deployment directory structure:"
-          ls -R deploy
-
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_SMOKE_0F9100100 }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "deploy" # Point to our clean folder
-          output_location: ""    # Standalone is ready-to-run, no further build output needed from SWA
-          skip_app_build: true   # Important!
+          app_location: "/" # Use root to preserve monorepo context
+          api_location: "" # We use Next.js API routes, so no separate API folder
+          output_location: "apps/web/.next" # Next.js build output relative to app_location
+          app_build_command: "npx turbo run build --filter=web" # Explicit build command using Turbo
 
 
   close_pull_request_job:
@@ -110,3 +80,4 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: "close"
+          app_location: "/" # Required by some validator versions even for close action
