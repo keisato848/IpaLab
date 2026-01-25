@@ -78,7 +78,9 @@ jobs:
           # Correctly place 'public' folder
           # In standalone, it expects: apps/web/public
           mkdir -p deploy/apps/web/public
-          cp -r apps/web/public/* deploy/apps/web/public/
+          if [ -d "apps/web/public" ]; then
+            cp -r apps/web/public/* deploy/apps/web/public/
+          fi
           
           # Correctly place '.next/static' folder
           # In standalone, it expects: apps/web/.next/static
@@ -92,7 +94,7 @@ jobs:
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_SMOKE_0F9100100 }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           app_location: "deploy" # Point to our clean folder
