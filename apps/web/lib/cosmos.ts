@@ -8,49 +8,45 @@ const DATABASE_NAME = "pm-exam-dx-db";
 // Singleton instance
 let client: CosmosClient | undefined;
 
-// Lazy initialization function
-const getClient = async (): Promise<CosmosClient> => {
-    if (client) {
-        return client;
-    }
+// 初期化時にエラーを絶対に投げないように変更
+const getClient = async (): Promise<CosmosClient | undefined> => {
+    if (client) return client;
 
+    // 接続文字列がない場合は、警告のみで undefined を返す（エラー終了させない）
     if (!CONNECTION_STRING) {
-        // In build time or CI without secrets, this might fail if called.
-        // But since it's lazy, it won't break the build unless SSG tries to access DB.
-        throw new Error("Cosmos DB not initialized (Check COSMOS_DB_CONNECTION)");
+        console.warn("[Cosmos] Skipping DB initialization (No Connection String)");
+        return undefined;
     }
 
     try {
         let connStr = CONNECTION_STRING;
-        // Fix for local emulator
         if (connStr.includes("localhost")) {
             connStr = connStr.replace("localhost", "127.0.0.1");
             process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
         }
-
         client = new CosmosClient({
             connectionString: connStr,
             agent: new https.Agent({ rejectUnauthorized: false })
         });
-
         return client;
-    } catch (e: any) {
-        console.error("Failed to create Cosmos Client (Web):", e);
-        const aiClient = getAppInsightsClient();
-        if (aiClient) {
-            aiClient.trackException({ exception: e as Error });
-        }
-        throw new Error("Could not create Cosmos Client instance.");
+    } catch (e) {
+        console.error("[Cosmos] Client creation failed (ignoring for startup):", e);
+        return undefined;
     }
 };
 
 const getDatabase = async () => {
     const c = await getClient();
+    if (!c) return undefined; // クライアントがなければ undefined
     return c.database(DATABASE_NAME);
 };
 
-export const getContainer = async (name: string): Promise<Container> => {
+export const getContainer = async (name: string): Promise<Container | undefined> => {
     const db = await getDatabase();
+    if (!db) {
+        console.warn(`[Cosmos] Cannot get container '${name}' (DB not ready)`);
+        return undefined; // エラーではなく undefined を返す
+    }
     return db.container(name);
 };
 
