@@ -13,6 +13,13 @@ export async function GET() {
         };
 
         const container = await getContainer("Metrics");
+
+        // 修正: containerがundefinedの場合（DB未接続時）のガード句を追加
+        if (!container) {
+            console.warn("Metrics container not available. Using default estimate.");
+            return NextResponse.json({ estimatedMs: 5000 });
+        }
+
         const { resources } = await container.items.query(querySpec).fetchAll();
         const avg = resources[0];
         const estimatedMs = (avg && typeof avg === 'number') ? Math.round(avg) : 5000;
