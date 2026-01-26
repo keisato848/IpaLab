@@ -8,12 +8,14 @@ export function CosmosAdapter(): Adapter {
             const id = uuidv4();
             const newUser = { ...user, id };
             const container = await getContainer("Users");
+            if (!container) throw new Error("Database not available");
             await container.items.create(newUser);
             return newUser as AdapterUser;
         },
         async getUser(id: string) {
             try {
                 const container = await getContainer("Users");
+                if (!container) return null;
                 const { resource } = await container.item(id, id).read();
                 return resource || null;
             } catch {
@@ -27,6 +29,7 @@ export function CosmosAdapter(): Adapter {
                     parameters: [{ name: "@email", value: email }]
                 };
                 const container = await getContainer("Users");
+                if (!container) return null;
                 const { resources } = await container.items.query(querySpec).fetchAll();
                 return resources[0] || null;
             } catch {
@@ -43,12 +46,14 @@ export function CosmosAdapter(): Adapter {
                     ]
                 };
                 const accountsContainer = await getContainer("Accounts");
+                if (!accountsContainer) return null;
                 const { resources } = await accountsContainer.items.query(querySpec).fetchAll();
                 const account = resources[0];
 
                 if (!account) return null;
 
                 const usersContainer = await getContainer("Users");
+                if (!usersContainer) return null;
                 const { resource: user } = await usersContainer.item(account.userId, account.userId).read();
                 return user || null;
             } catch {
@@ -58,6 +63,7 @@ export function CosmosAdapter(): Adapter {
         async updateUser(user: Partial<AdapterUser> & { id: string }) {
             if (!user.id) throw new Error("User ID is required for update");
             const container = await getContainer("Users");
+            if (!container) throw new Error("Database not available");
             const { resource: existing } = await container.item(user.id, user.id).read();
             if (!existing) throw new Error("User not found");
 
@@ -67,6 +73,7 @@ export function CosmosAdapter(): Adapter {
         },
         async deleteUser(userId: string) {
             const container = await getContainer("Users");
+            if (!container) throw new Error("Database not available");
             await container.item(userId, userId).delete();
         },
         async linkAccount(account: AdapterAccount) {
@@ -75,6 +82,7 @@ export function CosmosAdapter(): Adapter {
                 ...account
             };
             const container = await getContainer("Accounts");
+            if (!container) throw new Error("Database not available");
             await container.items.create(item);
             return account;
         },
@@ -87,6 +95,7 @@ export function CosmosAdapter(): Adapter {
                 ]
             };
             const container = await getContainer("Accounts");
+            if (!container) return; // Or throw
             const { resources } = await container.items.query(querySpec).fetchAll();
             const account = resources[0];
             if (account) {

@@ -19,6 +19,10 @@ async function runTest() {
     try {
         console.log("Testing DB connection...");
         const examsContainer = await getContainer("Exams");
+        if (!examsContainer) {
+            console.error("Failed to connect to Exams container.");
+            process.exit(1);
+        }
         const { resources: exams } = await examsContainer.items.readAll().fetchAll();
         console.log(`Found ${exams.length} exams in DB.`);
 

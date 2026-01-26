@@ -11,6 +11,7 @@ export const learningRecordRepository = {
         // We cast to any to satisfy parser if strict types differ slightly or verify strictness
         const validated = LearningRecordSchema.parse(record);
         const container = await getContainer(this.containerName);
+        if (!container) throw new Error("Database not available");
         const { resource } = await container.items.upsert(validated);
         if (!resource) throw new Error('Failed to save learning record');
         return resource as unknown as LearningRecord;
@@ -18,6 +19,7 @@ export const learningRecordRepository = {
 
     async findByUserId(userId: string): Promise<LearningRecord[]> {
         const container = await getContainer(this.containerName);
+        if (!container) return [];
         const querySpec: SqlQuerySpec = {
             query: "SELECT * FROM c WHERE c.userId = @userId",
             parameters: [{ name: "@userId", value: userId }]
@@ -32,6 +34,7 @@ export const learningRecordRepository = {
 
     async listByUserAndExamId(userId: string, examId: string): Promise<LearningRecord[]> {
         const container = await getContainer(this.containerName);
+        if (!container) return [];
         const querySpec: SqlQuerySpec = {
             query: "SELECT * FROM c WHERE c.userId = @userId AND c.examId = @examId",
             parameters: [
