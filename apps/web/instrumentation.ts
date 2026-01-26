@@ -5,11 +5,10 @@ export async function register() {
         // eslint-disable-next-line no-console
         console.log('[System] Registering instrumentation (async)...');
 
-        // DO NOT AWAIT - Fire and forget to prevent blocking startup
+        // 修正: awaitを削除し、完全に非同期で実行する
         import('./lib/appinsights')
             .then(({ initAppInsights }) => {
                 initAppInsights();
-                console.log('[System] App Insights initialization trigger sent.');
             })
             .catch((err) => {
                 console.error('[System] Failed to initialize App Insights:', err);
