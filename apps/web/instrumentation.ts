@@ -8,10 +8,8 @@ export async function register() {
         // DO NOT AWAIT - Fire and forget to prevent blocking startup
         import('./lib/appinsights')
             .then(({ initAppInsights }) => {
-                const client = initAppInsights();
-                if (client) {
-                    console.log('[System] App Insights initialized successfully.');
-                }
+                initAppInsights();
+                console.log('[System] App Insights initialization trigger sent.');
             })
             .catch((err) => {
                 console.error('[System] Failed to initialize App Insights:', err);
