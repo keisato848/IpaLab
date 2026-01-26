@@ -23,6 +23,7 @@ export async function GET(
         };
 
         const container = await getContainer("Questions");
+        if (!container) throw new Error("Database not available");
         const { resources: questions } = await container.items.query(querySpec).fetchAll();
 
         // Safety: Inject category if missing (Critical for AM exams where it might be omitted in raw data)

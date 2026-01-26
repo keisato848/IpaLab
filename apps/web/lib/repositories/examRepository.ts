@@ -18,6 +18,7 @@ export interface Exam {
 export const examRepository = {
     async findAll(): Promise<Exam[]> {
         const container = await getContainer("Exams");
+        if (!container) return [];
         const { resources } = await container.items
             .query("SELECT * FROM c ORDER BY c.id DESC")
             .fetchAll();
@@ -26,6 +27,7 @@ export const examRepository = {
 
     async findById(id: string): Promise<Exam | null> {
         const container = await getContainer("Exams");
+        if (!container) return null;
         try {
             const { resource } = await container.item(id, id).read();
             return resource || null;
