@@ -12,7 +12,7 @@ export function initAppInsights() {
                 .setAutoCollectExceptions(true)
                 .setAutoCollectRequests(true)
                 .setAutoCollectDependencies(true)
-                .setDistributedTracingMode(appInsights.defaultClient.context.distributedTracingModes.AI_AND_W3C)
+                .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
                 .start();
 
             // eslint-disable-next-line no-console
