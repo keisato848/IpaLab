@@ -1,16 +1,15 @@
 
 export async function register() {
-    // Debug: Temporarily disabled to rule out startup hang issues
-    /*
     // Only run in Node.js runtime and when explicitly enabled
     if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.START_APP_INSIGHTS === 'true') {
-        // await を削除し、バックグラウンドで実行
+        // バックグラウンドで実行（awaitなし）- スタートアップをブロックしない
         import('./lib/appinsights')
             .then(({ initAppInsights }) => {
                 initAppInsights();
+                console.log('[System] Application Insights initialized.');
             })
-            .catch((err) => console.error('App Insights init failed:', err));
+            .catch((err) => console.error('[System] App Insights init failed:', err));
+    } else {
+        console.log('[System] Application Insights skipped (NEXT_RUNTIME:', process.env.NEXT_RUNTIME, ', START_APP_INSIGHTS:', process.env.START_APP_INSIGHTS, ')');
     }
-    */
-    console.log('[System] Instrumentation skipped for debugging.');
 }

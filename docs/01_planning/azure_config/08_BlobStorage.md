@@ -3,7 +3,7 @@
 ## 基本情報
 - **設定項目 ID:** ST-001
 - **リソース種別:** Storage Account
-- **名称:** `stpmexamdxdata` (一意である必要あり)
+- **名称:** `rgpmexamdxprod9991`
 
 ## 詳細設定
 | 項目                 | 設定値               | 備考                              |
