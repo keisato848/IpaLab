@@ -59,8 +59,8 @@ jobs:
       - name: Cleanup Build Artifacts
         run: |
           rm -rf apps/web/.next/cache
-          rm -rf apps/web/.next/standalone
         shell: bash
+        # Note: Do NOT delete .next/standalone - it's required for Next.js server runtime
 
       - name: Build And Deploy
         id: builddeploy
