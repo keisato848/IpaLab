@@ -28,8 +28,22 @@ export async function GET(request: NextRequest) {
         const id = `${userId}-${examId}`;
         try {
             const container = await getContainer("ExamProgress");
+<<<<<<< Updated upstream
+            if (!container) {
+                // Return empty progress if DB unavailable (treat as new user/no progress)
+                return NextResponse.json({
+                    id,
+                    userId,
+                    examId,
+                    bookmarks: [],
+                    statusMap: {},
+                    updatedAt: new Date().toISOString()
+                });
+            }
+=======
             if (!container) throw new Error("Database not initialized");
 
+>>>>>>> Stashed changes
             const { resource } = await container.item(id, userId).read();
             if (!resource) {
                 // Return empty progress if not found
@@ -77,7 +91,11 @@ export async function POST(request: NextRequest) {
 
         const id = `${userId}-${examId}`;
         const container = await getContainer("ExamProgress");
+<<<<<<< Updated upstream
+        if (!container) throw new Error("Database not available");
+=======
         if (!container) throw new Error("Database not initialized");
+>>>>>>> Stashed changes
 
         // Fetch existing or init
         let progress: ExamProgress;

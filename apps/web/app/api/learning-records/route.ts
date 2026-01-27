@@ -51,8 +51,12 @@ export async function GET(request: NextRequest) {
         const actualUserId = session.user.id;
 
         const container = await getContainer("LearningRecords"); // Updated container call
+<<<<<<< Updated upstream
+        if (!container) throw new Error("Database not available");
+=======
         if (!container) throw new Error("Database not initialized");
 
+>>>>>>> Stashed changes
         let query = "SELECT * FROM c WHERE c.userId = @userId";
         const parameters = [{ name: "@userId", value: actualUserId }];
 
@@ -85,7 +89,11 @@ export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
         const container = await getContainer("LearningRecords");
+<<<<<<< Updated upstream
+        if (!container) throw new Error("Database not available");
+=======
         if (!container) throw new Error("Database not initialized");
+>>>>>>> Stashed changes
 
         if (Array.isArray(body)) {
             // Bulk Insert

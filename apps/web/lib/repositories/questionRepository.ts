@@ -5,7 +5,11 @@ import { SqlQuerySpec } from '@azure/cosmos';
 export const questionRepository = {
     async getById(id: string, examId: string): Promise<Question | null> {
         const container = await getContainer("Questions");
+<<<<<<< Updated upstream
+        if (!container) return null;
+=======
         if (!container) throw new Error("Database not initialized");
+>>>>>>> Stashed changes
         const { resource } = await container.item(id, examId).read();
         if (!resource) return null;
         return resource as Question;
@@ -13,7 +17,11 @@ export const questionRepository = {
 
     async listByExamId(examId: string): Promise<Question[]> {
         const container = await getContainer("Questions");
+<<<<<<< Updated upstream
+        if (!container) return [];
+=======
         if (!container) throw new Error("Database not initialized");
+>>>>>>> Stashed changes
         const querySpec: SqlQuerySpec = {
             query: "SELECT * FROM c WHERE c.examId = @examId ORDER BY c.qNo ASC",
             parameters: [{ name: "@examId", value: examId }]
@@ -24,7 +32,11 @@ export const questionRepository = {
 
     async create(question: Question): Promise<Question> {
         const container = await getContainer("Questions");
+<<<<<<< Updated upstream
+        if (!container) throw new Error("Database not available");
+=======
         if (!container) throw new Error("Database not initialized");
+>>>>>>> Stashed changes
         // Validation
         const validated = QuestionSchema.parse(question);
         const { resource } = await container.items.create(validated);
@@ -34,7 +46,11 @@ export const questionRepository = {
     // For Analytics/SubCategory filtering
     async listBySubCategory(subCategory: string): Promise<Question[]> {
         const container = await getContainer("Questions");
+<<<<<<< Updated upstream
+        if (!container) return [];
+=======
         if (!container) throw new Error("Database not initialized");
+>>>>>>> Stashed changes
         const querySpec: SqlQuerySpec = {
             query: "SELECT * FROM c WHERE c.subCategory = @subCategory",
             parameters: [{ name: "@subCategory", value: subCategory }]
