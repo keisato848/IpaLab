@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     transpilePackages: ["@ipa-lab/shared"],
-    output: 'standalone',
+    // Note: standalone mode removed - using Azure SWA native Next.js support instead
+    // output: 'standalone',
     reactStrictMode: true,
     experimental: {
         serverComponentsExternalPackages: [

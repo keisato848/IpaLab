@@ -17,45 +17,24 @@ jobs:
     permissions:
        id-token: write
        contents: read
-    env:
-      # Vercel, a similar service, sets this to true during build.
-      # We can use it to gate functionality that should only run in production.
-      CI: "true"
-
-      # Keys and Connection Strings
-      COSMOS_DB_CONNECTION: ${{ secrets.COSMOS_DB_CONNECTION }}
-      APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-
-      # Custom Flags
-      START_APP_INSIGHTS: "true" # Enable App Insights in runtime
-
-      # NextAuth Configuration
-      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-      AUTH_TRUST_HOST: "true" # Required for some environments
-
-      # Auth Providers (GitHub, Google)
-      AUTH_GITHUB_ID: ${{ secrets.AUTH_GITHUB_ID }}
-      AUTH_GITHUB_SECRET: ${{ secrets.AUTH_GITHUB_SECRET }}
-      AUTH_GOOGLE_ID: ${{ secrets.AUTH_GOOGLE_ID }}
-      AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
-          persist-credentials: false
 
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Build
-        run: npx turbo run build --filter=web
-        env:
-          CI: "true"
-          # Build-time secrets needed for static generation (if any) or config
-          NEXT_PUBLIC_API_BASE: ${{ secrets.NEXT_PUBLIC_API_BASE }}
-
+      # ============================================================
+      # 重要: Azure SWA 側でビルドを実行する設定
+      # ============================================================
+      # この設定は 2025/12/29 に動作確認済み（コミット 1323190）
+      # 
+      # 【禁止事項】以下の設定は monorepo 環境では動作しません：
+      # - output: 'standalone' (next.config.js)
+      # - skip_app_build: true + output_location: ".next"
+      # - GitHub Actions 側でのプリビルド
+      #
+      # 詳細: docs/02_design/06_DeploymentDesign.md を参照
+      # ============================================================
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -63,10 +42,10 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "/" # Use root to preserve monorepo context
-          api_location: "" # We use Next.js API routes, so no separate API folder
-          output_location: "apps/web/.next" # Next.js build output relative to app_location
-          app_build_command: "npx turbo run build --filter=web" # Explicit build command using Turbo
+          app_location: "/apps/web"
+          api_location: ""
+          output_location: ""
+          app_build_command: "npx turbo run build --filter=web"
 
 
   close_pull_request_job:

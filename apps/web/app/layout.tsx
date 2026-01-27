@@ -2,6 +2,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import type { Metadata } from "next";
 
+export const dynamic = 'force-dynamic';
+
 const inter = Inter({ subsets: ["latin"] });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://shikakuno.vercel.app'; // Fallback URL
