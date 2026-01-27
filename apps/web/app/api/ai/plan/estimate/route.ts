@@ -13,6 +13,7 @@ export async function GET() {
         };
 
         const container = await getContainer("Metrics");
+        if (!container) return NextResponse.json({ estimatedMs: 5000 });
         const { resources } = await container.items.query(querySpec).fetchAll();
         const avg = resources[0];
         const estimatedMs = (avg && typeof avg === 'number') ? Math.round(avg) : 5000;
