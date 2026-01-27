@@ -6,6 +6,7 @@
         "dev": "next dev",
         "build": "next build && node scripts/post-build.js",
         "start": "next start",
+        "start:standalone": "node .next/standalone/apps/web/server.js",
         "lint": "next lint"
     },
     "engines": {
