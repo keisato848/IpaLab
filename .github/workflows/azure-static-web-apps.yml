@@ -71,11 +71,9 @@ jobs:
           action: "upload"
           app_location: "apps/web" # Next.js app location
           api_location: "" # We use Next.js API routes, so no separate API folder
-          # Point to the standalone output directory directly
-          # This contains server.js at apps/web (monorepo structure preserved)
-          output_location: ".next/standalone"
+          output_location: ".next" # Standard Next.js build output (Azure SWA native support)
           skip_app_build: true # Skip Azure build - we pre-build with secrets above
-          skip_api_build: true # Skip API build - Next.js API routes are bundled in standalone
+          skip_api_build: true # Skip API build - prevents npm install errors for monorepo
 
 
   close_pull_request_job:
