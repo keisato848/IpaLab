@@ -4,10 +4,12 @@ export async function register() {
     /*
     // Only run in Node.js runtime and when explicitly enabled
     if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.START_APP_INSIGHTS === 'true') {
-        // eslint-disable-next-line no-console
-        console.log('[System] Registering instrumentation...');
-        const { initAppInsights } = await import('./lib/appinsights');
-        initAppInsights();
+        // await を削除し、バックグラウンドで実行
+        import('./lib/appinsights')
+            .then(({ initAppInsights }) => {
+                initAppInsights();
+            })
+            .catch((err) => console.error('App Insights init failed:', err));
     }
     */
     console.log('[System] Instrumentation skipped for debugging.');

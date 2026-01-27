@@ -8,8 +8,12 @@ export function CosmosAdapter(): Adapter {
             const id = uuidv4();
             const newUser = { ...user, id };
             const container = await getContainer("Users");
+<<<<<<< Updated upstream
+            if (!container) throw new Error("Database not available");
+=======
             if (!container) throw new Error("DB not ready");
 
+>>>>>>> Stashed changes
             await container.items.create(newUser);
             return newUser as AdapterUser;
         },
@@ -17,7 +21,10 @@ export function CosmosAdapter(): Adapter {
             try {
                 const container = await getContainer("Users");
                 if (!container) return null;
+<<<<<<< Updated upstream
+=======
 
+>>>>>>> Stashed changes
                 const { resource } = await container.item(id, id).read();
                 return resource || null;
             } catch {
@@ -32,7 +39,10 @@ export function CosmosAdapter(): Adapter {
                 };
                 const container = await getContainer("Users");
                 if (!container) return null;
+<<<<<<< Updated upstream
+=======
 
+>>>>>>> Stashed changes
                 const { resources } = await container.items.query(querySpec).fetchAll();
                 return resources[0] || null;
             } catch {
@@ -50,7 +60,10 @@ export function CosmosAdapter(): Adapter {
                 };
                 const accountsContainer = await getContainer("Accounts");
                 if (!accountsContainer) return null;
+<<<<<<< Updated upstream
+=======
 
+>>>>>>> Stashed changes
                 const { resources } = await accountsContainer.items.query(querySpec).fetchAll();
                 const account = resources[0];
 
@@ -58,7 +71,10 @@ export function CosmosAdapter(): Adapter {
 
                 const usersContainer = await getContainer("Users");
                 if (!usersContainer) return null;
+<<<<<<< Updated upstream
+=======
 
+>>>>>>> Stashed changes
                 const { resource: user } = await usersContainer.item(account.userId, account.userId).read();
                 return user || null;
             } catch {
@@ -68,8 +84,12 @@ export function CosmosAdapter(): Adapter {
         async updateUser(user: Partial<AdapterUser> & { id: string }) {
             if (!user.id) throw new Error("User ID is required for update");
             const container = await getContainer("Users");
+<<<<<<< Updated upstream
+            if (!container) throw new Error("Database not available");
+=======
             if (!container) throw new Error("DB not ready");
 
+>>>>>>> Stashed changes
             const { resource: existing } = await container.item(user.id, user.id).read();
             if (!existing) throw new Error("User not found");
 
@@ -79,8 +99,12 @@ export function CosmosAdapter(): Adapter {
         },
         async deleteUser(userId: string) {
             const container = await getContainer("Users");
+<<<<<<< Updated upstream
+            if (!container) throw new Error("Database not available");
+=======
             if (!container) return; // Cannot delete if DB missing
 
+>>>>>>> Stashed changes
             await container.item(userId, userId).delete();
         },
         async linkAccount(account: AdapterAccount) {
@@ -89,8 +113,12 @@ export function CosmosAdapter(): Adapter {
                 ...account
             };
             const container = await getContainer("Accounts");
+<<<<<<< Updated upstream
+            if (!container) throw new Error("Database not available");
+=======
             if (!container) throw new Error("DB not ready");
 
+>>>>>>> Stashed changes
             await container.items.create(item);
             return account;
         },
@@ -103,8 +131,12 @@ export function CosmosAdapter(): Adapter {
                 ]
             };
             const container = await getContainer("Accounts");
+<<<<<<< Updated upstream
+            if (!container) return; // Or throw
+=======
             if (!container) return;
 
+>>>>>>> Stashed changes
             const { resources } = await container.items.query(querySpec).fetchAll();
             const account = resources[0];
             if (account) {

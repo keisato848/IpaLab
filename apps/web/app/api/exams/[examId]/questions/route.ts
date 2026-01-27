@@ -23,7 +23,11 @@ export async function GET(
         };
 
         const container = await getContainer("Questions");
+<<<<<<< Updated upstream
+        if (!container) throw new Error("Database not available");
+=======
         if (!container) throw new Error("Database not initialized");
+>>>>>>> Stashed changes
         const { resources: questions } = await container.items.query(querySpec).fetchAll();
 
         // Safety: Inject category if missing (Critical for AM exams where it might be omitted in raw data)

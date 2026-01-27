@@ -1,0 +1,20 @@
+{
+    "platform": {
+        "apiRuntime": "node:20"
+    },
+    "routes": [
+        {
+            "route": "/api/*",
+            "methods": [
+                "GET",
+                "POST",
+                "PUT",
+                "DELETE"
+            ],
+            "allowedRoles": [
+                "anonymous",
+                "authenticated"
+            ]
+        }
+    ]
+}
