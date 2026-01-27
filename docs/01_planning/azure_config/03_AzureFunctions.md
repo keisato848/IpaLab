@@ -15,6 +15,14 @@ Next.js の API Routes (`/app/api/**`) は自動的に Managed Functions とし�
 | **ランタイム**          | Node.js 20           | SWAの設定に準拠                           |
 | **APIロケーション**     | (Next.jsビルド成果物)| `apps/web/.next` 内のFunctionsコードを使用 |
 
+## モノレポ構成における重要な制約
+本プロジェクトはモノレポ構成であり、`@ipa-lab/shared` 等のローカルパッケージに依存しています。
+これらのパッケージは npm レジストリに公開されていないため、Azure Static Web Apps の Oryx ビルドシステムが `npm install --production` を実行すると **404 エラー** で失敗します。
+
+**対策:**
+- GitHub Actions ワークフローで `skip_api_build: true` を設定
+- `next build` 時に API Routes は `.next` フォルダ内にバンドル済みのため、Oryx による再ビルドは不要
+
 ## 環境変数 (App Settings)
 以下の環境変数は、Static Web Apps のリソース設定に追加する必要があります。
 

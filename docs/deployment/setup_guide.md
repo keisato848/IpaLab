@@ -83,6 +83,19 @@ Static Web App リソース > **設定** > **環境変数** に移動します�
 `.github/workflows` 内のファイルを `main` ブランチにプッシュしてください。
 `azure-static-web-apps.yml` がトリガーされ、Next.js フロントエンドと Managed API がデプロイされます。
 
+### ビルド・デプロイの流れ
+1. **GitHub Actions 上でのビルド**: `npm ci` → `turbo run build --filter=web`
+   - モノレポ内のローカルパッケージ (`@ipa-lab/shared` 等) を含めて事前ビルド
+2. **不要ファイルのクリーンアップ**: `.next/cache` と `.next/standalone` を削除
+3. **Azure SWA へアップロード**: 事前ビルド済みの `.next` フォルダをアップロード
+   - `skip_app_build: true` - Oryx によるフロントエンド再ビルドをスキップ
+   - `skip_api_build: true` - Oryx による API 再ビルドをスキップ（ローカルパッケージ解決不可のため必須）
+
 ### SSG廃止に関する注記
 ビルド時間の短縮とデプロイの安定化のため、**SSG (Static Site Generation)** は無効化され、**SSR (Server Side Rendering) / Dynamic Rendering** に変更されました。
 これにより、すべてのページリクエストは Azure Static Web Apps の Managed Functions (Node.js) 上で処理されます。
+
+### モノレポ構成に関する注記
+本プロジェクトは `@ipa-lab/shared` 等のローカルパッケージを使用するモノレポ構成です。
+これらは npm レジストリに公開されていないため、Azure Oryx による `npm install` は失敗します。
+**必ず `skip_app_build` と `skip_api_build` を `true` に設定してください。**
