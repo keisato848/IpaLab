@@ -56,6 +56,12 @@ jobs:
           # Build-time secrets needed for static generation (if any) or config
           NEXT_PUBLIC_API_BASE: ${{ secrets.NEXT_PUBLIC_API_BASE }}
 
+      - name: Cleanup Build Artifacts
+        run: |
+          rm -rf apps/web/.next/cache
+          rm -rf apps/web/.next/standalone
+        shell: bash
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -67,6 +73,7 @@ jobs:
           api_location: "" # We use Next.js API routes, so no separate API folder
           output_location: ".next" # Next.js build output (relative to app_location)
           skip_app_build: true # Skip Azure build - we pre-build with secrets above
+          skip_api_build: true # Skip API build - Next.js API routes are bundled in .next
 
 
   close_pull_request_job:
