@@ -142,14 +142,16 @@ export async function POST(req: NextRequest) {
 
         try {
             const container = await getContainer("Metrics");
-            await container.items.create({
-                id: uuidv4(),
-                type: 'plan_generation',
-                userId: body.userId || 'guest',
-                targetExam,
-                duration,
-                createdAt: new Date().toISOString()
-            });
+            if (container) {
+                await container.items.create({
+                    id: uuidv4(),
+                    type: 'plan_generation',
+                    userId: body.userId || 'guest',
+                    targetExam,
+                    duration,
+                    createdAt: new Date().toISOString()
+                });
+            }
         } catch (metricErr) {
             console.error('Failed to save metric:', metricErr);
         }

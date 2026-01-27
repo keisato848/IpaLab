@@ -28,6 +28,8 @@ export async function GET(request: NextRequest) {
         const id = `${userId}-${examId}`;
         try {
             const container = await getContainer("ExamProgress");
+            if (!container) throw new Error("Database not initialized");
+
             const { resource } = await container.item(id, userId).read();
             if (!resource) {
                 // Return empty progress if not found
@@ -75,6 +77,7 @@ export async function POST(request: NextRequest) {
 
         const id = `${userId}-${examId}`;
         const container = await getContainer("ExamProgress");
+        if (!container) throw new Error("Database not initialized");
 
         // Fetch existing or init
         let progress: ExamProgress;

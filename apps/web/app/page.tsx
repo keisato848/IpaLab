@@ -5,7 +5,15 @@ import { authOptions } from "@/auth";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
-    const session = await getServerSession(authOptions);
+    let session = null;
+
+    // DB接続エラーがあってもトップページを落とさないためのTry-Catch
+    try {
+        session = await getServerSession(authOptions);
+    } catch (e) {
+        console.warn("Warmup: Session check failed (ignoring for deployment):", e);
+        // エラー時はセッションなし（未ログイン）として振る舞う
+    }
     if (session) {
         redirect('/dashboard');
     }

@@ -3,6 +3,14 @@ const nextConfig = {
     transpilePackages: ["@ipa-lab/shared"],
     output: 'standalone',
     reactStrictMode: true,
+    experimental: {
+        serverComponentsExternalPackages: [
+            'applicationinsights',
+            '@azure/cosmos',
+            '@azure/monitor-opentelemetry',
+            '@opentelemetry/instrumentation',
+        ],
+    },
     images: {
         unoptimized: true,
         remotePatterns: [
