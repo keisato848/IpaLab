@@ -7,11 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
     try {
         const container = await getContainer("Exams");
-<<<<<<< Updated upstream
-        if (!container) throw new Error("Database not available");
-=======
         if (!container) throw new Error("Database not initialized");
->>>>>>> Stashed changes
 
         // Fetch all exams from the Exams container
         const { resources: exams } = await container.items
