@@ -41,11 +41,7 @@ export async function POST(req: NextRequest) {
         const sessionData = LearningSessionSchema.parse(newSession);
 
         const container = await getContainer("LearningSessions");
-<<<<<<< Updated upstream
-        if (!container) throw new Error("Database not available");
-=======
         if (!container) throw new Error("Database not initialized");
->>>>>>> Stashed changes
         const { resource } = await container.items.create(sessionData);
 
         return NextResponse.json(resource, { status: 201 });
