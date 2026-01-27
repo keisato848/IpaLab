@@ -9,15 +9,16 @@ const DATABASE_NAME = "pm-exam-dx-db";
 let client: CosmosClient | undefined;
 
 // Lazy initialization function
-const getClient = async (): Promise<CosmosClient> => {
+const getClient = async (): Promise<CosmosClient | undefined> => {
     if (client) {
         return client;
     }
 
     if (!CONNECTION_STRING) {
         // In build time or CI without secrets, this might fail if called.
-        // But since it's lazy, it won't break the build unless SSG tries to access DB.
-        throw new Error("Cosmos DB not initialized (Check COSMOS_DB_CONNECTION)");
+        // We now return undefined to avoid crashing the build/startup.
+        console.warn("[CosmosDB] No connection string found. DB access will be disabled.");
+        return undefined;
     }
 
     try {
@@ -40,17 +41,20 @@ const getClient = async (): Promise<CosmosClient> => {
         if (aiClient) {
             aiClient.trackException({ exception: e as Error });
         }
-        throw new Error("Could not create Cosmos Client instance.");
+        // Return undefined instead of throwing
+        return undefined;
     }
 };
 
 const getDatabase = async () => {
     const c = await getClient();
+    if (!c) return undefined;
     return c.database(DATABASE_NAME);
 };
 
-export const getContainer = async (name: string): Promise<Container> => {
+export const getContainer = async (name: string): Promise<Container | undefined> => {
     const db = await getDatabase();
+    if (!db) return undefined;
     return db.container(name);
 };
 
