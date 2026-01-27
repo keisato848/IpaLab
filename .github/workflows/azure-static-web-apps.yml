@@ -63,10 +63,10 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "/" # Use root to preserve monorepo context
+          app_location: "apps/web" # Next.js app location for standalone detection
           api_location: "" # We use Next.js API routes, so no separate API folder
-          output_location: "apps/web/.next" # Next.js build output relative to app_location
-          app_build_command: "npx turbo run build --filter=web" # Explicit build command using Turbo
+          output_location: ".next" # Next.js build output (relative to app_location)
+          skip_app_build: true # Skip Azure build - we pre-build with secrets above
 
 
   close_pull_request_job:
