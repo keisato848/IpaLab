@@ -18,7 +18,7 @@ export interface Exam {
 export const examRepository = {
     async findAll(): Promise<Exam[]> {
         const container = await getContainer("Exams");
-        if (!container) return [];
+        if (!container) throw new Error("Database not initialized");
         const { resources } = await container.items
             .query("SELECT * FROM c ORDER BY c.id DESC")
             .fetchAll();

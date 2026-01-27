@@ -8,45 +8,53 @@ const DATABASE_NAME = "pm-exam-dx-db";
 // Singleton instance
 let client: CosmosClient | undefined;
 
-// 初期化時にエラーを絶対に投げないように変更
+// Lazy initialization function
 const getClient = async (): Promise<CosmosClient | undefined> => {
-    if (client) return client;
+    if (client) {
+        return client;
+    }
 
-    // 接続文字列がない場合は、警告のみで undefined を返す（エラー終了させない）
     if (!CONNECTION_STRING) {
-        console.warn("[Cosmos] Skipping DB initialization (No Connection String)");
+        // In build time or CI without secrets, this might fail if called.
+        // We now return undefined to avoid crashing the build/startup.
+        console.warn("[CosmosDB] No connection string found. DB access will be disabled.");
         return undefined;
     }
 
     try {
         let connStr = CONNECTION_STRING;
+        // Fix for local emulator
         if (connStr.includes("localhost")) {
             connStr = connStr.replace("localhost", "127.0.0.1");
             process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
         }
+
         client = new CosmosClient({
             connectionString: connStr,
             agent: new https.Agent({ rejectUnauthorized: false })
         });
+
         return client;
-    } catch (e) {
-        console.error("[Cosmos] Client creation failed (ignoring for startup):", e);
+    } catch (e: any) {
+        console.error("Failed to create Cosmos Client (Web):", e);
+        const aiClient = getAppInsightsClient();
+        if (aiClient) {
+            aiClient.trackException({ exception: e as Error });
+        }
+        // Return undefined instead of throwing
         return undefined;
     }
 };
 
 const getDatabase = async () => {
     const c = await getClient();
-    if (!c) return undefined; // クライアントがなければ undefined
+    if (!c) return undefined;
     return c.database(DATABASE_NAME);
 };
 
 export const getContainer = async (name: string): Promise<Container | undefined> => {
     const db = await getDatabase();
-    if (!db) {
-        console.warn(`[Cosmos] Cannot get container '${name}' (DB not ready)`);
-        return undefined; // エラーではなく undefined を返す
-    }
+    if (!db) return undefined;
     return db.container(name);
 };
 
@@ -73,4 +81,3 @@ export const initDatabase = async () => {
     await database.containers.createIfNotExists({ id: "ExamProgress", partitionKey: "/userId" });
     await database.containers.createIfNotExists({ id: "Metrics", partitionKey: "/type" });
 };
-
