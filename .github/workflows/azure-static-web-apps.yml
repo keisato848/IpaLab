@@ -69,11 +69,14 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "apps/web" # Next.js app location for standalone detection
+          # Use repository root as app_location since standalone output contains the full monorepo structure
+          app_location: "/" 
           api_location: "" # We use Next.js API routes, so no separate API folder
-          output_location: ".next" # Next.js build output (relative to app_location)
+          # Point directly to the standalone output in the monorepo structure
+          # Standalone build outputs server.js at: apps/web/.next/standalone/apps/web/server.js
+          output_location: "apps/web/.next/standalone/apps/web"
           skip_app_build: true # Skip Azure build - we pre-build with secrets above
-          skip_api_build: true # Skip API build - Next.js API routes are bundled in .next
+          skip_api_build: true # Skip API build - Next.js API routes are bundled in standalone
 
 
   close_pull_request_job:
