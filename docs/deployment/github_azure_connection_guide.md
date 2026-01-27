@@ -52,10 +52,13 @@
 
 *   **GitHub Actionsが失敗する場合**:
     *   「Build and Deploy Job」のログを確認してください。
-    *   APIのビルドエラーが出ている場合、ディレクトリ構成や `package.json` のスクリプト (`npm run build`) が正しいか確認してください。
+    *   `npm error 404 Not Found - @ipa-lab/shared` のようなエラーが出ている場合:
+        - ワークフローで `skip_api_build: true` が設定されているか確認してください。
+        - モノレポのローカルパッケージは npm レジストリに公開されていないため、Oryx による再ビルドは失敗します。
+    *   APIのビルドエラーが出ている場合、GitHub Actions 上での `turbo run build` が正常に完了しているか確認してください。
 *   **アプリは開くがデータが表示されない場合**:
     *   APIのエンドポイント（例: `/api/exams`）が404エラーになっていないか、ブラウザの開発者ツールで確認してください。
-    *   Azure Static Web Appsの設定で、`api_location` が正しく `apps/api` に設定されているか確認してください。
+    *   Next.js API Routes は `.next` フォルダ内にバンドルされるため、`api_location` は空欄で正しいです。
 
 ---
 
@@ -83,9 +86,11 @@ Bicepで作成されたリソースの設定が正しくない場合（`reposito
 5.  **「ビルドの詳細」** 設定：
     *   **ビルドのプリセット**: `Custom` (または `Next.js`)
     *   **App location**: `/apps/web`
-    *   **Api location**: `apps/api`
-    *   **Output location**: (空欄、または `.next` ※Next.jsの場合自動検出されるため空欄で可)
+    *   **Api location**: (空欄) ※Next.js API Routes を使用するため独立した API フォルダは不要
+    *   **Output location**: `.next`
 6.  **「保存 (Save)」** をクリックします。
+
+**重要:** 本プロジェクトはモノレポ構成のため、Azure Portal からの自動ビルド設定ではなく、GitHub Actions ワークフロー (`skip_app_build: true`, `skip_api_build: true`) を使用した事前ビルド方式を推奨します。
 
 ※ この操作を行うと、Azureが自動的にワークフローファイル (`.github/workflows/azure-static-web-apps-...yml`) をリポジトリにコミットしようとしますが、すでに手動で作成済みのファイル (`.github/workflows/azure-static-web-apps.yml`) があるため、競合しないように注意してください（または生成されたファイルを削除し、既存のファイルでデプロイを行ってください）。
 **今回のように「デプロイトークン」を使用する方法であれば、Portal上での接続設定は必須ではありませんが、正しく設定しておくとPR作成時のプレビュー環境などが利用可能になります。**
