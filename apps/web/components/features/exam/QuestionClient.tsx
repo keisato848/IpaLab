@@ -21,6 +21,13 @@ import styles from './QuestionClient.module.css';
 import { Question, saveLearningRecord, LearningRecord, getLearningRecords, saveExamProgress, getExamProgress } from '@/lib/api';
 import { FaRegBookmark, FaBookmark } from 'react-icons/fa';
 
+// Helper: Check if answer is correct (supports ALL_CORRECT for questions with no valid answer)
+const checkIsCorrect = (selectedOption: string | null, correctOption: string): boolean => {
+    if (!selectedOption) return false;
+    if (correctOption === 'ALL_CORRECT') return true; // 出題誤り等で全員正解
+    return selectedOption === correctOption;
+};
+
 const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false });
 import ExamSummary from './ExamSummary';
 import AIAnswerBox from './AIAnswerBox';
@@ -301,7 +308,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     };
 
     const saveResult = async (optionId: string) => {
-        const isCorrect = optionId === question.correctOption;
+        const isCorrect = checkIsCorrect(optionId, question.correctOption);
         const timeTaken = Math.floor((Date.now() - startTime) / 1000);
 
         const record: LearningRecord = {
@@ -697,7 +704,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     <div className={styles.optionsList}>
                         {question.options?.map((opt) => {
                             const isSelected = selectedOption === opt.id;
-                            const isCorrect = opt.id === question.correctOption;
+                            const isCorrect = checkIsCorrect(opt.id, question.correctOption);
 
                             // Styling logic
                             let optionClass = styles.optionBtn;
@@ -738,8 +745,8 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     {/* Explanation Area (Condensed or Expanded) */}
                     {showExplanation && isPractice && (
                         <div className={styles.explanationArea}>
-                            <div className={`${styles.resultBanner} ${selectedOption === question.correctOption ? styles.bannerCorrect : styles.bannerIncorrect}`}>
-                                {selectedOption === question.correctOption ? '正解！' : '不正解...'}
+                            <div className={`${styles.resultBanner} ${checkIsCorrect(selectedOption, question.correctOption) ? styles.bannerCorrect : styles.bannerIncorrect}`}>
+                                {checkIsCorrect(selectedOption, question.correctOption) ? '正解！' : '不正解...'}
                             </div>
                             <div className={styles.explanationBody}>
                                 <ReactMarkdown

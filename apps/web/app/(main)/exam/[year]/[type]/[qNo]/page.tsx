@@ -1,6 +1,7 @@
 // Rebuild Trigger (Fixed)
 import Link from 'next/link';
 import { getQuestions, Question } from '@/lib/api';
+import { getExamData } from '@/lib/ssg-helper';
 import QuestionClient from '@/components/features/exam/QuestionClient';
 import styles from './page.module.css';
 import { Suspense } from 'react';
@@ -54,6 +55,21 @@ export default async function ExamQuestionPage({ params }: { params: { year: str
         questions = data as unknown as Question[];
     } catch (e) {
         // console.warn(`[Page] Data load failed for ${examId}.`);
+    }
+
+    // Fallback to Filesystem (for local dev without DB)
+    if (questions.length === 0) {
+        try {
+            const fsData = await getExamData(examId);
+            // Handle { questions: [...] } structure from raw JSON
+            if (fsData && !Array.isArray(fsData) && 'questions' in fsData) {
+                questions = (fsData as any).questions as Question[];
+            } else if (Array.isArray(fsData)) {
+                questions = fsData as unknown as Question[];
+            }
+        } catch (e) {
+            console.warn(`[Page] FS Data load failed for ${examId}.`);
+        }
     }
 
     // Find current question by qNo

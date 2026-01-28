@@ -46,8 +46,9 @@
           "text": "品質尺度"
         }
       ],
-      "correctOption": null,
-      "point": 4
+      "correctOption": "ALL_CORRECT",
+      "point": 4,
+      "note": "出題誤りのため受験者全員が正解"
     },
     {
       "qNo": 3,
