@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     try {
         const { targetExam, studyTimeWeekday, studyTimeWeekend, studyPeriod, scores } = await req.json();
 
-        // Validate required fields
+        // Validate all required fields at once - fail fast if any are missing
         if (!targetExam || !scores || studyTimeWeekday === undefined || studyTimeWeekend === undefined) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
         const totalHours = (studyTimeWeekday * 5) + (studyTimeWeekend * 2);
 
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash",
+            model: "gemini-2.5-pro",
             generationConfig: {
                 responseMimeType: "application/json"
             }
