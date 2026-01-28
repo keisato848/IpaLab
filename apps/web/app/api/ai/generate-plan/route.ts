@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     try {
         const { targetExam, studyTimeWeekday, studyTimeWeekend, studyPeriod, scores } = await req.json();
 
-        if (!targetExam || scores) {
+        if (!targetExam || !scores) {
             // Basic validation (minutes/hours check omitted for brevity, assumed valid if present)
             if (studyTimeWeekday === undefined || studyTimeWeekend === undefined) {
                 return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
