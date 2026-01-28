@@ -32,6 +32,7 @@
     },
     "dependencies": {
         "@azure/cosmos": "^4.9.0",
+        "@google/genai": "^1.38.0",
         "@ipa-lab/shared": "*",
         "axios": "^1.6.0",
         "dotenv": "^16.4.5",
