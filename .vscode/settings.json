@@ -1,0 +1,26 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "ConvertFrom-Json": true,
+        "ForEach-Object": true,
+        "/^node -e \"const fs=require\\('fs'\\),path=require\\('path'\\);const questionsDir='packages/data/data/questions';const folders=fs\\.readdirSync\\(questionsDir\\)\\.filter\\(f=>fs\\.statSync\\(path\\.join\\(questionsDir,f\\)\\)\\.isDirectory\\(\\)\\);const results=\\{missingCorrectOption:\\[\\],missingExplanation:\\[\\],shortExplanation:\\[\\],noAnswersRaw:\\[\\],summary:\\{\\}\\};for\\(const folder of folders\\)\\{const questionsPath=path\\.join\\(questionsDir,folder,'questions_raw\\.json'\\);const answersPath=path\\.join\\(questionsDir,folder,'answers_raw\\.json'\\);if\\(!fs\\.existsSync\\(questionsPath\\)\\)continue;const hasAnswersRaw=fs\\.existsSync\\(answersPath\\);const data=JSON\\.parse\\(fs\\.readFileSync\\(questionsPath,'utf8'\\)\\);const questions=data\\.questions\\|\\|\\[\\];for\\(const q of questions\\)\\{const qNo=q\\.qNo\\|\\|q\\.questionNo\\|\\|'unknown';if\\(!q\\.correctOption\\|\\|q\\.correctOption===null\\|\\|q\\.correctOption===''\\)\\{results\\.missingCorrectOption\\.push\\(\\{examId:folder,qNo,hasAnswersRaw\\}\\);\\}if\\(!q\\.explanation\\|\\|q\\.explanation===null\\)\\{results\\.missingExplanation\\.push\\(\\{examId:folder,qNo\\}\\);\\}else if\\(q\\.explanation\\.length<=20\\)\\{results\\.shortExplanation\\.push\\(\\{examId:folder,qNo,len:q\\.explanation\\.length\\}\\);\\}\\}\\}results\\.summary=\\{totalFolders:folders\\.length,missingCorrectOptionCount:results\\.missingCorrectOption\\.length,missingExplanationCount:results\\.missingExplanation\\.length,shortExplanationCount:results\\.shortExplanation\\.length\\};console\\.log\\(JSON\\.stringify\\(results,null,2\\)\\);\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd c:\\\\Projects\\\\IpaLab\\\\IpaLab\\\\packages\\\\data; node audit-data\\.js$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node packages/data/audit-data\\.js$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd c:\\\\Projects\\\\IpaLab\\\\IpaLab; node packages\\\\data\\\\audit-data\\.js$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "npx ts-node": true,
+        "npm run fill-explanations": true,
+        "npm run extract": true,
+        "Get-Process": true
+    }
+}
