@@ -1,0 +1,2598 @@
+{
+  "timestamp": "2026-01-27T15:06:00.095Z",
+  "totalFolders": 174,
+  "missingCorrectOption": {
+    "total": 712,
+    "exams": [
+      {
+        "examId": "AP-2016-Fall-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2016-Spring-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2017-Fall-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2017-Spring-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 5,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2018-Fall-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2018-Spring-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2019-Fall-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2019-Spring-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 5,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2020-Fall-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2021-Fall-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2021-Spring-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2022-Fall-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2022-Spring-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2023-Fall-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2023-Spring-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2024-Fall-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 7,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2024-Spring-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "FE-2022-Sample-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "PM-2016-Spring-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 1,
+        "questions": [
+          2
+        ]
+      },
+      {
+        "examId": "PM-2016-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "PM-2016-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "PM-2017-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 1,
+        "questions": [
+          1
+        ]
+      },
+      {
+        "examId": "PM-2017-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "PM-2018-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "PM-2018-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "PM-2019-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "PM-2019-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "PM-2020-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "PM-2020-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "PM-2021-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "PM-2021-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "PM-2022-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "PM-2022-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "PM-2023-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 10,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?",
+          "?",
+          "?",
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "PM-2023-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "PM-2024-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "PM-2024-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "PM-2025-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "PM-2025-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SA-2016-Fall-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "SA-2016-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SA-2016-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2017-Fall-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "SA-2017-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SA-2017-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2018-Fall-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "SA-2018-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SA-2018-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2019-Fall-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "SA-2019-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SA-2019-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2021-Spring-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "SA-2021-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SA-2021-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2022-Spring-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "SA-2022-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SA-2022-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2023-Spring-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "SA-2023-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SA-2023-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2024-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2024-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2016-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SC-2016-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2016-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SC-2016-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2017-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2017-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2017-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SC-2017-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 1,
+        "questions": [
+          1
+        ]
+      },
+      {
+        "examId": "SC-2018-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SC-2018-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SC-2018-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2019-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SC-2019-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2019-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 1,
+        "questions": [
+          1
+        ]
+      },
+      {
+        "examId": "SC-2019-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2020-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SC-2020-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 5,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2021-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2021-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 5,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2021-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2021-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 5,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2022-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2022-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 6,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2022-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2022-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 6,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2023-Fall-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SC-2023-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2023-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 6,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2024-Fall-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2024-Spring-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2025-Fall-PM",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "ST-2016-Fall-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2016-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "ST-2016-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2017-Fall-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2017-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "ST-2017-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2018-Fall-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2018-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 1,
+        "questions": [
+          1
+        ]
+      },
+      {
+        "examId": "ST-2018-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2019-Fall-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2019-Fall-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "ST-2019-Fall-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2021-Spring-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2021-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "ST-2021-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2022-Spring-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2022-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "ST-2022-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2023-Spring-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2023-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "ST-2023-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2024-Spring-AM2",
+        "hasAnswersRaw": true,
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2024-Spring-PM1",
+        "hasAnswersRaw": true,
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2024-Spring-PM2",
+        "hasAnswersRaw": true,
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  "missingExplanation": {
+    "total": 561,
+    "exams": [
+      {
+        "examId": "AP-2017-Spring-PM",
+        "questionCount": 1,
+        "questions": [
+          "?"
+        ]
+      },
+      {
+        "examId": "AP-2022-Spring-PM",
+        "questionCount": 1,
+        "questions": [
+          "?"
+        ]
+      },
+      {
+        "examId": "FE-2023-Public-PM",
+        "questionCount": 6,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "examId": "FE-2024-Public-PM",
+        "questionCount": 6,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      {
+        "examId": "PM-2016-Spring-AM2",
+        "questionCount": 1,
+        "questions": [
+          2
+        ]
+      },
+      {
+        "examId": "PM-2016-Spring-PM1",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "PM-2016-Spring-PM2",
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "PM-2017-Spring-PM1",
+        "questionCount": 1,
+        "questions": [
+          1
+        ]
+      },
+      {
+        "examId": "PM-2017-Spring-PM2",
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "PM-2018-Spring-PM1",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "PM-2018-Spring-PM2",
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "PM-2019-Spring-PM2",
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "PM-2020-Fall-PM1",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "PM-2020-Fall-PM2",
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "PM-2025-Fall-PM1",
+        "questionCount": 2,
+        "questions": [
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SA-2016-Fall-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "SA-2016-Fall-PM1",
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SA-2016-Fall-PM2",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2017-Fall-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "SA-2017-Fall-PM1",
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SA-2017-Fall-PM2",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2018-Fall-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "SA-2018-Fall-PM1",
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SA-2018-Fall-PM2",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2019-Fall-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "SA-2019-Fall-PM1",
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SA-2019-Fall-PM2",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2021-Spring-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "SA-2021-Spring-PM1",
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SA-2021-Spring-PM2",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2022-Spring-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "SA-2022-Spring-PM1",
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SA-2022-Spring-PM2",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2023-Spring-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "SA-2023-Spring-PM1",
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SA-2023-Spring-PM2",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2024-Spring-PM1",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SA-2024-Spring-PM2",
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2016-Fall-PM1",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SC-2016-Fall-PM2",
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2016-Spring-PM1",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SC-2016-Spring-PM2",
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2017-Fall-PM2",
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2017-Spring-PM1",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SC-2017-Spring-PM2",
+        "questionCount": 1,
+        "questions": [
+          1
+        ]
+      },
+      {
+        "examId": "SC-2018-Fall-PM1",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SC-2018-Fall-PM2",
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2018-Spring-PM1",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SC-2018-Spring-PM2",
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2019-Fall-PM1",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SC-2019-Fall-PM2",
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2019-Spring-PM1",
+        "questionCount": 1,
+        "questions": [
+          1
+        ]
+      },
+      {
+        "examId": "SC-2019-Spring-PM2",
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      },
+      {
+        "examId": "SC-2020-Fall-PM1",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "SC-2021-Spring-PM1",
+        "questionCount": 3,
+        "questions": [
+          "?",
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2021-Spring-PM2",
+        "questionCount": 2,
+        "questions": [
+          "?",
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2022-Fall-PM2",
+        "questionCount": 1,
+        "questions": [
+          "?"
+        ]
+      },
+      {
+        "examId": "SC-2023-Fall-PM",
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "SC-2024-Fall-PM",
+        "questionCount": 1,
+        "questions": [
+          "?"
+        ]
+      },
+      {
+        "examId": "ST-2016-Fall-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2016-Fall-PM1",
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "ST-2016-Fall-PM2",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2017-Fall-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2017-Fall-PM1",
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "ST-2017-Fall-PM2",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2018-Fall-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2018-Fall-PM1",
+        "questionCount": 1,
+        "questions": [
+          1
+        ]
+      },
+      {
+        "examId": "ST-2018-Fall-PM2",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2019-Fall-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2019-Fall-PM1",
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "ST-2019-Fall-PM2",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2021-Spring-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2021-Spring-PM2",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2022-Spring-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2022-Spring-PM1",
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "ST-2022-Spring-PM2",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2023-Spring-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2023-Spring-PM1",
+        "questionCount": 4,
+        "questions": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "examId": "ST-2023-Spring-PM2",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2024-Spring-AM2",
+        "questionCount": 25,
+        "questions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ]
+      },
+      {
+        "examId": "ST-2024-Spring-PM1",
+        "questionCount": 3,
+        "questions": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "examId": "ST-2024-Spring-PM2",
+        "questionCount": 2,
+        "questions": [
+          1,
+          2
+        ]
+      }
+    ]
+  }
+}
