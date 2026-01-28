@@ -71,6 +71,12 @@ export async function POST(req: NextRequest) {
 
         const body: PlanRequest = await req.json();
         const { targetExam, examDate, studyTimeWeekday, studyTimeWeekend, scores } = body;
+
+        // Validate all required fields at once - fail fast if any are missing
+        if (!targetExam || !examDate || !scores || studyTimeWeekday === undefined || studyTimeWeekend === undefined) {
+            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        }
+
         const today = new Date().toISOString().split('T')[0];
 
         // Refined prompt
