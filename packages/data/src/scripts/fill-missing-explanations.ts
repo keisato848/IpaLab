@@ -15,7 +15,30 @@ envPaths.forEach(envPath => {
     dotenv.config({ path: envPath });
 });
 
-console.log('Using @google/genai SDK with Gemini 2.0 Flash Exp.');
+// Load API Keys - Use GEMINI_API_KEY_2 (paid) ONLY
+// Other keys are free tier and have quota limits on gemini-3-pro-preview
+const apiKeys: string[] = [];
+// KEY_2 is the paid key (PmStudy) - use it exclusively
+if (process.env.GEMINI_API_KEY_2) {
+    apiKeys.push(process.env.GEMINI_API_KEY_2);
+}
+// Fallback to GEMINI_API_KEY if KEY_2 not found
+if (apiKeys.length === 0 && process.env.GEMINI_API_KEY) {
+    apiKeys.push(process.env.GEMINI_API_KEY);
+}
+
+if (apiKeys.length === 0) {
+    throw new Error('No GEMINI_API_KEY found in environment variables.');
+}
+
+console.log(`Using Gemini 2.5 Pro with paid API key (KEY_2).`);
+
+// Single key - no rotation needed
+function getNextApiKey(): string {
+    return apiKeys[0];
+}
+
+const MODEL_NAME = 'gemini-2.5-pro';
 
 const SYSTEM_PROMPT = `
 あなたは情報処理技術者試験（応用情報技術者試験・AP）の学習メンターです。
@@ -44,20 +67,16 @@ ${question.correctOption}
 この問題の解説を作成してください。
 `;
 
-    // Configuration for Fallback
-    // Prioritize gemini-2.0-flash-exp as it was confirmed working
-    const keys = [
-        { key: process.env.GEMINI_API_KEY_2 || process.env.GEMINI_API_KEY, type: 'Primary', model: 'gemini-2.5-flash' },
-        { key: process.env.GEMINI_API_KEY, type: 'Backup', model: 'gemini-2.5-flash' }
-    ];
-
-    for (const config of keys) {
-        if (!config.key) continue;
-
+    // Try up to 3 times with retry
+    const maxRetries = 3;
+    
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+        const apiKey = getNextApiKey();
+        
         try {
-            const ai = new GoogleGenAI({ apiKey: config.key });
+            const ai = new GoogleGenAI({ apiKey });
             const result = await ai.models.generateContent({
-                model: config.model,
+                model: MODEL_NAME,
                 contents: {
                     role: "user",
                     parts: [
@@ -73,12 +92,13 @@ ${question.correctOption}
             }
 
         } catch (e: any) {
-            console.warn(`    ! Failed with ${config.type} (${config.model}): ${e.message}`);
-            if (e.cause) console.warn('      Cause:', e.cause);
-            // Continue to next key
+            console.warn(`    ! Attempt ${attempt + 1} failed: ${e.message?.slice(0, 100)}`);
+            if (attempt < maxRetries - 1) {
+                await new Promise(r => setTimeout(r, 2000)); // Wait 2 seconds before retry
+            }
         }
     }
-    throw new Error('All fallbacks failed');
+    throw new Error('All API keys failed');
 }
 
 async function processQuestion(q: any) {
