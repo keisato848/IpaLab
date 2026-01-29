@@ -18,7 +18,7 @@ import { guestManager } from '@/lib/guest-manager';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { getExamLabel } from '@/lib/exam-utils';
 import styles from './QuestionClient.module.css';
-import { Question, saveLearningRecord, LearningRecord, getLearningRecords, saveExamProgress, getExamProgress } from '@/lib/api';
+import { Question, saveLearningRecord, LearningRecord, getLearningRecords, saveExamProgress, getExamProgress, updateSessionProgress } from '@/lib/api';
 import { FaRegBookmark, FaBookmark } from 'react-icons/fa';
 
 // Helper: Check if answer is correct (supports ALL_CORRECT for questions with no valid answer)
@@ -83,6 +83,10 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const [isFlagged, setIsFlagged] = useState(false);
     // Guest Warning State (show only on first answer)
     const [showGuestWarning, setShowGuestWarning] = useState(false);
+    // [NEW] Progress dropdown state (mobile)
+    const [showProgressDropdown, setShowProgressDropdown] = useState(false);
+    // [NEW] Session finishing state
+    const [isFinishing, setIsFinishing] = useState(false);
 
     // Load history & progress on mount
     useEffect(() => {
@@ -274,11 +278,30 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
         try {
             if (session?.user?.id) {
-                await saveLearningRecord(record);
-                // [NEW] Sync Progress Snapshot immediately
-                await saveExamProgress(session.user.id, question.examId, {
-                    statusUpdate: { questionId: qId, isCorrect: (data.result.score || 0) >= 60 }
-                });
+                const isCorrect = (data.result.score || 0) >= 60;
+                
+                // Save record and progress
+                const savePromises: Promise<any>[] = [
+                    saveLearningRecord(record),
+                    saveExamProgress(session.user.id, question.examId, {
+                        statusUpdate: { questionId: qId, isCorrect }
+                    })
+                ];
+
+                // Update session progress if sessionId exists
+                if (sessionId) {
+                    const newTotal = sessionStats.total + 1;
+                    const newCorrect = sessionStats.correct + (isCorrect ? 1 : 0);
+                    savePromises.push(
+                        updateSessionProgress(sessionId, {
+                            answeredCount: newTotal,
+                            correctCount: newCorrect,
+                            lastQuestionNo: parseInt(qNo),
+                        })
+                    );
+                }
+
+                await Promise.all(savePromises);
             } else {
                 // Guest mode: show warning on first answer only
                 if (!guestManager.hasShownWarning()) {
@@ -334,13 +357,28 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
         if (session && session.user?.id) {
             try {
-                // Parallel Save: Log & Snapshot
-                await Promise.all([
+                // Parallel Save: Log & Snapshot & Session Progress
+                const savePromises: Promise<any>[] = [
                     saveLearningRecord(record),
                     saveExamProgress(session.user.id, question.examId, {
                         statusUpdate: { questionId: question.id, isCorrect }
                     })
-                ]);
+                ];
+
+                // Update session progress if sessionId exists
+                if (sessionId) {
+                    const newTotal = sessionStats.total + 1;
+                    const newCorrect = sessionStats.correct + (isCorrect ? 1 : 0);
+                    savePromises.push(
+                        updateSessionProgress(sessionId, {
+                            answeredCount: newTotal,
+                            correctCount: newCorrect,
+                            lastQuestionNo: parseInt(qNo),
+                        })
+                    );
+                }
+
+                await Promise.all(savePromises);
             } catch (e) {
                 console.error("Failed to save to API", e);
             }
@@ -377,6 +415,50 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             router.push(`/exam/${year}/${type}/${nextQ}?mode=${mode}${sessionId ? `&sessionId=${sessionId}` : ''}`);
         } else {
             router.push(`/exam/${year}/${type}/result?mode=${mode}${sessionId ? `&sessionId=${sessionId}` : ''}`);
+        }
+    };
+
+    // Session action handlers
+    const handleFinishSession = async () => {
+        if (!sessionId || !session?.user?.id) {
+            // For guests, just go to result
+            router.push(`/exam/${year}/${type}/result?mode=${mode}`);
+            return;
+        }
+        
+        try {
+            await updateSessionProgress(sessionId, {
+                status: 'completed',
+                answeredCount: sessionStats.total,
+                correctCount: sessionStats.correct,
+                lastQuestionNo: parseInt(qNo)
+            });
+            router.push(`/exam/${year}/${type}/result?mode=${mode}&sessionId=${sessionId}`);
+        } catch (err) {
+            console.error('Failed to finish session', err);
+            router.push(`/exam/${year}/${type}/result?mode=${mode}&sessionId=${sessionId}`);
+        }
+    };
+
+    const handleRestartSession = async () => {
+        setShowProgressDropdown(false);
+        const userId = session?.user?.id || guestManager.getGuestId();
+        if (!userId) {
+            router.push('/login');
+            return;
+        }
+
+        if (session?.user?.id) {
+            try {
+                const { createLearningSession } = await import('@/lib/api');
+                const newSession = await createLearningSession(userId, examId, mode as 'practice' | 'mock', totalQuestions);
+                router.push(`/exam/${year}/${type}/1?mode=${mode}&sessionId=${newSession?.id || ''}`);
+            } catch (err) {
+                console.error('Failed to create new session', err);
+                router.push(`/exam/${year}/${type}/1?mode=${mode}`);
+            }
+        } else {
+            router.push(`/exam/${year}/${type}/1?mode=${mode}`);
         }
     };
 
@@ -569,108 +651,155 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <div className={styles.examInfo}>
-                    <span className={`${styles.examBadge} ${styles.mobileHidden}`}>{type}</span>
-                    <span className={styles.examTitle}>
-                        <span className={styles.mobileHidden}>{examLabel} - </span>
-                        Q{qNo}
-                    </span>
-                </div>
-
-                {/* Progress Bar for Practice Mode */}
-                {isPractice && (
-                    <div style={{ flex: 1, margin: '0 2rem', maxWidth: '300px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#64748b', marginBottom: '4px' }}>
-                            <span>Progress</span>
-                            <span>{qNo} / {totalQuestions}</span>
-                        </div>
-                        <div style={{ width: '100%', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div
-                                style={{
-                                    width: `${(parseInt(qNo) / totalQuestions) * 100}%`,
-                                    height: '100%',
-                                    background: '#3b82f6',
-                                    transition: 'width 0.3s ease'
-                                }}
-                            />
-                        </div>
+                {/* Row 1: Exam info + Mode + Controls */}
+                <div className={styles.headerRow1}>
+                    <div className={styles.examInfo}>
+                        <span className={`${styles.examBadge} ${styles.mobileHidden}`}>{type}</span>
+                        <span className={styles.examTitle}>
+                            <span className={styles.mobileHidden}>{examLabel} - </span>
+                            Q{qNo}
+                        </span>
+                        <span className={`${styles.modeBadge} ${isMock ? styles.mockBadge : ''} ${styles.mobileHidden}`}>
+                            {isPractice ? '練習' : '模試'}
+                        </span>
                     </div>
-                )}
 
-                <div className={styles.meta}>
-                    <span className={`${styles.modeBadge} ${isMock ? styles.mockBadge : ''} ${styles.mobileHidden}`}>
-                        {isPractice ? '練習モード' : '模擬試験モード'}
-                    </span>
-                    {/* Header Controls: Bookmark & Stats */}
+                    {/* Controls: Flag, Bookmark */}
                     <div className={styles.headerControls}>
-                        {/* [NEW] Review/Flag Button (Session Specific) */}
                         <button
                             className={`${styles.bookmarkBtn} ${isFlagged ? styles.active : ''}`}
                             onClick={toggleFlag}
                             title="このセッションで見直す"
-                            aria-label="Flag for Review"
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                fontSize: '0.9rem',
-                                color: isFlagged ? '#eab308' : '#64748b', // Yellow for Flag
-                                marginRight: '1rem'
-                            }}
                         >
-                            <span style={{ fontSize: '1.2em' }}>{isFlagged ? '🚩' : '🏳️'}</span>
-                            <span className={styles.mobileHidden}>
-                                {isFlagged ? '見直し中' : '見直す'}
-                            </span>
+                            <span>{isFlagged ? '🚩' : '🏳️'}</span>
+                            <span className={styles.mobileHidden}>{isFlagged ? '見直し' : '見直す'}</span>
                         </button>
 
-                        {/* Bookmark Button */}
                         <button
                             className={`${styles.bookmarkBtn} ${isBookmarked ? styles.active : ''}`}
                             onClick={toggleBookmark}
-                            title="永久ブックマーク (保存)"
-                            aria-label="Bookmark"
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                fontSize: '0.9rem',
-                                color: isBookmarked ? '#f59e0b' : '#64748b',
-                                marginRight: '1rem'
-                            }}
+                            title="永久ブックマーク"
                         >
                             {isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
-                            <span className={styles.mobileHidden}>
-                                {isBookmarked ? '保存' : '保存'}
-                            </span>
+                            <span className={styles.mobileHidden}>保存</span>
                         </button>
-
-                        {/* Desktop: Show Stats inline if enabled */}
-                        <div className={`${styles.statsContainer} ${styles.mobileHidden}`}>
-                            {showExamStats && (
-                                <>
-                                    {isPractice && sessionStats.total > 0 && (
-                                        <span className={styles.statItem} title="今回の正答率">
-                                            今回: {Math.round((sessionStats.correct / sessionStats.total) * 100)}% ({sessionStats.correct}/{sessionStats.total})
-                                        </span>
-                                    )}
-                                    {examStats && examStats.total > 0 && (
-                                        <span className={styles.statItem} title="この試験の通算正答率">
-                                            通算: {Math.round((examStats.correct / examStats.total) * 100)}% ({examStats.correct}/{examStats.total})
-                                        </span>
-                                    )}
-                                </>
-                            )}
-                        </div>
-
                     </div>
                 </div>
+
+                {/* Row 2: Progress bar + Stats + Session Actions */}
+                {isPractice && (
+                    <div className={styles.headerRow2}>
+                        {/* Progress section - clickable on mobile */}
+                        <div 
+                            className={styles.progressContainer}
+                            onClick={() => setShowProgressDropdown(!showProgressDropdown)}
+                        >
+                            <div className={styles.progressBar}>
+                                <div 
+                                    className={styles.progressFill}
+                                    style={{ width: `${(parseInt(qNo) / totalQuestions) * 100}%` }}
+                                />
+                            </div>
+                            <span className={styles.progressText}>
+                                {qNo}/{totalQuestions}
+                            </span>
+                            {/* Mobile dropdown indicator */}
+                            <span className={styles.mobileOnly} style={{ marginLeft: '0.25rem' }}>
+                                {showProgressDropdown ? '▲' : '▼'}
+                            </span>
+                        </div>
+
+                        {/* Desktop: inline stats */}
+                        {showExamStats && (
+                            <div className={`${styles.statsContainer} ${styles.mobileHidden}`}>
+                                {sessionStats.total > 0 && (
+                                    <span className={styles.statItem}>
+                                        今回: {Math.round((sessionStats.correct / sessionStats.total) * 100)}%
+                                    </span>
+                                )}
+                                {examStats && examStats.total > 0 && (
+                                    <span className={styles.statItem}>
+                                        通算: {Math.round((examStats.correct / examStats.total) * 100)}%
+                                    </span>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Desktop: Session action buttons */}
+                        <div className={`${styles.sessionActions} ${styles.mobileHidden}`}>
+                            <button 
+                                className={`${styles.sessionActionBtn} ${styles.finish}`}
+                                onClick={handleFinishSession}
+                            >
+                                採点終了
+                            </button>
+                            <button 
+                                className={styles.sessionActionBtn}
+                                onClick={handleRestartSession}
+                            >
+                                やり直し
+                            </button>
+                            <Link 
+                                href={`/exam/${year}/${type}`}
+                                className={styles.sessionActionBtn}
+                            >
+                                一覧
+                            </Link>
+                        </div>
+
+                        {/* Mobile: Progress dropdown menu */}
+                        {showProgressDropdown && (
+                            <div className={styles.progressDropdown}>
+                                <div className={styles.dropdownStats}>
+                                    <div className={styles.dropdownStat}>
+                                        <div className={styles.dropdownStatValue}>{sessionStats.correct}</div>
+                                        <div className={styles.dropdownStatLabel}>正解</div>
+                                    </div>
+                                    <div className={styles.dropdownStat}>
+                                        <div className={styles.dropdownStatValue}>{sessionStats.total - sessionStats.correct}</div>
+                                        <div className={styles.dropdownStatLabel}>不正解</div>
+                                    </div>
+                                    <div className={styles.dropdownStat}>
+                                        <div className={styles.dropdownStatValue}>
+                                            {sessionStats.total > 0 ? Math.round((sessionStats.correct / sessionStats.total) * 100) : 0}%
+                                        </div>
+                                        <div className={styles.dropdownStatLabel}>正答率</div>
+                                    </div>
+                                </div>
+                                <div className={styles.dropdownActions}>
+                                    <button 
+                                        className={`${styles.dropdownBtn} ${styles.warning}`}
+                                        onClick={handleFinishSession}
+                                    >
+                                        採点して終了
+                                    </button>
+                                    <button 
+                                        className={styles.dropdownBtn}
+                                        onClick={handleRestartSession}
+                                    >
+                                        最初からやり直す
+                                    </button>
+                                    <Link 
+                                        href={`/exam/${year}/${type}`}
+                                        className={styles.dropdownBtn}
+                                        onClick={() => setShowProgressDropdown(false)}
+                                    >
+                                        問題一覧
+                                    </Link>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Mock mode: Timer only */}
+                {isMock && (
+                    <div className={styles.headerRow2}>
+                        <span className={styles.timer}>
+                            ⏱ {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
+                        </span>
+                    </div>
+                )}
             </header>
 
             {/* Guest Warning - show only on first answer */}
