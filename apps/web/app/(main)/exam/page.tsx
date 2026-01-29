@@ -117,18 +117,32 @@ export default function ExamListPage() {
                         </select>
                     </div>
 
-                    {/* Time Filters */}
+                    {/* Time Filters - Segment Buttons */}
                     <div className={styles.filterGroup}>
                         <span className={styles.filterLabel}>時間帯:</span>
-                        <select
-                            className={styles.dropdown}
-                            value={timeFilter}
-                            onChange={(e) => setTimeFilter(e.target.value)}
-                        >
-                            <option value="ALL">すべて</option>
-                            <option value="AM">午前 (AM)</option>
-                            <option value="PM">午後 (PM)</option>
-                        </select>
+                        <div className={styles.segmentGroup}>
+                            <button
+                                type="button"
+                                className={`${styles.segmentButton} ${timeFilter === 'ALL' ? styles.segmentActive : ''}`}
+                                onClick={() => setTimeFilter('ALL')}
+                            >
+                                すべて
+                            </button>
+                            <button
+                                type="button"
+                                className={`${styles.segmentButton} ${timeFilter === 'AM' ? styles.segmentActive : ''}`}
+                                onClick={() => setTimeFilter('AM')}
+                            >
+                                午前
+                            </button>
+                            <button
+                                type="button"
+                                className={`${styles.segmentButton} ${timeFilter === 'PM' ? styles.segmentActive : ''}`}
+                                onClick={() => setTimeFilter('PM')}
+                            >
+                                午後
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
