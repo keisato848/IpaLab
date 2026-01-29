@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { getExams } from '@/lib/api';
+import { getExams, Exam } from '@/lib/api';
 import ExamListClient from '@/components/features/exam/ExamListClient';
 import styles from './page.module.css';
 
@@ -12,8 +12,17 @@ export const metadata = {
 };
 
 export default async function ExamListPage() {
-    // Server-side data fetching - no client-side loading state needed
-    const exams = await getExams();
+    // Server-side data fetching with fallback for build time
+    // During build (SSG), API may not be available, so we provide empty array
+    // Client will fetch fresh data on mount
+    let exams: Exam[] = [];
+    try {
+        exams = await getExams();
+    } catch {
+        // Build time or API unavailable - client will fetch on mount
+        // eslint-disable-next-line no-console
+        console.log('SSG: API unavailable, will fetch on client');
+    }
 
     return (
         <Suspense fallback={<div className={styles.container}><p>読み込み中...</p></div>}>

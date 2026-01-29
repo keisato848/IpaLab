@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { Exam, LearningRecord } from '@/lib/api';
+import { Exam, LearningRecord, getExams } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
 import styles from '@/app/(main)/exam/page.module.css';
 
@@ -13,9 +13,23 @@ interface ExamListClientProps {
 }
 
 export default function ExamListClient({ initialExams, initialRecords = [] }: ExamListClientProps) {
+    const [exams, setExams] = useState<Exam[]>(initialExams);
+    const [isLoading, setIsLoading] = useState(initialExams.length === 0);
     const [filter, setFilter] = useState('ALL');
     const [timeFilter, setTimeFilter] = useState('ALL');
     const { data: session } = useSession();
+
+    // Fetch exams on client if not provided by server (SSG build time)
+    useEffect(() => {
+        if (initialExams.length === 0) {
+            getExams().then(data => {
+                setExams(data);
+                setIsLoading(false);
+            }).catch(() => {
+                setIsLoading(false);
+            });
+        }
+    }, [initialExams.length]);
 
     // Merge stats with user's learning records
     const examsWithStats = useMemo(() => {
@@ -24,7 +38,7 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
             ? initialRecords 
             : guestManager.getHistory();
 
-        return initialExams.map(exam => {
+        return exams.map(exam => {
             const examRecords = userRecords.filter(r => r.examId === exam.id);
             const uniqueAnswered = new Set(examRecords.map(r => r.questionId)).size;
             const correctCount = examRecords.filter(r => r.isCorrect).length;
@@ -40,7 +54,7 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
                 }
             };
         });
-    }, [initialExams, initialRecords, session?.user?.id]);
+    }, [exams, initialRecords, session?.user?.id]);
 
     const filteredExams = useMemo(() => {
         return examsWithStats.filter(e => {
@@ -120,7 +134,11 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
             </div>
 
             <div className={styles.grid}>
-                {filteredExams.length === 0 ? (
+                {isLoading ? (
+                    <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+                        読み込み中...
+                    </p>
+                ) : filteredExams.length === 0 ? (
                     <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
                         該当する試験区分は見つかりませんでした。
                     </p>
