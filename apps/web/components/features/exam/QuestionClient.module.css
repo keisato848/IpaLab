@@ -8,44 +8,287 @@
     color: var(--text-primary);
 }
 
+/* Two-row header structure */
 .header {
-    height: 60px;
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 1rem;
-    /* Reduced padding for mobile */
     flex-shrink: 0;
 }
 
+.headerRow1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    min-height: 44px;
+}
+
+.headerRow2 {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    position: relative;
+}
+
+/* Progress bar container */
+.progressContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+    min-width: 0;
+}
+
+/* Mobile: make it clickable */
+@media (max-width: 768px) {
+    .progressContainer {
+        cursor: pointer;
+        flex: 1;
+    }
+    .progressContainer:hover {
+        background: var(--bg-secondary);
+    }
+}
+
+/* Desktop: not clickable */
+@media (min-width: 769px) {
+    .progressContainer {
+        cursor: default;
+    }
+}
+
+.progressBar {
+    flex: 1;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    max-width: 200px;
+}
+
+.progressFill {
+    height: 100%;
+    background: var(--accent-color);
+    transition: width 0.3s ease;
+}
+
+.progressText {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+/* Session action buttons in header */
+.sessionActions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.sessionActionBtn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.sessionActionBtn:hover {
+    background: var(--bg-primary);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.sessionActionBtn.finish {
+    background: #f97316;
+    color: white;
+    border-color: #f97316;
+}
+
+.sessionActionBtn.finish:hover {
+    background: #ea580c;
+    border-color: #ea580c;
+}
+
+/* Progress dropdown menu - mobile only */
+.progressDropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    padding: 1rem;
+    z-index: 1000;
+    margin-top: 0.5rem;
+}
+
+/* Hide dropdown on desktop */
+@media (min-width: 769px) {
+    .progressDropdown {
+        display: none !important;
+    }
+}
+
+.dropdownStats {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dropdownStat {
+    text-align: center;
+}
+
+.dropdownStatValue {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.dropdownStatLabel {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.dropdownActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.dropdownBtn {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dropdownBtn:hover {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.dropdownBtn.primary {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.dropdownBtn.warning {
+    background: #f97316;
+    color: white;
+    border-color: #f97316;
+}
+
 /* Mobile Helper */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .mobileHidden {
         display: none !important;
+    }
+    
+    .headerRow1 {
+        padding: 0.4rem 0.75rem;
+    }
+    
+    .headerRow2 {
+        padding: 0.4rem 0.75rem;
+        gap: 0.5rem;
+    }
+    
+    .progressBar {
+        max-width: none;
+        flex: 1;
+    }
+    
+    .sessionActionBtn {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Show only on mobile */
+.mobileOnly {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobileOnly {
+        display: inline !important;
+    }
+}
+
+/* Tablet breakpoint */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .progressBar {
+        max-width: 150px;
+    }
+    
+    .sessionActionBtn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Large screens */
+@media (min-width: 1025px) {
+    .progressBar {
+        max-width: 250px;
+    }
+    
+    .sessionActions {
+        gap: 0.75rem;
     }
 }
 
 .examInfo {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
 .examBadge {
     background: var(--accent-color);
     color: white;
-    font-size: 0.8rem;
-    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
     border-radius: 4px;
     font-weight: 600;
 }
 
 .examTitle {
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    .examTitle {
+        font-size: 0.9rem;
+    }
 }
 
 .modeBadge {
@@ -120,13 +363,15 @@
 
 @media (max-width: 768px) {
     .container {
-        height: calc(100dvh - 6rem);
-        /* Mobile padding: 5rem top + 1rem bottom */
+        height: calc(100dvh - 5rem);
+        /* Mobile: account for mobile nav */
     }
 
     .content {
         flex-direction: column;
         overflow-y: auto;
+        padding: 1rem;
+        gap: 1rem;
     }
 
     .questionPanel,
@@ -135,6 +380,7 @@
         width: 100%;
         overflow-y: visible;
         border-right: none;
+        padding: 1rem;
     }
 }
 
