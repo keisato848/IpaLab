@@ -60,7 +60,7 @@ async function createLearningRecord(
 
         // Check if body is array
         if (Array.isArray(body)) {
-            // Bulk Insert
+            // Bulk Insert - use optimized bulk save
             const parseResults = z.array(LearningRecordSchema).safeParse(body);
             if (!parseResults.success) {
                 return {
@@ -70,12 +70,9 @@ async function createLearningRecord(
             }
 
             const records = parseResults.data;
-            const savedRecords = [];
-            // Ideally use transactions or bulk support, but for now simple loop
-            for (const record of records) {
-                const saved = await learningRecordRepository.save(record);
-                savedRecords.push(saved);
-            }
+            
+            // Use bulk save for better performance
+            const savedRecords = await learningRecordRepository.saveBulk(records);
 
             return {
                 status: 201,

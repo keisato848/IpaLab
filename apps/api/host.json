@@ -3,10 +3,25 @@
     "logging": {
         "applicationInsights": {
             "samplingSettings": {
-                "isEnabled": true
+                "isEnabled": true,
+                "maxTelemetryItemsPerSecond": 5
             }
+        },
+        "logLevel": {
+            "default": "Warning",
+            "Host.Results": "Error",
+            "Function": "Information"
         }
     },
+    "extensions": {
+        "http": {
+            "routePrefix": "api",
+            "maxOutstandingRequests": 200,
+            "maxConcurrentRequests": 100,
+            "dynamicThrottlesEnabled": true
+        }
+    },
+    "functionTimeout": "00:05:00",
     "extensionBundle": {
         "id": "Microsoft.Azure.Functions.ExtensionBundle",
         "version": "[4.*, 5.0.0)"
