@@ -48,15 +48,24 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
             };
 
             try {
-                // Parallel Fetch: History & Progress
-                const [records, examProgress] = await Promise.all([
-                    getLearningRecords(userId, examId),
-                    getExamProgress(userId, examId)
-                ]);
+                let records: LearningRecord[] = [];
+                let examProgressData: Awaited<ReturnType<typeof getExamProgress>> = null;
 
-                // 1. Process Bookmarks
-                if (examProgress?.bookmarks) {
-                    setBookmarks(new Set(examProgress.bookmarks));
+                if (session?.user?.id) {
+                    // Logged-in user: fetch from API
+                    [records, examProgressData] = await Promise.all([
+                        getLearningRecords(userId, examId),
+                        getExamProgress(userId, examId)
+                    ]);
+                } else {
+                    // Guest mode: fetch from localStorage
+                    const allRecords = guestManager.getHistory();
+                    records = allRecords.filter(r => r.examId === examId);
+                }
+
+                // 1. Process Bookmarks (logged-in only)
+                if (examProgressData?.bookmarks) {
+                    setBookmarks(new Set(examProgressData.bookmarks));
                 }
 
                 // 2. Build Status Map (Merge History & Progress)
@@ -78,18 +87,9 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                     const latest = sorted[0];
 
                     if (latest) {
-                        if (latest.isFlagged && !latest.isCorrect) {
-                            // "Review" status if flagged and NOT correct (or even if correct? User said "Review" is a status)
-                            // Requirement: "Review/Flagged" state.
-                            // Usually "Review" overrides "Incorrect". Does it override "Correct"?
-                            // User example: "Q1 Correct, Q2 Review, Q3 Incorrect". 
-                            // If I flag a correct answer, it implies I wasn't sure. So "Review" is useful.
-                            // But visual priority: Correct (Green) > Review (Yellow) > Incorrect (Red)?
-                            // Or Review (Yellow) > * ?
-                            // If I'm "Reviewing", I probably want to see it Yellow.
-                            // Let's set priority: Review > Correct > Incorrect?
-                            // Or: Review > Incorrect. Correct > All?
-                            // If I answered correctly but flagged it, I want to review it. So Yellow.
+                        // Priority: Review flag > Correct/Incorrect status
+                        if (latest.isFlagged) {
+                            // Flagged for review (regardless of correct/incorrect)
                             newStatusMap[qId] = 'review';
                         } else if (latest.isCorrect) {
                             newStatusMap[qId] = 'correct';
@@ -159,10 +159,20 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
 
     const startSession = async (startQNo: number, mode: 'practice' | 'mock') => {
         const userId = session?.user?.id || guestManager.getGuestId();
-        if (!userId) return; // Should handle auth redirect if needed
+        if (!userId) {
+            // Redirect to login if no user
+            router.push('/login');
+            return;
+        }
 
-        const newSession = await createLearningSession(userId, examId, mode);
-        const sessionId = newSession?.id;
+        let sessionId: string | undefined;
+
+        // Only create DB session for logged-in users
+        if (session?.user?.id) {
+            const totalQuestions = questions.length;
+            const newSession = await createLearningSession(userId, examId, mode, totalQuestions);
+            sessionId = newSession?.id;
+        }
 
         const targetUrl = `/exam/${year}/${type}/${startQNo}?mode=${mode}${sessionId ? `&sessionId=${sessionId}` : ''}`;
         router.push(targetUrl);
