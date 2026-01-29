@@ -43,8 +43,8 @@ graph TD
     end
 
     subgraph Azure_SWA [Azure Static Web Apps]
-        NextJS[Next.js App (SSR)]
-        API[Managed Functions (Node.js)]
+        NextJS["Next.js App (SSR)"]
+        API["Managed Functions (Node.js)"]
         
         NextJS -- "API Call / SSR Data" --> API
     end
@@ -56,7 +56,7 @@ graph TD
     
     subgraph External [外部サービス]
         Gemini[Google Gemini API]
-        Auth[OAuth Providers<br/>(GitHub/Google)]
+        Auth["OAuth Providers (GitHub/Google)"]
     end
 
     Browser -- "HTTPS" --> NextJS
@@ -72,18 +72,18 @@ graph TD
 sequenceDiagram
     autonumber
     participant User as ユーザー
-    participant NextJS as Next.js (Client)
-    participant API as Managed Function (API)
+    participant NextJS as "Next.js Client"
+    participant API as "Managed Function API"
     participant Gemini as Google Gemini
     participant DB as Cosmos DB
 
     User->>NextJS: 回答を入力して「採点」をクリック
-    NextJS->>API: POST /api/score (回答データ)
-    API->>DB: 問題データ(正解・解説)を取得
-    API->>Gemini: プロンプト(回答+正解)を送信
-    Gemini-->>API: 採点結果・解説・CLKSスコア
-    API->>DB: 学習履歴(LearningRecord)を保存
-    API-->>NextJS: 採点結果(JSON)を返却
+    NextJS->>API: POST /api/score 回答データ
+    API->>DB: 問題データを取得
+    API->>Gemini: プロンプトを送信
+    Gemini-->>API: 採点結果・CLKSスコア
+    API->>DB: 学習履歴を保存
+    API-->>NextJS: 採点結果 JSON
     NextJS-->>User: 結果とチャートを表示
 ```
 
