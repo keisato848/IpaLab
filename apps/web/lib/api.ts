@@ -106,7 +106,8 @@ export interface Exam {
 export async function getExams(): Promise<Exam[]> {
     try {
         const res = await fetch(`${API_BASE}/exams`, {
-            cache: 'no-store'
+            // Cache exam list for 1 hour - data doesn't change frequently
+            next: { revalidate: 3600 }
         });
 
         if (!res.ok) {
@@ -125,7 +126,8 @@ export async function getQuestions(examId: string, init?: RequestInit): Promise<
     // console.log(`Fetching questions from ${API_BASE}/exams/${examId}/questions`); // Reduced logging
     try {
         const res = await fetch(`${API_BASE}/exams/${examId}/questions`, {
-            cache: 'no-store', // Default
+            // Cache questions for 1 day - question content rarely changes
+            next: { revalidate: 86400 },
             ...init, // Allow override
             headers: {
                 'Content-Type': 'application/json',

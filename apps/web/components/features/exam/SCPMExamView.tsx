@@ -16,6 +16,33 @@ import styles from './SCPMExamView.module.css';
 const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false });
 import AIAnswerBox from './AIAnswerBox';
 import { ScoreResult } from './AIAnswerBox';
+import { useRef, useEffect } from 'react';
+
+// Dynamic import for Recharts to reduce initial bundle size
+const RechartsPMRadar = dynamic(
+    () => import('recharts').then(mod => {
+        const { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } = mod;
+        return function PMRadarChart({ data }: { data: any[] }) {
+            return (
+                <ResponsiveContainer width="100%" height={200}>
+                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
+                        <PolarGrid />
+                        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: '#64748b' }} />
+                        <PolarRadiusAxis angle={30} domain={[0, 10]} hide />
+                        <Radar
+                            name="Aggregated"
+                            dataKey="A"
+                            stroke="#8b5cf6"
+                            fill="#8b5cf6"
+                            fillOpacity={0.5}
+                        />
+                    </RadarChart>
+                </ResponsiveContainer>
+            );
+        };
+    }),
+    { ssr: false, loading: () => <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading chart...</div> }
+);
 
 interface SCPMExamViewProps {
     question: Question;
@@ -23,9 +50,6 @@ interface SCPMExamViewProps {
     onGrade?: (data: { answer: string; result: ScoreResult }, subQIndex: number) => void;
     descriptiveHistory?: Record<string, { answer: string; result: any }>; // Pass history
 }
-// Import logic for chart
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
-import { useRef, useEffect } from 'react';
 
 export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descriptiveHistory }: SCPMExamViewProps) {
     const { context, questions } = question;
@@ -283,20 +307,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                         <div className={styles.radarContainer}>
                             <h3 className={styles.radarTitle}>回答傾向分析 (全設問平均)</h3>
                             <div className={styles.radarChart}>
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={aggregatedData}>
-                                        <PolarGrid stroke="var(--border-color)" />
-                                        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} />
-                                        <PolarRadiusAxis angle={30} domain={[0, 10]} hide />
-                                        <Radar
-                                            name="Average"
-                                            dataKey="A"
-                                            stroke="var(--accent-color)"
-                                            fill="var(--accent-color)"
-                                            fillOpacity={0.5}
-                                        />
-                                    </RadarChart>
-                                </ResponsiveContainer>
+                                <RechartsPMRadar data={aggregatedData} />
                             </div>
                         </div>
                     )}
