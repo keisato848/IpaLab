@@ -3,6 +3,9 @@ import { CosmosClient, Container } from '@azure/cosmos';
 const CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION || "";
 const DATABASE_NAME = "pm-exam-dx-db";
 
+// Get preferred region from environment (e.g., "Japan East")
+const PREFERRED_LOCATIONS = process.env.COSMOS_PREFERRED_LOCATIONS?.split(',') || [];
+
 let client: CosmosClient | undefined;
 
 // For testing purposes
@@ -19,7 +22,20 @@ const getClient = (): CosmosClient => {
         throw new Error("Cosmos DB not initialized (Check COSMOS_DB_CONNECTION)");
     }
     try {
-        client = new CosmosClient(CONNECTION_STRING);
+        client = new CosmosClient({
+            connectionString: CONNECTION_STRING,
+            connectionPolicy: {
+                // Enable connection pooling with keep-alive
+                requestTimeout: 10000,
+                enableEndpointDiscovery: true,
+                preferredLocations: PREFERRED_LOCATIONS.length > 0 ? PREFERRED_LOCATIONS : undefined,
+                retryOptions: {
+                    maxRetryAttemptCount: 3,
+                    fixedRetryIntervalInMilliseconds: 1000,
+                    maxWaitTimeInSeconds: 30
+                }
+            }
+        });
         return client;
     } catch (e) {
         console.error("Failed to create Cosmos Client:", e);
