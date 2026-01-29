@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { getLearningSessions, LearningSessionInfo, LearningRecord, getLearningRecords } from '@/lib/api';
+import { getLearningSessions, LearningSessionInfo, LearningRecord, getLearningRecords, updateSessionProgress } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
 import { getExamLabel } from '@/lib/exam-utils';
 import styles from './HistoryList.module.css';
@@ -95,6 +96,13 @@ export default function HistoryList() {
     const inProgressSessions = sessions.filter(s => s.status === 'in-progress');
     const completedSessions = sessions.filter(s => s.status === 'completed');
 
+    // Handler to refresh sessions after finishing one
+    const handleSessionFinish = (sessionId: string) => {
+        setSessions(prev => prev.map(s => 
+            s.id === sessionId ? { ...s, status: 'completed' as const } : s
+        ));
+    };
+
     return (
         <div className={styles.container}>
             {/* In-progress sessions */}
@@ -105,7 +113,7 @@ export default function HistoryList() {
                 </div>
             )}
             {inProgressSessions.map((s) => (
-                <SessionCard key={s.id} session={s} />
+                <SessionCard key={s.id} session={s} onFinish={handleSessionFinish} />
             ))}
 
             {/* Completed sessions */}
@@ -122,7 +130,8 @@ export default function HistoryList() {
     );
 }
 
-function SessionCard({ session: s }: { session: LearningSessionInfo }) {
+function SessionCard({ session: s, onFinish }: { session: LearningSessionInfo; onFinish?: (id: string) => void }) {
+    const router = useRouter();
     const examLabel = getExamLabel(s.examId);
     const progressPercent = s.totalQuestions && s.totalQuestions > 0
         ? Math.round((s.answeredCount / s.totalQuestions) * 100)
@@ -131,7 +140,7 @@ function SessionCard({ session: s }: { session: LearningSessionInfo }) {
         ? Math.round((s.correctCount / s.answeredCount) * 100)
         : 0;
 
-    // Generate link to continue or review
+    // Generate links
     // examId format: "FE-2024-Spring-AM2" or "SC-2023-Fall-PM"
     const parts = s.examId.split('-');
     const category = parts[0]; // FE, SC, etc.
@@ -139,54 +148,88 @@ function SessionCard({ session: s }: { session: LearningSessionInfo }) {
     const type = parts.slice(3).join('-') || 'AM1'; // AM2, PM, etc.
     
     const continueQNo = s.lastQuestionNo ? s.lastQuestionNo + 1 : 1;
-    const linkHref = s.status === 'in-progress'
-        ? `/exam/${s.examId}/${type}/${continueQNo}?mode=${s.mode}&sessionId=${s.id}`
-        : `/exam/${s.examId}/${type}/result?sessionId=${s.id}`;
+    const safeQNo = continueQNo > (s.totalQuestions || 1) ? 1 : continueQNo;
+    
+    const continueHref = `/exam/${s.examId}/${type}/${safeQNo}?mode=${s.mode}&sessionId=${s.id}`;
+    const resultHref = `/exam/${s.examId}/${type}/result?sessionId=${s.id}`;
+    const examEntranceHref = `/exam/${s.examId}/${type}`;
+
+    const handleFinishSession = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Mark session as completed
+        await updateSessionProgress(s.id, { status: 'completed' });
+        
+        // Navigate to result page
+        router.push(resultHref);
+        
+        // Notify parent to refresh
+        onFinish?.(s.id);
+    };
 
     return (
-        <Link href={linkHref} className={styles.cardLink}>
-            <div className={`${styles.historyCard} ${s.status === 'in-progress' ? styles.inProgress : ''}`}>
-                <div className={styles.cardMain}>
-                    <div className={styles.examTitle}>
-                        {examLabel}
-                    </div>
-                    <div className={styles.sessionInfo}>
-                        <span className={styles.modeTag}>
-                            {s.mode === 'practice' ? '練習' : '模擬'}
-                        </span>
-                        <span className={styles.progressText}>
-                            {s.answeredCount}/{s.totalQuestions || '?'} 問解答済み
-                        </span>
-                        {s.answeredCount > 0 && (
-                            <span className={correctRate >= 60 ? styles.tagCorrect : styles.tagIncorrect}>
-                                正答率 {correctRate}%
-                            </span>
-                        )}
-                    </div>
-                    {/* Progress bar */}
-                    <div className={styles.progressBar}>
-                        <div 
-                            className={styles.progressFill} 
-                            style={{ width: `${progressPercent}%` }}
-                        />
-                    </div>
+        <div className={`${styles.historyCard} ${s.status === 'in-progress' ? styles.inProgress : ''}`}>
+            <div className={styles.cardMain}>
+                <div className={styles.examTitle}>
+                    {examLabel}
                 </div>
-                <div className={styles.cardMeta}>
-                    <div className={styles.date}>
-                        {new Date(s.startedAt).toLocaleDateString('ja-JP', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        })}
-                    </div>
-                    {s.status === 'in-progress' && (
-                        <span className={styles.continueBtn}>続きから →</span>
+                <div className={styles.sessionInfo}>
+                    <span className={styles.modeTag}>
+                        {s.mode === 'practice' ? '練習' : '模擬'}
+                    </span>
+                    <span className={styles.progressText}>
+                        {s.answeredCount}/{s.totalQuestions || '?'} 問解答済み
+                    </span>
+                    {s.answeredCount > 0 && (
+                        <span className={correctRate >= 60 ? styles.tagCorrect : styles.tagIncorrect}>
+                            正答率 {correctRate}%
+                        </span>
+                    )}
+                </div>
+                {/* Progress bar */}
+                <div className={styles.progressBar}>
+                    <div 
+                        className={styles.progressFill} 
+                        style={{ width: `${progressPercent}%` }}
+                    />
+                </div>
+            </div>
+            <div className={styles.cardMeta}>
+                <div className={styles.date}>
+                    {new Date(s.startedAt).toLocaleDateString('ja-JP', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}
+                </div>
+                
+                {/* Action buttons */}
+                <div className={styles.actionButtons}>
+                    {s.status === 'in-progress' ? (
+                        <>
+                            <Link href={continueHref} className={styles.continueBtn}>
+                                続きから →
+                            </Link>
+                            <button onClick={handleFinishSession} className={styles.finishBtn}>
+                                採点して終了
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <Link href={resultHref} className={styles.resultBtn}>
+                                結果を見る
+                            </Link>
+                            <Link href={examEntranceHref} className={styles.listBtn}>
+                                問題一覧
+                            </Link>
+                        </>
                     )}
                 </div>
             </div>
-        </Link>
+        </div>
     );
 }
 

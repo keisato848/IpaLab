@@ -239,9 +239,17 @@
     background: linear-gradient(135deg, #0070f3 0%, #00c6ff 100%);
     color: white;
     box-shadow: 0 4px 15px rgba(0, 112, 243, 0.3);
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
 }
 
-.retryBtn:hover {
+.retryBtn:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 112, 243, 0.4);
+}
+
+.retryBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
