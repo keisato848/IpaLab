@@ -161,7 +161,9 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
         const userId = session?.user?.id || guestManager.getGuestId();
         if (!userId) return; // Should handle auth redirect if needed
 
-        const newSession = await createLearningSession(userId, examId, mode);
+        // Pass total questions count when creating session
+        const totalQuestions = questions.length;
+        const newSession = await createLearningSession(userId, examId, mode, totalQuestions);
         const sessionId = newSession?.id;
 
         const targetUrl = `/exam/${year}/${type}/${startQNo}?mode=${mode}${sessionId ? `&sessionId=${sessionId}` : ''}`;

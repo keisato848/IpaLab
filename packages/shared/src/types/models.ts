@@ -84,6 +84,11 @@ export const LearningSessionSchema = z.object({
     startedAt: z.string().datetime(),
     completedAt: z.string().datetime().optional(),
     status: z.enum(['in-progress', 'completed']),
+    // Progress tracking fields
+    totalQuestions: z.number().int().min(0).optional(),
+    answeredCount: z.number().int().min(0).default(0),
+    correctCount: z.number().int().min(0).default(0),
+    lastQuestionNo: z.number().int().min(0).optional(),
 });
 export type LearningSession = z.infer<typeof LearningSessionSchema>;
 
