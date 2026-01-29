@@ -9,9 +9,34 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import rehypeRaw from 'rehype-raw';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import dynamic from 'next/dynamic';
 import styles from './AIAnswerBox.module.css';
+
+// Dynamic import for Recharts to reduce initial bundle size
+const RechartsScoreRadar = dynamic(
+    () => import('recharts').then(mod => {
+        const { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } = mod;
+        return function ScoreRadarChart({ data }: { data: any[] }) {
+            return (
+                <ResponsiveContainer width="100%" height={200}>
+                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
+                        <PolarGrid />
+                        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
+                        <PolarRadiusAxis angle={30} domain={[0, 10]} hide />
+                        <Radar
+                            name="Score"
+                            dataKey="A"
+                            stroke="#3b82f6"
+                            fill="#3b82f6"
+                            fillOpacity={0.6}
+                        />
+                    </RadarChart>
+                </ResponsiveContainer>
+            );
+        };
+    }),
+    { ssr: false, loading: () => <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading chart...</div> }
+);
 
 // Dynamically import Mermaid to avoid SSR issues
 const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false });
@@ -148,20 +173,7 @@ export default function AIAnswerBox({
                         </div>
                         {!hideChart && (
                             <div className={styles.radarContainer}>
-                                <ResponsiveContainer width="100%" height={200}>
-                                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={result.radarChartData}>
-                                        <PolarGrid />
-                                        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
-                                        <PolarRadiusAxis angle={30} domain={[0, 10]} hide />
-                                        <Radar
-                                            name="Score"
-                                            dataKey="A"
-                                            stroke="#3b82f6"
-                                            fill="#3b82f6"
-                                            fillOpacity={0.6}
-                                        />
-                                    </RadarChart>
-                                </ResponsiveContainer>
+                                <RechartsScoreRadar data={result.radarChartData} />
                             </div>
                         )}
                     </div>
