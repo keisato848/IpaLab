@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const GUEST_ID_KEY = 'ipalab_guest_id';
 const GUEST_HISTORY_KEY = 'ipalab_guest_history';
+const GUEST_WARNING_SHOWN_KEY = 'ipalab_guest_warning_shown';
 
 export const guestManager = {
     getGuestId: (): string => {
@@ -20,6 +21,22 @@ export const guestManager = {
     isGuest: (): boolean => {
         // Needs session context to be accurate, but this handles "no persisted auth" check
         return true; // Simple stub, logic is mostly "if !session"
+    },
+
+    // Guest warning state management
+    hasShownWarning: (): boolean => {
+        if (typeof window === 'undefined') return false;
+        return localStorage.getItem(GUEST_WARNING_SHOWN_KEY) === 'true';
+    },
+
+    markWarningShown: () => {
+        if (typeof window === 'undefined') return;
+        localStorage.setItem(GUEST_WARNING_SHOWN_KEY, 'true');
+    },
+
+    resetWarningFlag: () => {
+        if (typeof window === 'undefined') return;
+        localStorage.removeItem(GUEST_WARNING_SHOWN_KEY);
     },
 
     saveHistory: (history: any) => {
@@ -39,6 +56,7 @@ export const guestManager = {
         if (typeof window === 'undefined') return;
         localStorage.removeItem(GUEST_ID_KEY);
         localStorage.removeItem(GUEST_HISTORY_KEY);
+        localStorage.removeItem(GUEST_WARNING_SHOWN_KEY);
     },
 
     clearHistory: () => {
