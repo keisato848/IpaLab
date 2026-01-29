@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
            - "generatedAt" must be ISO string of now.
         `;
 
-        const MODELS = ["gemini-3-flash-preview", "gemini-2.5-flash"];
+        const MODELS = ["gemini-2.5-flash", "gemini-1.5-flash"];
         let validPlan: any = null;
         let lastError: any = null;
 
@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
             error: 'Failed to generate plan',
             details: error.message || String(error),
-            models_tried: ["gemini-3-flash-preview", "gemini-2.5-flash"] // Debug info
+            models_tried: ["gemini-2.5-flash", "gemini-1.5-flash"] // Debug info
         }, { status: 500 });
     }
 }
