@@ -81,6 +81,8 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const [isBookmarked, setIsBookmarked] = useState(false);
     // [NEW] Session Flag State
     const [isFlagged, setIsFlagged] = useState(false);
+    // Guest Warning State (show only on first answer)
+    const [showGuestWarning, setShowGuestWarning] = useState(false);
 
     // Load history & progress on mount
     useEffect(() => {
@@ -278,6 +280,11 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     statusUpdate: { questionId: qId, isCorrect: (data.result.score || 0) >= 60 }
                 });
             } else {
+                // Guest mode: show warning on first answer only
+                if (!guestManager.hasShownWarning()) {
+                    setShowGuestWarning(true);
+                    guestManager.markWarningShown();
+                }
                 guestManager.saveHistory(record);
             }
 
@@ -338,6 +345,11 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 console.error("Failed to save to API", e);
             }
         } else {
+            // Guest mode: show warning on first answer only
+            if (!guestManager.hasShownWarning()) {
+                setShowGuestWarning(true);
+                guestManager.markWarningShown();
+            }
             guestManager.saveHistory(record);
         }
 
@@ -473,10 +485,11 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     </div>
                 </header>
 
-                {/* Guest Warning */}
-                {!session?.user && (
-                    <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', color: '#92400e', padding: '0.5rem 1rem', fontSize: '0.85rem', textAlign: 'center' }}>
+                {/* Guest Warning - show only on first answer */}
+                {showGuestWarning && !session?.user && (
+                    <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', color: '#92400e', padding: '0.5rem 1rem', fontSize: '0.85rem', textAlign: 'center', position: 'relative' }}>
                         ⚠️ ゲストモード：履歴はブラウザに保存され、キャッシュクリア等で消失します。<Link href="/login" style={{ textDecoration: 'underline', fontWeight: 'bold' }}>ログイン</Link>してデータを守りましょう。
+                        <button onClick={() => setShowGuestWarning(false)} style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: '#92400e' }}>✕</button>
                     </div>
                 )}
 
@@ -660,10 +673,11 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 </div>
             </header>
 
-            {/* Guest Warning */}
-            {!session?.user && (
-                <div style={{ background: '#fffbeb', borderBottom: '1px solid #fcd34d', color: '#92400e', padding: '0.5rem 1rem', fontSize: '0.85rem', textAlign: 'center' }}>
-                    ⚠️ ゲストモード：履歴はブラウザに保存され、キャッシュクリア等で消失します。
+            {/* Guest Warning - show only on first answer */}
+            {showGuestWarning && !session?.user && (
+                <div style={{ background: '#fffbeb', borderBottom: '1px solid #fcd34d', color: '#92400e', padding: '0.5rem 1rem', fontSize: '0.85rem', textAlign: 'center', position: 'relative' }}>
+                    ⚠️ ゲストモード：履歴はブラウザに保存され、キャッシュクリア等で消失します。<Link href="/login" style={{ textDecoration: 'underline', fontWeight: 'bold', marginLeft: '0.5rem' }}>ログイン</Link>してデータを守りましょう。
+                    <button onClick={() => setShowGuestWarning(false)} style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: '#92400e' }}>✕</button>
                 </div>
             )}
 
