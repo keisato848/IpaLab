@@ -8,5 +8,21 @@
       "methods": ["GET", "POST", "PUT", "DELETE"],
       "allowedRoles": ["anonymous", "authenticated"]
     }
-  ]
+  ],
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY"
+  },
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/404.html"
+    }
+  },
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/api/*", "/_next/*", "/images/*", "/*.ico", "/*.png", "/*.svg", "/*.json"]
+  },
+  "mimeTypes": {
+    ".json": "application/json"
+  }
 }

@@ -35,7 +35,20 @@ interface ExamAnswers {
     answers: { qNo: number; correct: string }[];
 }
 
+// In-memory cache for questions (reduces filesystem access on repeated requests)
+const questionCache = new Map<string, { data: Question[]; timestamp: number }>();
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
 export const localQuestionRepository = {
+    // Clear cache for specific exam or all
+    clearCache(examId?: string): void {
+        if (examId) {
+            questionCache.delete(examId);
+        } else {
+            questionCache.clear();
+        }
+    },
+
     async getById(id: string, examId: string): Promise<Question | null> {
         // ID format: AP-2023-Fall-AM-1 -> We need qNo 1
         // Assuming ID ends with qNo, or we rely on list logic.
@@ -47,6 +60,13 @@ export const localQuestionRepository = {
     },
 
     async listByExamId(examId: string): Promise<Question[]> {
+        // Check cache first
+        const now = Date.now();
+        const cached = questionCache.get(examId);
+        if (cached && (now - cached.timestamp) < CACHE_TTL_MS) {
+            return cached.data;
+        }
+
         const questionsDir = path.join(DATA_ROOT, 'questions', examId);
 
         try {
@@ -93,7 +113,12 @@ export const localQuestionRepository = {
             }
         }
 
-        return results.sort((a, b) => (a.qNo || 0) - (b.qNo || 0));
+        const sorted = results.sort((a, b) => (a.qNo || 0) - (b.qNo || 0));
+
+        // Update cache
+        questionCache.set(examId, { data: sorted, timestamp: Date.now() });
+
+        return sorted;
     },
 
     async create(question: Question): Promise<Question> {

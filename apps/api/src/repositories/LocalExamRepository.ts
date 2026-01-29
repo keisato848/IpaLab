@@ -29,8 +29,24 @@ export interface Exam {
     };
 }
 
+// In-memory cache for exam list (reduces filesystem access)
+let examListCache: Exam[] | null = null;
+let cacheTimestamp: number = 0;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 export const localExamRepository = {
+    // Clear cache (useful for testing or manual refresh)
+    clearCache(): void {
+        examListCache = null;
+        cacheTimestamp = 0;
+    },
+
     async list(): Promise<Exam[]> {
+        // Return cached data if valid
+        const now = Date.now();
+        if (examListCache && (now - cacheTimestamp) < CACHE_TTL_MS) {
+            return examListCache;
+        }
         const questionsDir = path.join(DATA_ROOT, 'questions');
         try {
             await fs.access(questionsDir);
@@ -110,6 +126,12 @@ export const localExamRepository = {
             });
         }
 
-        return exams.sort((a, b) => b.id.localeCompare(a.id));
+        const sorted = exams.sort((a, b) => b.id.localeCompare(a.id));
+
+        // Update cache
+        examListCache = sorted;
+        cacheTimestamp = Date.now();
+
+        return sorted;
     }
 };
