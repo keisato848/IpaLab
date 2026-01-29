@@ -63,7 +63,39 @@
     min-width: 60px;
 }
 
+/* Segment Button Group */
+.segmentGroup {
+    display: flex;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background-color: var(--bg-primary);
+}
 
+.segmentButton {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border-right: 1px solid var(--border-color);
+}
+
+.segmentButton:last-child {
+    border-right: none;
+}
+
+.segmentButton:hover:not(.segmentActive) {
+    background-color: var(--bg-secondary);
+}
+
+.segmentActive {
+    background-color: var(--accent-color);
+    color: white;
+    font-weight: 500;
+}
 
 .grid {
     display: grid;
