@@ -145,18 +145,83 @@ export async function getQuestions(examId: string, init?: RequestInit): Promise<
     }
 }
 
+// Session Types
+export interface LearningSessionInfo {
+    id: string;
+    userId: string;
+    examId: string;
+    mode: 'practice' | 'mock';
+    startedAt: string;
+    completedAt?: string;
+    status: 'in-progress' | 'completed';
+    totalQuestions?: number;
+    answeredCount: number;
+    correctCount: number;
+    lastQuestionNo?: number;
+}
+
 // Session API
-export async function createLearningSession(userId: string, examId: string, mode: 'practice' | 'mock'): Promise<{ id: string } | null> {
+export async function createLearningSession(
+    userId: string,
+    examId: string,
+    mode: 'practice' | 'mock',
+    totalQuestions?: number
+): Promise<LearningSessionInfo | null> {
     try {
         const res = await fetch(`${API_BASE}/session/create`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, examId, mode })
+            body: JSON.stringify({ userId, examId, mode, totalQuestions })
         });
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         return await res.json();
     } catch (e) {
         console.error("Failed to create session:", e);
+        return null;
+    }
+}
+
+// Get learning sessions
+export async function getLearningSessions(
+    examId?: string,
+    status?: 'in-progress' | 'completed',
+    limit?: number
+): Promise<LearningSessionInfo[]> {
+    try {
+        const params = new URLSearchParams();
+        if (examId) params.set('examId', examId);
+        if (status) params.set('status', status);
+        if (limit) params.set('limit', limit.toString());
+
+        const res = await fetch(`${API_BASE}/session?${params.toString()}`);
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return await res.json();
+    } catch (e) {
+        console.error("Failed to fetch sessions:", e);
+        return [];
+    }
+}
+
+// Update session progress
+export async function updateSessionProgress(
+    sessionId: string,
+    update: {
+        answeredCount?: number;
+        correctCount?: number;
+        lastQuestionNo?: number;
+        status?: 'in-progress' | 'completed';
+    }
+): Promise<LearningSessionInfo | null> {
+    try {
+        const res = await fetch(`${API_BASE}/session`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId, ...update })
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return await res.json();
+    } catch (e) {
+        console.error("Failed to update session:", e);
         return null;
     }
 }
