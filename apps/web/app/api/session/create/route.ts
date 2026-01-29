@@ -12,6 +12,7 @@ const CreateSessionRequest = z.object({
     userId: z.string(),
     examId: z.string(),
     mode: z.enum(['practice', 'mock']),
+    totalQuestions: z.number().int().min(0).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const { userId, examId, mode } = parseResult.data;
+        const { userId, examId, mode, totalQuestions } = parseResult.data;
 
         const newSession = {
             id: crypto.randomUUID(),
@@ -34,7 +35,10 @@ export async function POST(req: NextRequest) {
             examId,
             mode,
             startedAt: new Date().toISOString(),
-            status: 'in-progress'
+            status: 'in-progress',
+            totalQuestions: totalQuestions || 0,
+            answeredCount: 0,
+            correctCount: 0,
         };
 
         // Validate against full model just in case

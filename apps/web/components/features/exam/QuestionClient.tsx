@@ -18,7 +18,7 @@ import { guestManager } from '@/lib/guest-manager';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { getExamLabel } from '@/lib/exam-utils';
 import styles from './QuestionClient.module.css';
-import { Question, saveLearningRecord, LearningRecord, getLearningRecords, saveExamProgress, getExamProgress } from '@/lib/api';
+import { Question, saveLearningRecord, LearningRecord, getLearningRecords, saveExamProgress, getExamProgress, updateSessionProgress } from '@/lib/api';
 import { FaRegBookmark, FaBookmark } from 'react-icons/fa';
 
 // Helper: Check if answer is correct (supports ALL_CORRECT for questions with no valid answer)
@@ -274,11 +274,30 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
         try {
             if (session?.user?.id) {
-                await saveLearningRecord(record);
-                // [NEW] Sync Progress Snapshot immediately
-                await saveExamProgress(session.user.id, question.examId, {
-                    statusUpdate: { questionId: qId, isCorrect: (data.result.score || 0) >= 60 }
-                });
+                const isCorrect = (data.result.score || 0) >= 60;
+                
+                // Save record and progress
+                const savePromises: Promise<any>[] = [
+                    saveLearningRecord(record),
+                    saveExamProgress(session.user.id, question.examId, {
+                        statusUpdate: { questionId: qId, isCorrect }
+                    })
+                ];
+
+                // Update session progress if sessionId exists
+                if (sessionId) {
+                    const newTotal = sessionStats.total + 1;
+                    const newCorrect = sessionStats.correct + (isCorrect ? 1 : 0);
+                    savePromises.push(
+                        updateSessionProgress(sessionId, {
+                            answeredCount: newTotal,
+                            correctCount: newCorrect,
+                            lastQuestionNo: parseInt(qNo),
+                        })
+                    );
+                }
+
+                await Promise.all(savePromises);
             } else {
                 // Guest mode: show warning on first answer only
                 if (!guestManager.hasShownWarning()) {
@@ -334,13 +353,28 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
         if (session && session.user?.id) {
             try {
-                // Parallel Save: Log & Snapshot
-                await Promise.all([
+                // Parallel Save: Log & Snapshot & Session Progress
+                const savePromises: Promise<any>[] = [
                     saveLearningRecord(record),
                     saveExamProgress(session.user.id, question.examId, {
                         statusUpdate: { questionId: question.id, isCorrect }
                     })
-                ]);
+                ];
+
+                // Update session progress if sessionId exists
+                if (sessionId) {
+                    const newTotal = sessionStats.total + 1;
+                    const newCorrect = sessionStats.correct + (isCorrect ? 1 : 0);
+                    savePromises.push(
+                        updateSessionProgress(sessionId, {
+                            answeredCount: newTotal,
+                            correctCount: newCorrect,
+                            lastQuestionNo: parseInt(qNo),
+                        })
+                    );
+                }
+
+                await Promise.all(savePromises);
             } catch (e) {
                 console.error("Failed to save to API", e);
             }
