@@ -1,9 +1,35 @@
 
 'use client';
 
-import { useMemo } from 'react';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
+import { useMemo, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import styles from './ExamSummary.module.css';
+
+// Dynamic import for Recharts to reduce initial bundle size (~140KB)
+const RechartsRadar = dynamic(
+    () => import('recharts').then(mod => {
+        const { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } = mod;
+        return function RechartsRadarChart({ data }: { data: any[] }) {
+            return (
+                <ResponsiveContainer width="100%" height={200}>
+                    <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
+                        <PolarGrid />
+                        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: '#64748b' }} />
+                        <PolarRadiusAxis angle={30} domain={[0, 10]} hide />
+                        <Radar
+                            name="Average"
+                            dataKey="A"
+                            stroke="#8b5cf6"
+                            fill="#8b5cf6"
+                            fillOpacity={0.5}
+                        />
+                    </RadarChart>
+                </ResponsiveContainer>
+            );
+        };
+    }),
+    { ssr: false, loading: () => <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading chart...</div> }
+);
 import { Question, LearningRecord } from '@/lib/api';
 import { calculateExamResult, calculateAggregatedRadar } from '@/lib/scoring';
 
@@ -59,20 +85,7 @@ export default function ExamSummary({ records, questions, title }: ExamSummaryPr
                 <div className={styles.chartSection}>
                     <h4 className={styles.chartTitle}>傾向分析 (平均)</h4>
                     <div className={styles.chartContainer}>
-                        <ResponsiveContainer width="100%" height={200}>
-                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                                <PolarGrid />
-                                <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: '#64748b' }} />
-                                <PolarRadiusAxis angle={30} domain={[0, 10]} hide />
-                                <Radar
-                                    name="Average"
-                                    dataKey="A"
-                                    stroke="#8b5cf6"
-                                    fill="#8b5cf6"
-                                    fillOpacity={0.5}
-                                />
-                            </RadarChart>
-                        </ResponsiveContainer>
+                        <RechartsRadar data={radarData} />
                     </div>
                 </div>
             )}
