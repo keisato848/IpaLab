@@ -140,19 +140,33 @@ function SessionCard({ session: s, onFinish }: { session: LearningSessionInfo; o
         ? Math.round((s.correctCount / s.answeredCount) * 100)
         : 0;
 
-    // Generate links
-    // examId format: "FE-2024-Spring-AM2" or "SC-2023-Fall-PM"
-    const parts = s.examId.split('-');
-    const category = parts[0]; // FE, SC, etc.
-    const yearSeason = parts.slice(1, 3).join('-'); // 2024-Spring
-    const type = parts.slice(3).join('-') || 'AM1'; // AM2, PM, etc.
+    // Parse examId to extract year and type for URL construction
+    // examId format: "FE-2024-Spring-AM2" → year="FE-2024-Spring", type="AM2"
+    // Or: "SC-2023-Fall-PM" → year="SC-2023-Fall", type="PM"
+    const parseExamId = (examId: string) => {
+        const parts = examId.split('-');
+        // Find where type starts (AM, AM1, AM2, PM, PM1, PM2)
+        const typePatterns = ['AM1', 'AM2', 'AM', 'PM1', 'PM2', 'PM'];
+        let typeIndex = parts.length;
+        for (let i = parts.length - 1; i >= 0; i--) {
+            if (typePatterns.includes(parts[i])) {
+                typeIndex = i;
+                break;
+            }
+        }
+        const year = parts.slice(0, typeIndex).join('-');
+        const type = parts.slice(typeIndex).join('-') || 'AM';
+        return { year, type };
+    };
+
+    const { year, type } = parseExamId(s.examId);
     
     const continueQNo = s.lastQuestionNo ? s.lastQuestionNo + 1 : 1;
     const safeQNo = continueQNo > (s.totalQuestions || 1) ? 1 : continueQNo;
     
-    const continueHref = `/exam/${s.examId}/${type}/${safeQNo}?mode=${s.mode}&sessionId=${s.id}`;
-    const resultHref = `/exam/${s.examId}/${type}/result?sessionId=${s.id}`;
-    const examEntranceHref = `/exam/${s.examId}/${type}`;
+    const continueHref = `/exam/${year}/${type}/${safeQNo}?mode=${s.mode}&sessionId=${s.id}`;
+    const resultHref = `/exam/${year}/${type}/result?sessionId=${s.id}`;
+    const examEntranceHref = `/exam/${year}/${type}`;
 
     const handleFinishSession = async (e: React.MouseEvent) => {
         e.preventDefault();
