@@ -2,7 +2,7 @@
     "name": "api-ai",
     "version": "1.0.0",
     "description": "Azure Functions API for AI (US Region)",
-    "main": "dist/src/index.js",
+    "main": "dist/src/functions/aiPlan.js",
     "scripts": {
         "build": "tsup",
         "watch": "tsup --watch",
@@ -14,10 +14,10 @@
         "lint": "eslint ."
     },
     "dependencies": {
-        "@azure/cosmos": "^4.9.0",
-        "@azure/functions": "^4.0.0",
+        "@azure/cosmos": "^4.9.1",
+        "@azure/functions": "^4.11.0",
         "@google/generative-ai": "^0.21.0",
-        "uuid": "^9.0.0"
+        "uuid": "^9.0.1"
     },
     "devDependencies": {
         "@types/node": "^20.0.0",

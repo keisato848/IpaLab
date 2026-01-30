@@ -231,8 +231,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.5rem;
-    max-height: 400px;
-    overflow-y: auto;
+    /* Removed max-height and overflow-y to prevent nested scrollbars */
     padding-right: 0.5rem;
 }
 
