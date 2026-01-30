@@ -5,6 +5,7 @@ const nextConfig = {
     // output: 'standalone',
     reactStrictMode: true,
     experimental: {
+        instrumentationHook: true,
         serverComponentsExternalPackages: [
             'applicationinsights',
             '@azure/cosmos',
