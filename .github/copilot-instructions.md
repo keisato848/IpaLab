@@ -78,7 +78,44 @@ packages/
 └── ui/           # 共有UIコンポーネント
 ```
 
+## AI API アーキテクチャ
+
+### プロキシ構成
+
+```
+[ユーザー] → [shikaku-no.com (East Asia)]
+                    ↓
+           [Next.js API Route: /api/ai/plan]
+                    ↓ (プロキシ)
+           [func-pm-exam-dx-ai-us.azurewebsites.net (US East 2)]
+                    ↓
+           [Gemini API]
+```
+
+### 使用モデル
+
+| 優先度 | モデル名 | 用途 |
+|--------|----------|------|
+| Primary | `gemini-3-flash-preview` | メイン |
+| Fallback | `gemini-2.5-flash` | フォールバック |
+
+### 環境変数 (api-ai)
+
+| 変数名 | 説明 |
+|--------|------|
+| `GEMINI_API_KEY` | Google AI Studio APIキー |
+| `COSMOS_DB_CONNECTION` | CosmosDB接続文字列（メトリクス保存用） |
+
+## 本番環境
+
+| リソース | URL / 名前 | リージョン |
+|----------|------------|------------|
+| フロントエンド | https://shikaku-no.com | East Asia |
+| AI Function App | func-pm-exam-dx-ai-us | US East 2 |
+| CosmosDB | pm-exam-dx-db | East Asia |
+
 ## 注意事項
 
-- Gemini API は US リージョンからのみ呼び出し可能（East Asia からは利用不可）
-- フロントエンド (East Asia) から AI 機能を使う場合は `/api/ai/plan` を経由して US の Function App にプロキシ
+- **Gemini API の地域制限**: US リージョンからのみ呼び出し可能（East Asia からは `User location is not supported` エラー）
+- フロントエンドから AI 機能を使う場合は必ず `/api/ai/plan` を経由（直接 Gemini API を呼ばない）
+- api-ai のデプロイ後は Function App の再起動が必要な場合あり
