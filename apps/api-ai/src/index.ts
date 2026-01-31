@@ -1,2 +1,2 @@
-// Entry point - exports all functions
-export * from './functions/aiPlan';
+// Entry point - imports all functions to register them
+import './functions/aiPlan';
