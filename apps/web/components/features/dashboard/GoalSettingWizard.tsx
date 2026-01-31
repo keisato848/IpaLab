@@ -77,41 +77,79 @@ export default function GoalSettingWizard({ onClose, onSave, initialExamId }: Go
         { id: 'familiarity', label: 'IPA試験形式への慣れ' },
     ];
 
+    const [pollingStatus, setPollingStatus] = useState<string>('');
+    const [retryCount, setRetryCount] = useState(0);
+
     const handleGenerate = async () => {
         if (!examDate) {
             alert("受験日を入力してください。");
             return;
         }
         setLoading(true);
-        try {
-            const res = await fetch('/api/ai/plan', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId: "guest",
-                    targetExam,
-                    studyTimeWeekday: hoursWeekday,
-                    studyTimeWeekend: hoursWeekend,
-                    examDate: examDate,
-                    scores
-                })
-            });
+        setPollingStatus('AI計画を生成中...');
+        setRetryCount(0);
 
-            if (!res.ok) throw new Error("Failed");
+        const maxRetries = 3;
+        let lastError: Error | null = null;
 
-            const rawPlan = await res.json();
-            const plan: StudyPlan = {
-                ...rawPlan,
-                id: crypto.randomUUID(),
-                targetExam: targetExam
-            };
-            onSave(plan);
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+            try {
+                if (attempt > 0) {
+                    setRetryCount(attempt);
+                    setPollingStatus(`再試行中... (${attempt}/${maxRetries})`);
+                    // 指数バックオフ: 2秒、4秒、8秒
+                    await new Promise(resolve => setTimeout(resolve, 2000 * Math.pow(2, attempt - 1)));
+                }
 
-        } catch (e) {
-            console.error(e);
-            alert("計画の生成に失敗しました。もう一度お試しください。");
-            setLoading(false);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 90000); // 90秒タイムアウト
+
+                const res = await fetch('/api/ai/plan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: "guest",
+                        targetExam,
+                        studyTimeWeekday: hoursWeekday,
+                        studyTimeWeekend: hoursWeekend,
+                        examDate: examDate,
+                        scores
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP ${res.status}`);
+                }
+
+                const rawPlan = await res.json();
+                const plan: StudyPlan = {
+                    ...rawPlan,
+                    id: crypto.randomUUID(),
+                    targetExam: targetExam
+                };
+                onSave(plan);
+                return; // 成功したらここで終了
+
+            } catch (e: any) {
+                lastError = e;
+                console.error(`Attempt ${attempt + 1} failed:`, e);
+                
+                // AbortErrorはタイムアウト
+                if (e.name === 'AbortError') {
+                    setPollingStatus('タイムアウト - 再試行します...');
+                }
+            }
         }
+
+        // 全てのリトライが失敗
+        alert(`計画の生成に失敗しました: ${lastError?.message || 'もう一度お試しください。'}\n\nサーバーが混雑している可能性があります。しばらく待ってから再度お試しください。`);
+        setLoading(false);
+        setPollingStatus('');
+        setRetryCount(0);
     };
 
     const handleScoreChange = (id: string, val: number) => {
@@ -343,12 +381,16 @@ export default function GoalSettingWizard({ onClose, onSave, initialExamId }: Go
                 <div className={styles.shimmer} />
             </div>
             <div className={styles.loadingInfo}>
-                <span>Generating...</span>
-                <span>目安: 約{Math.ceil(estimatedMs / 1000)}秒</span>
+                <span>{pollingStatus || 'AI計画を生成中...'}</span>
+                {retryCount > 0 && <span>再試行 {retryCount}/3</span>}
             </div>
             <h3 className={styles.loadingTitle}>AIが計画を最適化中...</h3>
             <p className={styles.loadingDescription}>
                 過去の実績データに基づき、合格までの最短ルートを設計中です。
+                {retryCount > 0 && <><br />接続に問題がありましたが、自動的にリトライしています。</>}
+            </p>
+            <p className={styles.loadingHint}>
+                💡 処理には30秒〜1分程度かかる場合があります
             </p>
         </div>
     );
