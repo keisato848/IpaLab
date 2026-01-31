@@ -331,3 +331,288 @@
     background: var(--primary-color);
     transform: scale(1.2);
 }
+
+/* Step Wizard Styles */
+.stepIndicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.stepDot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.stepDot::after {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2rem;
+    height: 2px;
+    background: var(--border-color);
+}
+
+.stepDot:last-child::after {
+    display: none;
+}
+
+.stepDotActive {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px var(--primary-color-alpha);
+}
+
+.stepDotCompleted {
+    background: var(--success-color, #10b981);
+    border-color: var(--success-color, #10b981);
+    color: white;
+}
+
+.stepDotCompleted::after {
+    background: var(--success-color, #10b981);
+}
+
+.stepContent {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.stepTitle {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.stepDescription {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.stepActions {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.hint {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    margin-top: 0.5rem;
+}
+
+.timeGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.timeItem {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.timeLabel {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.timeValue {
+    font-weight: bold;
+    color: var(--primary-color);
+    text-align: right;
+    margin-top: 0.5rem;
+}
+
+.weeklyTotal {
+    text-align: right;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+.feasibilityBox {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.feasibilityHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.progressBar {
+    position: relative;
+    height: 18px;
+    background: var(--border-color);
+    border-radius: 9px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progressFill {
+    height: 100%;
+    border-radius: 9px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progressGoal {
+    position: absolute;
+    top: 0;
+    right: 10px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+}
+
+.feasibilityMessage {
+    font-size: 0.85rem;
+}
+
+/* Assessment List for Step 3 */
+.assessmentList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.assessmentRow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: var(--bg-secondary);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.assessmentRow .rangeContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Loading State */
+.loadingContainer {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.loadingProgress {
+    width: 100%;
+    height: 24px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.loadingBar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), #3b82f6);
+    border-radius: 12px;
+    animation: loadingProgress linear forwards;
+}
+
+@keyframes loadingProgress {
+    from {
+        width: 0%;
+    }
+    to {
+        width: 95%;
+    }
+}
+
+.shimmer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.loadingInfo {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.loadingTitle {
+    margin-bottom: 0.5rem;
+}
+
+.loadingDescription {
+    color: var(--text-secondary);
+}
+
+.btnGenerate {
+    flex: 1;
+    max-width: 200px;
+}

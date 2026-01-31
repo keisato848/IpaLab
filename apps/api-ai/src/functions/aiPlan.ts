@@ -112,8 +112,8 @@ export async function aiPlan(request: HttpRequest, context: InvocationContext): 
            - "generatedAt" must be ISO string of now.
         `;
 
-        // Use stable models - gemini-1.5-flash is most stable
-        const MODELS = ["gemini-1.5-flash", "gemini-2.0-flash"];
+        // Use latest models with fallback
+        const MODELS = ["gemini-3-flash-preview", "gemini-2.5-flash"];
         let validPlan: any = null;
         let lastError: any = null;
 
