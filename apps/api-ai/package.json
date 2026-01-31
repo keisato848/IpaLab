@@ -1,0 +1,29 @@
+{
+    "name": "api-ai",
+    "version": "1.0.0",
+    "description": "Azure Functions API for AI (US Region)",
+    "main": "dist/src/functions/aiPlan.js",
+    "scripts": {
+        "build": "tsup",
+        "watch": "tsup --watch",
+        "clean": "rimraf dist",
+        "prestart": "npm run clean && npm run build",
+        "start": "func start --port 7075",
+        "dev": "npm start",
+        "test": "echo \"No tests yet...\"",
+        "lint": "eslint ."
+    },
+    "dependencies": {
+        "@azure/cosmos": "^4.9.1",
+        "@azure/functions": "^4.11.0",
+        "@google/generative-ai": "^0.21.0",
+        "uuid": "^9.0.1"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "@types/uuid": "^9.0.0",
+        "rimraf": "^5.0.0",
+        "tsup": "^8.5.1",
+        "typescript": "^5.0.0"
+    }
+}
