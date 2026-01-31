@@ -112,7 +112,8 @@ export async function aiPlan(request: HttpRequest, context: InvocationContext): 
            - "generatedAt" must be ISO string of now.
         `;
 
-        const MODELS = ["gemini-3-flash-preview", "gemini-2.5-flash"];
+        // Use stable models - gemini-1.5-flash is most stable
+        const MODELS = ["gemini-1.5-flash", "gemini-2.0-flash"];
         let validPlan: any = null;
         let lastError: any = null;
 
@@ -183,7 +184,7 @@ export async function aiPlan(request: HttpRequest, context: InvocationContext): 
             jsonBody: {
                 error: 'Failed to generate plan',
                 details: error.message || String(error),
-                models_tried: ["gemini-3-flash-preview", "gemini-2.5-flash"]
+                models_tried: ["gemini-1.5-flash", "gemini-2.0-flash"]
             }
         };
     }
