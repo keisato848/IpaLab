@@ -1,6 +1,17 @@
 {
     "routes": [
         {
+            "route": "/api/ai/*",
+            "methods": [
+                "GET",
+                "POST"
+            ],
+            "allowedRoles": [
+                "anonymous",
+                "authenticated"
+            ]
+        },
+        {
             "route": "/api/*",
             "methods": [
                 "GET",
