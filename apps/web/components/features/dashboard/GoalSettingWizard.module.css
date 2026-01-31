@@ -98,7 +98,7 @@
 .select,
 .input,
 .textarea {
-    background: var(--bg-input);
+    background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     padding: 0.8rem;
     border-radius: 8px;
@@ -107,6 +107,31 @@
     width: 100%;
     outline: none;
     transition: all 0.2s;
+}
+
+/* プルダウンのオプションのダークテーマ対応 */
+.select option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* カレンダー（日付入力）のダークテーマ対応 */
+.input[type="date"] {
+    color-scheme: light;
+}
+
+:global([data-theme='dark']) .input[type="date"] {
+    color-scheme: dark;
+}
+
+/* カレンダーアイコンの色調整 */
+.input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0);
+    cursor: pointer;
+}
+
+:global([data-theme='dark']) .input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
 }
 
 .select:focus,
