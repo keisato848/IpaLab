@@ -2,7 +2,7 @@
     "name": "api-ai",
     "version": "1.0.0",
     "description": "Azure Functions API for AI (US Region)",
-    "main": "src/functions/aiPlan.js",
+    "main": "dist/index.js",
     "scripts": {
         "build": "tsup",
         "watch": "tsup --watch",

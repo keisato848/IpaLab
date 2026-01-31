@@ -97,6 +97,8 @@ async function main() {
         await database.containers.createIfNotExists({ id: EXAM_CONTAINER_NAME, partitionKey: '/id' });
         // New Container for Predictive Metrics
         await database.containers.createIfNotExists({ id: "Metrics", partitionKey: '/type' });
+        // Container for AI Plan Generation Jobs (async processing)
+        await database.containers.createIfNotExists({ id: "PlanJobs", partitionKey: '/id' });
 
         console.log("Database and Container ensured.");
 
