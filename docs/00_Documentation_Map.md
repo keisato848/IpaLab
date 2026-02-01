@@ -8,15 +8,20 @@
 ```text
 docs/
 ├── 00_Documentation_Map.md      # 本ドキュメント。ドキュメント体系の定義。
+├── ai-planner-design.md         # AI学習プランナー機能の設計（USリージョンプロキシ構成含む）
 ├── 01_planning/                 # [Planning Level] 要件定義・基本設計・全体計画
 │   ├── 要件定義書.md            # プロジェクトの目的、機能要件、非機能要件
 │   ├── 基本設計書.md            # アーキテクチャ全体像、技術選定、開発規約概要
 │   ├── 環境設計書.md            # インフラ構成、ネットワーク、CI/CD、セキュリティ
 │   ├── DirectoryPlan.md         # ディレクトリ構造の方針
-│   └── WBS.md                   # スケジュールとタスク分解
+│   ├── WBS.md                   # スケジュールとタスク分解
+│   └── azure_config/            # Azure リソース設定詳細
+│       ├── 03_AzureFunctions.md # Managed Functions & 独立Function App (api-ai)
+│       └── ...
 ├── 02_design/                   # [Implementation Level] 詳細設計
 │   ├── 01_ConfigurationDesign.md # (New) プロジェクト設定、ツーリング、Monorepo構成詳細
 │   ├── 02_AppStructureDesign.md  # (New) 各アプリケーション(Web/API)の内部構造、モジュール設計
+│   ├── 06_DeploymentDesign.md    # デプロイメント設計（SWA & api-ai）
 │   └── (必要に応じて追加)
 └── agent_logs/                  # AIエージェントとの対話ログ
 ```

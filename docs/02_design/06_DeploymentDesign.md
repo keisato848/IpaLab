@@ -162,10 +162,56 @@ Azure Portal > Static Web Apps > `swa-pm-exam-dx-prod` > 設定 > 環境変数
 
 | 日付 | 変更内容 | 担当 |
 |------|---------|------|
+| 2026/02/01 | api-ai (US Function App) のデプロイ手順を追加 | - |
 | 2026/01/27 | 初版作成。warm-up timeout 問題の調査結果と解決策を文書化 | - |
 | 2025/12/29 | standalone モード削除による修正（コミット 1323190） | - |
 
-## 8. 参考資料
+## 8. api-ai (US Function App) のデプロイ
+
+### 8.1 概要
+Gemini API の地域制限を回避するため、US East 2 リージョンに独立した Azure Function App (`func-pm-exam-dx-ai-us`) を配置している。
+
+### 8.2 デプロイ手順
+
+**重要**: Linux Consumption Plan では `--build remote` オプションが必須。
+
+```bash
+# 1. api-ai ディレクトリに移動
+cd apps/api-ai
+
+# 2. ローカルビルド
+npm run build
+
+# 3. リモートビルドでデプロイ
+func azure functionapp publish func-pm-exam-dx-ai-us --build remote
+```
+
+### 8.3 デプロイ成功の確認
+
+```
+Functions in func-pm-exam-dx-ai-us:
+    aiPlan - [httpTrigger]
+        Invoke url: https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/plan
+```
+
+### 8.4 トラブルシューティング
+
+| 問題 | 原因 | 解決策 |
+|------|------|--------|
+| 0 functions found | `--build remote` 未使用 | `--build remote` オプションを追加 |
+| Gemini 404エラー | 無効なモデル名 | ListModels API で確認 |
+| User location not supported | 間違ったリージョン | Function App が US リージョンにあることを確認 |
+
+### 8.5 環境変数
+
+Azure Portal > Function Apps > `func-pm-exam-dx-ai-us` > 設定 > 環境変数
+
+| 変数名 | 用途 | 必須 |
+|--------|------|------|
+| `GEMINI_API_KEY` | Google AI Studio APIキー | ✅ |
+| `COSMOS_DB_CONNECTION` | CosmosDB接続文字列（メトリクス用） | ✅ |
+
+## 9. 参考資料
 
 - [Azure Static Web Apps - Deploy hybrid Next.js](https://learn.microsoft.com/en-us/azure/static-web-apps/deploy-nextjs-hybrid)
 - [Next.js - Output File Tracing (standalone)](https://nextjs.org/docs/advanced-features/output-file-tracing)
