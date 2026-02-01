@@ -1,8 +1,13 @@
-# AI学習プランナー機能 基本設計書 (Rev.3)
+# AI学習プランナー機能 基本設計書 (Rev.4)
 
 ## 1. 概要
 ユーザーの目標（試験区分・受験日）、学習可能時間、自己評価に基づき、生成AI（Gemini 2.5 Flash）を用いて**受験日までの学習計画を即座に策定**する機能である。
 サーバーレス環境（Azure Static Web Apps / Functions）への適合性を最優先し、ステートレスな**同期APIアーキテクチャ**を採用する。
+
+**Rev.4の主要変更点:**
+- AIプロンプトを完全日本語化し、出力の言語を厳格に制御
+- ゲーミフィケーション要素（XP、難易度、ミッション名）を追加
+- 「今日のミッション」「今週のテーマ」をゲーム感覚で消化できるUI設計
 
 ## 2. システムアーキテクチャ
 
@@ -77,33 +82,57 @@ interface PlanRequest {
 
 ```typescript
 interface StudyPlan {
-    title: string;          // 計画タイトル
+    title: string;          // 計画タイトル（日本語）
     generatedAt: string;    // 生成日時 (ISO)
     examDate: string;       // 受験日
-    monthlyGoal: string;    // 全体目標
+    monthlyGoal: string;    // 今月の目標（日本語）
     weeklySchedule: {
         weekNumber: number;
         startDate: string;
         endDate: string;
-        goal: string;
+        theme?: string;     // 週のテーマ（例: ネットワーク基礎）
+        goal: string;       // 週目標（日本語）
         dailyTasks: {
             date: string;
-            goal: string;
+            missionTitle?: string;   // ミッション名（ゲーム風、日本語）
+            goal: string;            // 詳細目標（日本語）
             questionCount: number;
-            targetCategory: string; // "セキュリティ", "アルゴリズム" 等
-            targetExamId?: string;  // "AP-2023-Spring" 等
+            targetCategory: string;  // "セキュリティ", "アルゴリズム" 等（日本語）
+            targetExamId?: string;   // "AP-2023-Spring" 等
+            difficulty?: 'easy' | 'normal' | 'hard';  // 難易度
+            xpReward?: number;       // 獲得XP（10-100）
+            isCompleted?: boolean;   // 完了フラグ（クライアント側で管理）
         }[];
     }[];
+    totalXpEarned?: number;  // 累計獲得XP（クライアント側で計算）
 }
 ```
+
+### 3.3 ゲーミフィケーション要素
+
+| 要素 | 説明 |
+|------|------|
+| `missionTitle` | ゲーム風のミッション名（例: 「セキュリティの門番」「DB探検隊」） |
+| `difficulty` | easy/normal/hard の3段階。難易度によりXP報酬が変動 |
+| `xpReward` | ミッション完了時の獲得XP。easy: 10-30, normal: 30-50, hard: 50-100 |
+| `isCompleted` | ユーザーがミッションを完了したかどうか（クライアント側で管理） |
 
 ## 4. 機能仕様
 
 ### 4.1 プロンプト設計
-*   **Role**: プロの資格試験コーチ。
-*   **Input**: ユーザーの強み・弱み（スコア）、可処分時間。
-*   **Output**: JSON形式。1日ごとの具体的なアクション（何問解くか）を含める。
-*   **制約**: `gemini-2.5-flash` のコンテキストウィンドウ内で完結させる。
+*   **Role**: 日本の情報処理技術者試験専門の学習コーチ
+*   **Language**: **すべての出力を日本語で厳格に指定**（英語禁止）
+*   **Input**: ユーザーの強み・弱み（スコア）、可処分時間
+*   **Output**: JSON形式。1日ごとの具体的なアクション（何問解くか）を含める
+*   **ゲーミフィケーション**: ミッション名、難易度、XP報酬を含める
+*   **制約**: `gemini-2.5-flash` のコンテキストウィンドウ内で完結させる
+
+### 4.1.1 プロンプトの日本語強制ルール
+```
+【重要】すべての出力は必ず日本語で記述してください。英語は一切使用しないでください。
+```
+- title, monthlyGoal, weeklySchedule.theme, dailyTasks.missionTitle, dailyTasks.goal, dailyTasks.targetCategory はすべて日本語
+- targetExamId（"AP-2023-Fall"等）のみ英数字を許可
 
 ### 4.2 エラーハンドリング
 *   **Timeouts**: 生成が長引いた場合、クライアントは再試行を促すメッセージを表示。
@@ -132,6 +161,7 @@ mainブランチへのプッシュで Azure Static Web Apps に自動デプロ�
 
 | 日付       | バージョン | 変更内容                                               |
 | ---------- | ---------- | ------------------------------------------------------ |
+| 2026/02/01 | Rev.4      | プロンプト完全日本語化、ゲーミフィケーション要素追加（XP、難易度、ミッション名） |
 | 2026/02/01 | Rev.3      | USリージョンプロキシ構成を追加、モデル名をgemini-2.5-flashに更新 |
 | -          | Rev.2      | 同期APIアーキテクチャに変更                            |
 | -          | Rev.1      | 初版作成                                               |
