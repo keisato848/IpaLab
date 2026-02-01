@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { LearningRecord, getLearningRecords, getQuestions } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
 import { getExamLabel } from '@/lib/exam-utils';
 import ThemeToggle from '@/components/common/ThemeToggle';
+import { useUserProgress } from '@/hooks/useUserProgress';
 import HeatmapWidget from './HeatmapWidget';
 import GoalSettingWizard, { StudyPlan } from './GoalSettingWizard';
 import styles from './DashboardClient.module.css';
@@ -20,6 +21,18 @@ export default function DashboardClient() {
     const [studyPlan, setStudyPlan] = useState<StudyPlan | null>(null);
     const [allPlans, setAllPlans] = useState<StudyPlan[]>([]);
     const [showWizard, setShowWizard] = useState(false);
+    const {
+        progress,
+        achievements,
+        levelInfo,
+        achievementTotal,
+        completeMission,
+        updateAchievementProgress,
+        lastMissionReward,
+        lastLevelUp,
+        clearMissionReward,
+        clearLevelUp
+    } = useUserProgress();
 
     const userName = session?.user?.name || "ゲスト";
 
@@ -188,6 +201,28 @@ export default function DashboardClient() {
         return true;
     });
 
+    const totalAnswered = records.length;
+    const categoryAccuracy = useMemo(() => {
+        const categoryStats = new Map<string, { total: number; correct: number }>();
+        records.forEach(record => {
+            const category = record.category || 'unknown';
+            const entry = categoryStats.get(category) || { total: 0, correct: 0 };
+            entry.total += 1;
+            if (record.isCorrect) entry.correct += 1;
+            categoryStats.set(category, entry);
+        });
+
+        const accuracyMap: Record<string, number> = {};
+        categoryStats.forEach((value, key) => {
+            accuracyMap[key] = value.total > 0 ? value.correct / value.total : 0;
+        });
+        return accuracyMap;
+    }, [records]);
+
+    useEffect(() => {
+        updateAchievementProgress({ totalAnswered, categoryAccuracy });
+    }, [categoryAccuracy, totalAnswered, updateAchievementProgress]);
+
     // -- Goal Logic (ゲーミフィケーション対応) --
     let todayTargetCount = 10;
     let todayMissionTitle = "学習を進めましょう";
@@ -196,6 +231,9 @@ export default function DashboardClient() {
     let todayDifficulty: 'easy' | 'normal' | 'hard' = 'normal';
     let todayXpReward = 30;
     let todayTaskCompleted = false;
+    const todayGoalData = !isAllPlans
+        ? studyPlan?.weeklySchedule?.flatMap(w => w.dailyTasks)?.find(t => t.date === todayStr)
+        : undefined;
 
     if (isAllPlans) {
         // Aggregate targets from all plans
@@ -215,10 +253,6 @@ export default function DashboardClient() {
         todayXpReward = totalXp || 50;
     } else {
         // Single Plan
-        const todayGoalData = studyPlan?.weeklySchedule
-            ?.flatMap(w => w.dailyTasks)
-            ?.find(t => t.date === todayStr);
-
         if (todayGoalData) {
             todayTargetCount = todayGoalData.questionCount;
             todayMissionTitle = todayGoalData.missionTitle || todayGoalData.goal || "今日のミッション";
@@ -246,6 +280,66 @@ export default function DashboardClient() {
     
     // ミッションクリア判定
     const isMissionComplete = todayCount >= todayTargetCount;
+
+    useEffect(() => {
+        if (!studyPlan || isAllPlans || !todayGoalData) return;
+        if (!isMissionComplete || todayTaskCompleted) return;
+
+        const result = completeMission({
+            date: todayStr,
+            planId: studyPlan.id,
+            missionTitle: todayMissionTitle,
+            baseXp: todayXpReward,
+            metrics: {
+                todayRecords: todayRecords.map(record => ({
+                    isCorrect: record.isCorrect,
+                    category: record.category
+                })),
+                totalAnswered,
+                categoryAccuracy
+            }
+        });
+
+        if (result.alreadyCompleted) return;
+
+        const storedPlansStr = localStorage.getItem('studyPlans');
+        if (!storedPlansStr) return;
+        try {
+            const parsedPlans: StudyPlan[] = JSON.parse(storedPlansStr);
+            const updatedPlans = parsedPlans.map(plan => {
+                if (plan.id !== studyPlan.id) return plan;
+                return {
+                    ...plan,
+                    weeklySchedule: plan.weeklySchedule.map(week => ({
+                        ...week,
+                        dailyTasks: week.dailyTasks.map(task => {
+                            if (task.date !== todayStr) return task;
+                            return { ...task, isCompleted: true };
+                        })
+                    }))
+                };
+            });
+            localStorage.setItem('studyPlans', JSON.stringify(updatedPlans));
+            setAllPlans(updatedPlans);
+            const refreshed = updatedPlans.find(plan => plan.id === studyPlan.id) || studyPlan;
+            setStudyPlan(refreshed);
+        } catch (error) {
+            console.error("Failed to update studyPlans completion state", error);
+        }
+    }, [
+        studyPlan,
+        isAllPlans,
+        todayGoalData,
+        isMissionComplete,
+        todayTaskCompleted,
+        todayStr,
+        todayMissionTitle,
+        todayXpReward,
+        todayRecords,
+        totalAnswered,
+        categoryAccuracy,
+        completeMission
+    ]);
 
     // 難易度に応じたスタイル
     const getDifficultyStyle = (diff: string) => {
@@ -313,6 +407,27 @@ export default function DashboardClient() {
             </header>
 
             <div className={styles.grid}>
+                <section className={`${styles.card} ${styles.levelCard} ${styles.fullWidthCard}`}>
+                    <div className={styles.levelHeader}>
+                        <div>
+                            <div className={styles.levelTitle}>
+                                Level {levelInfo.level} - {levelInfo.title}
+                            </div>
+                            <div className={styles.levelXp}>XP: {progress.totalXp.toLocaleString()}</div>
+                        </div>
+                        <div className={styles.levelMeta}>
+                            <span>🔥 連続学習: {progress.streakDays}日目</span>
+                            <span>🏆 実績: {achievements.unlocked.length}/{achievementTotal}</span>
+                        </div>
+                    </div>
+                    <div className={styles.levelBar}>
+                        <div
+                            className={styles.levelFill}
+                            style={{ width: `${levelInfo.progressPercent}%` }}
+                        />
+                    </div>
+                    <div className={styles.levelNext}>次のレベルまで {levelInfo.xpToNext} XP</div>
+                </section>
                 {/* 1. Goal Section (Hierarchical) - ゲーミフィケーション対応 */}
                 <section className={`${styles.card} ${styles.statusCard} ${styles.fullWidthCard}`}>
                     <div className={styles.cardHeader} style={{ justifyContent: 'space-between', display: 'flex' }}>
@@ -600,6 +715,44 @@ export default function DashboardClient() {
                     )}
                 </section>
             </div>
+
+            {lastMissionReward && (
+                <div className={styles.missionOverlay} onClick={clearMissionReward}>
+                    <div className={styles.missionPopup} onClick={(e) => e.stopPropagation()}>
+                        <h3 className={styles.missionTitle}>🎉 ミッションクリア！</h3>
+                        <p className={styles.missionSubtitle}>{todayMissionTitle}</p>
+                        <div className={styles.missionXpRow}>
+                            <span>⭐ +{lastMissionReward.xpEarned} XP</span>
+                            <span>🔥 連続ボーナス +{lastMissionReward.bonusXp} XP</span>
+                        </div>
+                        {lastMissionReward.achievementXp > 0 && (
+                            <div className={styles.missionXpRow}>
+                                <span>🏆 実績ボーナス +{lastMissionReward.achievementXp} XP</span>
+                            </div>
+                        )}
+                        <div className={styles.missionTotal}>
+                            合計: +{lastMissionReward.totalXpEarned} XP
+                        </div>
+                        <button className={styles.missionButton} onClick={clearMissionReward}>次のミッションへ</button>
+                    </div>
+                </div>
+            )}
+
+            {lastLevelUp && (
+                <div className={styles.levelOverlay} onClick={clearLevelUp}>
+                    <div className={styles.levelModal} onClick={(e) => e.stopPropagation()}>
+                        <h3 className={styles.levelUpTitle}>✨ LEVEL UP! ✨</h3>
+                        <div className={styles.levelUpBody}>
+                            <div className={styles.levelUpLevel}>Level {lastLevelUp.level}</div>
+                            <div className={styles.levelUpTitleText}>「{lastLevelUp.title}」</div>
+                            <p className={styles.levelUpMessage}>
+                                これまでの努力が実を結びました！この調子で合格を目指しましょう！
+                            </p>
+                        </div>
+                        <button className={styles.levelUpButton} onClick={clearLevelUp}>OK</button>
+                    </div>
+                </div>
+            )}
 
             {showWizard && (
                 <GoalSettingWizard

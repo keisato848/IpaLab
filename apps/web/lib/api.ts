@@ -97,6 +97,33 @@ export interface StudyPlan {
     totalXpEarned?: number;
 }
 
+export interface UserProgress {
+    totalXp: number;
+    currentLevel: number;
+    completedMissions: {
+        date: string;
+        planId: string;
+        xpEarned: number;
+        missionTitle: string;
+    }[];
+    streakDays: number;
+    lastActiveDate: string;
+}
+
+export interface Achievement {
+    id: string;
+    name: string;
+    description: string;
+    iconEmoji: string;
+    xpReward: number;
+    unlockedAt?: string;
+}
+
+export interface UserAchievements {
+    unlocked: Achievement[];
+    progress: Record<string, number>;
+}
+
 // Exam Interface
 export interface Exam {
     id: string;

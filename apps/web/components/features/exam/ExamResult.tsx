@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { Question, LearningRecord, getLearningRecords, createLearningSession } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
 import { getExamLabel } from '@/lib/exam-utils';
+import { useUserProgress } from '@/hooks/useUserProgress';
 import styles from './ExamResult.module.css';
 
 interface ExamResultProps {
@@ -21,6 +22,8 @@ export default function ExamResult({ questions, examId, year, type }: ExamResult
     const router = useRouter();
     const searchParams = useSearchParams();
     const sessionId = searchParams.get('sessionId');
+    const mode = searchParams.get('mode');
+    const { grantAchievement } = useUserProgress();
     
     const [records, setRecords] = useState<LearningRecord[]>([]);
     const [loading, setLoading] = useState(true);
@@ -70,6 +73,14 @@ export default function ExamResult({ questions, examId, year, type }: ExamResult
             loadRecords();
         }
     }, [status, session, examId, sessionId]);
+
+    useEffect(() => {
+        if (mode !== 'mock') return;
+        if (questions.length === 0) return;
+        if (records.length === questions.length) {
+            grantAchievement('exam_complete');
+        }
+    }, [mode, records.length, questions.length, grantAchievement]);
 
     // Start a new session (retest)
     const handleNewSession = async (mode: 'practice' | 'mock') => {
