@@ -77,17 +77,51 @@ export interface StudyPlan {
         weekNumber: number;
         startDate: string; // ISO Date
         endDate: string; // ISO Date
+        theme?: string; // 週のテーマ（例: ネットワーク基礎）
         goal: string;
         dailyTasks: {
             date: string; // ISO Date "YYYY-MM-DD"
+            missionTitle?: string; // ミッション名（ゲーム風）
             goal: string;
             questionCount: number;
-            targetCategory?: string; // e.g. "Security"
+            targetCategory?: string; // e.g. "セキュリティ"
             targetExamId?: string; // e.g. "AP-2023-Fall"
+            difficulty?: 'easy' | 'normal' | 'hard'; // 難易度
+            xpReward?: number; // 獲得XP
+            isCompleted?: boolean; // 完了フラグ（クライアント側で管理）
         }[];
         focus?: string; // "Weakness Reinforcement"
     }[];
     generatedAt: string;
+    // ゲーミフィケーション用累計（クライアント側で計算）
+    totalXpEarned?: number;
+}
+
+export interface UserProgress {
+    totalXp: number;
+    currentLevel: number;
+    completedMissions: {
+        date: string;
+        planId: string;
+        xpEarned: number;
+        missionTitle: string;
+    }[];
+    streakDays: number;
+    lastActiveDate: string;
+}
+
+export interface Achievement {
+    id: string;
+    name: string;
+    description: string;
+    iconEmoji: string;
+    xpReward: number;
+    unlockedAt?: string;
+}
+
+export interface UserAchievements {
+    unlocked: Achievement[];
+    progress: Record<string, number>;
 }
 
 // Exam Interface
