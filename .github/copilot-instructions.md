@@ -30,12 +30,37 @@
    git push -u origin <ブランチ名>
    ```
 
-4. **プルリクエストとマージ**
-   - ブランチをプッシュした後は、**GitHub上でプルリクエストを作成**
+4. **プルリクエストの作成**
+   - ブランチをプッシュした後は、**GitHub CLI (`gh pr create`) でプルリクエストを作成**
    - **エージェントが勝手にmainブランチにマージすることは禁止**
    - ユーザーの明示的な承認を得てからマージすること
    
-   マージが承認された場合のみ、以下を実行：
+   ```bash
+   gh pr create --title "<type>: <説明>" --body "<詳細説明>" --base main
+   ```
+
+5. **コンフリクトの解消**
+   - PRでコンフリクトが発生した場合は、以下の手順で解消すること：
+   ```bash
+   git fetch origin main
+   git merge origin/main
+   # コンフリクトを手動で解消
+   git add <解消したファイル>
+   git commit -m "fix: マージコンフリクトを解消"
+   git push
+   ```
+
+6. **CI/CDパイプラインの確認**
+   - PRを作成した後は、**CI/CDパイプラインの結果を必ず確認**
+   - エラーが発生した場合は、エラー内容を確認して修正
+   ```bash
+   gh pr checks <PR番号>
+   gh run list --limit 5
+   gh run view <run-id> --log-failed
+   ```
+
+7. **マージ（ユーザー承認後のみ）**
+   - マージが承認された場合のみ、以下を実行：
    ```bash
    git checkout main
    git pull origin main
