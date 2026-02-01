@@ -81,6 +81,58 @@
     margin-bottom: 1.2rem;
 }
 
+.levelCard {
+    grid-column: span 12;
+    background: linear-gradient(135deg, #0f172a 0%, #1f2937 100%);
+    color: #f8fafc;
+    border: none;
+}
+
+.levelHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.levelTitle {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.levelXp {
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
+.levelMeta {
+    display: flex;
+    gap: 1.2rem;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.levelBar {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    height: 10px;
+    overflow: hidden;
+}
+
+.levelFill {
+    height: 100%;
+    background: linear-gradient(90deg, #22c55e, #14b8a6);
+    transition: width 0.6s ease;
+}
+
+.levelNext {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    opacity: 0.85;
+}
+
 /* Specific Cards Layout */
 .statusCard {
     grid-column: span 12;
@@ -304,4 +356,89 @@
 .date {
     font-size: 0.75rem;
     color: var(--text-tertiary);
+}
+
+.missionOverlay,
+.levelOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.missionPopup,
+.levelModal {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 1.5rem;
+    width: min(420px, 90vw);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.missionTitle {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+}
+
+.missionSubtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.missionXpRow {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+}
+
+.missionTotal {
+    margin-top: 0.6rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.missionButton,
+.levelUpButton {
+    margin-top: 1rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent-color);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.levelUpTitle {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.levelUpBody {
+    display: grid;
+    gap: 0.4rem;
+}
+
+.levelUpLevel {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.levelUpTitleText {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+.levelUpMessage {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
 }
