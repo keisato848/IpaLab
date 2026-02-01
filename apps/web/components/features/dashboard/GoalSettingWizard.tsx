@@ -13,16 +13,22 @@ export interface StudyPlan {
         weekNumber: number;
         startDate: string;
         endDate: string;
+        theme?: string; // 週のテーマ
         goal: string;
         dailyTasks: {
             date: string;
+            missionTitle?: string; // ミッション名（ゲーム風）
             goal: string;
             questionCount: number;
             targetCategory: string;
             targetExamId?: string;
+            difficulty?: 'easy' | 'normal' | 'hard';
+            xpReward?: number;
+            isCompleted?: boolean;
         }[];
     }[];
     generatedAt: string;
+    totalXpEarned?: number;
 }
 
 interface GoalSettingWizardProps {
