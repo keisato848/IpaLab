@@ -188,21 +188,31 @@ export default function DashboardClient() {
         return true;
     });
 
-    // -- Goal Logic --
+    // -- Goal Logic (ゲーミフィケーション対応) --
     let todayTargetCount = 10;
-    let todayGoalLabel = "学習を進めましょう";
+    let todayMissionTitle = "学習を進めましょう";
+    let todayGoalLabel = "今日のミッションをクリアしよう！";
     let todayCategoryLabel = "全般";
+    let todayDifficulty: 'easy' | 'normal' | 'hard' = 'normal';
+    let todayXpReward = 30;
+    let todayTaskCompleted = false;
 
     if (isAllPlans) {
         // Aggregate targets from all plans
         let totalCount = 0;
+        let totalXp = 0;
         allPlans.forEach(p => {
             const tData = p.weeklySchedule?.flatMap(w => w.dailyTasks)?.find(t => t.date === todayStr);
-            if (tData) totalCount += tData.questionCount;
+            if (tData) {
+                totalCount += tData.questionCount;
+                totalXp += tData.xpReward || 30;
+            }
         });
         todayTargetCount = totalCount > 0 ? totalCount : 10;
-        todayGoalLabel = "全計画の合計目標";
+        todayMissionTitle = "🎯 全計画合計ミッション";
+        todayGoalLabel = "すべての計画のタスクを消化しよう";
         todayCategoryLabel = "合計";
+        todayXpReward = totalXp || 50;
     } else {
         // Single Plan
         const todayGoalData = studyPlan?.weeklySchedule
@@ -211,8 +221,12 @@ export default function DashboardClient() {
 
         if (todayGoalData) {
             todayTargetCount = todayGoalData.questionCount;
-            todayGoalLabel = todayGoalData.goal;
-            todayCategoryLabel = todayGoalData.targetCategory;
+            todayMissionTitle = todayGoalData.missionTitle || todayGoalData.goal || "今日のミッション";
+            todayGoalLabel = todayGoalData.goal || "学習を進めましょう";
+            todayCategoryLabel = todayGoalData.targetCategory || "全般";
+            todayDifficulty = todayGoalData.difficulty || 'normal';
+            todayXpReward = todayGoalData.xpReward || 30;
+            todayTaskCompleted = todayGoalData.isCompleted || false;
         }
     }
 
@@ -221,11 +235,26 @@ export default function DashboardClient() {
         todayStr >= w.startDate && todayStr <= w.endDate
     ) : null;
 
+    // 週のテーマとゴール
+    const weekTheme = currentWeekData?.theme || currentWeekData?.goal || "今週の学習";
+    const weekGoal = currentWeekData?.goal || "週間目標未設定";
 
     const today = new Date().toDateString();
     const todayRecords = filteredRecords.filter(r => new Date(r.answeredAt).toDateString() === today);
     const todayCount = todayRecords.length;
     const progressPercent = Math.min(100, Math.round((todayCount / todayTargetCount) * 100));
+    
+    // ミッションクリア判定
+    const isMissionComplete = todayCount >= todayTargetCount;
+
+    // 難易度に応じたスタイル
+    const getDifficultyStyle = (diff: string) => {
+        switch (diff) {
+            case 'easy': return { bg: '#22c55e', label: '🟢 Easy' };
+            case 'hard': return { bg: '#ef4444', label: '🔴 Hard' };
+            default: return { bg: '#f59e0b', label: '🟡 Normal' };
+        }
+    };
 
     // Use filtered records for stats
     const statsRecords = filteredRecords;
@@ -284,7 +313,7 @@ export default function DashboardClient() {
             </header>
 
             <div className={styles.grid}>
-                {/* 1. Goal Section (Hierarchical) */}
+                {/* 1. Goal Section (Hierarchical) - ゲーミフィケーション対応 */}
                 <section className={`${styles.card} ${styles.statusCard} ${styles.fullWidthCard}`}>
                     <div className={styles.cardHeader} style={{ justifyContent: 'space-between', display: 'flex' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -295,7 +324,6 @@ export default function DashboardClient() {
                                     value={studyPlan?.id || 'ALL'}
                                     onChange={(e) => {
                                         if (e.target.value === 'ALL') {
-                                            // Virtual "ALL" plan
                                             setStudyPlan({ id: 'ALL' } as any);
                                         } else {
                                             const selected = allPlans.find(p => p.id === e.target.value);
@@ -321,38 +349,95 @@ export default function DashboardClient() {
                                 </select>
                             )}
                         </div>
-                        <span className={styles.cardIcon}>🚀</span>
+                        <span className={styles.cardIcon} style={{ cursor: 'pointer' }} onClick={() => setShowWizard(true)}>✏️</span>
                     </div>
                     {studyPlan ? (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: '100%' }}>
-                            {/* Monthly */}
+                            {/* Monthly Goal */}
                             {!isAllPlans && (
                                 <div style={{ flex: 1, minWidth: '250px', padding: '0.8rem', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.3rem' }}>今月の目標</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.3rem' }}>📅 今月の目標</div>
                                     <div style={{ fontWeight: 'bold' }}>{studyPlan.monthlyGoal}</div>
                                 </div>
                             )}
 
-                            {/* Weekly */}
+                            {/* Weekly Theme */}
                             {!isAllPlans && (
                                 <div style={{ flex: 1, minWidth: '250px', padding: '0.8rem', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.3rem' }}>
-                                        今週のテーマ {currentWeekData ? `(Week ${currentWeekData.weekNumber})` : ''}
+                                        🎯 今週のテーマ {currentWeekData ? `(Week ${currentWeekData.weekNumber})` : ''}
                                     </div>
                                     <div style={{ fontWeight: 'bold' }}>
-                                        {currentWeekData?.goal || "予定なし"}
+                                        {weekTheme}
                                     </div>
                                 </div>
                             )}
 
-                            {/* Daily (Today) */}
-                            <div style={{ flex: 1, minWidth: '250px', padding: '0.8rem', background: 'var(--bg-primary)', borderRadius: '8px', border: '2px solid var(--primary-color)' }}>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--primary-color)', marginBottom: '0.3rem', fontWeight: 'bold' }}>{isAllPlans ? '今日の合計ミッション' : '今日のミッション'}</div>
-                                <div style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>
+                            {/* Today's Mission - ゲーム風デザイン */}
+                            <div style={{ 
+                                flex: 1, 
+                                minWidth: '250px', 
+                                padding: '1rem', 
+                                background: isMissionComplete 
+                                    ? 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' 
+                                    : 'linear-gradient(135deg, var(--primary-color) 0%, #6366f1 100%)', 
+                                borderRadius: '12px', 
+                                color: 'white',
+                                position: 'relative',
+                                overflow: 'hidden'
+                            }}>
+                                {/* 完了時のエフェクト */}
+                                {isMissionComplete && (
+                                    <div style={{ position: 'absolute', top: '8px', right: '8px', fontSize: '1.5rem' }}>🏆</div>
+                                )}
+                                
+                                <div style={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: '0.5rem',
+                                    marginBottom: '0.5rem'
+                                }}>
+                                    <span style={{ 
+                                        fontSize: '0.7rem', 
+                                        fontWeight: 'bold',
+                                        padding: '2px 8px',
+                                        borderRadius: '4px',
+                                        background: getDifficultyStyle(todayDifficulty).bg
+                                    }}>
+                                        {getDifficultyStyle(todayDifficulty).label}
+                                    </span>
+                                    <span style={{ fontSize: '0.75rem', opacity: 0.9 }}>今日のミッション</span>
+                                </div>
+                                
+                                <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+                                    {isMissionComplete ? '✅ ミッションクリア！' : todayMissionTitle}
+                                </div>
+                                
+                                <div style={{ fontSize: '0.85rem', opacity: 0.9, marginBottom: '0.5rem' }}>
                                     {todayGoalLabel}
                                 </div>
-                                <div style={{ fontSize: '0.85rem', marginTop: '0.3rem' }}>
-                                    目標: <strong>{todayTargetCount}問</strong> <span style={{ fontSize: '0.8rem' }}>({todayCategoryLabel})</span>
+                                
+                                <div style={{ 
+                                    display: 'flex', 
+                                    justifyContent: 'space-between', 
+                                    alignItems: 'center',
+                                    marginTop: '0.5rem',
+                                    paddingTop: '0.5rem',
+                                    borderTop: '1px solid rgba(255,255,255,0.2)'
+                                }}>
+                                    <span style={{ fontSize: '0.85rem' }}>
+                                        🎯 目標: <strong>{todayTargetCount}問</strong>
+                                        <span style={{ fontSize: '0.75rem', marginLeft: '0.3rem', opacity: 0.8 }}>({todayCategoryLabel})</span>
+                                    </span>
+                                    <span style={{ 
+                                        fontSize: '0.85rem', 
+                                        fontWeight: 'bold',
+                                        background: 'rgba(255,255,255,0.2)',
+                                        padding: '2px 8px',
+                                        borderRadius: '4px'
+                                    }}>
+                                        ⭐ +{todayXpReward} XP
+                                    </span>
                                 </div>
                             </div>
 
@@ -379,20 +464,58 @@ export default function DashboardClient() {
                     )}
                 </section>
 
-                {/* 2. Today's Status (Linked to Goal) */}
+                {/* 2. Today's Status - ゲーミフィケーション対応 */}
                 <section className={`${styles.card} ${styles.statusCard}`}>
                     <div className={styles.cardHeader}>
-                        <h3>今日の進捗 {isAllPlans ? '(全体)' : ''}</h3>
-                        <span className={styles.cardIcon}>🎯</span>
+                        <h3>今日の進捗</h3>
+                        <span className={styles.cardIcon}>{isMissionComplete ? '🏆' : '🎯'}</span>
                     </div>
                     <div className={styles.progressContainer}>
-                        <div className={styles.progressBar}>
-                            <div className={styles.progressFill} style={{ width: `${progressPercent}%` }}></div>
+                        <div className={styles.progressBar} style={{ 
+                            background: 'var(--bg-secondary)',
+                            height: '12px',
+                            borderRadius: '6px',
+                            overflow: 'hidden'
+                        }}>
+                            <div 
+                                className={styles.progressFill} 
+                                style={{ 
+                                    width: `${progressPercent}%`,
+                                    height: '100%',
+                                    background: isMissionComplete 
+                                        ? 'linear-gradient(90deg, #22c55e, #16a34a)' 
+                                        : progressPercent >= 80 
+                                            ? 'linear-gradient(90deg, #f59e0b, #d97706)'
+                                            : 'linear-gradient(90deg, var(--primary-color), #6366f1)',
+                                    transition: 'width 0.5s ease-out'
+                                }}
+                            />
                         </div>
-                        <div className={styles.progressStats}>
-                            <span className={styles.progressText}>{todayCount} / {todayTargetCount} 問</span>
-                            <span className={styles.progressPercent}>{progressPercent}%</span>
+                        <div className={styles.progressStats} style={{ marginTop: '0.5rem' }}>
+                            <span className={styles.progressText}>
+                                {isMissionComplete && '✅ '}{todayCount} / {todayTargetCount} 問
+                            </span>
+                            <span className={styles.progressPercent} style={{
+                                color: isMissionComplete ? '#22c55e' : 'var(--text-primary)',
+                                fontWeight: 'bold'
+                            }}>
+                                {progressPercent}%
+                            </span>
                         </div>
+                        {isMissionComplete && (
+                            <div style={{ 
+                                textAlign: 'center', 
+                                marginTop: '0.5rem',
+                                padding: '0.3rem 0.6rem',
+                                background: 'rgba(34, 197, 94, 0.1)',
+                                borderRadius: '4px',
+                                color: '#22c55e',
+                                fontSize: '0.85rem',
+                                fontWeight: 'bold'
+                            }}>
+                                🎉 ミッションクリア！ +{todayXpReward} XP 獲得
+                            </div>
+                        )}
                     </div>
                     <Link href={quickStartUrl} className={styles.quickStartBtn}>{quickStartLabel}</Link>
                 </section>
