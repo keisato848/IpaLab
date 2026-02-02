@@ -279,3 +279,139 @@ describe('実績解除条件', () => {
         expect(BASE_ACHIEVEMENTS.level_5.xpReward).toBe(200);
     });
 });
+
+describe('useUserProgress フック', () => {
+    beforeEach(() => {
+        localStorage.clear();
+        vi.clearAllMocks();
+    });
+
+    // フックのインポート
+    const importHook = async () => {
+        const module = await import('@/hooks/useUserProgress');
+        return module.useUserProgress;
+    };
+
+    it('初期状態で正しいデフォルト値を持つ', async () => {
+        const useUserProgress = await importHook();
+        const { result } = renderHook(() => useUserProgress());
+        
+        expect(result.current.progress.totalXp).toBe(0);
+        expect(result.current.progress.currentLevel).toBe(1);
+        expect(result.current.progress.streakDays).toBe(0);
+        expect(result.current.achievements.unlocked).toHaveLength(0);
+    });
+
+    it('levelInfoが正しく計算される', async () => {
+        const useUserProgress = await importHook();
+        const { result } = renderHook(() => useUserProgress());
+        
+        expect(result.current.levelInfo.level).toBe(1);
+        expect(result.current.levelInfo.title).toBe('見習い');
+        expect(result.current.levelInfo.nextLevelXp).toBe(100);
+    });
+
+    it('completeMissionでXPが獲得できる', async () => {
+        const useUserProgress = await importHook();
+        const { result } = renderHook(() => useUserProgress());
+        
+        act(() => {
+            const missionResult = result.current.completeMission({
+                date: '2026-02-01',
+                planId: 'plan-1',
+                missionTitle: 'テストミッション',
+                baseXp: 50
+            });
+            
+            expect(missionResult.alreadyCompleted).toBe(false);
+            expect(missionResult.xpEarned).toBe(50);
+        });
+    });
+
+    it('同じミッションを2回クリアしてもXPは1回分', async () => {
+        const useUserProgress = await importHook();
+        const { result } = renderHook(() => useUserProgress());
+        
+        act(() => {
+            result.current.completeMission({
+                date: '2026-02-01',
+                planId: 'plan-1',
+                missionTitle: 'テストミッション',
+                baseXp: 50
+            });
+        });
+        
+        act(() => {
+            const secondResult = result.current.completeMission({
+                date: '2026-02-01',
+                planId: 'plan-1',
+                missionTitle: 'テストミッション',
+                baseXp: 50
+            });
+            
+            expect(secondResult.alreadyCompleted).toBe(true);
+            expect(secondResult.totalXpEarned).toBe(0);
+        });
+    });
+
+    it('初回ミッションで実績が解除される', async () => {
+        const useUserProgress = await importHook();
+        const { result } = renderHook(() => useUserProgress());
+        
+        act(() => {
+            const missionResult = result.current.completeMission({
+                date: '2026-02-01',
+                planId: 'plan-1',
+                missionTitle: 'テストミッション',
+                baseXp: 10
+            });
+            
+            const firstMissionAchievement = missionResult.unlockedAchievements.find(
+                a => a.id === 'first_mission'
+            );
+            expect(firstMissionAchievement).toBeDefined();
+        });
+    });
+
+    it('clearMissionRewardでリワード状態がクリアされる', async () => {
+        const useUserProgress = await importHook();
+        const { result } = renderHook(() => useUserProgress());
+        
+        act(() => {
+            result.current.completeMission({
+                date: '2026-02-01',
+                planId: 'plan-1',
+                missionTitle: 'テストミッション',
+                baseXp: 50
+            });
+        });
+        
+        expect(result.current.lastMissionReward).not.toBeNull();
+        
+        act(() => {
+            result.current.clearMissionReward();
+        });
+        
+        expect(result.current.lastMissionReward).toBeNull();
+    });
+
+    it('grantAchievementで実績を手動解除できる', async () => {
+        const useUserProgress = await importHook();
+        const { result } = renderHook(() => useUserProgress());
+        
+        act(() => {
+            result.current.grantAchievement('exam_complete');
+        });
+        
+        // localStorageから再読み込みを待つ
+        expect(result.current.achievements.unlocked.some(a => a.id === 'exam_complete')).toBe(true);
+    });
+
+    it('achievementTotalが正しい実績総数を返す', async () => {
+        const useUserProgress = await importHook();
+        const { result } = renderHook(() => useUserProgress());
+        
+        // BASE_ACHIEVEMENTSに定義された実績数
+        expect(result.current.achievementTotal).toBeGreaterThan(0);
+    });
+});
