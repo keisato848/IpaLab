@@ -48,9 +48,11 @@ export default function DashboardClient() {
                 } else {
                     fetchedRecords = guestManager.getHistory();
                 }
+                // Filter out records with invalid or missing answeredAt
+                const validRecords = fetchedRecords.filter(r => r && r.answeredAt);
                 // Sort by answeredAt desc
-                fetchedRecords.sort((a, b) => new Date(b.answeredAt).getTime() - new Date(a.answeredAt).getTime());
-                setRecords(fetchedRecords);
+                validRecords.sort((a, b) => new Date(b.answeredAt).getTime() - new Date(a.answeredAt).getTime());
+                setRecords(validRecords);
             } catch (error) {
                 console.error("Failed to load dashboard data", error);
             } finally {
@@ -165,12 +167,15 @@ export default function DashboardClient() {
 
     // Filter records: If isAllPlans, show all. Else filter by targetExam prefix AND date (start of plan).
     const filteredRecords = records.filter(r => {
+        // Validate record has required fields
+        if (!r || !r.answeredAt) return false;
+        
         if (isAllPlans) return true;
         if (!studyPlan) return true;
 
         // 1. Exam Type Filter
         const target = getTargetExam(studyPlan);
-        if (target && !r.examId.startsWith(target)) return false;
+        if (target && !r.examId?.startsWith(target)) return false;
 
         // 2. Date Filter (Scope to plan duration)
         // Use weeklySchedule start date (inclusive of the whole start day)
@@ -706,7 +711,7 @@ export default function DashboardClient() {
                                             {r.isCorrect ? '正解' : '不正解'}
                                         </span>
                                         <span className={styles.date}>
-                                            {new Date(r.answeredAt).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                            {r.answeredAt ? new Date(r.answeredAt).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
                                         </span>
                                     </div>
                                 </li>
