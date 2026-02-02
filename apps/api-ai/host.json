@@ -1,9 +1,17 @@
 {
     "version": "2.0",
     "logging": {
+        "logLevel": {
+            "default": "Information",
+            "Host.Results": "Error",
+            "Function": "Information",
+            "Host.Aggregator": "Trace"
+        },
         "applicationInsights": {
             "samplingSettings": {
-                "isEnabled": true
+                "isEnabled": true,
+                "maxTelemetryItemsPerSecond": 20,
+                "excludedTypes": "Request;Exception"
             }
         }
     },
