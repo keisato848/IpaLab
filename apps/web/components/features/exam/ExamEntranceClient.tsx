@@ -81,9 +81,11 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
 
                 Object.keys(recordsByQ).forEach(qId => {
                     // Sort by answeredAt desc (Latest first)
-                    const sorted = recordsByQ[qId].sort((a, b) =>
-                        new Date(b.answeredAt).getTime() - new Date(a.answeredAt).getTime()
-                    );
+                    const sorted = recordsByQ[qId]
+                        .filter(r => r && r.answeredAt)
+                        .sort((a, b) =>
+                            new Date(b.answeredAt).getTime() - new Date(a.answeredAt).getTime()
+                        );
                     const latest = sorted[0];
 
                     if (latest) {

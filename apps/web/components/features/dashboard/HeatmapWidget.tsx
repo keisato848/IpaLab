@@ -34,6 +34,7 @@ export default function HeatmapWidget({ records }: HeatmapWidgetProps) {
     // Group records by YYYY-MM-DD
     const counts = new Map<string, number>();
     records.forEach(r => {
+        if (!r || !r.answeredAt) return;
         const d = new Date(r.answeredAt);
         const key = d.toDateString();
         counts.set(key, (counts.get(key) || 0) + 1);
