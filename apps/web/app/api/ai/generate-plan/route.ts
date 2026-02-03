@@ -2,6 +2,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
 import { getAppInsightsClient } from '@/lib/appinsights';
 
+// APIルートは動的レンダリングを強制
+export const dynamic = 'force-dynamic';
+
 const apiKey = process.env.GEMINI_API_KEY || (process.env.GEMINI_API_KEY_1 || "");
 const genAI = new GoogleGenerativeAI(apiKey);
 

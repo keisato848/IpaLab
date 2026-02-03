@@ -145,13 +145,48 @@ Azure Portal > Static Web Apps > `swa-pm-exam-dx-prod` > 設定 > 環境変数
 | `output_location: ".next"` を指定 | 空文字に変更 |
 | post-build.js が実行されている | package.json から削除 |
 
-### 6.2 デプロイ成功の確認ポイント
+### 6.2 API Route の静的レンダリングエラー
+
+**症状**: ビルド時に以下のエラーが発生
+```
+Error: Route /api/xxx couldn't be rendered statically because it used `headers`.
+```
+
+**原因**: Next.js はデフォルトで API Route を静的にレンダリングしようとするが、認証（`getServerSession`）やヘッダー（`headers()`）を使用するルートは静的化できない。
+
+**解決策**: 認証やヘッダーを使用する API Route には `dynamic = 'force-dynamic'` を追加する。
+
+```typescript
+// 必須: 認証を使用するAPIルート
+export const dynamic = 'force-dynamic';
+
+export async function GET(req: NextRequest) {
+    const session = await getServerSession(authOptions);
+    // ...
+}
+```
+
+**対象ルート一覧**:
+| ルート | 理由 |
+|--------|------|
+| `/api/ai/jobs` | 認証使用 |
+| `/api/ai/jobs/pending` | 認証使用 |
+| `/api/ai/jobs/[jobId]` | 認証使用 |
+| `/api/ai/plan` | 外部APIプロキシ |
+| `/api/ai/generate-plan` | 外部API呼び出し |
+| `/api/config/telemetry` | ランタイム環境変数取得 |
+| `/api/learning-records` | 認証使用 |
+| `/api/exam-progress` | 認証使用 |
+| `/api/session` | 認証使用 |
+| `/api/auth/[...nextauth]` | NextAuth |
+
+### 6.3 デプロイ成功の確認ポイント
 
 1. GitHub Actions ログで `Status: Succeeded` を確認
 2. `Deployment Complete :)` メッセージを確認
 3. warm-up 時間が 200秒以内（通常 150秒程度）
 
-### 6.3 動作確認済みコミット
+### 6.4 動作確認済みコミット
 
 問題が発生した場合、以下のコミットの設定を参照：
 
@@ -162,6 +197,7 @@ Azure Portal > Static Web Apps > `swa-pm-exam-dx-prod` > 設定 > 環境変数
 
 | 日付 | 変更内容 | 担当 |
 |------|---------|------|
+| 2026/02/04 | API Route の `dynamic = 'force-dynamic'` 規約追加（セクション6.2） | - |
 | 2026/02/02 | Application Insights 統合設計セクション追加 | - |
 | 2026/02/01 | api-ai (US Function App) のデプロイ手順を追加 | - |
 | 2026/01/27 | 初版作成。warm-up timeout 問題の調査結果と解決策を文書化 | - |

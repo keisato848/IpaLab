@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic'; // 動的レンダリングを強制
 export const maxDuration = 60; // AI generation might take time
 export const runtime = 'nodejs'; // Use Node runtime for stability
 

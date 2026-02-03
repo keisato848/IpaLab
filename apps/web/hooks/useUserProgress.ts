@@ -289,7 +289,7 @@ export function useUserProgress() {
         }
 
         const todayRecords = params.metrics?.todayRecords ?? [];
-        if (todayRecords.length > 0 && todayRecords.every(record => record.isCorrect)) {
+        if (todayRecords.length > 0 && todayRecords.filter(r => r).every(record => record.isCorrect)) {
             unlockAchievement(BASE_ACHIEVEMENTS.perfect_day);
         }
 
