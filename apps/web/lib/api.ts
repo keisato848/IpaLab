@@ -57,16 +57,27 @@ export interface LearningRecord {
 }
 
 // Async Job Interface
+// PlanJobs コンテナ: Partition Key = /userId, TTL = 30日
 export interface StudyPlanJob {
     id: string; // "job-{userId}-{timestamp}"
     type: "studyPlanJob";
-    userId: string;
+    userId: string; // Partition Key
     targetExam: string;
-    status: "pending" | "completed" | "failed";
-    requestData: any;
+    status: "pending" | "processing" | "completed" | "failed";
+    requestData: {
+        targetExam: string;
+        examDate: string;
+        studyTimeWeekday: number;
+        studyTimeWeekend: number;
+        scores: Record<string, number>;
+    };
     resultData?: StudyPlan;
+    error?: string; // 失敗時のエラーメッセージ
     createdAt: string;
+    processingStartedAt?: string; // 処理開始時刻
     completedAt?: string;
+    notifiedAt?: string; // ユーザーに通知した時刻
+    dismissed?: boolean; // ユーザーが通知を破棄した場合
 }
 
 export interface StudyPlan {

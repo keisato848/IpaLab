@@ -654,3 +654,27 @@
     flex: 1;
     max-width: 200px;
 }
+
+/* 非同期ジョブ作成完了 */
+.asyncJobCreated {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+}
+
+.asyncJobIcon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    animation: bounce 1s ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
