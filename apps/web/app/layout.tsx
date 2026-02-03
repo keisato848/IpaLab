@@ -87,7 +87,7 @@ export default function RootLayout({
                         `,
                     }}
                 />
-                <TelemetryProvider connectionString={process.env.APPLICATIONINSIGHTS_CONNECTION_STRING}>
+                <TelemetryProvider connectionString={process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING}>
                     <NextAuthProvider>
                         <ThemeProvider>
                             {children}

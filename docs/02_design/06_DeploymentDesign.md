@@ -162,16 +162,115 @@ Azure Portal > Static Web Apps > `swa-pm-exam-dx-prod` > 設定 > 環境変数
 
 | 日付 | 変更内容 | 担当 |
 |------|---------|------|
+| 2026/02/02 | Application Insights 統合設計セクション追加 | - |
 | 2026/02/01 | api-ai (US Function App) のデプロイ手順を追加 | - |
 | 2026/01/27 | 初版作成。warm-up timeout 問題の調査結果と解決策を文書化 | - |
 | 2025/12/29 | standalone モード削除による修正（コミット 1323190） | - |
 
-## 8. api-ai (US Function App) のデプロイ
+## 8. Application Insights 統合設計
 
-### 8.1 概要
+### 8.1 アーキテクチャ
+
+すべてのレイヤーから単一の Application Insights インスタンス (`appi-pm-exam-dx`) にテレメトリを送信する統合構成。
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Application Insights                          │
+│                 appi-pm-exam-dx (Japan East)                     │
+│  InstrumentationKey: fa3400e8-401e-4493-89a7-23d520eb021b       │
+└─────────────────────────────────────────────────────────────────┘
+                    ▲           ▲           ▲
+                    │           │           │
+        ┌───────────┘           │           └───────────┐
+        │                       │                       │
+┌───────┴───────┐     ┌────────┴────────┐     ┌────────┴────────┐
+│   ブラウザ     │     │   SWA (Node.js)  │     │ Azure Functions │
+│ @microsoft/    │     │  applicationinsights │     │ (自動収集)      │
+│ appinsights-web│     │                       │     │ host.json       │
+└───────────────┘     └───────────────────────┘     └─────────────────┘
+```
+
+### 8.2 各レイヤーの設定
+
+#### ブラウザ層
+
+| 項目 | 値 |
+|------|------|
+| SDK | `@microsoft/applicationinsights-web` |
+| 初期化場所 | `TelemetryProvider.tsx` |
+| 環境変数 | `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` |
+| 機能 | ページビュー、ユーザー行動トラッキング |
+
+**重要**: ブラウザからアクセスするには `NEXT_PUBLIC_` プレフィックスが必須。
+
+#### SWA層（Next.js サーバーサイド）
+
+| 項目 | 値 |
+|------|------|
+| SDK | `applicationinsights` (Node.js) |
+| 初期化場所 | `instrumentation.ts` → `lib/appinsights.ts` |
+| 環境変数 | `APPLICATIONINSIGHTS_CONNECTION_STRING`, `START_APP_INSIGHTS=true` |
+| 機能 | リクエスト、依存関係、例外の自動収集 |
+
+**注意**: Azure SWA 環境では `NEXT_RUNTIME` が設定されない場合があるため、`typeof window === 'undefined'` でサーバーサイドを検出。
+
+#### Azure Functions層
+
+| 項目 | 値 |
+|------|------|
+| SDK | Azure Functions ランタイム自動収集 |
+| 設定場所 | `host.json` |
+| 環境変数 | `APPLICATIONINSIGHTS_CONNECTION_STRING` |
+| 機能 | 関数実行、依存関係、例外の自動収集 |
+
+### 8.3 環境変数一覧
+
+| 変数名 | 設定場所 | 用途 |
+|--------|---------|------|
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | SWA, Azure Functions | サーバーサイドテレメトリ |
+| `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` | SWA | ブラウザテレメトリ |
+| `START_APP_INSIGHTS` | SWA | App Insights 有効化フラグ |
+| `ApplicationInsightsAgent_EXTENSION_VERSION` | SWA | SWA 拡張バージョン (`~3`) |
+
+### 8.4 host.json 設定（Azure Functions）
+
+```json
+{
+    "logging": {
+        "logLevel": {
+            "default": "Information",
+            "Host.Results": "Error",
+            "Function": "Information",
+            "Host.Aggregator": "Trace"
+        },
+        "applicationInsights": {
+            "samplingSettings": {
+                "isEnabled": true,
+                "maxTelemetryItemsPerSecond": 20,
+                "excludedTypes": "Request;Exception"
+            }
+        }
+    }
+}
+```
+
+- `excludedTypes`: リクエストと例外はサンプリングから除外（すべて記録）
+- `maxTelemetryItemsPerSecond`: 過剰なテレメトリを防止
+
+### 8.5 トラブルシューティング
+
+| 症状 | 原因 | 解決策 |
+|------|------|--------|
+| ブラウザからログが出ない | `NEXT_PUBLIC_` プレフィックスなし | 環境変数名を修正 |
+| SWA からログが出ない | `START_APP_INSIGHTS=true` 未設定 | 環境変数を追加 |
+| Functions からログが出ない | 接続文字列未設定 or 別インスタンス | 接続文字列を統一 |
+
+## 9. api-ai (US Function App) のデプロイ
+
+### 9.1 概要
 Gemini API の地域制限を回避するため、US East 2 リージョンに独立した Azure Function App (`func-pm-exam-dx-ai-us`) を配置している。
 
-### 8.2 デプロイ手順
+### 9.2 デプロイ手順
 
 **重要**: Linux Consumption Plan では `--build remote` オプションが必須。
 
@@ -186,7 +285,7 @@ npm run build
 func azure functionapp publish func-pm-exam-dx-ai-us --build remote
 ```
 
-### 8.3 デプロイ成功の確認
+### 9.3 デプロイ成功の確認
 
 ```
 Functions in func-pm-exam-dx-ai-us:
@@ -194,7 +293,7 @@ Functions in func-pm-exam-dx-ai-us:
         Invoke url: https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/plan
 ```
 
-### 8.4 トラブルシューティング
+### 9.4 トラブルシューティング
 
 | 問題 | 原因 | 解決策 |
 |------|------|--------|
@@ -202,7 +301,7 @@ Functions in func-pm-exam-dx-ai-us:
 | Gemini 404エラー | 無効なモデル名 | ListModels API で確認 |
 | User location not supported | 間違ったリージョン | Function App が US リージョンにあることを確認 |
 
-### 8.5 環境変数
+### 9.5 環境変数
 
 Azure Portal > Function Apps > `func-pm-exam-dx-ai-us` > 設定 > 環境変数
 
@@ -211,7 +310,7 @@ Azure Portal > Function Apps > `func-pm-exam-dx-ai-us` > 設定 > 環境変数
 | `GEMINI_API_KEY` | Google AI Studio APIキー | ✅ |
 | `COSMOS_DB_CONNECTION` | CosmosDB接続文字列（メトリクス用） | ✅ |
 
-## 9. 参考資料
+## 10. 参考資料
 
 - [Azure Static Web Apps - Deploy hybrid Next.js](https://learn.microsoft.com/en-us/azure/static-web-apps/deploy-nextjs-hybrid)
 - [Next.js - Output File Tracing (standalone)](https://nextjs.org/docs/advanced-features/output-file-tracing)
