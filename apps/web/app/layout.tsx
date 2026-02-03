@@ -70,6 +70,12 @@ export default function RootLayout({
         <html lang="ja">
             <body className={inter.className}>
                 {/* ... script ... */}
+                {/* Application Insights 接続文字列をランタイムで埋め込む（SWA対応） */}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `window.__APPINSIGHTS_CONNECTION_STRING__ = "${process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING || ''}";`,
+                    }}
+                />
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `
