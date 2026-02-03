@@ -57,6 +57,8 @@ export default function PlanViewer() {
 
                 const counts: Record<string, number> = {};
                 fetchedRecords.forEach(r => {
+                    // Skip records without valid answeredAt
+                    if (!r || !r.answeredAt) return;
                     const dateKey = r.answeredAt.split('T')[0];
                     counts[dateKey] = (counts[dateKey] || 0) + 1;
                 });
