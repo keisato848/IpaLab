@@ -23,16 +23,30 @@ const getClient = async (): Promise<CosmosClient | undefined> => {
 
     try {
         let connStr = CONNECTION_STRING;
+        const isLocalEmulator = connStr.includes("localhost") || connStr.includes("127.0.0.1");
+        
         // Fix for local emulator
         if (connStr.includes("localhost")) {
             connStr = connStr.replace("localhost", "127.0.0.1");
-            process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
         }
 
-        client = new CosmosClient({
-            connectionString: connStr,
-            agent: new https.Agent({ rejectUnauthorized: false })
-        });
+        // ローカルエミュレータの場合のみTLS検証を無効化
+        // 本番環境（Azure CosmosDB）では適切な証明書が使用される
+        if (isLocalEmulator) {
+            // codeql[js/disabling-certificate-validation] - ローカルエミュレータ専用の意図的な無効化
+            console.warn("[CosmosDB] ローカルエミュレータ接続: TLS証明書検証を無効化します（開発環境のみ）");
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+            client = new CosmosClient({
+                connectionString: connStr,
+                // codeql[js/disabling-certificate-validation] - ローカルエミュレータ専用
+                agent: new https.Agent({ rejectUnauthorized: false })
+            });
+        } else {
+            // 本番環境: 標準のTLS検証を使用
+            client = new CosmosClient({
+                connectionString: connStr,
+            });
+        }
 
         return client;
     } catch (e: any) {
