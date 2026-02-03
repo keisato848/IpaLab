@@ -34,10 +34,11 @@ export interface StudyPlan {
 interface GoalSettingWizardProps {
     onClose: () => void;
     onSave: (plan: StudyPlan) => void;
+    onAsyncJobCreated?: (jobId: string) => void; // 非同期ジョブ作成時のコールバック
     initialExamId?: string;
 }
 
-export default function GoalSettingWizard({ onClose, onSave, initialExamId }: GoalSettingWizardProps) {
+export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, initialExamId }: GoalSettingWizardProps) {
     const [estimatedMs, setEstimatedMs] = useState(5000);
     const [currentStep, setCurrentStep] = useState(1);
 
@@ -85,6 +86,36 @@ export default function GoalSettingWizard({ onClose, onSave, initialExamId }: Go
 
     const [pollingStatus, setPollingStatus] = useState<string>('');
     const [retryCount, setRetryCount] = useState(0);
+    const [asyncJobCreated, setAsyncJobCreated] = useState(false);
+
+    // 非同期ジョブを作成（タイムアウト時のフォールバック）
+    const createAsyncJob = async (): Promise<boolean> => {
+        try {
+            setPollingStatus('バックグラウンドで処理を続行します...');
+            const res = await fetch('/api/ai/jobs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    targetExam,
+                    studyTimeWeekday: hoursWeekday,
+                    studyTimeWeekend: hoursWeekend,
+                    examDate: examDate,
+                    scores
+                }),
+            });
+
+            if (res.ok) {
+                const job = await res.json();
+                setAsyncJobCreated(true);
+                onAsyncJobCreated?.(job.id);
+                return true;
+            }
+            return false;
+        } catch (e) {
+            console.error('Failed to create async job:', e);
+            return false;
+        }
+    };
 
     const handleGenerate = async () => {
         if (!examDate) {
@@ -94,68 +125,63 @@ export default function GoalSettingWizard({ onClose, onSave, initialExamId }: Go
         setLoading(true);
         setPollingStatus('AI計画を生成中...');
         setRetryCount(0);
+        setAsyncJobCreated(false);
 
-        const maxRetries = 3;
-        let lastError: Error | null = null;
+        // 同期処理: 45秒タイムアウトで1回試行
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 45000); // 45秒タイムアウト
 
-        for (let attempt = 0; attempt <= maxRetries; attempt++) {
-            try {
-                if (attempt > 0) {
-                    setRetryCount(attempt);
-                    setPollingStatus(`再試行中... (${attempt}/${maxRetries})`);
-                    // 指数バックオフ: 2秒、4秒、8秒
-                    await new Promise(resolve => setTimeout(resolve, 2000 * Math.pow(2, attempt - 1)));
-                }
+            const res = await fetch('/api/ai/plan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: "guest",
+                    targetExam,
+                    studyTimeWeekday: hoursWeekday,
+                    studyTimeWeekend: hoursWeekend,
+                    examDate: examDate,
+                    scores
+                }),
+                signal: controller.signal
+            });
 
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 90000); // 90秒タイムアウト
+            clearTimeout(timeoutId);
 
-                const res = await fetch('/api/ai/plan', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userId: "guest",
-                        targetExam,
-                        studyTimeWeekday: hoursWeekday,
-                        studyTimeWeekend: hoursWeekend,
-                        examDate: examDate,
-                        scores
-                    }),
-                    signal: controller.signal
-                });
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.error || `HTTP ${res.status}`);
+            }
 
-                clearTimeout(timeoutId);
+            const rawPlan = await res.json();
+            const plan: StudyPlan = {
+                ...rawPlan,
+                id: crypto.randomUUID(),
+                targetExam: targetExam
+            };
+            onSave(plan);
+            return; // 成功したらここで終了
 
-                if (!res.ok) {
-                    const errorData = await res.json().catch(() => ({}));
-                    throw new Error(errorData.error || `HTTP ${res.status}`);
-                }
-
-                const rawPlan = await res.json();
-                const plan: StudyPlan = {
-                    ...rawPlan,
-                    id: crypto.randomUUID(),
-                    targetExam: targetExam
-                };
-                onSave(plan);
-                return; // 成功したらここで終了
-
-            } catch (e: any) {
-                lastError = e;
-                console.error(`Attempt ${attempt + 1} failed:`, e);
+        } catch (e: any) {
+            console.error('Sync plan generation failed:', e);
+            
+            // タイムアウトまたはエラーの場合、非同期ジョブを作成
+            if (e.name === 'AbortError' || e.message?.includes('timeout')) {
+                setPollingStatus('タイムアウト - バックグラウンド処理に切り替えます...');
                 
-                // AbortErrorはタイムアウト
-                if (e.name === 'AbortError') {
-                    setPollingStatus('タイムアウト - 再試行します...');
+                const jobCreated = await createAsyncJob();
+                if (jobCreated) {
+                    setLoading(false);
+                    // 成功メッセージを表示してウィザードを閉じる
+                    return;
                 }
             }
+            
+            // 非同期ジョブも作成できなかった場合
+            alert(`計画の生成に失敗しました: ${e.message || 'もう一度お試しください。'}\n\nサーバーが混雑している可能性があります。しばらく待ってから再度お試しください。`);
+            setLoading(false);
+            setPollingStatus('');
         }
-
-        // 全てのリトライが失敗
-        alert(`計画の生成に失敗しました: ${lastError?.message || 'もう一度お試しください。'}\n\nサーバーが混雑している可能性があります。しばらく待ってから再度お試しください。`);
-        setLoading(false);
-        setPollingStatus('');
-        setRetryCount(0);
     };
 
     const handleScoreChange = (id: string, val: number) => {
@@ -401,6 +427,30 @@ export default function GoalSettingWizard({ onClose, onSave, initialExamId }: Go
         </div>
     );
 
+    // 非同期ジョブ作成完了時のUI
+    const renderAsyncJobCreated = () => (
+        <div className={styles.loadingContainer}>
+            <div className={styles.asyncJobCreated}>
+                <div className={styles.asyncJobIcon}>📋</div>
+                <h3 className={styles.loadingTitle}>バックグラウンドで処理中</h3>
+                <p className={styles.loadingDescription}>
+                    計画の生成をバックグラウンドで続行しています。<br />
+                    完了次第、ダッシュボードで通知されます。
+                </p>
+                <p className={styles.loadingHint}>
+                    💡 このウィンドウを閉じても、計画の生成は継続されます
+                </p>
+                <button
+                    onClick={onClose}
+                    className={`${styles.btn} ${styles.btnPrimary}`}
+                    style={{ marginTop: '1.5rem' }}
+                >
+                    閉じる
+                </button>
+            </div>
+        </div>
+    );
+
     return (
         <div className={styles.overlay} onClick={(e) => {
             if (e.target === e.currentTarget) onClose();
@@ -409,10 +459,10 @@ export default function GoalSettingWizard({ onClose, onSave, initialExamId }: Go
                 <header className={styles.modalHeader}>
                     <button className={styles.closeBtn} onClick={onClose} aria-label="閉じる">×</button>
                     <h2 className={styles.modalTitle}>AI学習プランナー</h2>
-                    {!loading && renderStepIndicator()}
+                    {!loading && !asyncJobCreated && renderStepIndicator()}
                 </header>
 
-                {loading ? renderLoading() : (
+                {asyncJobCreated ? renderAsyncJobCreated() : loading ? renderLoading() : (
                     <>
                         {currentStep === 1 && renderStep1()}
                         {currentStep === 2 && renderStep2()}

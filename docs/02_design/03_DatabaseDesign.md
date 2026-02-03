@@ -73,6 +73,8 @@ OAuthプロバイダ (Google, GitHub) との紐付け情報を管理。
 
 - **PK:** `/sessionToken`
 - **ID:** `sessionToken`
+
+### 2.5 `LearningRecords` コンテナ
 学習履歴とSR (Spaced Repetition) の状態を管理します。
 クエリの負荷分散のため、ユーザーIDをパーティションキーとします。
 
@@ -94,6 +96,50 @@ OAuthプロバイダ (Google, GitHub) との紐付け情報を管理。
 }
 ```
 
+### 2.6 `Metrics` コンテナ
+予測メトリクスとAI生成履歴を管理します。
+
+- **PK:** `/type`
+- **ID:** メトリクスタイプ + タイムスタンプ
+
+### 2.7 `PlanJobs` コンテナ
+AI学習計画生成の非同期ジョブを管理します。タイムアウト時のフォールバック処理に使用。
+
+- **PK:** `/userId` (ユーザー単位のクエリを効率化)
+- **ID:** `job-{userId}-{timestamp}`
+- **TTL:** 30日（2592000秒）
+
+**Item Structure Definition:**
+```json
+{
+  "id": "job-user123-1707000000000",
+  "type": "studyPlanJob",
+  "userId": "user123",
+  "targetExam": "AP",
+  "status": "pending", // pending | processing | completed | failed
+  "requestData": {
+    "targetExam": "AP",
+    "examDate": "2026-04-19",
+    "studyTimeWeekday": 2,
+    "studyTimeWeekend": 4,
+    "scores": { "テクノロジ系": 60, "マネジメント系": 50, "ストラテジ系": 70 }
+  },
+  "resultData": { /* StudyPlan オブジェクト */ },
+  "error": null,
+  "createdAt": "2026-02-03T10:00:00.000Z",
+  "processingStartedAt": "2026-02-03T10:00:05.000Z",
+  "completedAt": "2026-02-03T10:01:30.000Z",
+  "notifiedAt": null,
+  "dismissed": false
+}
+```
+
+**ステータス遷移:**
+```
+pending → processing → completed
+                    ↘ failed
+```
+
 ## 3. ER図 (Concept Mapping)
 
 NoSQLですが、論理的なリレーションシップを可視化します。
@@ -103,6 +149,7 @@ erDiagram
     Users ||--o{ Accounts : has
     Users ||--o{ Sessions : has
     Users ||--o{ LearningRecords : has
+    Users ||--o{ PlanJobs : has
     Questions ||--o{ LearningRecords : referenced_by
 
     Users {
@@ -123,7 +170,6 @@ erDiagram
     Questions {
         string id PK
         string examId FK
-        string examId FK
         string type
         string category
         string subCategory
@@ -137,6 +183,15 @@ erDiagram
         string questionId FK
         boolean isCorrect
         datetime nextReviewAt
+    }
+
+    PlanJobs {
+        string id PK
+        string userId FK
+        string status
+        string targetExam
+        datetime createdAt
+        datetime completedAt
     }
 ```
 

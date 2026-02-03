@@ -3,13 +3,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { LearningRecord, getLearningRecords, getQuestions } from '@/lib/api';
+import { LearningRecord, getLearningRecords, getQuestions, StudyPlanJob } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
 import { getExamLabel } from '@/lib/exam-utils';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import { useUserProgress } from '@/hooks/useUserProgress';
 import HeatmapWidget from './HeatmapWidget';
 import GoalSettingWizard, { StudyPlan } from './GoalSettingWizard';
+import PlanReadyNotification from './PlanReadyNotification';
 import styles from './DashboardClient.module.css';
 
 export default function DashboardClient() {
@@ -21,6 +22,7 @@ export default function DashboardClient() {
     const [studyPlan, setStudyPlan] = useState<StudyPlan | null>(null);
     const [allPlans, setAllPlans] = useState<StudyPlan[]>([]);
     const [showWizard, setShowWizard] = useState(false);
+    const [pendingJob, setPendingJob] = useState<StudyPlanJob | null>(null);
     const {
         progress,
         achievements,
@@ -120,7 +122,49 @@ export default function DashboardClient() {
         }
     }, []);
 
-    // Job Polling Removed - using Sync API now
+    // 2.5. Check for pending completed jobs (async job notification)
+    useEffect(() => {
+        async function checkPendingJobs() {
+            if (status !== 'authenticated') return;
+            
+            try {
+                const res = await fetch('/api/ai/jobs/pending');
+                if (res.ok) {
+                    const jobs = await res.json();
+                    if (jobs && jobs.length > 0) {
+                        // Show notification for the most recent completed job
+                        setPendingJob(jobs[0]);
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to check pending jobs:', e);
+            }
+        }
+
+        checkPendingJobs();
+    }, [status]);
+
+    // Handle async job created callback
+    const handleAsyncJobCreated = (jobId: string) => {
+        console.log('Async job created:', jobId);
+        setShowWizard(false);
+        // Could show a toast notification here
+    };
+
+    // Handle applying plan from notification
+    const handleApplyPlanFromNotification = (planData: any) => {
+        const plan: StudyPlan = {
+            ...planData,
+            id: crypto.randomUUID(),
+        };
+        handleSavePlan(plan);
+        setPendingJob(null);
+    };
+
+    // Handle dismissing notification
+    const handleDismissNotification = () => {
+        setPendingJob(null);
+    };
 
     const handleSavePlan = (plan: StudyPlan) => {
         setStudyPlan(plan);
@@ -763,6 +807,15 @@ export default function DashboardClient() {
                 <GoalSettingWizard
                     onClose={() => setShowWizard(false)}
                     onSave={handleSavePlan}
+                    onAsyncJobCreated={handleAsyncJobCreated}
+                />
+            )}
+
+            {pendingJob && (
+                <PlanReadyNotification
+                    job={pendingJob}
+                    onApply={handleApplyPlanFromNotification}
+                    onDismiss={handleDismissNotification}
                 />
             )}
         </div>

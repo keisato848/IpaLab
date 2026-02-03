@@ -210,7 +210,9 @@ async function main() {
         // New Container for Predictive Metrics
         await database.containers.createIfNotExists({ id: "Metrics", partitionKey: '/type' });
         // Container for AI Plan Generation Jobs (async processing)
-        await database.containers.createIfNotExists({ id: "PlanJobs", partitionKey: '/id' });
+        // Partition Key: /userId でユーザー単位のクエリを効率化
+        // TTL: 30日（2592000秒）は Azure Portal または CLI で設定済み
+        await database.containers.createIfNotExists({ id: "PlanJobs", partitionKey: '/userId' });
 
         console.log("Database and Container ensured.");
 
