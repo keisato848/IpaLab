@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+// SWA ランタイムで環境変数を取得するため、動的レンダリングを強制
+export const dynamic = 'force-dynamic';
+
 /**
  * Application Insights の接続文字列を返す API エンドポイント
  * 
