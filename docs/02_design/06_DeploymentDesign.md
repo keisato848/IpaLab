@@ -244,11 +244,19 @@ export async function GET(req: NextRequest) {
 | 項目 | 値 |
 |------|------|
 | SDK | `applicationinsights` (Node.js) |
-| 初期化場所 | `instrumentation.ts` → `lib/appinsights.ts` |
-| 環境変数 | `APPLICATIONINSIGHTS_CONNECTION_STRING`, `START_APP_INSIGHTS=true` |
+| 初期化方式 | **Preload スクリプト** (`load-appinsights.js`) + `instrumentation.ts` |
+| 環境変数 | `APPLICATIONINSIGHTS_CONNECTION_STRING`, `START_APP_INSIGHTS=true`, `NODE_OPTIONS` |
 | 機能 | リクエスト、依存関係、例外の自動収集 |
 
-**注意**: Azure SWA 環境では `NEXT_RUNTIME` が設定されない場合があるため、`typeof window === 'undefined'` でサーバーサイドを検出。
+**重要**: Azure SWA + Next.js (Hybrid) 環境では、以下の2段階の初期化が必要：
+
+1. **Preload スクリプト** (`load-appinsights.js`): `NODE_OPTIONS=--require ./load-appinsights.js` を設定することで、Next.js が起動する**前**に SDK を初期化
+2. **instrumentation.ts**: Next.js のインストルメンテーションフックによるフォールバック初期化
+
+**参考資料**:
+- [Enabling the Node.js Application Insights SDK in Next.js](https://medium.com/microsoftazure/enabling-the-node-js-application-insights-sdk-in-next-js-746762d92507)
+- [GitHub issue #808](https://github.com/microsoft/ApplicationInsights-node.js/issues/808)
+- [Azure SWA + Next.js ログ有効化](https://learn.microsoft.com/en-us/azure/static-web-apps/deploy-nextjs-hybrid#enable-logging-for-nextjs)
 
 #### Azure Functions層
 
@@ -265,7 +273,8 @@ export async function GET(req: NextRequest) {
 |--------|---------|------|
 | `APPLICATIONINSIGHTS_CONNECTION_STRING` | SWA, Azure Functions | サーバーサイドテレメトリ |
 | `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` | SWA | ブラウザテレメトリ |
-| `START_APP_INSIGHTS` | SWA | App Insights 有効化フラグ |
+| `START_APP_INSIGHTS` | SWA | App Insights 有効化フラグ (`true`) |
+| `NODE_OPTIONS` | SWA | Preload スクリプト (`--require ./load-appinsights.js`) |
 | `ApplicationInsightsAgent_EXTENSION_VERSION` | SWA | SWA 拡張バージョン (`~3`) |
 
 ### 8.4 host.json 設定（Azure Functions）
@@ -298,8 +307,21 @@ export async function GET(req: NextRequest) {
 | 症状 | 原因 | 解決策 |
 |------|------|--------|
 | ブラウザからログが出ない | `NEXT_PUBLIC_` プレフィックスなし | 環境変数名を修正 |
+| SWA からログが出ない | Preload スクリプト未設定 | `NODE_OPTIONS=--require ./load-appinsights.js` を設定 |
 | SWA からログが出ない | `START_APP_INSIGHTS=true` 未設定 | 環境変数を追加 |
+| SWA からログが出ない | 接続文字列未設定 | `APPLICATIONINSIGHTS_CONNECTION_STRING` を設定 |
+| SWA からログが出ない | `NEXT_RUNTIME` が設定されない | `instrumentation.ts` で `typeof window === 'undefined'` 検出を使用 |
 | Functions からログが出ない | 接続文字列未設定 or 別インスタンス | 接続文字列を統一 |
+
+#### 8.5.1 SWA ログ確認コマンド
+
+```bash
+# Application Insights のトレースログ確認
+az monitor app-insights query --app appi-pm-exam-dx --analytics-query "traces | where timestamp > ago(1h) | summarize count() by cloud_RoleName" --resource-group rg-pm-exam-dx-prod
+
+# リクエストログ確認
+az monitor app-insights query --app appi-pm-exam-dx --analytics-query "requests | where timestamp > ago(1h) | take 10" --resource-group rg-pm-exam-dx-prod
+```
 
 ## 9. api-ai (US Function App) のデプロイ
 
