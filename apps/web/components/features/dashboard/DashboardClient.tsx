@@ -281,7 +281,7 @@ export default function DashboardClient() {
     let todayXpReward = 30;
     let todayTaskCompleted = false;
     const todayGoalData = !isAllPlans
-        ? studyPlan?.weeklySchedule?.flatMap(w => w.dailyTasks)?.find(t => t.date === todayStr)
+        ? studyPlan?.weeklySchedule?.flatMap(w => w.dailyTasks || [])?.filter(t => t)?.find(t => t.date === todayStr)
         : undefined;
 
     if (isAllPlans) {
@@ -289,7 +289,7 @@ export default function DashboardClient() {
         let totalCount = 0;
         let totalXp = 0;
         allPlans.forEach(p => {
-            const tData = p.weeklySchedule?.flatMap(w => w.dailyTasks)?.find(t => t.date === todayStr);
+            const tData = p.weeklySchedule?.flatMap(w => w.dailyTasks || [])?.filter(t => t)?.find(t => t.date === todayStr);
             if (tData) {
                 totalCount += tData.questionCount;
                 totalXp += tData.xpReward || 30;
@@ -323,7 +323,7 @@ export default function DashboardClient() {
     const weekGoal = currentWeekData?.goal || "週間目標未設定";
 
     const today = new Date().toDateString();
-    const todayRecords = filteredRecords.filter(r => new Date(r.answeredAt).toDateString() === today);
+    const todayRecords = filteredRecords.filter(r => r && r.answeredAt && new Date(r.answeredAt).toDateString() === today);
     const todayCount = todayRecords.length;
     const progressPercent = Math.min(100, Math.round((todayCount / todayTargetCount) * 100));
     
@@ -359,10 +359,10 @@ export default function DashboardClient() {
                 if (plan.id !== studyPlan.id) return plan;
                 return {
                     ...plan,
-                    weeklySchedule: plan.weeklySchedule.map(week => ({
+                    weeklySchedule: (plan.weeklySchedule || []).map(week => ({
                         ...week,
-                        dailyTasks: week.dailyTasks.map(task => {
-                            if (task.date !== todayStr) return task;
+                        dailyTasks: (week.dailyTasks || []).map(task => {
+                            if (!task || task.date !== todayStr) return task;
                             return { ...task, isCompleted: true };
                         })
                     }))
@@ -710,20 +710,20 @@ export default function DashboardClient() {
                                     stroke="white"
                                     strokeWidth="12"
                                     strokeDasharray={`${2 * Math.PI * 40}`}
-                                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - (statsRecords.length > 0 ? (statsRecords.filter(r => r.isCorrect).length / statsRecords.length) : 0))}`}
+                                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - (statsRecords.length > 0 ? (statsRecords.filter(r => r && r.isCorrect).length / statsRecords.length) : 0))}`}
                                     strokeLinecap="round"
                                     transform="rotate(-90 50 50)"
                                 />
                             </svg>
                             <div style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold' }}>
-                                {statsRecords.length > 0 ? Math.round((statsRecords.filter(r => r.isCorrect).length / statsRecords.length) * 100) : 0}%
+                                {statsRecords.length > 0 ? Math.round((statsRecords.filter(r => r && r.isCorrect).length / statsRecords.length) * 100) : 0}%
                             </div>
                         </div>
 
                         <div style={{ textAlign: 'left' }}>
                             <div style={{ fontSize: '0.85rem', opacity: 0.9, marginBottom: '0.2rem' }}>正解数</div>
                             <div style={{ fontSize: '1.4rem', fontWeight: 'bold', lineHeight: 1 }}>
-                                {statsRecords.filter(r => r.isCorrect).length} <span style={{ fontSize: '0.9rem', fontWeight: 'normal', opacity: 0.8 }}>/ {statsRecords.length}</span>
+                                {statsRecords.filter(r => r && r.isCorrect).length} <span style={{ fontSize: '0.9rem', fontWeight: 'normal', opacity: 0.8 }}>/ {statsRecords.length}</span>
                             </div>
                         </div>
                     </div>

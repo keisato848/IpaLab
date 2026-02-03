@@ -226,7 +226,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     setAllExamRecords(eRecords);
                     // Session Stats (Today's records)
                     const today = new Date().toISOString().split('T')[0];
-                    const todaysRecords = eRecords.filter(r => r.answeredAt.startsWith(today));
+                    const todaysRecords = eRecords.filter(r => r && r.answeredAt && r.answeredAt.startsWith(today));
                     if (todaysRecords.length > 0) {
                         const sCorrect = todaysRecords.filter(r => r.isCorrect).length;
                         setSessionStats({ total: todaysRecords.length, correct: sCorrect });

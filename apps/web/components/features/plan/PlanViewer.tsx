@@ -197,7 +197,7 @@ export default function PlanViewer() {
 
                                         {hasTasks ? (
                                             <div style={{ display: 'grid', gap: '0.8rem' }}>
-                                                {week.dailyTasks.map((task, j) => {
+                                                {week.dailyTasks.filter(task => task && task.date).map((task, j) => {
                                                     const actual = dailyCounts[task.date] || 0;
                                                     const isMet = actual >= task.questionCount;
                                                     const remaining = task.questionCount - actual;

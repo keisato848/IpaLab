@@ -8,6 +8,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { getContainer } from '@/lib/cosmos';
 
+// 認証を使用するため動的レンダリングを強制
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/ai/jobs/pending
  * 完了済みで未通知のジョブを取得（ダッシュボード通知用）

@@ -156,6 +156,7 @@ export function calculateAggregatedRadar(records: LearningRecord[]): RadarData[]
     // API returns Japanese keys: "設問適合性", "論理構成"...
 
     records.forEach(r => {
+        if (!r) return;
         if (r.isDescriptive && r.aiRadarData) {
             r.aiRadarData.forEach((item: any) => {
                 if (sums[item.subject]) {

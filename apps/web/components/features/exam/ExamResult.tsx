@@ -52,10 +52,11 @@ export default function ExamResult({ questions, examId, year, type }: ExamResult
 
                 // Get latest record per question
                 // Sort by answeredAt desc (newest first)
-                fetchedRecords.sort((a, b) => new Date(b.answeredAt).getTime() - new Date(a.answeredAt).getTime());
+                const validRecords = fetchedRecords.filter(r => r && r.answeredAt);
+                validRecords.sort((a, b) => new Date(b.answeredAt).getTime() - new Date(a.answeredAt).getTime());
 
                 const latestMap = new Map<string, LearningRecord>();
-                fetchedRecords.forEach(r => {
+                validRecords.forEach(r => {
                     if (!latestMap.has(r.questionId)) {
                         latestMap.set(r.questionId, r);
                     }
