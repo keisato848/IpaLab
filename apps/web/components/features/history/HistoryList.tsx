@@ -27,8 +27,10 @@ export default function HistoryList() {
                 } else {
                     // Guest mode: show legacy records-based view
                     const records = guestManager.getHistory();
-                    records.sort((a, b) => new Date(b.answeredAt).getTime() - new Date(a.answeredAt).getTime());
-                    setGuestRecords(records);
+                    // Filter out records with invalid or missing answeredAt
+                    const validRecords = records.filter(r => r && r.answeredAt);
+                    validRecords.sort((a, b) => new Date(b.answeredAt).getTime() - new Date(a.answeredAt).getTime());
+                    setGuestRecords(validRecords);
                 }
             } catch (err) {
                 console.error("Failed to load history", err);
@@ -73,7 +75,7 @@ export default function HistoryList() {
                         </div>
                         <div className={styles.cardMeta}>
                             <div className={styles.date}>
-                                {new Date(r.answeredAt).toLocaleString('ja-JP')}
+                                {r.answeredAt ? new Date(r.answeredAt).toLocaleString('ja-JP') : '-'}
                             </div>
                         </div>
                     </div>

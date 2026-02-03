@@ -53,6 +53,118 @@ interface RawPMQuestion {
     questions: any[];
 }
 
+// Clean invalid LearningRecords (missing required fields like answeredAt)
+async function cleanLearningRecords() {
+    if (!CONNECTION_STRING) {
+        console.error("Error: COSMOS_DB_CONNECTION environment variable is not set.");
+        process.exit(1);
+    }
+
+    const isLocal = CONNECTION_STRING.includes('localhost') || CONNECTION_STRING.includes('127.0.0.1');
+    let finalConnectionString = CONNECTION_STRING;
+    let clientOptions: any = {};
+
+    if (isLocal) {
+        console.log("Detected Local Cosmos DB Emulator.");
+        if (CONNECTION_STRING.includes('localhost')) {
+            finalConnectionString = CONNECTION_STRING.replace('localhost', '127.0.0.1');
+        }
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        clientOptions = {
+            connectionString: finalConnectionString,
+            agent: new https.Agent({ rejectUnauthorized: false })
+        };
+    } else {
+        console.log("Detected Cloud Cosmos DB connection.");
+        clientOptions = { connectionString: finalConnectionString };
+    }
+
+    console.log(`Using Connection String Endpoint: ${finalConnectionString.split(';')[0]}`);
+
+    const client = new CosmosClient(clientOptions);
+    const database = client.database(DATABASE_NAME);
+    
+    // Ensure LearningRecords container exists
+    await database.containers.createIfNotExists({ id: "LearningRecords", partitionKey: '/userId' });
+    const container = database.container("LearningRecords");
+
+    console.log("Fetching all LearningRecords...");
+    
+    const { resources: records } = await container.items
+        .query("SELECT * FROM c")
+        .fetchAll();
+
+    console.log(`Found ${records.length} total records.`);
+
+    let deletedCount = 0;
+    let invalidRecords: { id: string; userId: string; reason: string }[] = [];
+
+    for (const record of records) {
+        const issues: string[] = [];
+        
+        // Check required fields
+        if (!record.answeredAt) issues.push('missing answeredAt');
+        if (!record.id) issues.push('missing id');
+        if (!record.userId) issues.push('missing userId');
+        if (!record.questionId) issues.push('missing questionId');
+        if (!record.examId) issues.push('missing examId');
+        if (typeof record.isCorrect !== 'boolean') issues.push('missing/invalid isCorrect');
+        
+        // Validate answeredAt format if present
+        if (record.answeredAt) {
+            const date = new Date(record.answeredAt);
+            if (isNaN(date.getTime())) {
+                issues.push('invalid answeredAt format');
+            }
+        }
+
+        if (issues.length > 0) {
+            invalidRecords.push({
+                id: record.id || 'unknown',
+                userId: record.userId || 'unknown',
+                reason: issues.join(', ')
+            });
+        }
+    }
+
+    if (invalidRecords.length === 0) {
+        console.log("✅ No invalid records found. Database is clean.");
+        return;
+    }
+
+    console.log(`\n⚠️  Found ${invalidRecords.length} invalid records:`);
+    invalidRecords.forEach(r => {
+        console.log(`  - ID: ${r.id}, UserId: ${r.userId}, Reason: ${r.reason}`);
+    });
+
+    // Confirm deletion
+    const readline = await import('readline');
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    
+    const answer = await new Promise<string>((resolve) => {
+        rl.question(`\nDelete these ${invalidRecords.length} invalid records? (y/N): `, resolve);
+    });
+    rl.close();
+
+    if (answer.toLowerCase() !== 'y') {
+        console.log("Aborted.");
+        return;
+    }
+
+    // Delete invalid records
+    for (const invalid of invalidRecords) {
+        try {
+            await container.item(invalid.id, invalid.userId).delete();
+            deletedCount++;
+            console.log(`  Deleted: ${invalid.id}`);
+        } catch (err: any) {
+            console.error(`  Failed to delete ${invalid.id}: ${err.message}`);
+        }
+    }
+
+    console.log(`\n✅ Cleaned ${deletedCount} invalid records.`);
+}
+
 async function main() {
     if (!CONNECTION_STRING) {
         console.error("Error: COSMOS_DB_CONNECTION environment variable is not set.");
@@ -379,7 +491,18 @@ async function main() {
 }
 
 
-main().catch(err => {
-    console.error(err);
-    process.exit(1);
-});
+// Main entry point with command routing
+const args = process.argv.slice(2);
+const command = args[0];
+
+if (command === 'clean' || command === '--clean') {
+    cleanLearningRecords().catch(err => {
+        console.error(err);
+        process.exit(1);
+    });
+} else {
+    main().catch(err => {
+        console.error(err);
+        process.exit(1);
+    });
+}
