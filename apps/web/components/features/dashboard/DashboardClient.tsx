@@ -281,7 +281,7 @@ export default function DashboardClient() {
     let todayXpReward = 30;
     let todayTaskCompleted = false;
     const todayGoalData = !isAllPlans
-        ? studyPlan?.weeklySchedule?.flatMap(w => w.dailyTasks)?.find(t => t.date === todayStr)
+        ? studyPlan?.weeklySchedule?.flatMap(w => w.dailyTasks || [])?.filter(t => t)?.find(t => t.date === todayStr)
         : undefined;
 
     if (isAllPlans) {
@@ -289,7 +289,7 @@ export default function DashboardClient() {
         let totalCount = 0;
         let totalXp = 0;
         allPlans.forEach(p => {
-            const tData = p.weeklySchedule?.flatMap(w => w.dailyTasks)?.find(t => t.date === todayStr);
+            const tData = p.weeklySchedule?.flatMap(w => w.dailyTasks || [])?.filter(t => t)?.find(t => t.date === todayStr);
             if (tData) {
                 totalCount += tData.questionCount;
                 totalXp += tData.xpReward || 30;
@@ -359,10 +359,10 @@ export default function DashboardClient() {
                 if (plan.id !== studyPlan.id) return plan;
                 return {
                     ...plan,
-                    weeklySchedule: plan.weeklySchedule.map(week => ({
+                    weeklySchedule: (plan.weeklySchedule || []).map(week => ({
                         ...week,
-                        dailyTasks: week.dailyTasks.map(task => {
-                            if (task.date !== todayStr) return task;
+                        dailyTasks: (week.dailyTasks || []).map(task => {
+                            if (!task || task.date !== todayStr) return task;
                             return { ...task, isCompleted: true };
                         })
                     }))
