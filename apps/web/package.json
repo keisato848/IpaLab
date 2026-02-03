@@ -5,7 +5,9 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
+        "build:standalone": "next build && node scripts/copy-standalone-assets.js",
         "start": "next start",
+        "start:standalone": "node .next/standalone/apps/web/server.js",
         "lint": "next lint",
         "test": "vitest",
         "test:run": "vitest run",
