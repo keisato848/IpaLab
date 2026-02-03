@@ -40,7 +40,7 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
 
         return exams.map(exam => {
             const examRecords = userRecords.filter(r => r && r.examId === exam.id);
-            const uniqueAnswered = new Set(examRecords.filter(r => r.questionId).map(r => r.questionId)).size;
+            const uniqueAnswered = new Set(examRecords.filter(r => r && r.questionId).map(r => r.questionId)).size;
             const correctCount = examRecords.filter(r => r.isCorrect).length;
             const totalAttempts = examRecords.length;
             const correctRate = totalAttempts > 0 ? correctCount / totalAttempts : 0;
