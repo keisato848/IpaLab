@@ -11,6 +11,9 @@ import { getContainer } from '@/lib/cosmos';
 import { StudyPlanJob } from '@/lib/api';
 import { QueueClient, QueueServiceClient } from '@azure/storage-queue';
 
+// 認証を使用するため動的レンダリングを強制
+export const dynamic = 'force-dynamic';
+
 const QUEUE_NAME = process.env.AI_JOB_QUEUE_NAME || 'ai-plan-jobs';
 const STORAGE_CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING || '';
 
