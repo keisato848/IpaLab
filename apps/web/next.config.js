@@ -11,15 +11,7 @@ const nextConfig = {
         // monorepo: trace files from the root (must be in experimental for Next.js 14)
         outputFileTracingRoot: path.join(__dirname, '../../'),
         serverComponentsExternalPackages: [
-            'applicationinsights',
             '@azure/cosmos',
-            '@azure/monitor-opentelemetry',
-            '@opentelemetry/api',
-            '@opentelemetry/sdk-node',
-            '@opentelemetry/sdk-trace-node',
-            '@opentelemetry/otlp-grpc-exporter-base',
-            '@opentelemetry/exporter-logs-otlp-grpc',
-            '@grpc/grpc-js',
         ],
     },
     images: {

@@ -1,29 +1,23 @@
 /**
  * Next.js Instrumentation Hook
  * 
- * App Service のコードレス監視が基本的なテレメトリを自動収集します。
- * このファイルではカスタムログ出力のために SDK を初期化します。
+ * App Service のコードレス監視（Codeless Monitoring）が
+ * 基本的なテレメトリを自動収集するため、SDK の手動初期化は不要です。
  * 
+ * Azure App Service は APPLICATIONINSIGHTS_CONNECTION_STRING が設定されていると
+ * 自動的に Application Insights エージェントを注入し、以下を収集します：
+ * - HTTP リクエスト/レスポンス
+ * - 依存関係の呼び出し
+ * - 例外
+ * - パフォーマンスカウンター
+ * 
+ * @see https://learn.microsoft.com/azure/azure-monitor/app/codeless-overview
  * @see https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation
  */
 export async function register() {
-    // サーバーサイドかつ Node.js ランタイムでのみ実行
-    const isServer = typeof window === 'undefined';
-    const isEdge = process.env.NEXT_RUNTIME === 'edge';
-
-    if (isServer && !isEdge) {
-        const connectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING;
-
-        if (connectionString) {
-            try {
-                const { initAppInsights } = await import('./lib/appinsights');
-                initAppInsights();
-                console.log('[System] Application Insights SDK initialized');
-            } catch (error) {
-                console.error('[System] Failed to initialize Application Insights SDK:', error);
-            }
-        } else {
-            console.log('[System] Application Insights skipped: connection string not set');
-        }
+    // App Service コードレス監視を使用するため、手動でのSDK初期化は行わない
+    // 必要に応じてカスタムテレメトリを追加する場合のみこのファイルを使用
+    if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
+        console.log('[System] App Service Codeless Monitoring enabled');
     }
 }
