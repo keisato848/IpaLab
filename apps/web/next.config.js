@@ -4,16 +4,14 @@ const path = require('path');
 const nextConfig = {
     // App Service deployment requires standalone mode
     output: 'standalone',
+    // monorepo: trace files from the root (moved out of experimental in Next.js 15)
+    outputFileTracingRoot: path.join(__dirname, '../../'),
     transpilePackages: ["@ipa-lab/shared"],
     reactStrictMode: true,
-    experimental: {
-        instrumentationHook: true,
-        // monorepo: trace files from the root (must be in experimental for Next.js 14)
-        outputFileTracingRoot: path.join(__dirname, '../../'),
-        serverComponentsExternalPackages: [
-            '@azure/cosmos',
-        ],
-    },
+    // Next.js 15: serverComponentsExternalPackages renamed to serverExternalPackages
+    serverExternalPackages: [
+        '@azure/cosmos',
+    ],
     images: {
         unoptimized: true,
         remotePatterns: [
