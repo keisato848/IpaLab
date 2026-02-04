@@ -43,6 +43,7 @@ jobs:
         run: |
           LATEST_TAG="${{ steps.get-latest-tag.outputs.latest_tag }}"
           PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_LABELS="${{ join(github.event.pull_request.labels.*.name, ',') }}"
           
           # バージョン番号を抽出 (v1.2.3 → 1 2 3)
           VERSION=${LATEST_TAG#v}
@@ -50,8 +51,14 @@ jobs:
           MINOR=$(echo $VERSION | cut -d. -f2)
           PATCH=$(echo $VERSION | cut -d. -f3)
           
-          # PRタイトルに基づいてバージョンを決定
-          if [[ "$PR_TITLE" =~ ^feat: ]] || [[ "$PR_TITLE" =~ ^feat\( ]]; then
+          # ラベルとPRタイトルに基づいてバージョンを決定
+          if [[ "$PR_LABELS" == *"breaking-change"* ]]; then
+            # breaking-change ラベル → メジャーバージョンアップ
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+            BUMP_TYPE="major"
+          elif [[ "$PR_TITLE" =~ ^feat: ]] || [[ "$PR_TITLE" =~ ^feat\( ]]; then
             # feat: → マイナーバージョンアップ
             MINOR=$((MINOR + 1))
             PATCH=0
