@@ -94,9 +94,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: webapp-artifact
-          path: |
-            apps/web/.next/standalone/**
-            !apps/web/.next/standalone/apps/**
+          path: apps/web/.next/standalone/
           retention-days: 1
 
   deploy:
