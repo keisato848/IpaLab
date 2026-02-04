@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getContainer } from '@/lib/cosmos';
 import { LearningSessionSchema } from '@ipa-lab/shared';
 import { z } from 'zod';
-import { getAppInsightsClient } from '@/lib/appinsights';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,12 +51,6 @@ export async function POST(req: NextRequest) {
 
     } catch (error: any) {
         console.error("Failed to create session:", error);
-
-        const client = getAppInsightsClient();
-        if (client) {
-            client.trackException({ exception: error });
-        }
-
         return NextResponse.json({ error: "Failed to create session" }, { status: 500 });
     }
 }
