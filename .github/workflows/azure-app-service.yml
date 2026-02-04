@@ -3,6 +3,9 @@ name: Azure App Service CI/CD
 permissions:
   contents: read
 
+permissions:
+  contents: read
+
 # ==============================================================
 # Azure App Service デプロイワークフロー
 # 
