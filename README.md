@@ -1,6 +1,6 @@
 # Shikakuno (シカクノ) - IPA 情報処理技術者試験 学習プラットフォーム
 
-[![Azure Static Web Apps CI/CD](https://github.com/hayato-git/IpaLab/actions/workflows/azure-static-web-apps.yml/badge.svg)](https://github.com/hayato-git/IpaLab/actions/workflows/azure-static-web-apps.yml)
+[![Azure App Service CI/CD](https://github.com/hayato-git/IpaLab/actions/workflows/azure-webapps.yml/badge.svg)](https://github.com/hayato-git/IpaLab/actions/workflows/azure-webapps.yml)
 
 **Shikakuno (シカクノ)** は、IPA（情報処理推進機構）の試験対策に特化したインテリジェントな学習プラットフォームです。最先端の **AI 記述式採点システム** を搭載しており、独学では採点が難しい午後試験の記述式問題に対し、即座に分析的なフィードバックを提供します。
 
@@ -25,16 +25,17 @@
 
 - **Framework**: Next.js 14 (App Router)
 - **Monorepo**: Turborepo & npm Workspaces
-- **Backend**: Managed Functions on Azure Static Web Apps (Node.js)
+- **Backend**: Azure Functions (Node.js)
 - **Database**: Azure Cosmos DB (NoSQL)
-- **AI Model**: Google Gemini Pro family
+- **AI Model**: Google Gemini Pro family (gemini-3-flash-preview / gemini-2.5-flash)
 - **Authentication**: NextAuth.js (Google, GitHub)
-- **Hosting**: Azure Static Web Apps
+- **Hosting**: Azure App Service (East Asia)
+- **AI API**: Azure Functions (US East 2) - Gemini API 地域制限対応
 - **Styling**: CSS Modules / Tailwind CSS
 
 ## 🧩 システム構成
 
-本システムは、Azure Static Web Apps 上で Next.js アプリケーションと Managed Functions (API) が動作する構成となっています。
+本システムは、Azure App Service 上で Next.js アプリケーションが動作し、AI 機能は US リージョンの Azure Functions で処理する構成となっています。
 
 ```mermaid
 graph TD
@@ -42,16 +43,14 @@ graph TD
         Browser[Web Browser]
     end
 
-    subgraph Azure_SWA [Azure Static Web Apps]
-        NextJS["Next.js App (SSR)"]
-        API["Managed Functions (Node.js)"]
-        
-        NextJS -- "API Call / SSR Data" --> API
-    end
-
-    subgraph Azure_Services [Azure Services]
+    subgraph Azure_EastAsia [Azure East Asia]
+        AppService["App Service\n(Next.js SSR)"]
         CosmosDB[(Azure Cosmos DB)]
         AppInsights[Application Insights]
+    end
+
+    subgraph Azure_USEast2 [Azure US East 2]
+        FuncAI["Azure Functions\n(api-ai)"]
     end
     
     subgraph External [外部サービス]
@@ -59,11 +58,26 @@ graph TD
         Auth["OAuth Providers (GitHub/Google)"]
     end
 
-    Browser -- "HTTPS" --> NextJS
-    API -- "Data Access" --> CosmosDB
-    API -- "AI Analysis" --> Gemini
-    API -- "Telemetry" --> AppInsights
-    NextJS -- "Auth Redirect" --> Auth
+    Browser -- "HTTPS" --> AppService
+    AppService -- "Data Access" --> CosmosDB
+    AppService -- "/api/ai/plan (Proxy)" --> FuncAI
+    FuncAI -- "AI Analysis" --> Gemini
+    AppService -- "Telemetry" --> AppInsights
+    AppService -- "Auth Redirect" --> Auth
+```
+
+### AI API プロキシ構成
+
+Gemini API は US リージョンからのみ呼び出し可能なため、以下のプロキシ構成を採用しています。
+
+```
+[ユーザー] → [shikaku-no.com (East Asia App Service)]
+                    ↓
+           [Next.js API Route: /api/ai/plan]
+                    ↓ (プロキシ)
+           [func-pm-exam-dx-ai-us.azurewebsites.net (US East 2)]
+                    ↓
+           [Gemini API]
 ```
 
 ### データフロー (AI採点)
@@ -72,18 +86,19 @@ graph TD
 sequenceDiagram
     autonumber
     participant User as ユーザー
-    participant NextJS as "Next.js Client"
-    participant API as "Managed Function API"
+    participant NextJS as "Next.js (App Service)"
+    participant FuncAI as "Azure Functions (US)"
     participant Gemini as Google Gemini
     participant DB as Cosmos DB
 
     User->>NextJS: 回答を入力して「採点」をクリック
-    NextJS->>API: POST /api/score 回答データ
-    API->>DB: 問題データを取得
-    API->>Gemini: プロンプトを送信
-    Gemini-->>API: 採点結果・CLKSスコア
-    API->>DB: 学習履歴を保存
-    API-->>NextJS: 採点結果 JSON
+    NextJS->>NextJS: /api/ai/plan へリクエスト
+    NextJS->>FuncAI: プロキシ転送
+    FuncAI->>DB: 問題データを取得
+    FuncAI->>Gemini: プロンプトを送信
+    Gemini-->>FuncAI: 採点結果・CLKSスコア
+    FuncAI->>DB: 学習履歴を保存
+    FuncAI-->>NextJS: 採点結果 JSON
     NextJS-->>User: 結果とチャートを表示
 ```
 
@@ -91,7 +106,8 @@ sequenceDiagram
 
 Turborepo を使用したモノレポ構成です。
 
-- `apps/web`: メインの Next.js アプリケーション。UI、APIルート、フロントエンドロジックを含みます。
+- `apps/web`: メインの Next.js アプリケーション。UI、APIルート、フロントエンドロジックを含みます。Azure App Service にデプロイされます。
+- `apps/api-ai`: AI 採点用 Azure Functions。US East 2 リージョンにデプロイされ、Gemini API を呼び出します。
 - `apps/api`: **(Legacy)** 旧 Azure Functions API。機能は `apps/web` の API Routes に統合されました。
 - `packages/data`: 過去問データのスクレイピング、加工、データベース同期用スクリプト。
 - `packages/shared`: モノレポ全体で共有される TypeScript 型定義やユーティリティ関数。
