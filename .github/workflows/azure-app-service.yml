@@ -62,10 +62,18 @@ jobs:
 
       - name: Create deployment package
         run: |
+          # monorepo構造のstandaloneから、App Service用にフラット化
           cd apps/web/.next/standalone
-          # monorepo構造のため、apps/web 配下に必要なファイルがある
+          echo "=== Original structure ==="
           ls -la
           ls -la apps/web/ || echo "apps/web directory check"
+          
+          # apps/webの内容をルートにコピー（App Serviceが期待する構造）
+          cp -r apps/web/* .
+          # publicとstaticも必要
+          if [ -d "../../static" ]; then cp -r ../../static ./public/_next/static; fi
+          echo "=== After flattening ==="
+          ls -la
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -73,6 +81,7 @@ jobs:
           name: webapp-artifact
           path: |
             apps/web/.next/standalone/**
+            !apps/web/.next/standalone/apps/**
           retention-days: 1
 
   deploy:
