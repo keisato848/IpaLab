@@ -102,6 +102,7 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: ./deploy
+          slot-name: ''
 
   # PR時はビルド成功のみを確認（デプロイはしない）
   pr-check:
