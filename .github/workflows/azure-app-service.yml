@@ -70,10 +70,25 @@ jobs:
           
           # apps/webの内容をルートにコピー（App Serviceが期待する構造）
           cp -r apps/web/* .
-          # publicとstaticも必要
-          if [ -d "../../static" ]; then cp -r ../../static ./public/_next/static; fi
+          
+          # .next ディレクトリをコピー（Next.js production buildに必要）
+          mkdir -p .next
+          cp -r apps/web/.next/* .next/ 2>/dev/null || true
+          # standalone の親ディレクトリから static をコピー
+          if [ -d "../../static" ]; then 
+            mkdir -p .next/static
+            cp -r ../../static/* .next/static/
+          fi
+          # public ディレクトリもコピー
+          if [ -d "../../../public" ]; then
+            mkdir -p public
+            cp -r ../../../public/* public/
+          fi
+          
           echo "=== After flattening ==="
           ls -la
+          echo "=== .next directory ==="
+          ls -la .next/ 2>/dev/null || echo ".next not found"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
