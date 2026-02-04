@@ -21,6 +21,7 @@
         "@azure/storage-queue": "^12.29.0",
         "@google/generative-ai": "^0.24.1",
         "@types/uuid": "^10.0.0",
+        "applicationinsights": "^3.13.0",
         "he": "^1.2.0",
         "katex": "0.16.28",
         "mermaid": "10.9.5",
