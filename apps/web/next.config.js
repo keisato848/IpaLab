@@ -11,7 +11,12 @@ const nextConfig = {
     // Next.js 15: serverComponentsExternalPackages renamed to serverExternalPackages
     serverExternalPackages: [
         '@azure/cosmos',
+        'applicationinsights',
     ],
+    // Ensure instrumentation hook is enabled (default in Next.js 14+)
+    experimental: {
+        instrumentationHook: true,
+    },
     images: {
         unoptimized: true,
         remotePatterns: [

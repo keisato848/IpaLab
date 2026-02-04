@@ -62,33 +62,56 @@ jobs:
 
       - name: Create deployment package
         run: |
-          # monorepo構造のstandaloneから、App Service用にフラット化
+          # Next.js standalone ビルドの構造:
+          # apps/web/.next/standalone/  - Node.js サーバー
+          # apps/web/.next/static/      - CSS/JS 静的ファイル（standalone外）
+          # apps/web/public/            - 公開ファイル
+          
           cd apps/web/.next/standalone
-          echo "=== Original structure ==="
+          echo "=== Original standalone structure ==="
           ls -la
           ls -la apps/web/ || echo "apps/web directory check"
           
           # apps/webの内容をルートにコピー（App Serviceが期待する構造）
           cp -r apps/web/* .
           
-          # .next ディレクトリをコピー（Next.js production buildに必要）
+          # .next ディレクトリを作成
           mkdir -p .next
+          
+          # apps/web/.next 配下のファイルをコピー
           cp -r apps/web/.next/* .next/ 2>/dev/null || true
-          # standalone の親ディレクトリから static をコピー
-          if [ -d "../../static" ]; then 
-            mkdir -p .next/static
-            cp -r ../../static/* .next/static/
-          fi
-          # public ディレクトリもコピー
-          if [ -d "../../../public" ]; then
-            mkdir -p public
-            cp -r ../../../public/* public/
+          
+          # 重要: standalone 外の static ディレクトリをコピー
+          # Next.js standalone では static は standalone フォルダ外に出力される
+          echo "=== Copying .next/static from parent ==="
+          if [ -d "../static" ]; then 
+            cp -r ../static .next/
+            echo "Copied .next/static successfully"
+            ls -la .next/static/ | head -20
+          else
+            echo "WARNING: ../static not found!"
+            echo "Checking parent structure:"
+            ls -la ../
           fi
           
-          echo "=== After flattening ==="
+          # public ディレクトリをコピー
+          echo "=== Copying public directory ==="
+          if [ -d "../../../public" ]; then
+            cp -r ../../../public .
+            echo "Copied public directory"
+          else
+            echo "No public directory found"
+          fi
+          
+          # 不要なディレクトリを削除
+          rm -rf apps node_modules 2>/dev/null || true
+          
+          echo "=== Final deployment structure ==="
           ls -la
           echo "=== .next directory ==="
-          ls -la .next/ 2>/dev/null || echo ".next not found"
+          ls -la .next/
+          echo "=== .next/static check ==="
+          ls -la .next/static/ 2>/dev/null || echo ".next/static not found!"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
