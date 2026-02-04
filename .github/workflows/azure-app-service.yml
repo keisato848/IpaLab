@@ -95,6 +95,7 @@ jobs:
         with:
           name: webapp-artifact
           path: apps/web/.next/standalone/
+          include-hidden-files: true
           retention-days: 1
 
   deploy:
