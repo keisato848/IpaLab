@@ -1,18 +1,17 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // App Service deployment requires standalone mode
+    output: 'standalone',
+    // monorepo: trace files from the root (moved out of experimental in Next.js 15)
+    outputFileTracingRoot: path.join(__dirname, '../../'),
     transpilePackages: ["@ipa-lab/shared"],
-    // Note: standalone mode removed - using Azure SWA native Next.js support instead
-    // output: 'standalone',
     reactStrictMode: true,
-    experimental: {
-        instrumentationHook: true,
-        serverComponentsExternalPackages: [
-            'applicationinsights',
-            '@azure/cosmos',
-            '@azure/monitor-opentelemetry',
-            '@opentelemetry/instrumentation',
-        ],
-    },
+    // Next.js 15: serverComponentsExternalPackages renamed to serverExternalPackages
+    serverExternalPackages: [
+        '@azure/cosmos',
+    ],
     images: {
         unoptimized: true,
         remotePatterns: [

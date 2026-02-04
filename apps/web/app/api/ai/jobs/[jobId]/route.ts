@@ -10,9 +10,9 @@ import { authOptions } from '@/auth';
 import { getContainer } from '@/lib/cosmos';
 
 interface RouteParams {
-    params: {
+    params: Promise<{
         jobId: string;
-    };
+    }>;
 }
 
 /**
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
         }
 
         const userId = session.user.id;
-        const { jobId } = params;
+        const { jobId } = await params;
 
         const container = await getContainer('PlanJobs');
         if (!container) {
@@ -69,7 +69,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
         }
 
         const userId = session.user.id;
-        const { jobId } = params;
+        const { jobId } = await params;
         const body = await req.json();
 
         const container = await getContainer('PlanJobs');

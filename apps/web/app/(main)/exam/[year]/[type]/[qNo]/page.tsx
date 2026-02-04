@@ -14,8 +14,8 @@ export const revalidate = 3600;
 
 import { Metadata } from 'next';
 
-export async function generateMetadata({ params }: { params: { year: string; type: string; qNo: string } }): Promise<Metadata> {
-    const { year, type, qNo } = params;
+export async function generateMetadata({ params }: { params: Promise<{ year: string; type: string; qNo: string }> }): Promise<Metadata> {
+    const { year, type, qNo } = await params;
     const typeSuffix = type === 'AM1' ? 'AM' : type;
     const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
 
@@ -41,8 +41,8 @@ export async function generateMetadata({ params }: { params: { year: string; typ
     }
 }
 
-export default async function ExamQuestionPage({ params }: { params: { year: string; type: string; qNo: string } }) {
-    const { year, type, qNo } = params;
+export default async function ExamQuestionPage({ params }: { params: Promise<{ year: string; type: string; qNo: string }> }) {
+    const { year, type, qNo } = await params;
 
     const typeSuffix = type === 'AM1' ? 'AM' : type;
     const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;

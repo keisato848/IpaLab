@@ -1,6 +1,5 @@
 import { CosmosClient, Container } from '@azure/cosmos';
 import * as https from 'https';
-import { getAppInsightsClient } from '@/lib/appinsights';
 
 const CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION || "";
 const DATABASE_NAME = "pm-exam-dx-db";
@@ -51,10 +50,6 @@ const getClient = async (): Promise<CosmosClient | undefined> => {
         return client;
     } catch (e: any) {
         console.error("Failed to create Cosmos Client (Web):", e);
-        const aiClient = getAppInsightsClient();
-        if (aiClient) {
-            aiClient.trackException({ exception: e as Error });
-        }
         // Return undefined instead of throwing
         return undefined;
     }

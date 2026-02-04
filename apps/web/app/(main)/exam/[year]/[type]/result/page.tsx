@@ -6,8 +6,8 @@ import { questionRepository } from '@/lib/repositories/questionRepository';
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 
-export default async function ExamResultPage({ params }: { params: { year: string; type: string } }) {
-    const { year, type } = params;
+export default async function ExamResultPage({ params }: { params: Promise<{ year: string; type: string }> }) {
+    const { year, type } = await params;
 
     // Construct Exam ID
     const typeSuffix = type === 'AM1' ? 'AM' : type;

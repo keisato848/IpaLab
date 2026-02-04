@@ -1,0 +1,115 @@
+name: Auto Release Tag
+
+# ==============================================================
+# PRマージ時に自動でリリースタグを付与するワークフロー
+# 
+# タグ命名規則:
+#   - feat: → マイナーバージョンアップ (v1.1.0 → v1.2.0)
+#   - fix:  → パッチバージョンアップ (v1.1.0 → v1.1.1)
+#   - その他 → パッチバージョンアップ
+# 
+# 作成日: 2026/02/04
+# ==============================================================
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  create-release-tag:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag
+        id: get-latest-tag
+        run: |
+          # 最新のタグを取得（なければ v0.0.0 を初期値とする）
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          echo "Latest tag: $LATEST_TAG"
+
+      - name: Determine version bump
+        id: bump-version
+        run: |
+          LATEST_TAG="${{ steps.get-latest-tag.outputs.latest_tag }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_LABELS="${{ join(github.event.pull_request.labels.*.name, ',') }}"
+          
+          # バージョン番号を抽出 (v1.2.3 → 1 2 3)
+          VERSION=${LATEST_TAG#v}
+          MAJOR=$(echo $VERSION | cut -d. -f1)
+          MINOR=$(echo $VERSION | cut -d. -f2)
+          PATCH=$(echo $VERSION | cut -d. -f3)
+          
+          # ラベルとPRタイトルに基づいてバージョンを決定
+          if [[ "$PR_LABELS" == *"breaking-change"* ]]; then
+            # breaking-change ラベル → メジャーバージョンアップ
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+            BUMP_TYPE="major"
+          elif [[ "$PR_TITLE" =~ ^feat: ]] || [[ "$PR_TITLE" =~ ^feat\( ]]; then
+            # feat: → マイナーバージョンアップ
+            MINOR=$((MINOR + 1))
+            PATCH=0
+            BUMP_TYPE="minor"
+          else
+            # fix: やその他 → パッチバージョンアップ
+            PATCH=$((PATCH + 1))
+            BUMP_TYPE="patch"
+          fi
+          
+          NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
+          echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+          echo "New tag: $NEW_TAG (${BUMP_TYPE})"
+
+      - name: Create and push tag
+        run: |
+          NEW_TAG="${{ steps.bump-version.outputs.new_tag }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # アノテーション付きタグを作成
+          git tag -a "$NEW_TAG" -m "Release $NEW_TAG
+
+          PR #${PR_NUMBER}: ${PR_TITLE}
+          ${PR_URL}"
+          
+          git push origin "$NEW_TAG"
+          echo "✅ Created and pushed tag: $NEW_TAG"
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.bump-version.outputs.new_tag }}
+          release_name: Release ${{ steps.bump-version.outputs.new_tag }}
+          body: |
+            ## Changes
+            
+            **PR #${{ github.event.pull_request.number }}**: ${{ github.event.pull_request.title }}
+            
+            ${{ github.event.pull_request.body }}
+            
+            ---
+            
+            **Labels**: ${{ join(github.event.pull_request.labels.*.name, ', ') }}
+            **Merged by**: @${{ github.event.pull_request.merged_by.login }}
+          draft: false
+          prerelease: false

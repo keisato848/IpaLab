@@ -8,8 +8,8 @@ export const dynamic = 'force-dynamic';
 export const dynamicParams = true; // Allow new exams not built yet (ISR)
 export const revalidate = 3600;
 
-export default async function ExamEntrancePage({ params }: { params: { year: string; type: string } }) {
-    const { year, type } = params;
+export default async function ExamEntrancePage({ params }: { params: Promise<{ year: string; type: string }> }) {
+    const { year, type } = await params;
 
     // Construct Exam ID
     const typeSuffix = type === 'AM1' ? 'AM' : type;

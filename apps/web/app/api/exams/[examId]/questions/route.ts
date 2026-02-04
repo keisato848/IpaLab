@@ -6,10 +6,10 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { examId: string } }
+    { params }: { params: Promise<{ examId: string }> }
 ) {
     try {
-        const { examId } = params;
+        const { examId } = await params;
         if (!examId) {
             return NextResponse.json({ error: "Exam ID required" }, { status: 400 });
         }

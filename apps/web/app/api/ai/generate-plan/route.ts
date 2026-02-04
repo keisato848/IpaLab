@@ -1,6 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
-import { getAppInsightsClient } from '@/lib/appinsights';
 
 // APIルートは動的レンダリングを強制
 export const dynamic = 'force-dynamic';
@@ -85,12 +84,6 @@ export async function POST(req: Request) {
         return NextResponse.json(JSON.parse(responseText).plans);
     } catch (error: any) {
         console.error("AI Plan Generation Error:", error);
-
-        const client = getAppInsightsClient();
-        if (client) {
-            client.trackException({ exception: error });
-        }
-
         return NextResponse.json({ error: "Failed to generate plan" }, { status: 500 });
     }
 }
