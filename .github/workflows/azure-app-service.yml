@@ -28,6 +28,9 @@ on:
       - 'packages/**'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
   AZURE_WEBAPP_NAME: app-pm-exam-dx-prod
   AZURE_WEBAPP_PACKAGE_PATH: './apps/web/.next/standalone'
