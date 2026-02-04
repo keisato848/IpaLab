@@ -1,5 +1,14 @@
 name: Deploy AI Function App (US Region)
 
+# ==============================================================
+# Azure Functions デプロイワークフロー (AI プランナー用)
+# 
+# リソース: func-pm-exam-dx-ai-us (East US 2)
+# 理由: Gemini API は US リージョンからのみアクセス可能
+# 
+# 認証: Service Principal (AZURE_CREDENTIALS) を使用
+# ==============================================================
+
 on:
   push:
     branches:
@@ -9,17 +18,20 @@ on:
       - '.github/workflows/azure-functions-ai.yml'
   workflow_dispatch:  # 手動実行を許可
 
+permissions:
+  contents: read
+
 env:
   AZURE_FUNCTIONAPP_NAME: func-pm-exam-dx-ai-us
   AZURE_FUNCTIONAPP_PACKAGE_PATH: 'apps/api-ai'
+  AZURE_RESOURCE_GROUP: rg-pm-exam-dx-ai-us
   NODE_VERSION: '20.x'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     name: Build and Deploy AI Function
-    permissions:
-      contents: read
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -38,9 +50,40 @@ jobs:
         working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
         run: npm run build
 
+      - name: Prepare deployment package
+        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        run: |
+          echo "=== Deployment package structure ==="
+          ls -la
+          echo "=== dist directory ==="
+          ls -la dist/
+          echo "=== package.json main field ==="
+          cat package.json | grep '"main"'
+
+      # Service Principal を使用して Azure にログイン
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Deploy to Azure Functions
         uses: Azure/functions-action@v1
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_AI_US }}
+
+      - name: Sync Function Triggers
+        run: |
+          echo "Syncing function triggers..."
+          az functionapp restart --name ${{ env.AZURE_FUNCTIONAPP_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
+          sleep 30
+          az rest --method post --url "https://management.azure.com/subscriptions/$(az account show --query id -o tsv)/resourceGroups/${{ env.AZURE_RESOURCE_GROUP }}/providers/Microsoft.Web/sites/${{ env.AZURE_FUNCTIONAPP_NAME }}/host/default/sync?api-version=2022-03-01"
+          echo "Trigger sync completed"
+
+      - name: Verify deployment
+        run: |
+          echo "Listing deployed functions..."
+          az functionapp function list --name ${{ env.AZURE_FUNCTIONAPP_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --output table || echo "Function list may take time to populate"
+
+      - name: Azure Logout
+        run: az logout
