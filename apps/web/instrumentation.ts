@@ -1,23 +1,40 @@
 /**
  * Next.js Instrumentation Hook
  * 
- * App Service のコードレス監視（Codeless Monitoring）が
- * 基本的なテレメトリを自動収集するため、SDK の手動初期化は不要です。
+ * Linux App Service では Node.js のコードレス監視（Codeless Monitoring）が
+ * 利用できないため、Application Insights SDK を手動で初期化します。
  * 
- * Azure App Service は APPLICATIONINSIGHTS_CONNECTION_STRING が設定されていると
- * 自動的に Application Insights エージェントを注入し、以下を収集します：
- * - HTTP リクエスト/レスポンス
- * - 依存関係の呼び出し
- * - 例外
- * - パフォーマンスカウンター
- * 
- * @see https://learn.microsoft.com/azure/azure-monitor/app/codeless-overview
+ * @see https://learn.microsoft.com/azure/azure-monitor/app/nodejs
  * @see https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation
  */
 export async function register() {
-    // App Service コードレス監視を使用するため、手動でのSDK初期化は行わない
-    // 必要に応じてカスタムテレメトリを追加する場合のみこのファイルを使用
+    // サーバーサイドでのみ Application Insights を初期化
     if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
-        console.log('[System] App Service Codeless Monitoring enabled');
+        const connectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING;
+        
+        if (connectionString) {
+            try {
+                // Application Insights SDK を動的にインポート
+                const appInsights = await import('applicationinsights');
+                
+                appInsights.default
+                    .setup(connectionString)
+                    .setAutoCollectRequests(true)
+                    .setAutoCollectPerformance(true, true)
+                    .setAutoCollectExceptions(true)
+                    .setAutoCollectDependencies(true)
+                    .setAutoCollectConsole(true, true)
+                    .setUseDiskRetryCaching(true)
+                    .setSendLiveMetrics(false)
+                    .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
+                    .start();
+                
+                console.log('[System] Application Insights SDK initialized successfully');
+            } catch (error) {
+                console.error('[System] Failed to initialize Application Insights:', error);
+            }
+        } else {
+            console.warn('[System] APPLICATIONINSIGHTS_CONNECTION_STRING not set, telemetry disabled');
+        }
     }
 }
