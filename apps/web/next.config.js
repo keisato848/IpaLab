@@ -4,15 +4,22 @@ const path = require('path');
 const nextConfig = {
     // App Service deployment requires standalone mode
     output: 'standalone',
-    // monorepo: trace files from the root
-    outputFileTracingRoot: path.join(__dirname, '../../'),
     transpilePackages: ["@ipa-lab/shared"],
     reactStrictMode: true,
     experimental: {
         instrumentationHook: true,
+        // monorepo: trace files from the root (must be in experimental for Next.js 14)
+        outputFileTracingRoot: path.join(__dirname, '../../'),
         serverComponentsExternalPackages: [
             'applicationinsights',
             '@azure/cosmos',
+            '@azure/monitor-opentelemetry',
+            '@opentelemetry/api',
+            '@opentelemetry/sdk-node',
+            '@opentelemetry/sdk-trace-node',
+            '@opentelemetry/otlp-grpc-exporter-base',
+            '@opentelemetry/exporter-logs-otlp-grpc',
+            '@grpc/grpc-js',
         ],
     },
     images: {
