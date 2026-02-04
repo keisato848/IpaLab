@@ -86,9 +86,6 @@ jobs:
     needs: build
     name: Deploy to Azure App Service
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
       - name: Download artifact from build job
