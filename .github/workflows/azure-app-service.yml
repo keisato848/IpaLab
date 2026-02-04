@@ -57,9 +57,6 @@ jobs:
           # ビルド時に必要な環境変数
           NEXT_PUBLIC_APP_URL: https://app-pm-exam-dx-prod.azurewebsites.net
 
-      - name: Copy static assets to standalone
-        run: npm run -w apps/web copy-standalone
-        
       - name: Create deployment package
         run: |
           cd apps/web/.next/standalone
