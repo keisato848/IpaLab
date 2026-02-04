@@ -144,6 +144,14 @@ Azure Portal > Static Web Apps > `swa-pm-exam-dx-prod` > 設定 > 環境変数
 | `skip_app_build: true` を使用 | 削除して Azure SWA 側でビルド |
 | `output_location: ".next"` を指定 | 空文字に変更 |
 | post-build.js が実行されている | package.json から削除 |
+| `navigationFallback` / `responseOverrides` 使用 | staticwebapp.config.json から削除（Next.js hybridでは非サポート） |
+
+**重要**: Next.js hybrid rendering では `staticwebapp.config.json` の以下の設定は**サポートされていません**：
+- `navigationFallback`: Next.js が独自にルーティングを処理するため不要
+- `responseOverrides`: 404等のカスタムハンドリングは Next.js の `not-found.tsx` で実装
+
+Azure SWA はデプロイ時に `/.swa/health.html` にアクセスしてヘルスチェックを行います。
+上記の設定があると、このヘルスチェックが妨げられ warm-up timeout が発生します。
 
 ### 6.2 API Route の静的レンダリングエラー
 
@@ -197,6 +205,7 @@ export async function GET(req: NextRequest) {
 
 | 日付 | 変更内容 | 担当 |
 |------|---------|------|
+| 2026/02/04 | navigationFallback/responseOverrides 禁止事項追加（warm-up timeout対策） | - |
 | 2026/02/04 | API Route の `dynamic = 'force-dynamic'` 規約追加（セクション6.2） | - |
 | 2026/02/02 | Application Insights 統合設計セクション追加 | - |
 | 2026/02/01 | api-ai (US Function App) のデプロイ手順を追加 | - |
