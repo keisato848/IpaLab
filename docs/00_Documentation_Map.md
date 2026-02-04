@@ -17,12 +17,20 @@ docs/
 │   ├── WBS.md                   # スケジュールとタスク分解
 │   └── azure_config/            # Azure リソース設定詳細
 │       ├── 03_AzureFunctions.md # Managed Functions & 独立Function App (api-ai)
+│       ├── 10_AppService.md     # App Service 設定（移行後）
 │       └── ...
 ├── 02_design/                   # [Implementation Level] 詳細設計
 │   ├── 01_ConfigurationDesign.md # (New) プロジェクト設定、ツーリング、Monorepo構成詳細
 │   ├── 02_AppStructureDesign.md  # (New) 各アプリケーション(Web/API)の内部構造、モジュール設計
-│   ├── 06_DeploymentDesign.md    # デプロイメント設計（SWA & api-ai）
+│   ├── 06_DeploymentDesign.md    # デプロイメント設計（App Service）
 │   └── (必要に応じて追加)
+├── 03_migration/                # [Migration] SWA → App Service 移行計画
+│   ├── 00_Migration_Overview.md     # 移行概要・スケジュール
+│   ├── 01_Azure_AppService_Design.md # App Service 設計
+│   ├── 02_Source_Code_Changes.md    # ソースコード変更点
+│   ├── 03_CICD_Workflow_Design.md   # CI/CD 設計
+│   ├── 04_Test_Verification_Plan.md # テスト・検証計画
+│   └── 05_Rollback_Plan.md          # ロールバック計画
 └── agent_logs/                  # AIエージェントとの対話ログ
 ```
 

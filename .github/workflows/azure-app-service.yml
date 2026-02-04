@@ -1,0 +1,120 @@
+name: Azure App Service CI/CD
+
+permissions:
+  contents: read
+
+permissions:
+  contents: read
+
+# ==============================================================
+# Azure App Service デプロイワークフロー
+# 
+# 背景: Azure SWA + Next.js Hybrid での Application Insights 
+#       ログ出力問題を解決するため、App Service に移行
+# 
+# 作成日: 2025/01/XX
+# 関連: docs/03_migration/01_SWA_to_AppService_Migration_Plan.md
+# ==============================================================
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/web/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'turbo.json'
+      - '.github/workflows/azure-app-service.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'apps/web/**'
+      - 'packages/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  AZURE_WEBAPP_NAME: app-pm-exam-dx-prod
+  AZURE_WEBAPP_PACKAGE_PATH: './apps/web/.next/standalone'
+  NODE_VERSION: '20.x'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build with Turbo (standalone mode)
+        run: npm run build:standalone
+        env:
+          # ビルド時に必要な環境変数
+          NEXT_PUBLIC_APP_URL: https://app-pm-exam-dx-prod.azurewebsites.net
+
+      - name: Create deployment package
+        run: |
+          cd apps/web/.next/standalone
+          # monorepo構造のため、apps/web 配下に必要なファイルがある
+          ls -la
+          ls -la apps/web/ || echo "apps/web directory check"
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: webapp-artifact
+          path: |
+            apps/web/.next/standalone/**
+          retention-days: 1
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    name: Deploy to Azure App Service
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: webapp-artifact
+          path: ./deploy
+
+      - name: Display structure of downloaded files
+        run: |
+          echo "=== Deploy directory structure ==="
+          ls -la ./deploy
+          echo "=== Looking for server.js ==="
+          find ./deploy -name "server.js" -type f
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./deploy
+
+  # PR時はビルド成功のみを確認（デプロイはしない）
+  pr-check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    name: PR Build Check
+    needs: build
+    steps:
+      - name: Build successful
+        run: echo "Build completed successfully for PR"

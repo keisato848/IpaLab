@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { getContainer } from '@/lib/cosmos';
-import { getAppInsightsClient } from '@/lib/appinsights';
 
 export const runtime = 'nodejs';
 
@@ -21,12 +20,6 @@ export async function GET() {
         return NextResponse.json({ estimatedMs });
     } catch (error: any) {
         console.error("Failed to get estimate:", error);
-
-        const client = getAppInsightsClient();
-        if (client) {
-            client.trackException({ exception: error });
-        }
-
         return NextResponse.json({ estimatedMs: 5000 }); // Fallback
     }
 }
