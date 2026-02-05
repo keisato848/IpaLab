@@ -66,25 +66,25 @@ jobs:
           # apps/web/.next/standalone/  - Node.js サーバー
           # apps/web/.next/static/      - CSS/JS 静的ファイル（standalone外）
           # apps/web/public/            - 公開ファイル
-          
+
           cd apps/web/.next/standalone
           echo "=== Original standalone structure ==="
           ls -la
           ls -la apps/web/ || echo "apps/web directory check"
-          
+
           # apps/webの内容をルートにコピー（App Serviceが期待する構造）
           cp -r apps/web/* .
-          
+
           # .next ディレクトリを作成
           mkdir -p .next
-          
+
           # apps/web/.next 配下のファイルをコピー
           cp -r apps/web/.next/* .next/ 2>/dev/null || true
-          
+
           # 重要: standalone 外の static ディレクトリをコピー
           # Next.js standalone では static は standalone フォルダ外に出力される
           echo "=== Copying .next/static from parent ==="
-          if [ -d "../static" ]; then 
+          if [ -d "../static" ]; then
             cp -r ../static .next/
             echo "Copied .next/static successfully"
             ls -la .next/static/ | head -20
@@ -93,7 +93,7 @@ jobs:
             echo "Checking parent structure:"
             ls -la ../
           fi
-          
+
           # public ディレクトリをコピー
           echo "=== Copying public directory ==="
           if [ -d "../../../public" ]; then
@@ -102,10 +102,19 @@ jobs:
           else
             echo "No public directory found"
           fi
-          
+
+          # Application Insights preload スクリプトをコピー
+          echo "=== Copying appinsights-preload.js ==="
+          if [ -f "../../../scripts/appinsights-preload.js" ]; then
+            cp ../../../scripts/appinsights-preload.js .
+            echo "Copied appinsights-preload.js successfully"
+          else
+            echo "WARNING: appinsights-preload.js not found!"
+          fi
+
           # 不要なディレクトリを削除
           rm -rf apps node_modules 2>/dev/null || true
-          
+
           echo "=== Final deployment structure ==="
           ls -la
           echo "=== .next directory ==="
