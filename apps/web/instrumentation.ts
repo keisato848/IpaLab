@@ -4,37 +4,72 @@
  * Linux App Service では Node.js のコードレス監視（Codeless Monitoring）が
  * 利用できないため、Application Insights SDK を手動で初期化します。
  * 
+ * 重要: Application Insights SDK は HTTP モジュールをモンキーパッチするため、
+ * 他のモジュールがロードされる前に初期化する必要があります。
+ * 
  * @see https://learn.microsoft.com/azure/azure-monitor/app/nodejs
  * @see https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation
  */
 export async function register() {
-    // サーバーサイドでのみ Application Insights を初期化
-    if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
-        const connectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING;
+    // Node.js ランタイムでのみ Application Insights を初期化
+    // NEXT_RUNTIME が 'nodejs' または undefined の場合にのみ実行（Edge runtime を除外）
+    const runtime = process.env.NEXT_RUNTIME;
+    
+    if (runtime === 'edge') {
+        // Edge runtime では Application Insights SDK は使用不可
+        return;
+    }
+    
+    // サーバーサイドでのみ初期化
+    if (typeof window !== 'undefined') {
+        return;
+    }
+    
+    const connectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING;
+    
+    if (!connectionString) {
+        console.warn('[AppInsights] APPLICATIONINSIGHTS_CONNECTION_STRING not set, telemetry disabled');
+        return;
+    }
+    
+    try {
+        // Application Insights SDK を動的にインポート
+        const appInsights = await import('applicationinsights');
         
-        if (connectionString) {
-            try {
-                // Application Insights SDK を動的にインポート
-                const appInsights = await import('applicationinsights');
-                
-                appInsights.default
-                    .setup(connectionString)
-                    .setAutoCollectRequests(true)
-                    .setAutoCollectPerformance(true, true)
-                    .setAutoCollectExceptions(true)
-                    .setAutoCollectDependencies(true)
-                    .setAutoCollectConsole(true, true)
-                    .setUseDiskRetryCaching(true)
-                    .setSendLiveMetrics(false)
-                    .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
-                    .start();
-                
-                console.log('[System] Application Insights SDK initialized successfully');
-            } catch (error) {
-                console.error('[System] Failed to initialize Application Insights:', error);
-            }
-        } else {
-            console.warn('[System] APPLICATIONINSIGHTS_CONNECTION_STRING not set, telemetry disabled');
+        // SDK が既に初期化されているかチェック
+        if (appInsights.defaultClient) {
+            console.log('[AppInsights] SDK already initialized, skipping');
+            return;
         }
+        
+        appInsights.default
+            .setup(connectionString)
+            .setAutoCollectRequests(true)           // HTTP リクエストを自動収集
+            .setAutoCollectPerformance(true, true)  // パフォーマンスメトリクスを収集
+            .setAutoCollectExceptions(true)         // 未処理例外を収集
+            .setAutoCollectDependencies(true)       // 外部依存関係（DB、HTTP等）を収集
+            .setAutoCollectConsole(true, true)      // console.log/warn/error を収集
+            .setAutoCollectPreAggregatedMetrics(true) // 事前集計メトリクス
+            .setUseDiskRetryCaching(true)           // 一時的な障害時のディスクキャッシュ
+            .setSendLiveMetrics(false)              // Live Metrics は無効（コスト考慮）
+            .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
+            .setInternalLogging(false, false)       // 内部ログは無効化
+            .start();
+        
+        // クライアントの設定を調整
+        const client = appInsights.defaultClient;
+        if (client) {
+            // アプリケーション名とバージョンを設定
+            client.context.tags[client.context.keys.cloudRole] = 'pm-exam-dx-web';
+            client.context.tags[client.context.keys.cloudRoleInstance] = process.env.WEBSITE_INSTANCE_ID || 'local';
+            
+            // サンプリングレート（100% = すべてのリクエストを収集）
+            // 本番環境でトラフィックが多い場合は調整を検討
+            client.config.samplingPercentage = 100;
+        }
+        
+        console.log('[AppInsights] SDK initialized successfully');
+    } catch (error) {
+        console.error('[AppInsights] Failed to initialize SDK:', error);
     }
 }

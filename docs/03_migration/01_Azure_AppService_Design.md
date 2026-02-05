@@ -69,33 +69,36 @@
 ### 3.3 スタートアップコマンド
 
 ```bash
-node server.js
+node --require ./appinsights-preload.js server.js
 ```
 
 ※ Next.js standalone モードの出力ファイル
+※ `--require` オプションで Application Insights SDK を HTTP モジュールより先に初期化
 
 ## 4. Application Insights 統合
 
-### 4.1 コードレス監視（自動インストゥルメンテーション）
+### 4.1 SDK 手動統合（Linux App Service 必須）
 
-App Service では Azure Portal から **1クリックで Application Insights を有効化**できる。
+**重要:** Linux App Service + Node.js ではコードレス監視が利用できないため、SDK を手動で初期化する必要があります。
 
-**設定手順:**
+**対応方法:**
+1. `appinsights-preload.js` でスタートアップ時に SDK を初期化
+2. `--require` オプションで HTTP モジュールより先に読み込み
+
+**環境変数の設定:**
 1. Azure Portal > App Service > `app-pm-exam-dx-prod`
-2. 左メニュー「監視」>「Application Insights」
-3. 「オンにする」を選択
-4. 既存の `appi-pm-exam-dx` を選択
-5. 「適用」
+2. 「設定」>「構成」>「アプリケーション設定」
+3. `APPLICATIONINSIGHTS_CONNECTION_STRING` を設定（Application Insights の接続文字列）
 
-**自動収集されるデータ:**
+**収集されるデータ:**
 - HTTP リクエスト/レスポンス
 - 依存関係（Cosmos DB、外部 API）
 - 例外・エラー
 - パフォーマンスメトリクス
 
-### 4.2 SDK 統合（追加カスタムログ）
+### 4.2 追加カスタムログ
 
-コードレス監視に加え、カスタムログを出力する場合は SDK も併用可能。
+SDK 初期化後、カスタムログを出力可能。
 
 ```javascript
 // lib/appinsights.ts
