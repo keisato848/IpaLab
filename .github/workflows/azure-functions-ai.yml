@@ -53,8 +53,8 @@ jobs:
       - name: Install production dependencies
         working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
         run: |
-          # devDependencies を除いた本番用依存関係をインストール
-          npm ci --omit=dev
+          # monorepo の hoisting を無効にして、このディレクトリに node_modules を作成
+          npm install --omit=dev --workspaces=false
           echo "=== Production node_modules installed ==="
 
       - name: Prepare deployment package
