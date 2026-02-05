@@ -83,17 +83,6 @@ jobs:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
 
-      - name: Configure Function App settings for Node.js v4 model
-        run: |
-          echo "Setting required app settings for Node.js v4 programming model..."
-          az functionapp config appsettings set \
-            --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
-            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-            --settings \
-              "FUNCTIONS_WORKER_RUNTIME=node" \
-              "AzureWebJobsFeatureFlags=EnableWorkerIndexing" \
-              "WEBSITE_NODE_DEFAULT_VERSION=~20"
-
       - name: Sync Function Triggers
         run: |
           echo "Syncing function triggers..."
