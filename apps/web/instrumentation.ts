@@ -56,18 +56,6 @@ export async function register() {
             .setInternalLogging(false, false)       // 内部ログは無効化
             .start();
         
-        // クライアントの設定を調整
-        const client = appInsights.defaultClient;
-        if (client) {
-            // アプリケーション名とバージョンを設定
-            client.context.tags[client.context.keys.cloudRole] = 'pm-exam-dx-web';
-            client.context.tags[client.context.keys.cloudRoleInstance] = process.env.WEBSITE_INSTANCE_ID || 'local';
-            
-            // サンプリングレート（100% = すべてのリクエストを収集）
-            // 本番環境でトラフィックが多い場合は調整を検討
-            client.config.samplingPercentage = 100;
-        }
-        
         console.log('[AppInsights] SDK initialized successfully');
     } catch (error) {
         console.error('[AppInsights] Failed to initialize SDK:', error);

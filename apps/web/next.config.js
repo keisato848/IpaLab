@@ -13,10 +13,6 @@ const nextConfig = {
         '@azure/cosmos',
         'applicationinsights',
     ],
-    // Ensure instrumentation hook is enabled (default in Next.js 14+)
-    experimental: {
-        instrumentationHook: true,
-    },
     images: {
         unoptimized: true,
         remotePatterns: [
