@@ -8,4 +8,5 @@ export default defineConfig({
     splitting: false,
     sourcemap: true,
     outDir: 'dist',
+    external: ['applicationinsights'],
 });
