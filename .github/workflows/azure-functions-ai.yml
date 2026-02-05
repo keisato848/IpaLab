@@ -50,6 +50,13 @@ jobs:
         working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
         run: npm run build
 
+      - name: Install production dependencies
+        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        run: |
+          # devDependencies を除いた本番用依存関係をインストール
+          npm ci --omit=dev
+          echo "=== Production node_modules installed ==="
+
       - name: Prepare deployment package
         working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
         run: |
@@ -59,6 +66,10 @@ jobs:
           ls -la dist/
           echo "=== package.json main field ==="
           cat package.json | grep '"main"'
+          echo "=== Verifying @azure/functions package ==="
+          ls -la node_modules/@azure/functions/ || echo "WARNING: @azure/functions not found!"
+          echo "=== node_modules size ==="
+          du -sh node_modules/
 
       # Service Principal を使用して Azure にログイン
       - name: Azure Login
@@ -71,6 +82,17 @@ jobs:
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+
+      - name: Configure Function App settings for Node.js v4 model
+        run: |
+          echo "Setting required app settings for Node.js v4 programming model..."
+          az functionapp config appsettings set \
+            --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --settings \
+              "FUNCTIONS_WORKER_RUNTIME=node" \
+              "AzureWebJobsFeatureFlags=EnableWorkerIndexing" \
+              "WEBSITE_NODE_DEFAULT_VERSION=~20"
 
       - name: Sync Function Triggers
         run: |
