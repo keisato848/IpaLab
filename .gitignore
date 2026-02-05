@@ -145,3 +145,4 @@ apps/web/data/questions/
 deploy_temp/
 backup_settings.json
 logs_*.json
+tmpclaude*
