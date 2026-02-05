@@ -94,19 +94,19 @@ jobs:
             ls -la ../
           fi
 
-          # public ディレクトリをコピー
+          # public ディレクトリをコピー (apps/web/public -> standalone root)
           echo "=== Copying public directory ==="
-          if [ -d "../../../public" ]; then
-            cp -r ../../../public .
+          if [ -d "../../public" ]; then
+            cp -r ../../public .
             echo "Copied public directory"
           else
             echo "No public directory found"
           fi
 
-          # Application Insights preload スクリプトをコピー
+          # Application Insights preload スクリプトをコピー (apps/web/scripts -> standalone root)
           echo "=== Copying appinsights-preload.js ==="
-          if [ -f "../../../scripts/appinsights-preload.js" ]; then
-            cp ../../../scripts/appinsights-preload.js .
+          if [ -f "../../scripts/appinsights-preload.js" ]; then
+            cp ../../scripts/appinsights-preload.js .
             echo "Copied appinsights-preload.js successfully"
           else
             echo "WARNING: appinsights-preload.js not found!"
