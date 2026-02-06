@@ -44,10 +44,13 @@
 | キー | 値 | 備考 |
 |------|-----|------|
 | `WEBSITE_NODE_DEFAULT_VERSION` | `~20` | Node.js バージョン |
-| `WEBSITES_PORT` | `3000` | Next.js デフォルトポート |
+| `WEBSITES_PORT` | `8080` | Oryx が `PORT=8080` を設定するため合わせる |
 | `NODE_ENV` | `production` | 本番モード |
 | `COSMOS_DB_CONNECTION` | `@Microsoft.KeyVault(...)` | Key Vault 参照 |
-| `APPLICATIONINSIGHTS_CONNECTION_STRING` | 自動設定 | コードレス監視で自動 |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | 手動設定 | SDK 手動統合用の接続文字列 |
+| `ApplicationInsightsAgent_EXTENSION_VERSION` | `disabled` | コードレスエージェント無効化 |
+| `XDT_MicrosoftApplicationInsights_Mode` | `disabled` | 自動計測モード無効化 |
+| `XDT_MicrosoftApplicationInsights_PreemptSdk` | `disabled` | SDK 先取り無効化 |
 | `AUTH_SECRET` | `@Microsoft.KeyVault(...)` | Key Vault 参照 |
 | `AUTH_TRUST_HOST` | `true` | NextAuth 設定 |
 | `AUTH_GITHUB_ID` | 設定値 | GitHub OAuth |
@@ -81,9 +84,30 @@ node --require ./appinsights-preload.js server.js
 
 **重要:** Linux App Service + Node.js ではコードレス監視が利用できないため、SDK を手動で初期化する必要があります。
 
+**注意:** Azure のコードレスエージェント (`ApplicationInsightsAgent_EXTENSION_VERSION: ~3`) と
+手動 preload スクリプトを同時に有効にすると、HTTP モジュールの二重パッチにより
+Next.js standalone の内部設定が破壊され、`canonicalBase` エラーでクラッシュします。
+必ずコードレスエージェントを `disabled` に設定してください。
+
+**無効化が必要な設定:**
+| 設定名 | 値 | 理由 |
+|--------|-----|------|
+| `ApplicationInsightsAgent_EXTENSION_VERSION` | `disabled` | コードレスエージェントを無効化 |
+| `XDT_MicrosoftApplicationInsights_Mode` | `disabled` | 自動計測モードを無効化 |
+| `XDT_MicrosoftApplicationInsights_PreemptSdk` | `disabled` | SDK 先取りを無効化 |
+
+**不要な設定（削除推奨）:**
+- `APPINSIGHTS_INSTRUMENTATIONKEY` - コードレスエージェント用（不要）
+- `APPINSIGHTS_CONNECTIONSTRING` - コードレスエージェント用（不要、`APPLICATIONINSIGHTS_CONNECTION_STRING` と重複）
+- `APPINSIGHTS_PROFILERFEATURE_VERSION` - 不要
+- `APPINSIGHTS_SNAPSHOTFEATURE_VERSION` - 不要
+- `DiagnosticServices_EXTENSION_VERSION` - 不要
+- `SnapshotDebugger_EXTENSION_VERSION` - 不要
+
 **対応方法:**
 1. `appinsights-preload.js` でスタートアップ時に SDK を初期化
 2. `--require` オプションで HTTP モジュールより先に読み込み
+3. `instrumentation.ts` がフォールバックとして機能（preload が先に初期化済みの場合はスキップ）
 
 **環境変数の設定:**
 1. Azure Portal > App Service > `app-pm-exam-dx-prod`
@@ -196,8 +220,11 @@ az webapp config appsettings set \
   --resource-group rg-pm-exam-dx-prod \
   --settings \
     NODE_ENV=production \
-    WEBSITES_PORT=3000 \
-    AUTH_TRUST_HOST=true
+    WEBSITES_PORT=8080 \
+    AUTH_TRUST_HOST=true \
+    ApplicationInsightsAgent_EXTENSION_VERSION=disabled \
+    XDT_MicrosoftApplicationInsights_Mode=disabled \
+    XDT_MicrosoftApplicationInsights_PreemptSdk=disabled
 ```
 
 ## 9. Bicep テンプレート
@@ -233,7 +260,10 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
       minTlsVersion: '1.2'
       appSettings: [
         { name: 'NODE_ENV', value: 'production' }
-        { name: 'WEBSITES_PORT', value: '3000' }
+        { name: 'WEBSITES_PORT', value: '8080' }
+        { name: 'ApplicationInsightsAgent_EXTENSION_VERSION', value: 'disabled' }
+        { name: 'XDT_MicrosoftApplicationInsights_Mode', value: 'disabled' }
+        { name: 'XDT_MicrosoftApplicationInsights_PreemptSdk', value: 'disabled' }
       ]
     }
     httpsOnly: true
@@ -259,5 +289,5 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
 ---
 
 **作成日**: 2026-02-04
-**更新日**: 2026-02-04
+**更新日**: 2026-02-06
 **ステータス**: 設計完了
