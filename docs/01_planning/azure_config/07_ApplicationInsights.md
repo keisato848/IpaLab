@@ -25,13 +25,13 @@
 **コードレスエージェントの無効化が必須:**
 
 Linux App Service + Node.js + Next.js standalone 構成では、Azure コードレスエージェント
-(`ApplicationInsightsAgent_EXTENSION_VERSION: ~3`) と手動 SDK 初期化 (`appinsights-preload.js`)
-の二重初期化が原因で Next.js がクラッシュする。
+(`ApplicationInsightsAgent_EXTENSION_VERSION: ~3`) と手動 SDK 初期化の
+二重初期化が原因で Next.js がクラッシュする。
 
 以下の設定を必ず `disabled` にすること:
 - `ApplicationInsightsAgent_EXTENSION_VERSION` = `disabled`
 - `XDT_MicrosoftApplicationInsights_Mode` = `disabled`
 - `XDT_MicrosoftApplicationInsights_PreemptSdk` = `disabled`
 
-SDK の初期化は `appinsights-preload.js` (Node.js `--require`) で行い、
+SDK の初期化は `instrumentation.ts`（Next.js Instrumentation Hook）で行い、
 `APPLICATIONINSIGHTS_CONNECTION_STRING` のみを設定する。
