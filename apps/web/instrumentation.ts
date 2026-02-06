@@ -55,7 +55,14 @@ export async function register() {
             .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
             .setInternalLogging(false, false)       // 内部ログは無効化
             .start();
-        
+
+        // クラウドロール名の設定
+        const client = appInsights.default.defaultClient;
+        if (client) {
+            client.context.tags[client.context.keys.cloudRole] = 'pm-exam-dx-web';
+            client.context.tags[client.context.keys.cloudRoleInstance] = process.env.WEBSITE_INSTANCE_ID || 'local';
+        }
+
         console.log('[AppInsights] SDK initialized successfully');
     } catch (error) {
         console.error('[AppInsights] Failed to initialize SDK:', error);
