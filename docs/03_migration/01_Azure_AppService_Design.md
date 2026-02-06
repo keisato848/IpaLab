@@ -72,11 +72,11 @@
 ### 3.3 スタートアップコマンド
 
 ```bash
-node --require ./appinsights-preload.js server.js
+node server.js
 ```
 
 ※ Next.js standalone モードの出力ファイル
-※ `--require` オプションで Application Insights SDK を HTTP モジュールより先に初期化
+※ Application Insights SDK は `instrumentation.ts`（Next.js Instrumentation Hook）で初期化
 
 ## 4. Application Insights 統合
 
@@ -105,9 +105,9 @@ Next.js standalone の内部設定が破壊され、`canonicalBase` エラーで
 - `SnapshotDebugger_EXTENSION_VERSION` - 不要
 
 **対応方法:**
-1. `appinsights-preload.js` でスタートアップ時に SDK を初期化
-2. `--require` オプションで HTTP モジュールより先に読み込み
-3. `instrumentation.ts` がフォールバックとして機能（preload が先に初期化済みの場合はスキップ）
+1. `instrumentation.ts`（Next.js Instrumentation Hook）で SDK を初期化
+2. Next.js サーバー起動時に `register()` が自動的に呼ばれ、SDK が初期化される
+3. `applicationinsights` は `next.config.js` の `serverExternalPackages` に登録済み
 
 **環境変数の設定:**
 1. Azure Portal > App Service > `app-pm-exam-dx-prod`

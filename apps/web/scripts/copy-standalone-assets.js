@@ -49,13 +49,5 @@ if (fs.existsSync(staticSrc)) {
     process.exit(1);
 }
 
-// Application Insights preload スクリプトをコピー
-const appInsightsSrc = path.join(__dirname, 'appinsights-preload.js');
-const appInsightsDest = path.join(standaloneWebDir, 'appinsights-preload.js');
-if (fs.existsSync(appInsightsSrc)) {
-    fs.copyFileSync(appInsightsSrc, appInsightsDest);
-    console.log('✅ Copied appinsights-preload.js to', appInsightsDest);
-}
-
 console.log('🎉 Standalone assets copied successfully!');
 

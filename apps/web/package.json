@@ -7,7 +7,7 @@
         "build": "next build",
         "build:standalone": "next build && node scripts/copy-standalone-assets.js",
         "start": "next start",
-        "start:standalone": "node --require ./appinsights-preload.js server.js",
+        "start:standalone": "node server.js",
         "lint": "next lint",
         "test": "vitest",
         "test:run": "vitest run",

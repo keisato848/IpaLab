@@ -103,15 +103,6 @@ jobs:
             echo "No public directory found"
           fi
 
-          # Application Insights preload スクリプトをコピー (apps/web/scripts -> standalone root)
-          echo "=== Copying appinsights-preload.js ==="
-          if [ -f "../../scripts/appinsights-preload.js" ]; then
-            cp ../../scripts/appinsights-preload.js .
-            echo "Copied appinsights-preload.js successfully"
-          else
-            echo "WARNING: appinsights-preload.js not found!"
-          fi
-
           # 不要なディレクトリを削除
           rm -rf apps node_modules 2>/dev/null || true
 
