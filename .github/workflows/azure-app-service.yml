@@ -163,6 +163,21 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: ./deploy
 
+      # Application Insights コードレスエージェント無効化 + WEBSITES_PORT 修正
+      # 背景: コードレスエージェントと手動 preload スクリプトの二重初期化が
+      #       Next.js の canonicalBase エラーを引き起こしていた
+      # 参照: docs/appservice-startup-failure-investigation.md
+      - name: Configure App Service settings
+        run: |
+          az webapp config appsettings set \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group rg-pm-exam-dx-prod \
+            --settings \
+              ApplicationInsightsAgent_EXTENSION_VERSION=disabled \
+              XDT_MicrosoftApplicationInsights_Mode=disabled \
+              XDT_MicrosoftApplicationInsights_PreemptSdk=disabled \
+              WEBSITES_PORT=8080
+
       - name: Azure Logout
         run: az logout
 

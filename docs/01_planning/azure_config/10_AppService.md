@@ -28,5 +28,5 @@
 | リソース名 | `swa-pm-exam-dx-prod` | `app-pm-exam-dx-prod` |
 | SKU | Standard | B1 (Basic) |
 | 月額コスト | ~$9 | ~$13 |
-| Application Insights | 手動 SDK 統合 | コードレス監視 |
+| Application Insights | 手動 SDK 統合 | SDK 手動統合（コードレスエージェント無効） |
 | Node.js 制御 | 制限あり | 完全制御 |
