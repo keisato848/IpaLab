@@ -34,15 +34,19 @@ export async function register() {
     
     try {
         // Application Insights SDK を動的にインポート
-        const appInsights = await import('applicationinsights');
-        
+        // applicationinsights は CommonJS モジュールのため、バンドラによって
+        // import() の返り値の構造が異なる（Webpack: module直接, Turbopack: .default経由）
+        const appInsightsModule = await import('applicationinsights');
+        // CJS モジュールのため Webpack では .default が undefined になる
+        const appInsights = (appInsightsModule.default ?? appInsightsModule) as typeof appInsightsModule;
+
         // SDK が既に初期化されているかチェック
         if (appInsights.defaultClient) {
             console.log('[AppInsights] SDK already initialized, skipping');
             return;
         }
-        
-        appInsights.default
+
+        appInsights
             .setup(connectionString)
             .setAutoCollectRequests(true)           // HTTP リクエストを自動収集
             .setAutoCollectPerformance(true, true)  // パフォーマンスメトリクスを収集
@@ -52,12 +56,13 @@ export async function register() {
             .setAutoCollectPreAggregatedMetrics(true) // 事前集計メトリクス
             .setUseDiskRetryCaching(true)           // 一時的な障害時のディスクキャッシュ
             .setSendLiveMetrics(false)              // Live Metrics は無効（コスト考慮）
-            .setDistributedTracingMode(appInsights.DistributedTracingModes.AI_AND_W3C)
+            .setDistributedTracingMode(appInsightsModule.DistributedTracingModes.AI_AND_W3C)
             .setInternalLogging(false, false)       // 内部ログは無効化
             .start();
 
         // クラウドロール名の設定
-        const client = appInsights.default.defaultClient;
+        const client = appInsights.defaultClient as
+            import('applicationinsights').TelemetryClient | undefined;
         if (client) {
             client.context.tags[client.context.keys.cloudRole] = 'pm-exam-dx-web';
             client.context.tags[client.context.keys.cloudRoleInstance] = process.env.WEBSITE_INSTANCE_ID || 'local';
