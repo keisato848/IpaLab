@@ -61,17 +61,27 @@ export async function getAllExamIds(): Promise<string[]> {
 /**
  * Get all questions for a specific exam from local JSON file.
  * Replaces DB access for SSG.
+ * questions_transformed.json を優先的に読み込み、存在しない場合は questions_raw.json にフォールバックする。
  */
 export async function getExamData(examId: string): Promise<any[]> {
     try {
         const dataDir = resolveDataDir();
         if (!dataDir) return [];
 
-        const filePath = path.join(dataDir, examId, 'questions_raw.json');
-        if (!fs.existsSync(filePath)) {
-            console.warn(`[SSG] Data file not found for ${examId}: ${filePath}`);
+        // questions_transformed.json を優先（PM午後問題の設問・解答が正しく構造化されている）
+        const transformedPath = path.join(dataDir, examId, 'questions_transformed.json');
+        const rawPath = path.join(dataDir, examId, 'questions_raw.json');
+
+        let filePath: string;
+        if (fs.existsSync(transformedPath)) {
+            filePath = transformedPath;
+        } else if (fs.existsSync(rawPath)) {
+            filePath = rawPath;
+        } else {
+            console.warn(`[SSG] Data file not found for ${examId}`);
             return [];
         }
+
         const fileContent = fs.readFileSync(filePath, 'utf-8');
         return JSON.parse(fileContent);
     } catch (error) {
