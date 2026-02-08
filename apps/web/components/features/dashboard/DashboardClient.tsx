@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { LearningRecord, getLearningRecords, getQuestions, StudyPlanJob } from '@/lib/api';
+import { LearningRecord, getLearningRecords, getQuestions, getExams, StudyPlanJob, Question } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
 import { getExamLabel } from '@/lib/exam-utils';
 import ThemeToggle from '@/components/common/ThemeToggle';
@@ -23,6 +23,11 @@ export default function DashboardClient() {
     const [allPlans, setAllPlans] = useState<StudyPlan[]>([]);
     const [showWizard, setShowWizard] = useState(false);
     const [pendingJob, setPendingJob] = useState<StudyPlanJob | null>(null);
+
+    // Mission Question List State
+    const [showMissionQuestions, setShowMissionQuestions] = useState(false);
+    const [missionQuestions, setMissionQuestions] = useState<{ examId: string; qNo: number; category: string; text: string }[]>([]);
+    const [missionQuestionsLoading, setMissionQuestionsLoading] = useState(false);
     const {
         progress,
         achievements,
@@ -399,6 +404,130 @@ export default function DashboardClient() {
         }
     };
 
+    // ミッション問題取得用ヘルパー: examIdからURL生成
+    const getQuestionUrl = (examId: string, qNo: number): string => {
+        const parts = examId.split('-');
+        const typeSuffix = parts[parts.length - 1];
+        const yearPart = parts.slice(0, -1).join('-');
+        const typeUrl = typeSuffix === 'AM' ? 'AM1' : typeSuffix;
+        return `/exam/${yearPart}/${typeUrl}/${qNo}?mode=practice`;
+    };
+
+    // ミッション問題一覧を読み込む
+    const loadMissionQuestions = async () => {
+        if (missionQuestions.length > 0) return;
+        setMissionQuestionsLoading(true);
+        try {
+            // localStorageキャッシュ確認（同日中は固定）
+            const planId = studyPlan?.id || 'default';
+            const cacheKey = `mission_questions_${todayStr}_${planId}`;
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    setMissionQuestions(parsed);
+                    setMissionQuestionsLoading(false);
+                    return;
+                }
+            }
+
+            // ターゲット試験IDを決定
+            let targetExamIds: string[] = [];
+
+            if (!isAllPlans && todayGoalData?.targetExamId) {
+                // プランに特定の試験IDが指定されている場合
+                targetExamIds = [todayGoalData.targetExamId];
+            } else if (isAllPlans) {
+                // 全プラン合算：各プランの今日のタスクからtargetExamIdを収集
+                allPlans.forEach(p => {
+                    const tData = p.weeklySchedule?.flatMap(w => w.dailyTasks || [])?.filter(t => t)?.find(t => t.date === todayStr);
+                    if (tData?.targetExamId) targetExamIds.push(tData.targetExamId);
+                });
+            }
+
+            // 特定のexamIdが無い場合はプランの対象試験種別から探す
+            if (targetExamIds.length === 0) {
+                const examType = studyPlan && !isAllPlans ? getTargetExam(studyPlan) : 'AP';
+                if (examType) {
+                    const exams = await getExams();
+                    targetExamIds = exams
+                        .filter(e => e.id.startsWith(examType + '-') && e.id.endsWith('-AM'))
+                        .sort((a, b) => b.id.localeCompare(a.id)) // 新しい順
+                        .slice(0, 3)
+                        .map(e => e.id);
+                }
+            }
+
+            if (targetExamIds.length === 0) {
+                // フォールバック: AP午前
+                const exams = await getExams();
+                targetExamIds = exams
+                    .filter(e => e.id.startsWith('AP-') && e.id.endsWith('-AM'))
+                    .sort((a, b) => b.id.localeCompare(a.id))
+                    .slice(0, 3)
+                    .map(e => e.id);
+            }
+
+            // 問題を取得
+            let allCandidates: { examId: string; qNo: number; category: string; text: string }[] = [];
+            for (const eid of targetExamIds) {
+                const questions = await getQuestions(eid);
+                questions.forEach(q => {
+                    if (q.qNo && q.text) {
+                        allCandidates.push({
+                            examId: eid,
+                            qNo: q.qNo,
+                            category: q.category || '未分類',
+                            text: q.text.replace(/\n/g, ' ').substring(0, 80)
+                        });
+                    }
+                });
+            }
+
+            // カテゴリフィルター
+            const targetCat = !isAllPlans ? todayGoalData?.targetCategory : undefined;
+            if (targetCat && targetCat !== '全般' && targetCat !== '合計') {
+                const filtered = allCandidates.filter(q => q.category.includes(targetCat));
+                if (filtered.length >= todayTargetCount) {
+                    allCandidates = filtered;
+                }
+            }
+
+            // まだ回答していない問題を優先
+            const answeredSet = new Set(records.map(r => `${r.examId}__${r.questionId?.split('-').pop()}`));
+            const unanswered = allCandidates.filter(q => !answeredSet.has(`${q.examId}__${q.qNo}`));
+            const pool = unanswered.length >= todayTargetCount ? unanswered : allCandidates;
+
+            // シャッフルして選択
+            const shuffled = [...pool].sort(() => Math.random() - 0.5);
+            const selected = shuffled.slice(0, todayTargetCount);
+
+            // キャッシュ保存
+            localStorage.setItem(cacheKey, JSON.stringify(selected));
+
+            // 古いキャッシュ削除
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const oldKey = `mission_questions_${yesterday.toISOString().split('T')[0]}_${planId}`;
+            localStorage.removeItem(oldKey);
+
+            setMissionQuestions(selected);
+        } catch (error) {
+            console.error("ミッション問題の読み込みに失敗しました", error);
+        } finally {
+            setMissionQuestionsLoading(false);
+        }
+    };
+
+    // ミッション問題が回答済みかチェック
+    const isMissionQuestionAnswered = (examId: string, qNo: number): boolean => {
+        return todayRecords.some(r => {
+            if (r.examId !== examId) return false;
+            const rQNo = parseInt(r.questionId?.split('-').pop() || '0');
+            return rQNo === qNo;
+        });
+    };
+
     // Use filtered records for stats
     const statsRecords = filteredRecords;
 
@@ -603,6 +732,138 @@ export default function DashboardClient() {
                                         ⭐ +{todayXpReward} XP
                                     </span>
                                 </div>
+                            </div>
+
+                            {/* ミッション問題一覧 */}
+                            <div style={{ width: '100%', marginTop: '0.5rem' }}>
+                                <button
+                                    onClick={() => {
+                                        const next = !showMissionQuestions;
+                                        setShowMissionQuestions(next);
+                                        if (next) loadMissionQuestions();
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.5rem 0.8rem',
+                                        background: 'var(--bg-secondary)',
+                                        color: 'var(--text-primary)',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        fontSize: '0.85rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        transition: 'background 0.2s'
+                                    }}
+                                >
+                                    <span>📋 今日の問題一覧 ({todayCount}/{todayTargetCount}問 完了)</span>
+                                    <span style={{ fontSize: '0.7rem', transition: 'transform 0.2s', transform: showMissionQuestions ? 'rotate(180deg)' : 'rotate(0)' }}>▼</span>
+                                </button>
+
+                                {showMissionQuestions && (
+                                    <div style={{
+                                        marginTop: '0.5rem',
+                                        background: 'var(--bg-primary)',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: '8px',
+                                        overflow: 'hidden'
+                                    }}>
+                                        {missionQuestionsLoading ? (
+                                            <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                                                ⏳ 問題を読み込んでいます...
+                                            </div>
+                                        ) : missionQuestions.length === 0 ? (
+                                            <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                                                問題データがありません。学習計画を作成してください。
+                                            </div>
+                                        ) : (
+                                            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                                                {missionQuestions.map((q, idx) => {
+                                                    const answered = isMissionQuestionAnswered(q.examId, q.qNo);
+                                                    const url = getQuestionUrl(q.examId, q.qNo);
+                                                    return (
+                                                        <li key={`${q.examId}-${q.qNo}`} style={{
+                                                            borderBottom: idx < missionQuestions.length - 1 ? '1px solid var(--border-color)' : 'none',
+                                                        }}>
+                                                            <Link
+                                                                href={url}
+                                                                style={{
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '0.6rem',
+                                                                    padding: '0.6rem 0.8rem',
+                                                                    textDecoration: 'none',
+                                                                    color: answered ? 'var(--text-secondary)' : 'var(--text-primary)',
+                                                                    transition: 'background 0.15s',
+                                                                    opacity: answered ? 0.7 : 1,
+                                                                }}
+                                                                onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-secondary)'; }}
+                                                                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                                                            >
+                                                                {/* チェックマーク */}
+                                                                <span style={{
+                                                                    width: '22px',
+                                                                    height: '22px',
+                                                                    borderRadius: '50%',
+                                                                    border: answered ? 'none' : '2px solid var(--border-color)',
+                                                                    background: answered ? '#22c55e' : 'transparent',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    fontSize: '0.7rem',
+                                                                    color: 'white',
+                                                                    flexShrink: 0
+                                                                }}>
+                                                                    {answered && '✓'}
+                                                                </span>
+
+                                                                {/* 問題番号 */}
+                                                                <span style={{
+                                                                    fontSize: '0.75rem',
+                                                                    fontWeight: 'bold',
+                                                                    color: 'var(--text-secondary)',
+                                                                    minWidth: '28px',
+                                                                    flexShrink: 0
+                                                                }}>
+                                                                    {idx + 1}.
+                                                                </span>
+
+                                                                {/* 問題情報 */}
+                                                                <div style={{ flex: 1, minWidth: 0 }}>
+                                                                    <div style={{
+                                                                        fontSize: '0.8rem',
+                                                                        fontWeight: 500,
+                                                                        textDecoration: answered ? 'line-through' : 'none',
+                                                                        whiteSpace: 'nowrap',
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis'
+                                                                    }}>
+                                                                        {getExamLabel(q.examId)} Q{q.qNo}
+                                                                    </div>
+                                                                    <div style={{
+                                                                        fontSize: '0.7rem',
+                                                                        color: 'var(--text-secondary)',
+                                                                        whiteSpace: 'nowrap',
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis'
+                                                                    }}>
+                                                                        {q.category} | {q.text}
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* 矢印 */}
+                                                                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', flexShrink: 0 }}>
+                                                                    {answered ? '✅' : '→'}
+                                                                </span>
+                                                            </Link>
+                                                        </li>
+                                                    );
+                                                })}
+                                            </ul>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             <div style={{ width: '100%', marginTop: '0.5rem' }}>
