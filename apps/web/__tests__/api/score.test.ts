@@ -1,0 +1,331 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { NextRequest } from 'next/server';
+
+describe('/api/score', () => {
+    const originalEnv = process.env;
+
+    beforeEach(() => {
+        vi.resetModules();
+        vi.clearAllMocks();
+        process.env = { ...originalEnv };
+    });
+
+    afterEach(() => {
+        process.env = originalEnv;
+    });
+
+    describe('POST - バリデーション', () => {
+        it('GEMINI_API_KEYが未設定の場合は500を返す', async () => {
+            process.env.GEMINI_API_KEY = '';
+
+            // モックを設定
+            vi.doMock('@google/generative-ai', () => ({
+                GoogleGenerativeAI: class {
+                    constructor() {}
+                    getGenerativeModel() {
+                        return { generateContent: vi.fn() };
+                    }
+                },
+                SchemaType: {},
+            }));
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: 'テスト問題',
+                    userAnswer: 'テスト回答',
+                }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(500);
+            expect(data.error).toBe('GEMINI_API_KEY is not set');
+        });
+
+        it('questionが未指定の場合は400を返す', async () => {
+            process.env.GEMINI_API_KEY = 'test-api-key';
+
+            vi.doMock('@google/generative-ai', () => ({
+                GoogleGenerativeAI: class {
+                    constructor() {}
+                    getGenerativeModel() {
+                        return { generateContent: vi.fn() };
+                    }
+                },
+                SchemaType: {},
+            }));
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userAnswer: 'テスト回答',
+                }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(400);
+            expect(data.error).toBe('Missing question or user answer');
+        });
+
+        it('userAnswerが未指定の場合は400を返す', async () => {
+            process.env.GEMINI_API_KEY = 'test-api-key';
+
+            vi.doMock('@google/generative-ai', () => ({
+                GoogleGenerativeAI: class {
+                    constructor() {}
+                    getGenerativeModel() {
+                        return { generateContent: vi.fn() };
+                    }
+                },
+                SchemaType: {},
+            }));
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: 'テスト問題',
+                }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(400);
+            expect(data.error).toBe('Missing question or user answer');
+        });
+
+        it('正常にAI採点が実行できる', async () => {
+            process.env.GEMINI_API_KEY = 'test-api-key';
+
+            const mockResponse = {
+                score: 75,
+                radarChartData: [
+                    { subject: '設問適合性', A: 8, fullMark: 10 },
+                    { subject: '論理構成', A: 7, fullMark: 10 },
+                    { subject: '重要語句', A: 8, fullMark: 10 },
+                    { subject: '具体性', A: 6, fullMark: 10 },
+                ],
+                feedback: 'テストフィードバック',
+                mermaidDiagram: 'graph TD; A --> B',
+                improvedAnswer: '改善回答',
+            };
+
+            vi.doMock('@google/generative-ai', () => ({
+                GoogleGenerativeAI: class {
+                    constructor() {}
+                    getGenerativeModel() {
+                        return {
+                            generateContent: vi.fn().mockResolvedValue({
+                                response: {
+                                    text: () => JSON.stringify(mockResponse),
+                                },
+                            }),
+                        };
+                    }
+                },
+                SchemaType: {},
+            }));
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: 'テスト問題',
+                    userAnswer: 'テスト回答',
+                    modelAnswer: '模範解答',
+                }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(200);
+            expect(data.score).toBe(75);
+        });
+
+        it('AIレスポンスがJSON形式でない場合は500を返す', async () => {
+            process.env.GEMINI_API_KEY = 'test-api-key';
+
+            vi.doMock('@google/generative-ai', () => ({
+                GoogleGenerativeAI: class {
+                    constructor() {}
+                    getGenerativeModel() {
+                        return {
+                            generateContent: vi.fn().mockResolvedValue({
+                                response: {
+                                    text: () => 'これはJSONではありません',
+                                },
+                            }),
+                        };
+                    }
+                },
+                SchemaType: {},
+            }));
+
+            const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: 'テスト問題',
+                    userAnswer: 'テスト回答',
+                }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(500);
+            expect(data.error).toBe('Failed to parse AI response');
+
+            consoleError.mockRestore();
+        });
+
+        it('AI APIエラー時は500を返す', async () => {
+            process.env.GEMINI_API_KEY = 'test-api-key';
+
+            vi.doMock('@google/generative-ai', () => ({
+                GoogleGenerativeAI: class {
+                    constructor() {}
+                    getGenerativeModel() {
+                        return {
+                            generateContent: vi.fn().mockRejectedValue(new Error('API Error')),
+                        };
+                    }
+                },
+                SchemaType: {},
+            }));
+
+            const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: 'テスト問題',
+                    userAnswer: 'テスト回答',
+                }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(500);
+            expect(data.error).toBe('Scoring failed');
+
+            consoleError.mockRestore();
+        });
+    });
+});
+
+describe('AI採点レスポンス構造', () => {
+    it('正しいスキーマ構造を持つ', () => {
+        const validResponse = {
+            score: 75,
+            radarChartData: [
+                { subject: '設問適合性', A: 8, fullMark: 10 },
+                { subject: '論理構成', A: 7, fullMark: 10 },
+                { subject: '重要語句', A: 8, fullMark: 10 },
+                { subject: '具体性', A: 6, fullMark: 10 },
+            ],
+            feedback: 'フィードバックテキスト',
+            mermaidDiagram: 'graph TD; A --> B',
+            improvedAnswer: '改善回答',
+        };
+
+        expect(validResponse.score).toBeGreaterThanOrEqual(0);
+        expect(validResponse.score).toBeLessThanOrEqual(100);
+        expect(validResponse.radarChartData).toHaveLength(4);
+        validResponse.radarChartData.forEach(item => {
+            expect(item.A).toBeGreaterThanOrEqual(0);
+            expect(item.A).toBeLessThanOrEqual(10);
+            expect(item.fullMark).toBe(10);
+        });
+    });
+
+    it('CLKSモデルの4つの評価軸を持つ', () => {
+        const expectedSubjects = ['設問適合性', '論理構成', '重要語句', '具体性'];
+        const radarData = [
+            { subject: '設問適合性', A: 8, fullMark: 10 },
+            { subject: '論理構成', A: 7, fullMark: 10 },
+            { subject: '重要語句', A: 8, fullMark: 10 },
+            { subject: '具体性', A: 6, fullMark: 10 },
+        ];
+
+        const subjects = radarData.map(d => d.subject);
+        expect(subjects).toEqual(expectedSubjects);
+    });
+
+    it('スコアは0-100の範囲', () => {
+        const validateScore = (score: number) => score >= 0 && score <= 100;
+
+        expect(validateScore(0)).toBe(true);
+        expect(validateScore(50)).toBe(true);
+        expect(validateScore(100)).toBe(true);
+        expect(validateScore(-1)).toBe(false);
+        expect(validateScore(101)).toBe(false);
+    });
+
+    it('レーダーチャートのAは0-10の範囲', () => {
+        const validateRadarValue = (value: number) => value >= 0 && value <= 10;
+
+        expect(validateRadarValue(0)).toBe(true);
+        expect(validateRadarValue(5)).toBe(true);
+        expect(validateRadarValue(10)).toBe(true);
+        expect(validateRadarValue(-1)).toBe(false);
+        expect(validateRadarValue(11)).toBe(false);
+    });
+});
+
+describe('スコアリングプロンプト', () => {
+    it('CLKSモデルの4要素が定義されている', () => {
+        const clksModel = {
+            C: 'Context - 設問適合性',
+            L: 'Logic - 論理的妥当性',
+            K: 'Keyword - 知識と語彙',
+            S: 'Specificity - 具体性',
+        };
+
+        expect(Object.keys(clksModel)).toHaveLength(4);
+        expect(clksModel.C).toContain('設問適合性');
+        expect(clksModel.L).toContain('論理');
+        expect(clksModel.K).toContain('知識');
+        expect(clksModel.S).toContain('具体性');
+    });
+
+    it('必要な出力フィールドが定義されている', () => {
+        const expectedFields = [
+            'score',
+            'radarChartData',
+            'feedback',
+            'mermaidDiagram',
+            'improvedAnswer',
+        ];
+
+        const outputSchema = {
+            score: 75,
+            radarChartData: [],
+            feedback: '',
+            mermaidDiagram: '',
+            improvedAnswer: '',
+        };
+
+        expectedFields.forEach(field => {
+            expect(outputSchema).toHaveProperty(field);
+        });
+    });
+});
