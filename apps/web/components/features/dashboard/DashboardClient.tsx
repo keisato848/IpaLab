@@ -8,8 +8,10 @@ import { guestManager } from '@/lib/guest-manager';
 import { getExamLabel } from '@/lib/exam-utils';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import { useUserProgress } from '@/hooks/useUserProgress';
+import { useMonthlyProgress, createDefaultMonthlyGoals } from '@/hooks/useMonthlyProgress';
 import HeatmapWidget from './HeatmapWidget';
-import GoalSettingWizard, { StudyPlan } from './GoalSettingWizard';
+import GoalSettingWizard, { StudyPlan, MonthlyGoal } from './GoalSettingWizard';
+import MonthlyGoalEditor from './MonthlyGoalEditor';
 import PlanReadyNotification from './PlanReadyNotification';
 import styles from './DashboardClient.module.css';
 
@@ -28,6 +30,8 @@ export default function DashboardClient() {
     const [showMissionQuestions, setShowMissionQuestions] = useState(false);
     const [missionQuestions, setMissionQuestions] = useState<{ examId: string; qNo: number; category: string; text: string }[]>([]);
     const [missionQuestionsLoading, setMissionQuestionsLoading] = useState(false);
+    // Monthly Goal Editor State
+    const [showGoalEditor, setShowGoalEditor] = useState(false);
     const {
         progress,
         achievements,
@@ -109,13 +113,23 @@ export default function DashboardClient() {
         // 3. Else fallback to first.
 
         if (allPlans.length > 0) {
-            // For now, just pick the first one or latest created? 
-            // Better: Pick the one with closest future date.
+            // Pick the one with closest future date.
             const sorted = [...allPlans].sort((a, b) => new Date(a.examDate).getTime() - new Date(b.examDate).getTime());
             // Filter future or today
             const future = sorted.filter(p => new Date(p.examDate) >= new Date(new Date().setHours(0, 0, 0, 0)));
 
-            const active = future.length > 0 ? future[0] : sorted[sorted.length - 1]; // Nearest future or latest past
+            let active = future.length > 0 ? future[0] : sorted[sorted.length - 1]; // Nearest future or latest past
+
+            // monthlyGoals が未設定のプランにデフォルト値を自動付与
+            if (active && !active.monthlyGoals) {
+                const defaults = createDefaultMonthlyGoals(active.weeklySchedule || []);
+                active = { ...active, monthlyGoals: defaults };
+                // localStorageも更新
+                const updatedPlans = allPlans.map(p => p.id === active.id ? active : p);
+                localStorage.setItem('studyPlans', JSON.stringify(updatedPlans));
+                setAllPlans(updatedPlans);
+            }
+
             setStudyPlan(active);
         }
 
@@ -172,6 +186,10 @@ export default function DashboardClient() {
     };
 
     const handleSavePlan = (plan: StudyPlan) => {
+        // 新規プランに定量目標がなければデフォルトを自動付与
+        if (!plan.monthlyGoals) {
+            plan = { ...plan, monthlyGoals: createDefaultMonthlyGoals(plan.weeklySchedule || []) };
+        }
         setStudyPlan(plan);
         // Save to array
         const allPlansStr = localStorage.getItem('studyPlans');
@@ -212,6 +230,40 @@ export default function DashboardClient() {
         if (p.title.includes('ネット') || p.title.includes('NW')) return 'NW';
         if (p.title.includes('パスポート') || p.title.includes('IP')) return 'IP';
         return '';
+    };
+
+    // Monthly Progress Hook - 定量目標の進捗計算
+    const targetExamPrefix = (!isAllPlans && studyPlan) ? getTargetExam(studyPlan) : undefined;
+    const monthlyProgress = useMonthlyProgress(
+        studyPlan?.monthlyGoals,
+        records,
+        targetExamPrefix
+    );
+
+    // 定量目標の保存ハンドラ
+    const handleSaveMonthlyGoals = (goals: MonthlyGoal[], goalText: string) => {
+        if (!studyPlan || isAllPlans) return;
+
+        const updatedPlan: StudyPlan = {
+            ...studyPlan,
+            monthlyGoal: goalText,
+            monthlyGoals: goals,
+        };
+        setStudyPlan(updatedPlan);
+
+        // localStorageにも永続化
+        const stored = localStorage.getItem('studyPlans');
+        if (stored) {
+            try {
+                const plans: StudyPlan[] = JSON.parse(stored);
+                const updated = plans.map(p => p.id === studyPlan.id ? updatedPlan : p);
+                localStorage.setItem('studyPlans', JSON.stringify(updated));
+                setAllPlans(updated);
+            } catch (e) {
+                console.error('Failed to persist monthly goals', e);
+            }
+        }
+        setShowGoalEditor(false);
     };
 
     // Filter records: If isAllPlans, show all. Else filter by targetExam prefix AND date (start of plan).
@@ -646,11 +698,137 @@ export default function DashboardClient() {
                     </div>
                     {studyPlan ? (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: '100%' }}>
-                            {/* Monthly Goal */}
+                            {/* Monthly Goal - 定量目標 + テキスト */}
                             {!isAllPlans && (
-                                <div style={{ flex: 1, minWidth: '250px', padding: '0.8rem', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.3rem' }}>📅 今月の目標</div>
-                                    <div style={{ fontWeight: 'bold' }}>{studyPlan.monthlyGoal}</div>
+                                <div style={{ width: '100%', padding: '1rem', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                                            📊 今月の目標（{monthlyProgress.monthLabel}）
+                                        </div>
+                                        <button
+                                            onClick={() => setShowGoalEditor(true)}
+                                            style={{
+                                                background: 'transparent',
+                                                border: '1px solid var(--border-color)',
+                                                borderRadius: '4px',
+                                                color: 'var(--text-secondary)',
+                                                cursor: 'pointer',
+                                                padding: '2px 8px',
+                                                fontSize: '0.7rem',
+                                                transition: 'all 0.15s'
+                                            }}
+                                            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-color)'; e.currentTarget.style.color = 'var(--accent-color)'; }}
+                                            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                                        >
+                                            目標を編集
+                                        </button>
+                                    </div>
+                                    {/* テキスト目標（1行） */}
+                                    <div style={{ fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.8rem' }}>
+                                        {studyPlan.monthlyGoal}
+                                    </div>
+
+                                    {/* 定量目標プログレス */}
+                                    {monthlyProgress.goals.length > 0 ? (
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.6rem' }}>
+                                            {monthlyProgress.goals.map(goal => (
+                                                <div key={goal.id} style={{
+                                                    padding: '0.6rem',
+                                                    background: 'var(--bg-primary)',
+                                                    borderRadius: '8px',
+                                                    border: goal.isAchieved ? '1px solid #22c55e' : '1px solid var(--border-color)',
+                                                }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                                                        <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>
+                                                            {goal.iconEmoji} {goal.label}
+                                                        </span>
+                                                        <span style={{
+                                                            fontSize: '0.75rem',
+                                                            fontWeight: 'bold',
+                                                            color: goal.isAchieved ? '#22c55e' : goal.progressPercent >= 70 ? '#f59e0b' : 'var(--text-secondary)',
+                                                        }}>
+                                                            {goal.isAchieved ? '✅ 達成' : `${goal.progressPercent}%`}
+                                                        </span>
+                                                    </div>
+                                                    {/* プログレスバー */}
+                                                    <div style={{
+                                                        height: '6px',
+                                                        background: 'var(--border-color)',
+                                                        borderRadius: '3px',
+                                                        overflow: 'hidden',
+                                                        marginBottom: '0.25rem',
+                                                    }}>
+                                                        <div style={{
+                                                            height: '100%',
+                                                            width: `${goal.progressPercent}%`,
+                                                            background: goal.isAchieved
+                                                                ? 'linear-gradient(90deg, #22c55e, #16a34a)'
+                                                                : goal.progressPercent >= 70
+                                                                    ? 'linear-gradient(90deg, #f59e0b, #d97706)'
+                                                                    : 'linear-gradient(90deg, var(--accent-color), #6366f1)',
+                                                            borderRadius: '3px',
+                                                            transition: 'width 0.5s ease-out',
+                                                        }} />
+                                                    </div>
+                                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                                        {goal.currentValue}{goal.unit} / {goal.targetValue}{goal.unit}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div style={{
+                                            padding: '0.6rem',
+                                            background: 'var(--bg-primary)',
+                                            borderRadius: '8px',
+                                            border: '1px dashed var(--border-color)',
+                                            textAlign: 'center',
+                                            fontSize: '0.8rem',
+                                            color: 'var(--text-secondary)',
+                                        }}>
+                                            定量目標が未設定です。
+                                            <button
+                                                onClick={() => setShowGoalEditor(true)}
+                                                style={{
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    color: 'var(--accent-color)',
+                                                    cursor: 'pointer',
+                                                    textDecoration: 'underline',
+                                                    fontSize: '0.8rem',
+                                                    marginLeft: '0.3rem',
+                                                }}
+                                            >
+                                                設定する
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* 全体達成サマリー */}
+                                    {monthlyProgress.goals.length > 0 && (
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            marginTop: '0.5rem',
+                                            fontSize: '0.75rem',
+                                            color: 'var(--text-secondary)',
+                                        }}>
+                                            <span>
+                                                達成: {monthlyProgress.achievedCount}/{monthlyProgress.totalGoals} 項目
+                                            </span>
+                                            <span style={{
+                                                fontWeight: 'bold',
+                                                color: monthlyProgress.overallPercent >= 100
+                                                    ? '#22c55e'
+                                                    : monthlyProgress.overallPercent >= 70
+                                                        ? '#f59e0b'
+                                                        : 'var(--text-primary)',
+                                            }}>
+                                                総合進捗: {monthlyProgress.overallPercent}%
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
@@ -1077,6 +1255,15 @@ export default function DashboardClient() {
                     job={pendingJob}
                     onApply={handleApplyPlanFromNotification}
                     onDismiss={handleDismissNotification}
+                />
+            )}
+
+            {showGoalEditor && studyPlan && !isAllPlans && (
+                <MonthlyGoalEditor
+                    goals={studyPlan.monthlyGoals || []}
+                    monthlyGoalText={studyPlan.monthlyGoal || ''}
+                    onSave={handleSaveMonthlyGoals}
+                    onClose={() => setShowGoalEditor(false)}
                 />
             )}
         </div>
