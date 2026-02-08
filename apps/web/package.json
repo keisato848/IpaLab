@@ -4,8 +4,8 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "next build",
-        "build:standalone": "next build && node scripts/copy-standalone-assets.js",
+        "build": "next build --webpack",
+        "build:standalone": "next build --webpack && node scripts/copy-standalone-assets.js",
         "start": "next start",
         "start:standalone": "node server.js",
         "lint": "next lint",
