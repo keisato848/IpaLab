@@ -103,11 +103,13 @@ jobs:
             echo "No public directory found"
           fi
 
-          # 不要なディレクトリを削除
-          rm -rf apps node_modules 2>/dev/null || true
+          # 不要なディレクトリを削除（apps/ のみ。node_modules/ は standalone 実行に必須）
+          rm -rf apps 2>/dev/null || true
 
           echo "=== Final deployment structure ==="
           ls -la
+          echo "=== node_modules check (must contain 'next') ==="
+          ls node_modules/next/package.json && echo "OK: next module found" || echo "ERROR: next module missing!"
           echo "=== .next directory ==="
           ls -la .next/
           echo "=== .next/static check ==="
