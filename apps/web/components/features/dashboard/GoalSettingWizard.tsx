@@ -3,12 +3,22 @@
 import { useState, useEffect } from 'react';
 import styles from './GoalSettingWizard.module.css';
 
+export interface MonthlyGoal {
+    id: string;
+    label: string;
+    type: 'questionCount' | 'accuracy' | 'studyDays' | 'correctCount' | 'custom';
+    targetValue: number;
+    unit: string;
+    iconEmoji: string;
+}
+
 export interface StudyPlan {
     id: string;
     title: string;
     targetExam: string;
     examDate: string;
     monthlyGoal: string;
+    monthlyGoals?: MonthlyGoal[];
     weeklySchedule: {
         weekNumber: number;
         startDate: string;
