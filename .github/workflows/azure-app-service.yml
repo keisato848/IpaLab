@@ -147,27 +147,44 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          package: ./deploy
+      # 起動コマンドを明示的に設定（Oryx デフォルトに依存しない）
+      # 背景: Azure Portal / CLI で設定した startup-file はコードデプロイとは独立して管理される。
+      #       過去に設定された旧起動コマンド (node --require ./appinsights-preload.js server.js) が
+      #       コード変更後も残存し、起動失敗の根本原因となっていた。
+      # 参照: docs/04_reports/AppService_Startup_Failure_RootCause_20260207.md
+      - name: Configure App Service startup command
+        run: |
+          az webapp config set \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group rg-pm-exam-dx-prod \
+            --startup-file "node server.js"
 
-      # Application Insights コードレスエージェント無効化 + WEBSITES_PORT 修正
-      # 背景: コードレスエージェントと手動 preload スクリプトの二重初期化が
-      #       Next.js の canonicalBase エラーを引き起こしていた
-      # 参照: docs/appservice-startup-failure-investigation.md
+      # Application Insights コードレスエージェント無効化 + Oryx バイパス
+      # 背景:
+      #   - WEBSITE_RUN_FROM_PACKAGE=1: ZIP パッケージを直接マウントして実行。
+      #     Oryx の node_modules.tar.gz 展開を完全にバイパスし、
+      #     古い依存関係による上書き問題を根本的に排除する。
+      #   - コードレスエージェント無効化: HTTP モンキーパッチによる
+      #     Next.js canonicalBase エラーを防止。
+      # 参照: docs/04_reports/AppService_Startup_Failure_RootCause_20260207.md
       - name: Configure App Service settings
         run: |
           az webapp config appsettings set \
             --name ${{ env.AZURE_WEBAPP_NAME }} \
             --resource-group rg-pm-exam-dx-prod \
             --settings \
+              WEBSITE_RUN_FROM_PACKAGE=1 \
               ApplicationInsightsAgent_EXTENSION_VERSION=disabled \
               XDT_MicrosoftApplicationInsights_Mode=disabled \
               XDT_MicrosoftApplicationInsights_PreemptSdk=disabled \
               WEBSITES_PORT=8080
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          package: ./deploy
 
       - name: Azure Logout
         run: az logout
