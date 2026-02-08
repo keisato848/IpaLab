@@ -146,3 +146,11 @@ deploy_temp/
 backup_settings.json
 logs_*.json
 tmpclaude*
+
+# Azure 調査用一時ファイル
+appservice-logs/
+*appservice-logs.zip
+nul
+
+# Claude Code
+.claude/
