@@ -1,8 +1,8 @@
 /**
  * Next.js Instrumentation Hook - 診断モード
  *
- * テレメトリが Application Insights に到達しない問題を調査するため、
- * 手動送信テスト＋明示的フラッシュ＋詳細診断ログを実装。
+ * テレメトリがディスクキャッシュにフォールバックし Application Insights に
+ * 到達しない問題を調査。disableOfflineStorage=true で送信エラーを可視化。
  */
 export async function register() {
     const runtime = process.env.NEXT_RUNTIME;
@@ -16,23 +16,56 @@ export async function register() {
     }
 
     try {
-        // クラウドロール名を OpenTelemetry 環境変数で設定
         if (!process.env.OTEL_SERVICE_NAME) {
             process.env.OTEL_SERVICE_NAME = 'pm-exam-dx-web';
+        }
+
+        // 接続文字列からインジェストエンドポイントを抽出してログ出力
+        const ingestionMatch = connectionString.match(/IngestionEndpoint=([^;]+)/);
+        const ikeyMatch = connectionString.match(/InstrumentationKey=([^;]+)/);
+        console.log('[AppInsights] InstrumentationKey:', ikeyMatch?.[1]?.substring(0, 8) + '...');
+        console.log('[AppInsights] IngestionEndpoint:', ingestionMatch?.[1] || 'NOT FOUND');
+
+        // インジェストエンドポイントへの接続テスト
+        if (ingestionMatch?.[1]) {
+            try {
+                const https = await import('https');
+                const testUrl = ingestionMatch[1].replace(/\/$/, '') + '/v2/track';
+                console.log('[AppInsights] Testing connectivity to:', testUrl);
+                await new Promise<void>((resolve) => {
+                    const req = https.request(testUrl, { method: 'POST', timeout: 5000 }, (res) => {
+                        console.log('[AppInsights] Ingestion endpoint responded:', res.statusCode, res.statusMessage);
+                        resolve();
+                    });
+                    req.on('error', (err: Error) => {
+                        console.error('[AppInsights] Ingestion endpoint UNREACHABLE:', err.message);
+                        resolve();
+                    });
+                    req.on('timeout', () => {
+                        console.error('[AppInsights] Ingestion endpoint TIMEOUT (5s)');
+                        req.destroy();
+                        resolve();
+                    });
+                    req.end('[]');
+                });
+            } catch (testErr) {
+                console.error('[AppInsights] Connectivity test error:', testErr);
+            }
         }
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const appInsightsModule = await import('applicationinsights') as any;
         const appInsights = (appInsightsModule.default ?? appInsightsModule) as typeof import('applicationinsights');
 
-        console.log('[AppInsights] Module loaded. Available exports:', Object.keys(appInsightsModule).join(', '));
-        console.log('[AppInsights] useAzureMonitor type:', typeof appInsights.useAzureMonitor);
-        console.log('[AppInsights] TelemetryClient type:', typeof appInsights.TelemetryClient);
+        // useAzureMonitor() 後に DiagConsoleLogger を設定するため先にインポート
+        const otelApi = await import('@opentelemetry/api');
 
-        // useAzureMonitor を呼び出す
+        // disableOfflineStorage=true でディスクフォールバックを無効化
+        // → 送信失敗時にエラーが DiagConsoleLogger に出力される
         appInsights.useAzureMonitor({
             azureMonitorExporterOptions: {
                 connectionString,
+                disableOfflineStorage: true,
             },
             instrumentationOptions: {
                 http: { enabled: true },
@@ -43,54 +76,16 @@ export async function register() {
             enableAutoCollectPerformance: true,
             enableLiveMetrics: false,
         });
-        console.log('[AppInsights] useAzureMonitor() completed');
+        console.log('[AppInsights] useAzureMonitor() completed (offlineStorage DISABLED)');
 
         // useAzureMonitor() 後に DiagConsoleLogger を設定（上書き対策）
-        const otelApi = await import('@opentelemetry/api');
         otelApi.diag.setLogger(
             new otelApi.DiagConsoleLogger(),
             otelApi.DiagLogLevel.DEBUG,
         );
-        console.log('[AppInsights] DiagConsoleLogger set AFTER useAzureMonitor');
+        console.log('[AppInsights] DiagConsoleLogger set (DEBUG level)');
 
-        // 手動でテストトレースを送信
-        const client = new appInsights.TelemetryClient(connectionString);
-        console.log('[AppInsights] TelemetryClient created');
-
-        client.trackTrace({
-            message: '[TEST] AppInsights instrumentation diagnostic test trace',
-            severity: 'Information' as any,
-        });
-        console.log('[AppInsights] Test trace tracked');
-
-        client.trackEvent({
-            name: 'AppInsights_DiagnosticTest',
-            properties: {
-                timestamp: new Date().toISOString(),
-                nodeVersion: process.version,
-                nextRuntime: runtime || 'nodejs',
-            },
-        });
-        console.log('[AppInsights] Test event tracked');
-
-        // 明示的にフラッシュ（バッチ送信を待たずに即時送信）
-        try {
-            await client.flush();
-            console.log('[AppInsights] Client flush completed');
-        } catch (flushError) {
-            console.error('[AppInsights] Client flush FAILED:', flushError);
-        }
-
-        // グローバルフラッシュも試行
-        try {
-            await appInsights.flushAzureMonitor();
-            console.log('[AppInsights] Global flushAzureMonitor completed');
-        } catch (globalFlushError) {
-            console.error('[AppInsights] Global flush FAILED:', globalFlushError);
-        }
-
-        console.log('[AppInsights] SDK initialized + test telemetry sent');
-        console.log('[AppInsights] CS prefix:', connectionString.substring(0, 50) + '...');
+        console.log('[AppInsights] SDK initialized. Waiting for export errors in log stream...');
     } catch (error) {
         console.error('[AppInsights] Failed to initialize SDK:', error);
     }
