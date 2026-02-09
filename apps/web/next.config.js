@@ -12,6 +12,7 @@ const nextConfig = {
     serverExternalPackages: [
         '@azure/cosmos',
         'applicationinsights',
+        '@opentelemetry/api',
     ],
     images: {
         unoptimized: true,
