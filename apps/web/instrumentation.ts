@@ -35,10 +35,14 @@ export async function register() {
     }
 
     try {
-        // 診断ログレベルを設定（SDK 内部のエラー・警告をログストリームで確認可能にする）
-        if (!process.env.APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL) {
-            process.env.APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL = 'WARN';
-        }
+        // OpenTelemetry 診断ログを有効化（SDK 内部のエクスポート状況を確認）
+        // applicationinsights の依存関係として @opentelemetry/api が利用可能
+        const otelApi = await import('@opentelemetry/api');
+        otelApi.diag.setLogger(
+            new otelApi.DiagConsoleLogger(),
+            otelApi.DiagLogLevel.DEBUG,
+        );
+        console.log('[AppInsights] OpenTelemetry diagnostic logging enabled (DEBUG)');
 
         // クラウドロール名を OpenTelemetry 環境変数で設定
         // useAzureMonitor() 呼び出し前に設定する必要がある
@@ -58,15 +62,10 @@ export async function register() {
         const appInsights = (appInsightsModule.default ?? appInsightsModule) as typeof import('applicationinsights');
 
         // v3 推奨 API を直接使用
-        // v2 互換の setup().start() は TelemetryClient.initialize() 内で
-        // useAzureMonitor() のエラーを catch して diag.error() にしか出力しないため、
-        // 初期化失敗時も "SDK initialized successfully" と誤表示される問題があった
         appInsights.useAzureMonitor({
             azureMonitorExporterOptions: {
                 connectionString,
             },
-            // console は applicationinsights の InstrumentationOptions に定義されているが、
-            // 型の継承チェーンで DistroInstrumentationOptions として解決されるため型エラーになる
             instrumentationOptions: {
                 http: { enabled: true },
                 console: { enabled: true },
@@ -78,6 +77,7 @@ export async function register() {
         });
 
         console.log('[AppInsights] SDK initialized successfully (v3 useAzureMonitor API)');
+        console.log('[AppInsights] Connection string prefix:', connectionString.substring(0, 40) + '...');
     } catch (error) {
         console.error('[AppInsights] Failed to initialize SDK:', error);
     }
