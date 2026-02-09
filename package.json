@@ -16,12 +16,16 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "test:unit": "turbo run test:run --filter=web",
+    "test:e2e": "cd apps/web && npx playwright test",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
+    "next": "16.1.5",
     "prettier": "^3.2.5",
     "turbo": "^2.7.4",
-    "typescript": "^5.4.5",
-    "next": "16.1.5"
+    "typescript": "^5.4.5"
   }
 }
