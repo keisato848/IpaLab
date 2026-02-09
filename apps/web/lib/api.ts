@@ -80,10 +80,20 @@ export interface StudyPlanJob {
     dismissed?: boolean; // ユーザーが通知を破棄した場合
 }
 
+export interface MonthlyGoal {
+    id: string;
+    label: string;
+    type: 'questionCount' | 'accuracy' | 'studyDays' | 'correctCount' | 'custom';
+    targetValue: number;
+    unit: string;
+    iconEmoji: string;
+}
+
 export interface StudyPlan {
     title: string;
     examDate: string;
-    monthlyGoal: string; // Current month's goal (summary)
+    monthlyGoal: string; // Current month's goal (summary text, backward compat)
+    monthlyGoals?: MonthlyGoal[]; // Quantitative mid-term targets
     weeklySchedule: {
         weekNumber: number;
         startDate: string; // ISO Date

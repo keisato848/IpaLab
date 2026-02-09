@@ -163,6 +163,22 @@ export default function PlanViewer() {
                                 </div>
                                 <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--bg-primary)', borderRadius: '8px' }}>
                                     <strong>今月の目標:</strong> {activePlan.monthlyGoal}
+                                    {/* 定量目標の表示 */}
+                                    {activePlan.monthlyGoals && activePlan.monthlyGoals.length > 0 && (
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.8rem' }}>
+                                            {activePlan.monthlyGoals.map(goal => (
+                                                <span key={goal.id} style={{
+                                                    padding: '0.3rem 0.6rem',
+                                                    background: 'var(--bg-secondary)',
+                                                    borderRadius: '6px',
+                                                    fontSize: '0.8rem',
+                                                    border: '1px solid var(--border-color)',
+                                                }}>
+                                                    {goal.iconEmoji} {goal.label}: {goal.targetValue}{goal.unit}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <button
