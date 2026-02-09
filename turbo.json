@@ -23,6 +23,18 @@
                 "test/**/*.tsx"
             ]
         },
+        "test:run": {
+            "dependsOn": [
+                "^build"
+            ],
+            "outputs": [],
+            "inputs": [
+                "**/*.tsx",
+                "**/*.ts",
+                "__tests__/**/*.ts",
+                "__tests__/**/*.tsx"
+            ]
+        },
         "lint": {
             "outputs": []
         },
