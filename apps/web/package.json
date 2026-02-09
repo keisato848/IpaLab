@@ -11,7 +11,9 @@
         "lint": "next lint",
         "test": "vitest",
         "test:run": "vitest run",
-        "test:coverage": "vitest run --coverage"
+        "test:coverage": "vitest run --coverage",
+        "test:e2e": "npx playwright test",
+        "test:e2e:ui": "npx playwright test --ui"
     },
     "engines": {
         "node": "20"
@@ -43,6 +45,7 @@
         "@ipa-lab/config": "*",
         "@ipa-lab/data": "*",
         "@ipa-lab/shared": "*",
+        "@playwright/test": "^1.58.2",
         "@testing-library/jest-dom": "^6.9.1",
         "@testing-library/react": "^16.3.2",
         "@types/node": "^20.0.0",
