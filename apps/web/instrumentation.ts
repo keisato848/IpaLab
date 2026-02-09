@@ -15,14 +15,12 @@
  */
 export async function register() {
     // Node.js ランタイムでのみ Application Insights を初期化
-    // NEXT_RUNTIME が 'nodejs' または undefined の場合にのみ実行（Edge runtime を除外）
     const runtime = process.env.NEXT_RUNTIME;
 
     if (runtime === 'edge') {
         return;
     }
 
-    // サーバーサイドでのみ初期化
     if (typeof window !== 'undefined') {
         return;
     }
@@ -35,13 +33,15 @@ export async function register() {
     }
 
     try {
-        // 診断ログレベルを設定（SDK 内部のエラー・警告をログストリームで確認可能にする）
-        if (!process.env.APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL) {
-            process.env.APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL = 'WARN';
-        }
+        // OpenTelemetry 診断ログを有効化（SDK 内部のエクスポート状況を確認）
+        const otelApi = await import('@opentelemetry/api');
+        otelApi.diag.setLogger(
+            new otelApi.DiagConsoleLogger(),
+            otelApi.DiagLogLevel.DEBUG,
+        );
+        console.log('[AppInsights] OpenTelemetry diagnostic logging enabled (DEBUG)');
 
         // クラウドロール名を OpenTelemetry 環境変数で設定
-        // useAzureMonitor() 呼び出し前に設定する必要がある
         if (!process.env.OTEL_SERVICE_NAME) {
             process.env.OTEL_SERVICE_NAME = 'pm-exam-dx-web';
         }
@@ -51,22 +51,15 @@ export async function register() {
         }
 
         // Application Insights SDK を動的にインポート
-        // applicationinsights は CommonJS モジュールのため、バンドラによって
-        // import() の返り値の構造が異なる（Webpack: module直接, Turbopack: .default経由）
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const appInsightsModule = await import('applicationinsights') as any;
         const appInsights = (appInsightsModule.default ?? appInsightsModule) as typeof import('applicationinsights');
 
         // v3 推奨 API を直接使用
-        // v2 互換の setup().start() は TelemetryClient.initialize() 内で
-        // useAzureMonitor() のエラーを catch して diag.error() にしか出力しないため、
-        // 初期化失敗時も "SDK initialized successfully" と誤表示される問題があった
         appInsights.useAzureMonitor({
             azureMonitorExporterOptions: {
                 connectionString,
             },
-            // console は applicationinsights の InstrumentationOptions に定義されているが、
-            // 型の継承チェーンで DistroInstrumentationOptions として解決されるため型エラーになる
             instrumentationOptions: {
                 http: { enabled: true },
                 console: { enabled: true },
@@ -78,6 +71,7 @@ export async function register() {
         });
 
         console.log('[AppInsights] SDK initialized successfully (v3 useAzureMonitor API)');
+        console.log('[AppInsights] Connection string prefix:', connectionString.substring(0, 50) + '...');
     } catch (error) {
         console.error('[AppInsights] Failed to initialize SDK:', error);
     }
