@@ -154,3 +154,9 @@ nul
 
 # Claude Code
 .claude/
+
+# Playwright E2E テスト出力
+apps/web/playwright-report/
+apps/web/test-results/
+apps/web/e2e/test-results/
+apps/web/e2e/evidence/
