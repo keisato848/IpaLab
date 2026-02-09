@@ -22,6 +22,13 @@ if (process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET) {
         Google({
             clientId: process.env.AUTH_GOOGLE_ID,
             clientSecret: process.env.AUTH_GOOGLE_SECRET,
+            authorization: {
+                params: {
+                    prompt: "consent",
+                    access_type: "offline",
+                    response_type: "code",
+                },
+            },
         })
     );
 }
@@ -29,23 +36,31 @@ if (process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET) {
 
 export const authOptions: NextAuthOptions = {
     providers: providers,
+    // next-auth v4 は NEXTAUTH_SECRET を自動認識するが、AUTH_SECRET もサポートするため明示的に設定
+    secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
     callbacks: {
-        async session({ session, token, user }) {
+        async session({ session, token }) {
             if (session.user) {
-                session.user.id = token.sub || ""; // Use token sub as ID for now (JWT strategy)
+                session.user.id = token.sub || "";
             }
             return session;
         },
-        async jwt({ token, user }) {
+        async jwt({ token, user, account, profile }) {
             if (user) {
                 token.sub = user.id;
+            }
+            // Google OAuth からプロフィール情報を保持
+            if (account?.provider === "google" && profile) {
+                token.picture = (profile as { picture?: string }).picture;
             }
             return token;
         }
     },
     pages: {
-        signIn: '/login', // Custom login page
+        signIn: '/login',
+        error: '/login', // エラー時もログインページにリダイレクト
     },
     adapter: CosmosAdapter(),
-    session: { strategy: "jwt" }, // Start with JWT, switch to Database later if needed/compatible with Adapter
+    session: { strategy: "jwt" },
+    debug: process.env.NODE_ENV === "development",
 }

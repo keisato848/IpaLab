@@ -25,6 +25,19 @@
     font-size: 0.875rem;
 }
 
+.error {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 0.5rem;
+    color: #dc2626;
+    font-size: 0.875rem;
+    text-align: center;
+    line-height: 1.4;
+}
+
 .buttons {
     display: flex;
     flex-direction: column;
@@ -43,6 +56,25 @@
     transition: all 0.2s;
     border: 1px solid transparent;
     cursor: pointer;
+}
+
+.button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.spinner {
+    display: inline-block;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
 .icon {
