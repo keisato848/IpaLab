@@ -1,67 +1,35 @@
 /**
- * Next.js Instrumentation Hook
+ * Next.js Instrumentation Hook - 診断モード
  *
- * Linux App Service では Node.js のコードレス監視（Codeless Monitoring）が
- * 利用できないため、Application Insights SDK を手動で初期化します。
- *
- * applicationinsights v3 では内部的に OpenTelemetry を使用しており、
- * v3 推奨の useAzureMonitor() API を直接使用します。
- *
- * 注意: v2 互換の setup().start() API は TelemetryClient.initialize() 内で
- * エラーを握りつぶすため、初期化失敗を検知できない問題がありました。
- *
- * @see https://learn.microsoft.com/azure/azure-monitor/app/nodejs
- * @see https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation
+ * テレメトリが Application Insights に到達しない問題を調査するため、
+ * 手動送信テスト＋明示的フラッシュ＋詳細診断ログを実装。
  */
 export async function register() {
-    // Node.js ランタイムでのみ Application Insights を初期化
-    // NEXT_RUNTIME が 'nodejs' または undefined の場合にのみ実行（Edge runtime を除外）
     const runtime = process.env.NEXT_RUNTIME;
-
-    if (runtime === 'edge') {
-        return;
-    }
-
-    // サーバーサイドでのみ初期化
-    if (typeof window !== 'undefined') {
-        return;
-    }
+    if (runtime === 'edge') return;
+    if (typeof window !== 'undefined') return;
 
     const connectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING;
-
     if (!connectionString) {
         console.warn('[AppInsights] APPLICATIONINSIGHTS_CONNECTION_STRING not set, telemetry disabled');
         return;
     }
 
     try {
-        // OpenTelemetry 診断ログを有効化（SDK 内部のエクスポート状況を確認）
-        // applicationinsights の依存関係として @opentelemetry/api が利用可能
-        const otelApi = await import('@opentelemetry/api');
-        otelApi.diag.setLogger(
-            new otelApi.DiagConsoleLogger(),
-            otelApi.DiagLogLevel.DEBUG,
-        );
-        console.log('[AppInsights] OpenTelemetry diagnostic logging enabled (DEBUG)');
-
         // クラウドロール名を OpenTelemetry 環境変数で設定
-        // useAzureMonitor() 呼び出し前に設定する必要がある
         if (!process.env.OTEL_SERVICE_NAME) {
             process.env.OTEL_SERVICE_NAME = 'pm-exam-dx-web';
         }
-        if (!process.env.OTEL_RESOURCE_ATTRIBUTES) {
-            process.env.OTEL_RESOURCE_ATTRIBUTES =
-                `service.instance.id=${process.env.WEBSITE_INSTANCE_ID || 'local'}`;
-        }
 
-        // Application Insights SDK を動的にインポート
-        // applicationinsights は CommonJS モジュールのため、バンドラによって
-        // import() の返り値の構造が異なる（Webpack: module直接, Turbopack: .default経由）
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const appInsightsModule = await import('applicationinsights') as any;
         const appInsights = (appInsightsModule.default ?? appInsightsModule) as typeof import('applicationinsights');
 
-        // v3 推奨 API を直接使用
+        console.log('[AppInsights] Module loaded. Available exports:', Object.keys(appInsightsModule).join(', '));
+        console.log('[AppInsights] useAzureMonitor type:', typeof appInsights.useAzureMonitor);
+        console.log('[AppInsights] TelemetryClient type:', typeof appInsights.TelemetryClient);
+
+        // useAzureMonitor を呼び出す
         appInsights.useAzureMonitor({
             azureMonitorExporterOptions: {
                 connectionString,
@@ -75,9 +43,54 @@ export async function register() {
             enableAutoCollectPerformance: true,
             enableLiveMetrics: false,
         });
+        console.log('[AppInsights] useAzureMonitor() completed');
 
-        console.log('[AppInsights] SDK initialized successfully (v3 useAzureMonitor API)');
-        console.log('[AppInsights] Connection string prefix:', connectionString.substring(0, 40) + '...');
+        // useAzureMonitor() 後に DiagConsoleLogger を設定（上書き対策）
+        const otelApi = await import('@opentelemetry/api');
+        otelApi.diag.setLogger(
+            new otelApi.DiagConsoleLogger(),
+            otelApi.DiagLogLevel.DEBUG,
+        );
+        console.log('[AppInsights] DiagConsoleLogger set AFTER useAzureMonitor');
+
+        // 手動でテストトレースを送信
+        const client = new appInsights.TelemetryClient(connectionString);
+        console.log('[AppInsights] TelemetryClient created');
+
+        client.trackTrace({
+            message: '[TEST] AppInsights instrumentation diagnostic test trace',
+            severity: 'Information' as any,
+        });
+        console.log('[AppInsights] Test trace tracked');
+
+        client.trackEvent({
+            name: 'AppInsights_DiagnosticTest',
+            properties: {
+                timestamp: new Date().toISOString(),
+                nodeVersion: process.version,
+                nextRuntime: runtime || 'nodejs',
+            },
+        });
+        console.log('[AppInsights] Test event tracked');
+
+        // 明示的にフラッシュ（バッチ送信を待たずに即時送信）
+        try {
+            await client.flush();
+            console.log('[AppInsights] Client flush completed');
+        } catch (flushError) {
+            console.error('[AppInsights] Client flush FAILED:', flushError);
+        }
+
+        // グローバルフラッシュも試行
+        try {
+            await appInsights.flushAzureMonitor();
+            console.log('[AppInsights] Global flushAzureMonitor completed');
+        } catch (globalFlushError) {
+            console.error('[AppInsights] Global flush FAILED:', globalFlushError);
+        }
+
+        console.log('[AppInsights] SDK initialized + test telemetry sent');
+        console.log('[AppInsights] CS prefix:', connectionString.substring(0, 50) + '...');
     } catch (error) {
         console.error('[AppInsights] Failed to initialize SDK:', error);
     }
