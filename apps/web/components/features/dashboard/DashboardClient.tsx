@@ -9,7 +9,9 @@ import { getExamLabel } from '@/lib/exam-utils';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import { useUserProgress } from '@/hooks/useUserProgress';
 import { useMonthlyProgress, createDefaultMonthlyGoals } from '@/hooks/useMonthlyProgress';
+import { useMonthlyStats } from '@/hooks/useMonthlyStats';
 import HeatmapWidget from './HeatmapWidget';
+import MonthlyProgressCard from './MonthlyProgressCard';
 import GoalSettingWizard, { StudyPlan, MonthlyGoal } from './GoalSettingWizard';
 import MonthlyGoalEditor from './MonthlyGoalEditor';
 import PlanReadyNotification from './PlanReadyNotification';
@@ -239,6 +241,9 @@ export default function DashboardClient() {
         records,
         targetExamPrefix
     );
+
+    // 月次統計（目標設定に依存しない定量サマリー）
+    const monthlyStats = useMonthlyStats(records, targetExamPrefix);
 
     // 定量目標の保存ハンドラ
     const handleSaveMonthlyGoals = (goals: MonthlyGoal[], goalText: string) => {
@@ -1065,6 +1070,11 @@ export default function DashboardClient() {
                             </button>
                         </div>
                     )}
+                </section>
+
+                {/* 1.5 Monthly Progress Card - 今月の定量進捗 */}
+                <section className={`${styles.statusCard} ${styles.fullWidthCard}`}>
+                    <MonthlyProgressCard stats={monthlyStats} />
                 </section>
 
                 {/* 2. Today's Status - ゲーミフィケーション対応 */}
