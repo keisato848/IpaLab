@@ -1,0 +1,221 @@
+/* MonthlyGoalEditor.module.css - 月次目標編集モーダル */
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.modal {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 520px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.2rem;
+    line-height: 1;
+}
+
+.closeBtn:hover {
+    color: var(--text-primary);
+}
+
+.section {
+    margin-bottom: 1.5rem;
+}
+
+.label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.textInput {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    box-sizing: border-box;
+}
+
+.textInput:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.15);
+}
+
+.goalList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.goalRow {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.goalEmoji {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.goalInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.typeSelect {
+    width: 100%;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.goalTarget {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-shrink: 0;
+}
+
+.numberInput {
+    width: 72px;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    text-align: right;
+}
+
+.numberInput:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.goalUnit {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    min-width: 1.5em;
+}
+
+.removeBtn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.2rem;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+}
+
+.removeBtn:hover {
+    opacity: 1;
+}
+
+.addBtn {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.15s, border-color 0.15s;
+    width: 100%;
+}
+
+.addBtn:hover {
+    background: var(--bg-primary);
+    border-color: var(--accent-color);
+    color: var(--text-primary);
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.8rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.cancelBtn {
+    padding: 0.6rem 1.2rem;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.cancelBtn:hover {
+    background: var(--bg-primary);
+}
+
+.saveBtn {
+    padding: 0.6rem 1.5rem;
+    background: var(--accent-color);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background 0.15s;
+}
+
+.saveBtn:hover {
+    background: var(--accent-hover);
+}
