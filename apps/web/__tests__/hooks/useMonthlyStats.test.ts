@@ -1,6 +1,7 @@
 /**
  * useMonthlyStats フックのテスト
  */
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useMonthlyStats } from '@/hooks/useMonthlyStats';
 import { LearningRecord } from '@/lib/api';
@@ -23,12 +24,12 @@ function createRecord(overrides: Partial<LearningRecord> & { answeredAt: string 
 
 describe('useMonthlyStats', () => {
     beforeAll(() => {
-        jest.useFakeTimers();
-        jest.setSystemTime(NOW);
+        vi.useFakeTimers();
+        vi.setSystemTime(NOW);
     });
 
     afterAll(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it('レコードが空の場合、ゼロ統計を返す', () => {
@@ -75,8 +76,7 @@ describe('useMonthlyStats', () => {
         const { result } = renderHook(() => useMonthlyStats(records, undefined));
 
         expect(result.current.trend.questionCountDiff).toBe(2); // 3 - 1
-        expect(result.current.trend.correctCountDiff).toBe(2); // 3 - 1 (先月correctCount = 0ではなく、先月は1問0正解か確認)
-        // 先月: 1問・0正解 → correctCount = 0
+        // 先月: 1問・isCorrect=false → correctCount = 0
         expect(result.current.previous.correctCount).toBe(0);
         expect(result.current.trend.correctCountDiff).toBe(3); // 3 - 0
         expect(result.current.trend.accuracyDiff).toBe(100); // 100% - 0%
