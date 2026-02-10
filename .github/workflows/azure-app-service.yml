@@ -182,28 +182,25 @@ jobs:
             --resource-group rg-pm-exam-dx-prod \
             --startup-file "node server.js"
 
-      # Application Insights コードレスエージェント（IPA）無効化
-      # 背景:
-      #   Linux App Service の IPA エージェントは ApplicationInsightsAgent_EXTENSION_VERSION
-      #   が「存在する」だけで有効化される（値が "disabled" でも無視される）。
-      #   また XDT_* 設定は Windows（IIS）専用で Linux では効果がない。
-      #   これらの設定を削除することで IPA エージェントを確実に無効化し、
-      #   instrumentation.ts の手動 SDK のみがテレメトリを送信するようにする。
-      # 参照: https://learn.microsoft.com/en-us/azure/azure-monitor/app/codeless-app-service
-      - name: Disable codeless agent (delete Linux-incompatible settings)
+      # IPA コードレスエージェント無効化
+      # Linux App Service の IPA は APPLICATIONINSIGHTS_CONNECTION_STRING の「存在」を
+      # 検出して自動有効化し、手動 SDK の OpenTelemetry セットアップと競合する。
+      # 対策: 標準の接続文字列を削除し、IPA が認識しないカスタム名 APPINSIGHTS_CS で
+      # 接続文字列を渡す。instrumentation.ts はこのカスタム名から読み取る。
+      - name: Disable IPA codeless agent (remove trigger env vars)
         run: |
           az webapp config appsettings delete \
             --name ${{ env.AZURE_WEBAPP_NAME }} \
             --resource-group rg-pm-exam-dx-prod \
             --setting-names \
+              APPLICATIONINSIGHTS_CONNECTION_STRING \
+              APPINSIGHTS_INSTRUMENTATIONKEY \
               ApplicationInsightsAgent_EXTENSION_VERSION \
               XDT_MicrosoftApplicationInsights_Mode \
               XDT_MicrosoftApplicationInsights_PreemptSdk \
             2>/dev/null || echo "Settings already removed or not found"
 
-      # Oryx バイパス + ポート設定
-      # WEBSITE_RUN_FROM_PACKAGE=1: ZIP パッケージを直接マウントして実行。
-      # Oryx の node_modules.tar.gz 展開を完全にバイパスする。
+      # App Service 設定: Oryx バイパス + ポート + Application Insights 接続文字列
       - name: Configure App Service settings
         run: |
           az webapp config appsettings set \
@@ -211,7 +208,8 @@ jobs:
             --resource-group rg-pm-exam-dx-prod \
             --settings \
               WEBSITE_RUN_FROM_PACKAGE=1 \
-              WEBSITES_PORT=8080
+              WEBSITES_PORT=8080 \
+              APPINSIGHTS_CS="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}"
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
