@@ -94,7 +94,7 @@ export default function PrivacyPolicyPage() {
                         </section>
 
                         <div className="pt-8 mt-12 border-t text-sm text-gray-500 text-center">
-                            <p>&copy; 2024-2025 シカクノ All Rights Reserved.</p>
+                            <p>&copy; 2025-2026 シカクノ All Rights Reserved.</p>
                             <div className="mt-4">
                                 <a href="/" className="text-blue-600 hover:text-blue-800 hover:underline">トップページへ戻る</a>
                             </div>
