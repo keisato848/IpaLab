@@ -1,5 +1,5 @@
 /**
- * Next.js Instrumentation Hook - 診断モード
+ * Next.js Instrumentation Hook
  *
  * Application Insights v3 SDK を useAzureMonitor() API で初期化する。
  *
@@ -8,6 +8,9 @@
  * APPINSIGHTS_* プレフィックスの環境変数を検出して自動有効化し、
  * 手動 SDK の OpenTelemetry セットアップと競合するため、
  * IPA が認識しない環境変数名を使用している。
+ *
+ * 診断ログ: SDK初期化の問題を診断するため、詳細なログを出力する。
+ * 本番環境でも有効だが、機密情報は出力しない。
  */
 export async function register() {
     const runtime = process.env.NEXT_RUNTIME;
@@ -15,7 +18,7 @@ export async function register() {
     if (typeof window !== 'undefined') return;
 
     const connectionString = process.env.TELEMETRY_CONNECTION_STRING;
-    console.log('[AppInsights] TELEMETRY_CONNECTION_STRING:', connectionString ? `SET (${connectionString.substring(0, 40)}...)` : 'NOT SET');
+    console.log('[AppInsights] TELEMETRY_CONNECTION_STRING:', connectionString ? 'SET' : 'NOT SET');
     console.log('[AppInsights] APPLICATIONINSIGHTS_CONNECTION_STRING:', process.env.APPLICATIONINSIGHTS_CONNECTION_STRING ? 'SET (IPA trigger!)' : 'NOT SET (good)');
 
     if (!connectionString) {
