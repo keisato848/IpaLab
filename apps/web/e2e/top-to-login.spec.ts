@@ -64,7 +64,7 @@ test.describe('トップページ → ログイン フロー', () => {
     test('フッターが表示される', async ({ page }) => {
       await page.goto('/');
 
-      await expect(page.getByText('© 2024 シカクノ')).toBeVisible();
+      await expect(page.getByText('© 2025-2026 シカクノ')).toBeVisible();
     });
   });
 
