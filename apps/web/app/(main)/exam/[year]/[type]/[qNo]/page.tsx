@@ -23,21 +23,21 @@ export async function generateMetadata({ params }: { params: Promise<{ year: str
         const questions = await questionRepository.listByExamId(examId);
         const question = questions.find((q: any) => q.qNo === parseInt(qNo));
 
-        if (!question) return { title: `Not Found - IpaLab` };
+        if (!question) return { title: `Not Found - シカクノ` };
 
         // Safe substring for description
         const desc = question.text ? question.text.substring(0, 120).replace(/\n/g, ' ') + '...' : `情報処理技術者試験 ${year} ${type} 問${qNo}`;
 
         return {
-            title: `Q${qNo} ${year} ${type} - IpaLab 過去問道場`,
+            title: `Q${qNo} ${year} ${type} - シカクノ`,
             description: desc,
             openGraph: {
-                title: `Q${qNo} ${year} ${type} (正答率: --%) - IpaLab`,
+                title: `Q${qNo} ${year} ${type} (正答率: --%) - シカクノ`,
                 description: desc,
             }
         };
     } catch {
-        return { title: `IpaLab Exam Question` };
+        return { title: `シカクノ` };
     }
 }
 

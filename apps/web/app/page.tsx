@@ -26,7 +26,7 @@ export default async function Home() {
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "シカクノ",
-        "url": "https://shikakuno.vercel.app",
+        "url": "https://shikaku-no.com",
         "description": "忙しいエンジニアのための情報処理技術者試験（基本情報・応用情報・PM）最短合格プラットフォーム。学習データを分析し、あなただけの効率的な学習戦略を提供します。",
         "applicationCategory": "EducationalApplication",
         "operatingSystem": "Web Browser",
@@ -37,9 +37,9 @@ export default async function Home() {
         },
         "featureList": [
             "過去問演習",
+            "AI自動採点（CLKS分析）",
             "学習履歴分析",
-            "模擬試験モード",
-            "レスポンシブデザイン"
+            "ダークモード対応レスポンシブデザイン"
         ],
         "author": {
             "@type": "Organization",
@@ -101,7 +101,7 @@ export default async function Home() {
             </main>
 
             <footer className={styles.footer}>
-                &copy; 2024 シカクノ (Shikaku-No) Project
+                &copy; 2025-2026 シカクノ (Shikaku-No) Project
             </footer>
         </div>
     );
