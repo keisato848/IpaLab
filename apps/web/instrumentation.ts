@@ -1,12 +1,8 @@
 /**
- * Next.js Instrumentation Hook
+ * Next.js Instrumentation Hook - 診断モード
  *
  * Application Insights v3 SDK を useAzureMonitor() API で初期化する。
- *
- * 重要: 接続文字列は APPINSIGHTS_CS（カスタム名）から読み取る。
- * Linux App Service の IPA コードレスエージェントは APPLICATIONINSIGHTS_CONNECTION_STRING
- * の「存在」を検出して自動有効化し、手動 SDK と競合するため、
- * IPA が認識しない環境変数名を使用している。
+ * IPA コードレスエージェント回避のため APPINSIGHTS_CS から接続文字列を読み取る。
  */
 export async function register() {
     const runtime = process.env.NEXT_RUNTIME;
@@ -14,13 +10,15 @@ export async function register() {
     if (typeof window !== 'undefined') return;
 
     const connectionString = process.env.APPINSIGHTS_CS;
+    console.log('[AppInsights] APPINSIGHTS_CS:', connectionString ? `SET (${connectionString.substring(0, 40)}...)` : 'NOT SET');
+    console.log('[AppInsights] APPLICATIONINSIGHTS_CONNECTION_STRING:', process.env.APPLICATIONINSIGHTS_CONNECTION_STRING ? 'SET (IPA trigger!)' : 'NOT SET (good)');
+
     if (!connectionString) {
         console.warn('[AppInsights] APPINSIGHTS_CS not set, telemetry disabled');
         return;
     }
 
     try {
-        // クラウドロール名を OpenTelemetry 環境変数で設定（useAzureMonitor より前に必要）
         if (!process.env.OTEL_SERVICE_NAME) {
             process.env.OTEL_SERVICE_NAME = 'pm-exam-dx-web';
         }
@@ -29,9 +27,14 @@ export async function register() {
         const appInsightsModule = await import('applicationinsights') as any;
         const appInsights = (appInsightsModule.default ?? appInsightsModule) as typeof import('applicationinsights');
 
+        console.log('[AppInsights] Module loaded. useAzureMonitor:', typeof appInsights.useAzureMonitor);
+
+        const otelApi = await import('@opentelemetry/api');
+
         appInsights.useAzureMonitor({
             azureMonitorExporterOptions: {
                 connectionString,
+                disableOfflineStorage: true,
             },
             instrumentationOptions: {
                 http: { enabled: true },
@@ -42,8 +45,16 @@ export async function register() {
             enableAutoCollectPerformance: true,
             enableLiveMetrics: false,
         });
+        console.log('[AppInsights] useAzureMonitor() completed (offlineStorage DISABLED)');
 
-        console.log('[AppInsights] SDK initialized (useAzureMonitor v3 API)');
+        // DiagConsoleLogger で SDK 内部エラーを出力
+        otelApi.diag.setLogger(
+            new otelApi.DiagConsoleLogger(),
+            otelApi.DiagLogLevel.WARN,
+        );
+        console.log('[AppInsights] DiagConsoleLogger set (WARN level)');
+
+        console.log('[AppInsights] SDK initialized. Monitoring export errors...');
     } catch (error) {
         console.error('[AppInsights] Failed to initialize SDK:', error);
     }
