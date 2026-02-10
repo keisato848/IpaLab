@@ -16,7 +16,7 @@
 }
 
 .header h1 {
-    font-size: 1.8rem;
+    font-size: var(--fs-xl);
     font-weight: 700;
     color: var(--text-primary);
     margin: 0 0 0.5rem 0;
@@ -24,7 +24,7 @@
 
 .subtitle {
     color: var(--text-secondary);
-    font-size: 1rem;
+    font-size: var(--fs-base);
 }
 
 /* Card Style for List Items */
@@ -59,7 +59,7 @@
 
 .examTitle {
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: var(--fs-md);
     color: var(--text-primary);
 }
 
@@ -73,7 +73,7 @@
     color: var(--text-secondary);
     padding: 0.2rem 0.6rem;
     border-radius: 4px;
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     border: 1px solid var(--border-color);
 }
@@ -97,12 +97,12 @@
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     color: var(--text-secondary);
 }
 
 .date {
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     color: var(--text-tertiary);
 }
 

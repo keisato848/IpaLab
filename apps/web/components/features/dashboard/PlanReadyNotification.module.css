@@ -65,7 +65,7 @@
 }
 
 .title {
-    font-size: 1.5rem;
+    font-size: var(--fs-xl);
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 1rem;
@@ -83,7 +83,7 @@
 }
 
 .timestamp {
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     color: var(--text-muted);
     margin-bottom: 1.5rem;
 }
@@ -98,7 +98,7 @@
 .btn {
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: var(--fs-md);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;

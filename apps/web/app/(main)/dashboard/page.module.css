@@ -22,7 +22,7 @@
 }
 
 .header h1 {
-    font-size: 1.8rem;
+    font-size: var(--fs-xl);
     font-weight: 700;
     color: #111;
     margin: 0 0 0.5rem 0;
@@ -30,11 +30,11 @@
 
 .subtitle {
     color: #666;
-    font-size: 1rem;
+    font-size: var(--fs-base);
 }
 
 .dateDisplay {
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     color: #888;
     background: white;
     padding: 0.5rem 1rem;
@@ -68,7 +68,7 @@
 
 .card h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: var(--fs-md);
     color: #333;
     font-weight: 600;
 }
@@ -149,7 +149,7 @@
 .progressStats {
     display: flex;
     justify-content: space-between;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     color: #555;
     font-weight: 500;
 }
@@ -192,12 +192,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.6rem;
+    font-size: var(--fs-xs);
     margin-bottom: 0.5rem;
 }
 
 .chartNote {
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     text-align: center;
     padding: 0 1rem;
 }
@@ -207,7 +207,7 @@
     background: none;
     border: none;
     color: #0070f3;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     cursor: pointer;
     font-weight: 500;
 }
@@ -243,13 +243,13 @@
     color: #555;
     padding: 0.2rem 0.6rem;
     border-radius: 4px;
-    font-size: 0.75rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     align-self: flex-start;
 }
 
 .examName {
-    font-size: 0.95rem;
+    font-size: var(--fs-base);
     color: #333;
 }
 
@@ -262,7 +262,7 @@
 
 .result {
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
 }
 
 .result.correct {
@@ -274,6 +274,6 @@
 }
 
 .date {
-    font-size: 0.75rem;
+    font-size: var(--fs-xs);
     color: #999;
 }
