@@ -35,7 +35,7 @@
 
 .header h3 {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: var(--fs-lg);
     font-weight: 700;
     color: var(--text-primary);
 }
@@ -43,7 +43,7 @@
 .closeBtn {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: var(--fs-xl);
     color: var(--text-secondary);
     cursor: pointer;
     padding: 0.2rem;
@@ -60,7 +60,7 @@
 
 .label {
     display: block;
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     color: var(--text-secondary);
     margin-bottom: 0.5rem;
@@ -73,7 +73,7 @@
     border-radius: 8px;
     background: var(--bg-primary);
     color: var(--text-primary);
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
     box-sizing: border-box;
 }
 
@@ -100,7 +100,7 @@
 }
 
 .goalEmoji {
-    font-size: 1.3rem;
+    font-size: var(--fs-lg);
     flex-shrink: 0;
 }
 
@@ -116,7 +116,7 @@
     border-radius: 4px;
     background: var(--bg-secondary);
     color: var(--text-primary);
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     cursor: pointer;
 }
 
@@ -134,7 +134,7 @@
     border-radius: 4px;
     background: var(--bg-primary);
     color: var(--text-primary);
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
     text-align: right;
 }
 
@@ -144,7 +144,7 @@
 }
 
 .goalUnit {
-    font-size: 0.8rem;
+    font-size: var(--fs-sm);
     color: var(--text-secondary);
     min-width: 1.5em;
 }
@@ -152,7 +152,7 @@
 .removeBtn {
     background: none;
     border: none;
-    font-size: 1rem;
+    font-size: var(--fs-md);
     cursor: pointer;
     padding: 0.2rem;
     opacity: 0.5;
@@ -171,7 +171,7 @@
     border-radius: 8px;
     color: var(--text-secondary);
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     transition: background 0.15s, border-color 0.15s;
     width: 100%;
 }
@@ -197,7 +197,7 @@
     border-radius: 8px;
     color: var(--text-primary);
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
 }
 
 .cancelBtn:hover {
@@ -211,7 +211,7 @@
     border-radius: 8px;
     color: white;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
     font-weight: 600;
     transition: background 0.15s;
 }

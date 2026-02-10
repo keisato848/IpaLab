@@ -18,7 +18,7 @@
 }
 
 .logo {
-    font-size: 1.8rem;
+    font-size: var(--fs-xl);
     font-weight: 900;
     color: var(--text-primary);
     letter-spacing: 0.05em;
@@ -47,7 +47,7 @@
 .loginLink {
     color: var(--text-secondary);
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     font-weight: 500;
 }
 
@@ -83,7 +83,7 @@
 }
 
 .title {
-    font-size: 3.5rem;
+    font-size: var(--fs-3xl);
     font-weight: 800;
     line-height: 1.2;
     margin-bottom: 1.5rem;
@@ -96,7 +96,7 @@
 }
 
 .description {
-    font-size: 1.1rem;
+    font-size: var(--fs-base);
     line-height: 1.8;
     color: var(--text-secondary);
     margin-bottom: 2.5rem;
@@ -145,7 +145,7 @@
 }
 
 .note {
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     color: var(--text-tertiary);
 }
 
@@ -167,13 +167,13 @@
 }
 
 .featureCard h2 {
-    font-size: 1.25rem;
+    font-size: var(--fs-lg);
     margin-bottom: 0.5rem;
     color: var(--text-primary);
 }
 
 .featureCard p {
-    font-size: 0.95rem;
+    font-size: var(--fs-base);
     color: var(--text-secondary);
     line-height: 1.6;
 }
@@ -182,7 +182,7 @@
     text-align: center;
     padding: 2rem;
     color: var(--text-tertiary);
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     border-top: 1px solid var(--border-color);
 }
 
@@ -193,7 +193,7 @@
 
 @media (max-width: 600px) {
     .title {
-        font-size: 2rem;
+        font-size: var(--fs-3xl);
     }
 
     .actions {
