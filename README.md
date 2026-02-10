@@ -1,6 +1,6 @@
 # Shikakuno (シカクノ) - IPA 情報処理技術者試験 学習プラットフォーム
 
-[![Azure App Service CI/CD](https://github.com/hayato-git/IpaLab/actions/workflows/azure-webapps.yml/badge.svg)](https://github.com/hayato-git/IpaLab/actions/workflows/azure-webapps.yml)
+[![Azure App Service CI/CD](https://github.com/keisato848/IpaLab/actions/workflows/azure-webapps.yml/badge.svg)](https://github.com/keisato848/IpaLab/actions/workflows/azure-webapps.yml)
 
 **Shikakuno (シカクノ)** は、IPA（情報処理推進機構）の試験対策に特化したインテリジェントな学習プラットフォームです。最先端の **AI 記述式採点システム** を搭載しており、独学では採点が難しい午後試験の記述式問題に対し、即座に分析的なフィードバックを提供します。
 
@@ -23,15 +23,21 @@
 
 ## 🛠️ 技術スタック
 
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript 5
 - **Monorepo**: Turborepo & npm Workspaces
-- **Backend**: Azure Functions (Node.js)
-- **Database**: Azure Cosmos DB (NoSQL)
-- **AI Model**: Google Gemini Pro family (gemini-3-flash-preview / gemini-2.5-flash)
-- **Authentication**: NextAuth.js (Google, GitHub)
-- **Hosting**: Azure App Service (East Asia)
+- **Backend**: Azure Functions v4 (Node.js 20)
+- **Database**: Azure Cosmos DB (NoSQL, Serverless)
+- **AI**: Google Gemini (`@google/generative-ai`)
+- **Authentication**: NextAuth.js v4 (Google, GitHub)
+- **Hosting**: Azure App Service (Next.js Standalone mode)
 - **AI API**: Azure Functions (US East 2) - Gemini API 地域制限対応
-- **Styling**: CSS Modules / Tailwind CSS
+- **UI Libraries**: React 18, Recharts (グラフ), React Markdown, KaTeX (数式), Mermaid (図表)
+- **Styling**: CSS Modules
+- **Validation**: Zod
+- **Monitoring**: Azure Application Insights
+- **Testing**: Vitest (Unit), Playwright (E2E)
+- **CI/CD**: GitHub Actions
 
 ## 🧩 システム構成
 
@@ -44,7 +50,7 @@ graph TD
     end
 
     subgraph Azure_EastAsia [Azure East Asia]
-        AppService["App Service\n(Next.js SSR)"]
+        AppService["App Service\n(Next.js Standalone)"]
         CosmosDB[(Azure Cosmos DB)]
         AppInsights[Application Insights]
     end
@@ -118,14 +124,14 @@ Turborepo を使用したモノレポ構成です。
 ### 1. 前提条件
 
 - Node.js v20 以降
-- npm v9 以降
+- npm v10 以降
 
 ### 2. インストール
 
 リポジトリをクローンし、ルートディレクトリで依存関係をインストールします。
 
 ```bash
-git clone https://github.com/hayato-git/IpaLab.git
+git clone https://github.com/keisato848/IpaLab.git
 cd IpaLab
 npm install
 ```
@@ -194,5 +200,7 @@ Next.js 開発サーバーが起動し、通常は `http://localhost:3000` で�
 - `npm run dev`: 全アプリケーションの開発サーバーを起動します。
 - `npm run build`: 本番用に全アプリケーションをビルドします。
 - `npm run test`: テストを実行します。
+- `npm run test:unit`: Webアプリのユニットテスト（Vitest）を実行します。
+- `npm run test:e2e`: E2Eテスト（Playwright）を実行します。
 - `npm run lint`: コードの静的解析を実行します。
 - `npm run format`: Prettier を使用してコードをフォーマットします。

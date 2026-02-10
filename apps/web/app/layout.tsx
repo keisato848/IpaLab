@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://shikakuno.vercel.app'; // Fallback URL
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://shikaku-no.com'; // Fallback URL
 
 export const metadata: Metadata = {
     metadataBase: new URL(siteUrl),
