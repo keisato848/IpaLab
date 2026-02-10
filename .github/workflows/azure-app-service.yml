@@ -183,10 +183,11 @@ jobs:
             --startup-file "node server.js"
 
       # IPA コードレスエージェント無効化
-      # Linux App Service の IPA は APPLICATIONINSIGHTS_CONNECTION_STRING の「存在」を
-      # 検出して自動有効化し、手動 SDK の OpenTelemetry セットアップと競合する。
-      # 対策: 標準の接続文字列を削除し、IPA が認識しないカスタム名 APPINSIGHTS_CS で
-      # 接続文字列を渡す。instrumentation.ts はこのカスタム名から読み取る。
+      # Linux App Service の IPA は APPLICATIONINSIGHTS_* / APPINSIGHTS_* プレフィックスや
+      # *_EXTENSION_VERSION / XDT_* 設定の「存在」を検出して自動有効化し、
+      # 手動 SDK の OpenTelemetry セットアップと競合する。
+      # 対策: IPA トリガーとなる全設定を削除し、IPA が認識しないカスタム名
+      # TELEMETRY_CONNECTION_STRING で接続文字列を渡す。
       - name: Disable IPA codeless agent (remove trigger env vars)
         run: |
           az webapp config appsettings delete \
@@ -194,13 +195,21 @@ jobs:
             --resource-group rg-pm-exam-dx-prod \
             --setting-names \
               APPLICATIONINSIGHTS_CONNECTION_STRING \
+              APPINSIGHTS_CONNECTIONSTRING \
               APPINSIGHTS_INSTRUMENTATIONKEY \
+              APPINSIGHTS_CS \
+              APPINSIGHTS_PROFILERFEATURE_VERSION \
+              APPINSIGHTS_SNAPSHOTFEATURE_VERSION \
               ApplicationInsightsAgent_EXTENSION_VERSION \
+              DiagnosticServices_EXTENSION_VERSION \
+              InstrumentationEngine_EXTENSION_VERSION \
+              SnapshotDebugger_EXTENSION_VERSION \
               XDT_MicrosoftApplicationInsights_Mode \
               XDT_MicrosoftApplicationInsights_PreemptSdk \
+              XDT_MicrosoftApplicationInsights_BaseExtensions \
             2>/dev/null || echo "Settings already removed or not found"
 
-      # App Service 設定: Oryx バイパス + ポート + Application Insights 接続文字列
+      # App Service 設定: Oryx バイパス + ポート + テレメトリ接続文字列
       - name: Configure App Service settings
         run: |
           az webapp config appsettings set \
@@ -209,7 +218,7 @@ jobs:
             --settings \
               WEBSITE_RUN_FROM_PACKAGE=1 \
               WEBSITES_PORT=8080 \
-              APPINSIGHTS_CS="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}"
+              TELEMETRY_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}"
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp

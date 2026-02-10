@@ -3,9 +3,10 @@
  *
  * Application Insights v3 SDK を useAzureMonitor() API で初期化する。
  *
- * 重要: 接続文字列は APPINSIGHTS_CS（カスタム名）から読み取る。
- * Linux App Service の IPA コードレスエージェントは APPLICATIONINSIGHTS_CONNECTION_STRING
- * の「存在」を検出して自動有効化し、手動 SDK と競合するため、
+ * 重要: 接続文字列は TELEMETRY_CONNECTION_STRING（カスタム名）から読み取る。
+ * Linux App Service の IPA コードレスエージェントは APPLICATIONINSIGHTS_* や
+ * APPINSIGHTS_* プレフィックスの環境変数を検出して自動有効化し、
+ * 手動 SDK の OpenTelemetry セットアップと競合するため、
  * IPA が認識しない環境変数名を使用している。
  */
 export async function register() {
@@ -13,9 +14,9 @@ export async function register() {
     if (runtime === 'edge') return;
     if (typeof window !== 'undefined') return;
 
-    const connectionString = process.env.APPINSIGHTS_CS;
+    const connectionString = process.env.TELEMETRY_CONNECTION_STRING;
     if (!connectionString) {
-        console.warn('[AppInsights] APPINSIGHTS_CS not set, telemetry disabled');
+        console.warn('[AppInsights] TELEMETRY_CONNECTION_STRING not set, telemetry disabled');
         return;
     }
 
