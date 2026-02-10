@@ -22,7 +22,7 @@
 }
 
 .header h1 {
-    font-size: 1.8rem;
+    font-size: var(--fs-xl);
     font-weight: 700;
     color: var(--text-primary);
     margin: 0 0 0.5rem 0;
@@ -30,11 +30,11 @@
 
 .subtitle {
     color: var(--text-secondary);
-    font-size: 1rem;
+    font-size: var(--fs-base);
 }
 
 .dateDisplay {
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     color: var(--text-tertiary);
     background: var(--bg-secondary);
     padding: 0.5rem 1rem;
@@ -69,7 +69,7 @@
 
 .card h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: var(--fs-md);
     color: var(--text-primary);
     font-weight: 600;
 }
@@ -98,19 +98,19 @@
 }
 
 .levelTitle {
-    font-size: 1.3rem;
+    font-size: var(--fs-lg);
     font-weight: 700;
 }
 
 .levelXp {
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     opacity: 0.85;
 }
 
 .levelMeta {
     display: flex;
     gap: 1.2rem;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     opacity: 0.9;
 }
 
@@ -129,7 +129,7 @@
 
 .levelNext {
     margin-top: 0.6rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     opacity: 0.85;
 }
 
@@ -222,7 +222,7 @@
 .progressStats {
     display: flex;
     justify-content: space-between;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     color: var(--text-secondary);
     font-weight: 500;
 }
@@ -268,13 +268,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.6rem;
+    font-size: var(--fs-xs);
     margin-bottom: 0.5rem;
     color: var(--text-secondary);
 }
 
 .chartNote {
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     text-align: center;
     padding: 0 1rem;
     color: var(--text-secondary);
@@ -285,7 +285,7 @@
     background: none;
     border: none;
     color: var(--accent-color);
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     cursor: pointer;
     font-weight: 500;
     text-decoration: none;
@@ -322,14 +322,14 @@
     color: var(--text-secondary);
     padding: 0.2rem 0.6rem;
     border-radius: 4px;
-    font-size: 0.75rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     align-self: flex-start;
     border: 1px solid var(--border-color);
 }
 
 .examName {
-    font-size: 0.95rem;
+    font-size: var(--fs-base);
     color: var(--text-primary);
 }
 
@@ -342,7 +342,7 @@
 
 .result {
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
 }
 
 .result.correct {
@@ -354,7 +354,7 @@
 }
 
 .date {
-    font-size: 0.75rem;
+    font-size: var(--fs-xs);
     color: var(--text-tertiary);
 }
 
@@ -381,13 +381,13 @@
 }
 
 .missionTitle {
-    font-size: 1.2rem;
+    font-size: var(--fs-md);
     font-weight: 700;
     margin-bottom: 0.4rem;
 }
 
 .missionSubtitle {
-    font-size: 0.95rem;
+    font-size: var(--fs-base);
     color: var(--text-secondary);
     margin-bottom: 1rem;
 }
@@ -395,13 +395,13 @@
 .missionXpRow {
     display: flex;
     justify-content: space-between;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     margin-bottom: 0.4rem;
 }
 
 .missionTotal {
     margin-top: 0.6rem;
-    font-size: 1rem;
+    font-size: var(--fs-md);
     font-weight: 700;
 }
 
@@ -418,7 +418,7 @@
 }
 
 .levelUpTitle {
-    font-size: 1.3rem;
+    font-size: var(--fs-lg);
     font-weight: 700;
     margin-bottom: 1rem;
 }
@@ -429,16 +429,16 @@
 }
 
 .levelUpLevel {
-    font-size: 1.8rem;
+    font-size: var(--fs-xl);
     font-weight: 700;
 }
 
 .levelUpTitleText {
-    font-size: 1.1rem;
+    font-size: var(--fs-md);
     color: var(--text-secondary);
 }
 
 .levelUpMessage {
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     color: var(--text-secondary);
 }

@@ -8,7 +8,7 @@
 }
 
 .title {
-    font-size: 1.1rem;
+    font-size: var(--fs-lg);
     font-weight: 700;
     margin-bottom: 1rem;
     color: #1e293b;
@@ -35,13 +35,13 @@
 }
 
 .scoreLabel {
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     color: #64748b;
     font-weight: 600;
 }
 
 .scoreValue {
-    font-size: 2.5rem;
+    font-size: var(--fs-2xl);
     font-weight: 800;
     line-height: 1;
 }
@@ -55,13 +55,13 @@
 }
 
 .totalPoints {
-    font-size: 1.2rem;
+    font-size: var(--fs-lg);
     color: #94a3b8;
     font-weight: 600;
 }
 
 .unit {
-    font-size: 1rem;
+    font-size: var(--fs-md);
     margin-left: 0.2rem;
     color: #64748b;
 }
@@ -76,7 +76,7 @@
     padding: 0.4rem 0.8rem;
     border-radius: 99px;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
 }
 
 .failBadge {
@@ -85,7 +85,7 @@
     padding: 0.4rem 0.8rem;
     border-radius: 99px;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
 }
 
 .statsRow {
@@ -102,12 +102,12 @@
 }
 
 .statLabel {
-    font-size: 0.75rem;
+    font-size: var(--fs-xs);
     color: #64748b;
 }
 
 .statValue {
-    font-size: 1rem;
+    font-size: var(--fs-md);
     font-weight: 700;
     color: #334155;
 }
@@ -118,7 +118,7 @@
 }
 
 .chartTitle {
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
     font-weight: 600;
     color: #475569;
     margin-bottom: 0.5rem;

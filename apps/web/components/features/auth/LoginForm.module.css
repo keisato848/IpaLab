@@ -12,7 +12,7 @@
 }
 
 .title {
-    font-size: 1.5rem;
+    font-size: var(--fs-xl);
     font-weight: 700;
     margin-bottom: 0.5rem;
     color: #1f2937;
@@ -22,7 +22,7 @@
     color: #6b7280;
     margin-bottom: 2rem;
     text-align: center;
-    font-size: 0.875rem;
+    font-size: var(--fs-sm);
 }
 
 .error {
@@ -33,7 +33,7 @@
     border: 1px solid #fecaca;
     border-radius: 0.5rem;
     color: #dc2626;
-    font-size: 0.875rem;
+    font-size: var(--fs-sm);
     text-align: center;
     line-height: 1.4;
 }
@@ -78,7 +78,7 @@
 }
 
 .icon {
-    font-size: 1.25rem;
+    font-size: var(--fs-lg);
 }
 
 .google {
@@ -106,7 +106,7 @@
     display: flex;
     align-items: center;
     color: #9ca3af;
-    font-size: 0.875rem;
+    font-size: var(--fs-sm);
 }
 
 .divider::before,
@@ -125,7 +125,7 @@
 }
 
 .guest p {
-    font-size: 0.875rem;
+    font-size: var(--fs-sm);
     color: #6b7280;
     margin-bottom: 0.5rem;
 }
@@ -144,7 +144,7 @@
 }
 
 .consent {
-    font-size: 0.75rem;
+    font-size: var(--fs-xs);
     color: #6b7280;
     margin-top: 1rem;
     text-align: center;

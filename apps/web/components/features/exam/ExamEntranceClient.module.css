@@ -7,7 +7,7 @@
 .breadcrumb {
     color: var(--text-secondary);
     margin-bottom: 1rem;
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
 }
 
 .breadcrumb a {
@@ -63,7 +63,7 @@
 }
 
 .btnSub {
-    font-size: 0.8rem;
+    font-size: var(--fs-sm);
     font-weight: 400;
     opacity: 0.9;
     margin-top: 0.5rem;
@@ -90,7 +90,7 @@
 }
 
 .questionList h2 {
-    font-size: 1.2rem;
+    font-size: var(--fs-lg);
     margin-bottom: 1rem;
     color: var(--text-secondary);
 }
@@ -141,12 +141,12 @@
 
 .qNo {
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: var(--fs-lg);
     color: var(--text-primary);
 }
 
 .qCat {
-    font-size: 0.8rem;
+    font-size: var(--fs-sm);
     color: var(--text-secondary);
     background: var(--bg-primary);
     padding: 0.2rem 0.6rem;
@@ -155,7 +155,7 @@
 }
 
 .qSummary {
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
     color: var(--text-secondary);
     line-height: 1.5;
     margin: 0;
@@ -226,7 +226,7 @@
 .filterLabel {
     font-weight: bold;
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
 }
 
 .filterSelect {
@@ -235,7 +235,7 @@
     border-radius: 0.5rem;
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    font-size: 0.95rem;
+    font-size: var(--fs-base);
     cursor: pointer;
     min-width: 240px;
     font-family: inherit;
@@ -260,7 +260,7 @@
 }
 
 .subcategoryBadge {
-    font-size: 0.75rem;
+    font-size: var(--fs-xs);
     background-color: var(--bg-primary);
     border: 1px solid var(--border-color);
     padding: 0.1rem 0.4rem;
@@ -269,7 +269,7 @@
 }
 
 .statusBadge {
-    font-size: 0.75rem;
+    font-size: var(--fs-xs);
     font-weight: 500;
     padding: 2px 6px;
     border-radius: 4px;
