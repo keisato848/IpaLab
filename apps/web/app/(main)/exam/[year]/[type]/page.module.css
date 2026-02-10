@@ -7,7 +7,7 @@
 .breadcrumb {
     color: var(--text-secondary);
     margin-bottom: 1rem;
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
 }
 
 .breadcrumb a {
@@ -54,7 +54,7 @@
 }
 
 .btnSub {
-    font-size: 0.8rem;
+    font-size: var(--fs-sm);
     font-weight: 400;
     opacity: 0.9;
     margin-top: 0.3rem;
@@ -75,7 +75,7 @@
 }
 
 .questionList h2 {
-    font-size: 1.2rem;
+    font-size: var(--fs-lg);
     margin-bottom: 1rem;
     color: var(--text-secondary);
 }
@@ -118,12 +118,12 @@
 
 .qNo {
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: var(--fs-lg);
     color: var(--text-primary);
 }
 
 .qCat {
-    font-size: 0.8rem;
+    font-size: var(--fs-sm);
     color: var(--text-secondary);
     background: var(--bg-primary);
     /* Light contrast */
@@ -133,7 +133,7 @@
 }
 
 .qSummary {
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
     color: var(--text-secondary);
     line-height: 1.5;
     margin: 0;
