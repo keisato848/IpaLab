@@ -2,17 +2,20 @@
  * Next.js Instrumentation Hook
  *
  * Application Insights v3 SDK を useAzureMonitor() API で初期化する。
- * コードレスエージェント（IPA）は CI/CD で無効化済みのため、
- * このファイルのみがテレメトリを送信する。
+ *
+ * 重要: 接続文字列は APPINSIGHTS_CS（カスタム名）から読み取る。
+ * Linux App Service の IPA コードレスエージェントは APPLICATIONINSIGHTS_CONNECTION_STRING
+ * の「存在」を検出して自動有効化し、手動 SDK と競合するため、
+ * IPA が認識しない環境変数名を使用している。
  */
 export async function register() {
     const runtime = process.env.NEXT_RUNTIME;
     if (runtime === 'edge') return;
     if (typeof window !== 'undefined') return;
 
-    const connectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING;
+    const connectionString = process.env.APPINSIGHTS_CS;
     if (!connectionString) {
-        console.warn('[AppInsights] APPLICATIONINSIGHTS_CONNECTION_STRING not set, telemetry disabled');
+        console.warn('[AppInsights] APPINSIGHTS_CS not set, telemetry disabled');
         return;
     }
 
