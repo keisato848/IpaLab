@@ -150,7 +150,21 @@ tmpclaude*
 # Azure 調査用一時ファイル
 appservice-logs/
 *appservice-logs.zip
+temp-logs/
+temp-logs.zip
+appsettings-backup*.json
 nul
+
+# デバッグ・調査用スクリプト・ログ
+debug_*.js
+debug-*.js
+test-models.js
+run_log*.txt
+test_result.txt
+amps.json
+logs_*.json
+logs_*.txt
+logs.txt
 
 # Claude Code
 .claude/
