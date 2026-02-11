@@ -210,7 +210,8 @@ az webapp config appsettings set \
     NODE_ENV=production \
     WEBSITES_PORT=8080 \
     WEBSITE_RUN_FROM_PACKAGE=1 \
-    AUTH_TRUST_HOST=true
+    AUTH_TRUST_HOST=true \
+    TELEMETRY_CONNECTION_STRING="<Application Insights 接続文字列>"
 ```
 
 ## 9. Bicep テンプレート
@@ -248,6 +249,7 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
         { name: 'NODE_ENV', value: 'production' }
         { name: 'WEBSITES_PORT', value: '8080' }
         { name: 'WEBSITE_RUN_FROM_PACKAGE', value: '1' }
+        { name: 'TELEMETRY_CONNECTION_STRING', value: '@Microsoft.KeyVault(SecretUri=https://<key-vault-name>.vault.azure.net/secrets/telemetry-connection-string/)' }
       ]
     }
     httpsOnly: true
