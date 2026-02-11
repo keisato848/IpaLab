@@ -189,6 +189,59 @@ packages/
 | AI Function App | func-pm-exam-dx-ai-us | US East 2 |
 | CosmosDB | pm-exam-dx-db | East Asia |
 
+## Git 管理対象外ファイルのルール
+
+調査・デバッグ作業で生成する一時ファイルは **git 追跡対象外**とする。
+
+### 管理対象外のファイルパターン
+
+| パターン | 用途 |
+|---------|------|
+| `debug_*.js`, `debug-*.js` | デバッグ用スクリプト |
+| `test-models.js` | モデルテスト用スクリプト |
+| `run_log*.txt`, `test_result.txt` | 実行ログ |
+| `logs*.json`, `logs*.txt`, `amps.json` | 調査用ログデータ |
+| `temp-logs/`, `temp-logs.zip` | Azure ログダウンロード |
+| `appservice-logs/`, `*appservice-logs.zip` | App Service ログ |
+| `appsettings-backup*.json` | App Service 設定バックアップ |
+| `tmpclaude*` | Claude Code 一時ファイル |
+
+### 運用ルール
+
+1. **新規作成時**: 上記パターンに従う命名で作成すること。`.gitignore` に登録済み
+2. **誘ってコミットしない**: `git add .` を使わず、対象ファイルを明示的に指定する
+3. **既存の追跡ファイルの削除**: 既に git 追跡されている一時ファイルは `git rm --cached <ファイル>` で追跡を解除すること
+4. **調査結果の保存**: 調査結果を欸久的に保存する場合は `docs/` 配下に報告書として整理する
+
+## Azure リソースの実装・調査ルール
+
+Azure リソースに関する実装、設定変更、障害調査、デプロイ作業を行う際は、
+**以下の 2 つの MCP サーバーを必ず最初に参照すること**。
+
+| MCP サーバー | 用途 | 使用タイミング |
+|-------------|------|---------------|
+| **Azure MCP** (`mcp_azure_mcp_*`) | Azure リソースの状態確認・操作・ベストプラクティス取得 | リソース設定確認、診断、CLI コマンド生成、デプロイ時 |
+| **Microsoft Learn MCP** (`mcp_microsoft-lea_microsoft_docs_search`) | 公式ドキュメント検索・コードサンプル取得 | 設定方法の確認、トラブルシューティング、ベストプラクティス調査時 |
+
+### 必須ワークフロー
+
+1. Azure MCP の `bestpractices` ツールでベストプラクティスを取得
+2. Microsoft Learn MCP で公式ドキュメントを検索し、最新の推奨手順を確認
+3. Azure MCP の各サービス専用ツール（`appservice`、`monitor`、`cosmos` 等）でリソース状態を確認
+4. 上記の情報に基づいて実装・修正を行う
+
+**推測や記憶に頼らず、必ず MCP サーバー経由で最新情報を取得すること。**
+
+### 対象となる作業例
+
+- App Service / Azure Functions の設定変更・デプロイ
+- Application Insights のテレメトリ調査・設定
+- CosmosDB の接続・クエリ関連
+- Azure Static Web Apps の構成
+- Bicep / ARM テンプレートの作成・変更
+- Azure CLI コマンドの生成・実行
+- Azure リソースの障害調査・トラブルシューティング
+
 ## 注意事項
 
 - **Gemini API の地域制限**: US リージョンからのみ呼び出し可能（East Asia からは `User location is not supported` エラー）
