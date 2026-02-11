@@ -11,6 +11,7 @@ const nextConfig = {
     // Next.js 15: serverComponentsExternalPackages renamed to serverExternalPackages
     serverExternalPackages: [
         '@azure/cosmos',
+        '@azure/identity',
         // Application Insights v3 SDK + 全依存パッケージ
         // Webpack バンドルによる OpenTelemetry グローバルレジストリ分離を防止
         'applicationinsights',

@@ -3,7 +3,12 @@
  *
  * Application Insights v3 SDK を useAzureMonitor() API で初期化する。
  *
- * 重要: 接続文字列は TELEMETRY_CONNECTION_STRING（カスタム名）から読み取る。
+ * 認証方式: AAD認証（マネージドID）
+ * - APPI リソース `appi-pm-exam-dx` は DisableLocalAuth=true のため、
+ *   Instrumentation Key / 接続文字列だけでは 401 になる。
+ * - ManagedIdentityCredential を使用してテレメトリを送信する。
+ *
+ * 接続文字列: TELEMETRY_CONNECTION_STRING（カスタム名）から読み取る。
  * Linux App Service の IPA コードレスエージェントは APPLICATIONINSIGHTS_* や
  * APPINSIGHTS_* プレフィックスの環境変数を検出して自動有効化し、
  * 手動 SDK の OpenTelemetry セットアップと競合するため、
@@ -30,9 +35,15 @@ export async function register() {
         const appInsightsModule = await import('applicationinsights') as any;
         const appInsights = (appInsightsModule.default ?? appInsightsModule) as typeof import('applicationinsights');
 
+        // AAD認証: ManagedIdentityCredential を使用
+        // APPI リソースの DisableLocalAuth=true に対応
+        const { ManagedIdentityCredential } = await import('@azure/identity');
+        const credential = new ManagedIdentityCredential();
+
         appInsights.useAzureMonitor({
             azureMonitorExporterOptions: {
                 connectionString,
+                credential,
             },
             instrumentationOptions: {
                 http: { enabled: true },
@@ -44,7 +55,7 @@ export async function register() {
             enableLiveMetrics: false,
         });
 
-        console.log('[AppInsights] SDK initialized (useAzureMonitor v3 API)');
+        console.log('[AppInsights] SDK initialized (useAzureMonitor v3 + AAD auth)');
     } catch (error) {
         console.error('[AppInsights] Failed to initialize SDK:', error);
     }
