@@ -11,8 +11,33 @@ const nextConfig = {
     // Next.js 15: serverComponentsExternalPackages renamed to serverExternalPackages
     serverExternalPackages: [
         '@azure/cosmos',
+        // Application Insights v3 SDK + 全依存パッケージ
+        // Webpack バンドルによる OpenTelemetry グローバルレジストリ分離を防止
         'applicationinsights',
+        '@azure/monitor-opentelemetry',
+        '@azure/monitor-opentelemetry-exporter',
+        '@azure/opentelemetry-instrumentation-azure-sdk',
         '@opentelemetry/api',
+        '@opentelemetry/api-logs',
+        '@opentelemetry/core',
+        '@opentelemetry/exporter-logs-otlp-http',
+        '@opentelemetry/exporter-metrics-otlp-http',
+        '@opentelemetry/exporter-metrics-otlp-proto',
+        '@opentelemetry/exporter-trace-otlp-http',
+        '@opentelemetry/instrumentation',
+        '@opentelemetry/instrumentation-http',
+        '@opentelemetry/otlp-exporter-base',
+        '@opentelemetry/resources',
+        '@opentelemetry/sdk-logs',
+        '@opentelemetry/sdk-metrics',
+        '@opentelemetry/sdk-node',
+        '@opentelemetry/sdk-trace-base',
+        '@opentelemetry/sdk-trace-node',
+        '@opentelemetry/semantic-conventions',
+        'diagnostic-channel',
+        'diagnostic-channel-publishers',
+        'import-in-the-middle',
+        'require-in-the-middle',
     ],
     images: {
         unoptimized: true,
