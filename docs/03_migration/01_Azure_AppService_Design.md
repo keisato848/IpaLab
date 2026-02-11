@@ -48,10 +48,7 @@
 | `WEBSITE_RUN_FROM_PACKAGE` | `1` | ZIP パッケージを直接マウントして実行。Oryx の node_modules.tar.gz 展開をバイパスする |
 | `NODE_ENV` | `production` | 本番モード |
 | `COSMOS_DB_CONNECTION` | `@Microsoft.KeyVault(...)` | Key Vault 参照 |
-| `APPLICATIONINSIGHTS_CONNECTION_STRING` | 手動設定 | SDK 手動統合用の接続文字列 |
-| `ApplicationInsightsAgent_EXTENSION_VERSION` | `disabled` | コードレスエージェント無効化 |
-| `XDT_MicrosoftApplicationInsights_Mode` | `disabled` | 自動計測モード無効化 |
-| `XDT_MicrosoftApplicationInsights_PreemptSdk` | `disabled` | SDK 先取り無効化 |
+| `TELEMETRY_CONNECTION_STRING` | 手動設定 | Application Insights 接続文字列（IPA コードレスエージェントが検出しないカスタム名） |
 | `AUTH_SECRET` | `@Microsoft.KeyVault(...)` | Key Vault 参照 |
 | `AUTH_TRUST_HOST` | `true` | NextAuth 設定 |
 | `AUTH_GITHUB_ID` | 設定値 | GitHub OAuth |
@@ -82,39 +79,32 @@ node server.js
 
 ## 4. Application Insights 統合
 
-### 4.1 SDK 手動統合（Linux App Service 必須）
+### 4.1 SDK 手動統合（v3 useAzureMonitor API）
 
-**重要:** Linux App Service + Node.js ではコードレス監視が利用できないため、SDK を手動で初期化する必要があります。
+**重要:** Linux App Service + Node.js ではコードレス監視が利用できないため、SDK を手動で初期化する。
 
-**注意:** Azure のコードレスエージェント (`ApplicationInsightsAgent_EXTENSION_VERSION: ~3`) と
-手動 preload スクリプトを同時に有効にすると、HTTP モジュールの二重パッチにより
-Next.js standalone の内部設定が破壊され、`canonicalBase` エラーでクラッシュします。
-必ずコードレスエージェントを `disabled` に設定してください。
+**IPA コードレスエージェントとの競合回避:**
 
-**無効化が必要な設定:**
-| 設定名 | 値 | 理由 |
-|--------|-----|------|
-| `ApplicationInsightsAgent_EXTENSION_VERSION` | `disabled` | コードレスエージェントを無効化 |
-| `XDT_MicrosoftApplicationInsights_Mode` | `disabled` | 自動計測モードを無効化 |
-| `XDT_MicrosoftApplicationInsights_PreemptSdk` | `disabled` | SDK 先取りを無効化 |
+Linux App Service の Oryx スクリプトは `APPLICATIONINSIGHTS_*` や `APPINSIGHTS_*` プレフィックスの
+環境変数を検出して IPA コードレスエージェントを自動有効化する。手動 SDK と二重初期化され、
+OpenTelemetry のグローバルレジストリが競合するため、以下の対策を適用:
 
-**不要な設定（削除推奨）:**
-- `APPINSIGHTS_INSTRUMENTATIONKEY` - コードレスエージェント用（不要）
-- `APPINSIGHTS_CONNECTIONSTRING` - コードレスエージェント用（不要、`APPLICATIONINSIGHTS_CONNECTION_STRING` と重複）
-- `APPINSIGHTS_PROFILERFEATURE_VERSION` - 不要
-- `APPINSIGHTS_SNAPSHOTFEATURE_VERSION` - 不要
-- `DiagnosticServices_EXTENSION_VERSION` - 不要
-- `SnapshotDebugger_EXTENSION_VERSION` - 不要
+1. **IPA 関連環境変数はすべて完全削除**（`disabled` ではなく削除）
+   - `ApplicationInsightsAgent_EXTENSION_VERSION`
+   - `XDT_MicrosoftApplicationInsights_Mode`
+   - `XDT_MicrosoftApplicationInsights_PreemptSdk`
+   - `APPLICATIONINSIGHTS_CONNECTION_STRING`
+2. **接続文字列は `TELEMETRY_CONNECTION_STRING`（カスタム名）を使用**
 
-**対応方法:**
-1. `instrumentation.ts`（Next.js Instrumentation Hook）で SDK を初期化
+**SDK 初期化方法:**
+1. `instrumentation.ts`（Next.js Instrumentation Hook）で `applicationinsights` v3 の `useAzureMonitor()` API を呼び出し
 2. Next.js サーバー起動時に `register()` が自動的に呼ばれ、SDK が初期化される
-3. `applicationinsights` は `next.config.js` の `serverExternalPackages` に登録済み
+3. `next.config.js` の `serverExternalPackages` に `applicationinsights` および全 OpenTelemetry 依存パッケージを登録し、Webpack バンドルによるモジュールスコープ分離を防止
 
 **環境変数の設定:**
 1. Azure Portal > App Service > `app-pm-exam-dx-prod`
 2. 「設定」>「構成」>「アプリケーション設定」
-3. `APPLICATIONINSIGHTS_CONNECTION_STRING` を設定（Application Insights の接続文字列）
+3. `TELEMETRY_CONNECTION_STRING` に Application Insights の接続文字列を設定
 
 **収集されるデータ:**
 - HTTP リクエスト/レスポンス
@@ -122,17 +112,13 @@ Next.js standalone の内部設定が破壊され、`canonicalBase` エラーで
 - 例外・エラー
 - パフォーマンスメトリクス
 
-### 4.2 追加カスタムログ
+### 4.2 serverExternalPackages の設定
 
-SDK 初期化後、カスタムログを出力可能。
+`next.config.js` の `serverExternalPackages` には、Application Insights v3 SDK の
+依存ツリー全体を指定する。不完全な指定では Webpack バンドルにより
+OpenTelemetry のグローバルレジストリが分離し、テレメトリがサイレントに失われる。
 
-```javascript
-// lib/appinsights.ts
-const appInsights = require('applicationinsights');
-appInsights.setup()
-    .setAutoCollectConsole(true, true)
-    .start();
-```
+詳細は `next.config.js` の `serverExternalPackages` 配列を参照。
 
 ## 5. カスタムドメイン
 
@@ -224,10 +210,7 @@ az webapp config appsettings set \
     NODE_ENV=production \
     WEBSITES_PORT=8080 \
     WEBSITE_RUN_FROM_PACKAGE=1 \
-    AUTH_TRUST_HOST=true \
-    ApplicationInsightsAgent_EXTENSION_VERSION=disabled \
-    XDT_MicrosoftApplicationInsights_Mode=disabled \
-    XDT_MicrosoftApplicationInsights_PreemptSdk=disabled
+    AUTH_TRUST_HOST=true
 ```
 
 ## 9. Bicep テンプレート
@@ -265,9 +248,6 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
         { name: 'NODE_ENV', value: 'production' }
         { name: 'WEBSITES_PORT', value: '8080' }
         { name: 'WEBSITE_RUN_FROM_PACKAGE', value: '1' }
-        { name: 'ApplicationInsightsAgent_EXTENSION_VERSION', value: 'disabled' }
-        { name: 'XDT_MicrosoftApplicationInsights_Mode', value: 'disabled' }
-        { name: 'XDT_MicrosoftApplicationInsights_PreemptSdk', value: 'disabled' }
       ]
     }
     httpsOnly: true
@@ -293,5 +273,5 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
 ---
 
 **作成日**: 2026-02-04
-**更新日**: 2026-02-07
+**更新日**: 2026-02-11
 **ステータス**: 設計完了
