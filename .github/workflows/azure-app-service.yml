@@ -227,6 +227,21 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: ./deploy
 
+      # VNet 統合の維持確認 (CosmosDB ゼロトラスト保護)
+      # コードデプロイでは VNet 統合設定は影響を受けないが、念のため確認
+      - name: Verify VNet integration
+        run: |
+          VNET_SUBNET=$(az webapp show \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group rg-pm-exam-dx-prod \
+            --query virtualNetworkSubnetId -o tsv 2>/dev/null)
+          if [ -n "$VNET_SUBNET" ] && [ "$VNET_SUBNET" != "null" ]; then
+            echo "✅ VNet integration active: $VNET_SUBNET"
+          else
+            echo "⚠️ WARNING: VNet integration not detected. CosmosDB 接続に影響の可能性あり"
+            echo "Run: az webapp vnet-integration add --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group rg-pm-exam-dx-prod --vnet vnet-pm-exam-dx-ea --subnet snet-appservice"
+          fi
+
       - name: Azure Logout
         run: az logout
 
