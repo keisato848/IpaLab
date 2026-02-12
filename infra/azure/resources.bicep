@@ -2,7 +2,14 @@ param location string
 param envName string
 param appName string
 
-// 1. Cosmos DB (Serverless)
+// ネットワーク保護パラメータ (network.bicep からの出力を受け取る)
+@description('App Service サブネットのリソース ID (VNet Service Endpoint 経由のアクセス許可用)')
+param appServiceSubnetId string = ''
+
+@description('CosmosDB IP ルール配列 (Function App アウトバウンド IP)')
+param cosmosIpRules array = []
+
+// 1. Cosmos DB (Serverless) — ゼロトラスト保護: Service Endpoint + IP フィルタ
 resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
   name: 'cosmos-${appName}-${envName}'
   location: location
@@ -24,6 +31,16 @@ resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
     consistencyPolicy: {
       defaultConsistencyLevel: 'Session'
     }
+    // ネットワーク保護設定 (Selected Networks モード)
+    publicNetworkAccess: 'Enabled' // Selected Networks モードで運用
+    isVirtualNetworkFilterEnabled: !empty(appServiceSubnetId)
+    virtualNetworkRules: !empty(appServiceSubnetId) ? [
+      {
+        id: appServiceSubnetId
+        ignoreMissingVNetServiceEndpoint: false
+      }
+    ] : []
+    ipRules: cosmosIpRules
   }
 }
 
