@@ -137,10 +137,10 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
         setRetryCount(0);
         setAsyncJobCreated(false);
 
-        // 同期処理: 45秒タイムアウトで1回試行
+        // 同期処理: 60秒タイムアウトで1回試行（Consumption Planコールドスタート+Gemini API応答を考慮）
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 45000); // 45秒タイムアウト
+            const timeoutId = setTimeout(() => controller.abort(), 60000); // 60秒タイムアウト
 
             const res = await fetch('/api/ai/plan', {
                 method: 'POST',
