@@ -34,9 +34,9 @@ const getClient = async (): Promise<CosmosClient | undefined> => {
         if (isLocalEmulator) {
             // codeql[js/disabling-certificate-validation] - ローカルエミュレータ専用の意図的な無効化
             console.warn("[CosmosDB] ローカルエミュレータ接続: TLS証明書検証を無効化します（開発環境のみ）");
-            process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
             client = new CosmosClient({
                 connectionString: connStr,
+                // HTTPSエージェントで証明書検証を無効化（環境変数は使用しない）
                 // codeql[js/disabling-certificate-validation] - ローカルエミュレータ専用
                 agent: new https.Agent({ rejectUnauthorized: false })
             });

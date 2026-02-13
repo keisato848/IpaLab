@@ -29,7 +29,7 @@ async function main() {
     const isLocal = CONNECTION_STRING.includes('localhost') || CONNECTION_STRING.includes('127.0.0.1');
     let clientOptions: any = {};
     if (isLocal) {
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        // ローカルエミュレータ専用: HTTPSエージェントで証明書検証を無効化
         clientOptions = {
             connectionString: CONNECTION_STRING.replace('localhost', '127.0.0.1'),
             agent: new https.Agent({ rejectUnauthorized: false })

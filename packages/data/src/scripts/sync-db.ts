@@ -69,7 +69,7 @@ async function cleanLearningRecords() {
         if (CONNECTION_STRING.includes('localhost')) {
             finalConnectionString = CONNECTION_STRING.replace('localhost', '127.0.0.1');
         }
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        // ローカルエミュレータ専用: HTTPSエージェントで証明書検証を無効化
         clientOptions = {
             connectionString: finalConnectionString,
             agent: new https.Agent({ rejectUnauthorized: false })
@@ -183,7 +183,7 @@ async function main() {
         if (CONNECTION_STRING.includes('localhost')) {
             finalConnectionString = CONNECTION_STRING.replace('localhost', '127.0.0.1');
         }
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        // ローカルエミュレータ専用: HTTPSエージェントで証明書検証を無効化
         clientOptions = {
             connectionString: finalConnectionString,
             agent: new https.Agent({ rejectUnauthorized: false })

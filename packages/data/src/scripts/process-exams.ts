@@ -269,7 +269,7 @@ async function syncExamToDB(examId: string): Promise<boolean> {
     const isLocal = CONNECTION_STRING.includes('localhost') || CONNECTION_STRING.includes('127.0.0.1');
     let clientOptions: any = { connectionString: CONNECTION_STRING };
     if (isLocal) {
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        // ローカルエミュレータ専用: HTTPSエージェントで証明書検証を無効化
         clientOptions.agent = new https.Agent({ rejectUnauthorized: false });
     }
 
