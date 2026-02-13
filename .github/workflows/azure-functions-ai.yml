@@ -96,5 +96,38 @@ jobs:
           echo "Listing deployed functions..."
           az functionapp function list --name ${{ env.AZURE_FUNCTIONAPP_NAME }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --output table || echo "Function list may take time to populate"
 
+      # CosmosDB ゼロトラスト保護: アウトバウンド IP の変更検知
+      # Consumption Plan のスケールインイベントで IP が変更される可能性があるため、
+      # CosmosDB の IP ルールとの整合性を確認
+      - name: Check outbound IPs for CosmosDB firewall
+        run: |
+          FUNC_IPS=$(az functionapp show \
+            --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --query possibleOutboundIpAddresses -o tsv)
+          echo "Function App outbound IPs: $FUNC_IPS"
+          
+          COSMOS_IPS=$(az cosmosdb show \
+            --name cosmos-pm-exam-dx-db \
+            --resource-group rg-pm-exam-dx-prod-grobal \
+            --query "ipRules[].ipAddressOrRange" -o tsv 2>/dev/null | tr '\n' ',')
+          echo "CosmosDB allowed IPs: $COSMOS_IPS"
+          
+          # Function App の全 IP が CosmosDB に登録されているか確認
+          MISSING=""
+          IFS=',' read -ra FUNC_IP_ARRAY <<< "$FUNC_IPS"
+          for ip in "${FUNC_IP_ARRAY[@]}"; do
+            if [[ "$COSMOS_IPS" != *"$ip"* ]]; then
+              MISSING="$MISSING $ip"
+            fi
+          done
+          
+          if [ -n "$MISSING" ]; then
+            echo "⚠️ WARNING: 以下の IP が CosmosDB ファイアウォールに未登録:$MISSING"
+            echo "CosmosDB の IP ルールを更新してください"
+          else
+            echo "✅ 全ての Function App アウトバウンド IP が CosmosDB に登録済み"
+          fi
+
       - name: Azure Logout
         run: az logout

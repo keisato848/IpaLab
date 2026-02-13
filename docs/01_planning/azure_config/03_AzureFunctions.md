@@ -138,6 +138,37 @@ Functions in func-pm-exam-dx-ai-us:
 - **原因**: ネットワーク接続の問題、またはリージョン制限
 - **解決策**: Function App が US リージョンにあることを確認
 
+#### CosmosDB 接続エラー (403 Forbidden)
+- **原因**: Function App のアウトバウンド IP が CosmosDB ファイアウォールに未登録
+- **解決策**: `possibleOutboundIpAddresses` を確認し、CosmosDB の IP ルールを更新
+  ```bash
+  # 現在のアウトバウンド IP を確認
+  az functionapp show --name func-pm-exam-dx-ai-us \
+    --resource-group rg-pm-exam-dx-ai-us \
+    --query possibleOutboundIpAddresses -o tsv
+  ```
+
+### 3.9 ネットワーク・セキュリティ
+
+Function App から CosmosDB へのアクセスは、**IP フィルタ方式**で制御しています。  
+Y1 Consumption Plan では VNet 統合が使用できないため、アウトバウンド IP を CosmosDB のファイアウォールに登録しています。
+
+| 項目 | 設定値 | 備考 |
+| :--- | :--- | :--- |
+| **CosmosDB への接続方式** | IP フィルタ | VNet 統合不可 (Y1 Plan) |
+| **登録対象 IP** | `possibleOutboundIpAddresses` | 全候補 IP を登録 |
+| **IP ルール数** | 25件 | US East 2 リージョンの全候補 IP |
+
+**アーキテクチャ:**
+```
+Function App (US East 2, Y1 Consumption)
+  └─ アウトバウンド IP (パブリックインターネット経由)
+       └─ CosmosDB IP フィルタで許可
+            └─ CosmosDB (cosmos-pm-exam-dx-db)
+```
+
+> **運用上の注意**: Consumption Plan のスケールインイベントやプラットフォーム更新で `possibleOutboundIpAddresses` が変更される可能性があります。定期的に確認し、CosmosDB の IP ルールとの不一致があれば更新してください。
+
 ---
 
 ## 4. 将来の拡張
