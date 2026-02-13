@@ -148,7 +148,29 @@ OpenTelemetry のグローバルレジストリが分離し、テレメトリが
 | **最小 TLS バージョン** | 1.2 | セキュリティ要件 |
 | **IP 制限** | なし | パブリックアクセス |
 
-### 6.2 マネージド ID
+### 6.2 VNet 統合 (CosmosDB ゼロトラスト保護)
+
+App Service から CosmosDB へのアクセスを VNet Service Endpoint 経由に制限し、Azure バックボーン内通信に限定しています。
+
+| 項目 | 設定値 | 備考 |
+|------|--------|------|
+| **VNet 統合先** | `vnet-pm-exam-dx-ea/snet-appservice` | East Asia VNet |
+| **サブネット** | `10.0.1.0/24` | App Service 専用 |
+| **委任** | `Microsoft.Web/serverFarms` | App Service Plan 用 |
+| **Service Endpoint** | `Microsoft.AzureCosmosDB` | CosmosDB への接続許可 |
+| **WEBSITE_VNET_ROUTE_ALL** | `1` | 全アウトバウンドを VNet 経由 |
+
+**アーキテクチャ:**
+```
+App Service (East Asia)
+  └─ VNet統合: vnet-pm-exam-dx-ea/snet-appservice
+       └─ Service Endpoint: Microsoft.AzureCosmosDB
+            └─ CosmosDB (cosmos-pm-exam-dx-db) ← Azure バックボーン内通信
+```
+
+**Bicep テンプレート:** `infra/azure/network.bicep`
+
+### 6.3 マネージド ID
 
 | 項目 | 設定値 | 用途 |
 |------|--------|------|

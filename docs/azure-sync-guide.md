@@ -70,3 +70,75 @@ npm run sync
 6. **「保存 (Save)」** をクリックして設定を反映させます。
 
 設定反映後、数分待ってからアプリケーションをリロードしてください。
+
+## CosmosDB ファイアウォール制限下でのローカルアクセス
+
+CosmosDB はゼロトラスト保護（Selected Networks モード）で運用されており、許可された VNet / IP アドレス以外からのアクセスは遮断されます。ローカル PC から `packages/data` のスクリプト（sync-db, check-duplicates 等）を実行する場合は、**作業前に一時的にIPを許可し、作業後に必ず削除**してください。
+
+### 前提条件
+
+- Azure CLI がインストール・ログイン済み (`az login`)
+- CosmosDB リソースへの操作権限
+
+### 手順
+
+#### 1. 作業前: 自分の IP を一時許可
+
+```powershell
+# 自分のパブリック IP を取得
+$myIp = (Invoke-WebRequest -Uri "https://ifconfig.me" -UseBasicParsing).Content.Trim()
+Write-Host "自分の IP: $myIp"
+
+# 現在の CosmosDB IP ルールを取得
+$existingIps = (az cosmosdb show `
+  --name cosmos-pm-exam-dx-db `
+  --resource-group rg-pm-exam-dx-prod-grobal `
+  --query "ipRules[].ipAddressOrRange" -o tsv) -join ","
+
+# 自分の IP を追加してファイアウォール更新
+az cosmosdb update `
+  --name cosmos-pm-exam-dx-db `
+  --resource-group rg-pm-exam-dx-prod-grobal `
+  --ip-range-filter "$existingIps,$myIp" `
+  -o none
+
+Write-Host "IP を一時許可しました。CosmosDB の更新完了まで数分かかる場合があります。"
+```
+
+> **注意**: CosmosDB の更新は非同期で行われ、完了まで 1〜5 分程度かかることがあります。  
+> `provisioningState` が `Succeeded` になるまで待ってから作業を開始してください。
+
+```powershell
+# 更新完了を確認
+az cosmosdb show `
+  --name cosmos-pm-exam-dx-db `
+  --resource-group rg-pm-exam-dx-prod-grobal `
+  --query provisioningState -o tsv
+```
+
+#### 2. 作業実行
+
+```powershell
+cd packages/data
+npx ts-node src/scripts/sync-db.ts
+```
+
+#### 3. 作業後: 自分の IP を削除（必須）
+
+```powershell
+# 元の IP リストに戻す（自分の IP を除外）
+az cosmosdb update `
+  --name cosmos-pm-exam-dx-db `
+  --resource-group rg-pm-exam-dx-prod-grobal `
+  --ip-range-filter "$existingIps" `
+  -o none
+
+Write-Host "IP を削除しました。"
+```
+
+### 注意事項
+
+- **作業後は必ず IP を削除**すること。放置するとセキュリティリスクになります
+- `$existingIps` 変数は PowerShell セッション内で保持されるため、同じターミナルで作業してください
+- セッションが切れた場合は、手動で Azure Portal から IP を削除してください
+- CosmosDB のリソースグループ名は `rg-pm-exam-dx-prod-grobal`（typo ですが実際のリソース名）です
