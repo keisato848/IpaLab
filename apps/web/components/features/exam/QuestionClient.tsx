@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
@@ -60,6 +60,9 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const [pastStats, setPastStats] = useState<{ total: number; correct: number } | null>(null);
     const [examStats, setExamStats] = useState<{ total: number; correct: number } | null>(null);
     const [allExamRecords, setAllExamRecords] = useState<LearningRecord[]>([]);
+
+    // Stats version counter to protect optimistic updates from stale server data
+    const statsVersionRef = useRef(0);
 
     // Mock Mode Logic
     const isMock = mode === 'mock';
@@ -211,6 +214,9 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 const userId = session?.user?.id || guestManager.getGuestId();
                 if (!userId) return;
 
+                // Capture version before async fetch to detect concurrent saves
+                const fetchVersion = statsVersionRef.current;
+
                 // 1. Past Stats for this Question
                 const qRecords = await getLearningRecords(userId, undefined, question.id);
                 if (qRecords.length > 0) {
@@ -222,6 +228,10 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
                 // 2. Cumulative Stats for this Exam (All records for this examId)
                 const eRecords = await getLearningRecords(userId, question.examId);
+
+                // Skip overwriting stats if a save occurred during this fetch (race condition protection)
+                if (fetchVersion !== statsVersionRef.current) return;
+
                 if (eRecords.length > 0) {
                     setAllExamRecords(eRecords);
                     // Session Stats (Today's records)
@@ -259,6 +269,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
     const handleSaveAIScore = async (data: { answer: string; result: any }, subQIdx: number, subSubIdx?: number) => {
         const qId = getSubQId(question.id, subQIdx, subSubIdx);
+        const isCorrect = (data.result.score || 0) >= 60;
         const record: LearningRecord = {
             id: uuidv4(),
             userId: session?.user?.id || guestManager.getGuestId() || 'anonymous',
@@ -271,15 +282,28 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             aiScore: data.result.score,
             aiFeedback: data.result.feedback,
             aiRadarData: data.result.radarChartData,
-            isCorrect: (data.result.score || 0) >= 60,
+            isCorrect,
             answeredAt: new Date().toISOString(),
             timeTakenSeconds: 0,
         };
 
+        // Optimistic UI update (before API calls to ensure immediate feedback)
+        statsVersionRef.current += 1;
+        setSessionStats(prev => ({
+            total: prev.total + 1,
+            correct: prev.correct + (isCorrect ? 1 : 0)
+        }));
+        setExamStats(prev => {
+            const currentTotal = prev?.total || 0;
+            const currentCorrect = prev?.correct || 0;
+            return {
+                total: currentTotal + 1,
+                correct: currentCorrect + (isCorrect ? 1 : 0)
+            };
+        });
+
         try {
             if (session?.user?.id) {
-                const isCorrect = (data.result.score || 0) >= 60;
-                
                 // Save record and progress
                 const savePromises: Promise<any>[] = [
                     saveLearningRecord(record),
@@ -355,6 +379,21 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             timeTakenSeconds: timeTaken,
         };
 
+        // Optimistic UI update (before API calls to ensure immediate feedback)
+        statsVersionRef.current += 1;
+        setSessionStats(prev => ({
+            total: prev.total + 1,
+            correct: prev.correct + (isCorrect ? 1 : 0)
+        }));
+        setExamStats(prev => {
+            const currentTotal = prev?.total || 0;
+            const currentCorrect = prev?.correct || 0;
+            return {
+                total: currentTotal + 1,
+                correct: currentCorrect + (isCorrect ? 1 : 0)
+            };
+        });
+
         if (session && session.user?.id) {
             try {
                 // Parallel Save: Log & Snapshot & Session Progress
@@ -390,22 +429,6 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             }
             guestManager.saveHistory(record);
         }
-
-        // Update Session Stats
-        setSessionStats(prev => ({
-            total: prev.total + 1,
-            correct: prev.correct + (isCorrect ? 1 : 0)
-        }));
-
-        // Update Exam Stats (Optimistic)
-        setExamStats(prev => {
-            const currentTotal = prev?.total || 0;
-            const currentCorrect = prev?.correct || 0;
-            return {
-                total: currentTotal + 1,
-                correct: currentCorrect + (isCorrect ? 1 : 0)
-            };
-        });
     };
 
     const handleNext = () => {
