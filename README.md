@@ -149,6 +149,7 @@ Web アプリケーションには API キーやデータベース接続情報�
     - **認証 (NextAuth.js)**: `AUTH_SECRET`, `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET` 等
     - **データベース (Azure Cosmos DB)**: `COSMOS_DB_ENDPOINT`, `COSMOS_DB_KEY`
     - **AI (Google Gemini)**: `GEMINI_API_KEY`
+    - **広告 (Google AdSense)**: `NEXT_PUBLIC_ADSENSE_CLIENT_ID` (オプション)
 
 ### 4. 開発サーバーの起動
 
