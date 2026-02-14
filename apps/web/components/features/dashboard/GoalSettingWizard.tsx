@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './GoalSettingWizard.module.css';
+import { getExamTypeName } from '@/lib/exam-utils';
 
 export interface MonthlyGoal {
     id: string;
@@ -100,6 +101,16 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
     const [retryCount, setRetryCount] = useState(0);
     const [asyncJobCreated, setAsyncJobCreated] = useState(false);
 
+    /**
+     * 計画名を自動生成する
+     * フォーマット: {試験名} {受験日} {X}h/週
+     */
+    const generatePlanTitle = (examCode: string, date: string, weekdayHours: number, weekendHours: number): string => {
+        const examName = getExamTypeName(examCode);
+        const weeklyHours = Math.round(weekdayHours * 5 + weekendHours * 2);
+        return `${examName} ${date} ${weeklyHours}h/週`;
+    };
+
     // 非同期ジョブを作成（タイムアウト時のフォールバック）
     const createAsyncJob = async (): Promise<boolean> => {
         try {
@@ -169,7 +180,10 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
             const plan: StudyPlan = {
                 ...rawPlan,
                 id: crypto.randomUUID(),
-                targetExam: targetExam
+                targetExam: targetExam,
+                title: generatePlanTitle(targetExam, examDate, hoursWeekday, hoursWeekend),
+                hoursWeekday: hoursWeekday,
+                hoursWeekend: hoursWeekend
             };
             onSave(plan);
             return; // 成功したらここで終了
