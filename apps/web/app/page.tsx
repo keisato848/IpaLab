@@ -3,6 +3,10 @@ import styles from './page.module.css';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { redirect } from "next/navigation";
+import { lazy, Suspense } from 'react';
+
+// 広告コンポーネントを遅延ロード（クライアントコンポーネントのため）
+const AdBanner = lazy(() => import('@/components/common/AdBanner'));
 
 // This page uses getServerSession which requires dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -83,6 +87,14 @@ export default async function Home() {
                     </div>
                     <p className={styles.note}>※ゲストモードでも、学習データはブラウザに一時保存されます。</p>
                 </section>
+
+                {/* 広告バナー：機能紹介とフッターの間 */}
+                <Suspense fallback={<div style={{ minHeight: '100px' }} />}>
+                    <AdBanner 
+                        dataAdSlot="1234567890"
+                        dataAdFormat="auto"
+                    />
+                </Suspense>
 
                 <section className={styles.features}>
                     <div className={styles.featureCard}>

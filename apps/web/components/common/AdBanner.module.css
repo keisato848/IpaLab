@@ -1,0 +1,20 @@
+.adContainer {
+  margin: 2rem auto;
+  padding: 1rem 0;
+  max-width: 100%;
+  text-align: center;
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+  .adContainer {
+    margin: 1rem auto;
+    padding: 0.5rem 0;
+  }
+}
+
+/* ダークモード対応 */
+[data-theme='dark'] .adContainer {
+  /* 広告は通常背景色を持つため、特別な調整は不要 */
+  /* 必要に応じてボーダーや背景色を調整 */
+}

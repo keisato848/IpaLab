@@ -66,8 +66,20 @@ export default function RootLayout({
 }: {
     children: React.ReactNode;
 }) {
+    const adSenseClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+
     return (
         <html lang="ja" suppressHydrationWarning>
+            <head>
+                {/* Google AdSense スクリプト */}
+                {adSenseClientId && (
+                    <script
+                        async
+                        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adSenseClientId}`}
+                        crossOrigin="anonymous"
+                    />
+                )}
+            </head>
             <body className={inter.className}>
                 {/* ... script ... */}
                 {/* Application Insights 接続文字列をランタイムで埋め込む（SWA対応） */}

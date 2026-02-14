@@ -4,7 +4,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { UserMenu } from '@/components/features/auth/UserMenu';
+import dynamic from 'next/dynamic';
 import styles from './layout.module.css';
+
+// 広告コンポーネントを動的インポート
+const AdBanner = dynamic(() => import('@/components/common/AdBanner'), {
+  ssr: false,
+});
 
 export default function DashboardLayout({
   children,
@@ -90,6 +96,12 @@ export default function DashboardLayout({
 
       <main className={styles.mainContent}>
         {children}
+        
+        {/* 広告バナー：メインコンテンツの下部 */}
+        <AdBanner 
+          dataAdSlot="0987654321"
+          dataAdFormat="horizontal"
+        />
       </main>
     </div>
   );
