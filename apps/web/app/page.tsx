@@ -91,7 +91,7 @@ export default async function Home() {
                 {/* 広告バナー：機能紹介とフッターの間 */}
                 <Suspense fallback={<div style={{ minHeight: '100px' }} />}>
                     <AdBanner 
-                        dataAdSlot="1234567890"
+                        dataAdSlot={process.env.NEXT_PUBLIC_ADSENSE_LANDING_AD_SLOT || '1234567890'}
                         dataAdFormat="auto"
                     />
                 </Suspense>

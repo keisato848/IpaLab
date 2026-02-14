@@ -99,7 +99,7 @@ export default function DashboardLayout({
         
         {/* 広告バナー：メインコンテンツの下部 */}
         <AdBanner 
-          dataAdSlot="0987654321"
+          dataAdSlot={process.env.NEXT_PUBLIC_ADSENSE_DASHBOARD_AD_SLOT || '0987654321'}
           dataAdFormat="horizontal"
         />
       </main>

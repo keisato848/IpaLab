@@ -3,6 +3,13 @@
 import { useEffect } from 'react';
 import styles from './AdBanner.module.css';
 
+// Window型の拡張
+declare global {
+  interface Window {
+    adsbygoogle?: Array<Record<string, unknown>>;
+  }
+}
+
 interface AdBannerProps {
   /**
    * Google AdSense データ広告スロット ID
@@ -45,7 +52,6 @@ export default function AdBanner({
     // AdSenseクライアントIDが設定されている場合のみ広告をロード
     if (adClient && typeof window !== 'undefined') {
       try {
-        // @ts-ignore
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch (error) {
         console.error('AdSense広告の読み込みに失敗しました:', error);
