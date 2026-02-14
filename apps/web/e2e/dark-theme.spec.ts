@@ -29,7 +29,7 @@ test.describe('ダークテーマテスト', () => {
       await page.goto('/');
       await page.evaluate(() => localStorage.clear());
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const theme = await getDataTheme(page);
       // デフォルトはライト（システム設定に依存するが、テスト環境はライト前提）
@@ -124,7 +124,7 @@ test.describe('ダークテーマテスト', () => {
 
       // ページをリロード
       await page.reload();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // data-theme が 'dark' であることを確認
       const theme = await getDataTheme(page);
@@ -142,7 +142,7 @@ test.describe('ダークテーマテスト', () => {
 
       await setTheme(page, 'light');
       await page.reload();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const theme = await getDataTheme(page);
       expect(theme).toBe('light');
@@ -187,7 +187,7 @@ test.describe('ダークテーマテスト', () => {
       await page.goto('/');
       await page.evaluate(() => localStorage.removeItem('theme'));
       await page.reload();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const theme = await getDataTheme(page);
       expect(theme).toBe('dark');
@@ -200,7 +200,7 @@ test.describe('ダークテーマテスト', () => {
       await page.goto('/');
       await page.evaluate(() => localStorage.removeItem('theme'));
       await page.reload();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const theme = await getDataTheme(page);
       expect(theme).toBe('light');

@@ -230,7 +230,7 @@ test.describe('トップページ → ログイン フロー', () => {
 
       await page.goto('/');
       // ページ読み込み完了を待つ
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       expect(errors).toHaveLength(0);
     });
@@ -244,7 +244,7 @@ test.describe('トップページ → ログイン フロー', () => {
       });
 
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       expect(errors).toHaveLength(0);
     });

@@ -69,7 +69,7 @@ test.describe('異常系テスト', () => {
       test(`${id}: error=${error} の場合エラーメッセージが表示される`, async ({ page }, testInfo) => {
         await page.goto(`/login?error=${error}`);
         // Suspense解決 + クライアントサイドレンダリングを待機
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // LoginForm が Suspense で遅延レンダリングされるため、見出しの表示を待つ
         await expect(page.getByRole('heading', { name: 'ログイン / 新規登録' })).toBeVisible();
@@ -84,7 +84,7 @@ test.describe('異常系テスト', () => {
 
     test('E-02b: 未知のエラーコードの場合デフォルトメッセージが表示される', async ({ page }, testInfo) => {
       await page.goto('/login?error=UnknownError123');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await expect(page.getByRole('heading', { name: 'ログイン / 新規登録' })).toBeVisible();
 
       const expectedMsg = '認証中にエラーが発生しました。もう一度お試しください。';
@@ -96,7 +96,7 @@ test.describe('異常系テスト', () => {
 
     test('E-02c: エラーパラメータがない場合エラーメッセージは表示されない', async ({ page }, testInfo) => {
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await expect(page.getByRole('heading', { name: 'ログイン / 新規登録' })).toBeVisible();
 
       // エラーパラメータがない場合、エラーメッセージを含むalertは存在しない
@@ -124,7 +124,7 @@ test.describe('異常系テスト', () => {
       });
 
       await page.goto('/login?callbackUrl=javascript:alert(1)');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       await expect(page.getByRole('heading', { name: 'ログイン / 新規登録' })).toBeVisible();
 
@@ -137,7 +137,7 @@ test.describe('異常系テスト', () => {
       const longUrl = '/login?callbackUrl=' + 'A'.repeat(5000);
 
       await page.goto(longUrl);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       await expect(page.getByRole('heading', { name: 'ログイン / 新規登録' })).toBeVisible();
 
@@ -146,7 +146,7 @@ test.describe('異常系テスト', () => {
 
     test('複数のerrorパラメータが渡された場合でもクラッシュしない', async ({ page }, testInfo) => {
       await page.goto('/login?error=OAuthSignin&error=AccessDenied');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       await expect(page.getByRole('heading', { name: 'ログイン / 新規登録' })).toBeVisible();
 
@@ -158,7 +158,7 @@ test.describe('異常系テスト', () => {
 
     test('未ログイン状態で設定ページにアクセス', async ({ page }, testInfo) => {
       await page.goto('/settings');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       await captureEvidence(page, testInfo, 'E-07_unauthenticated_settings');
 
@@ -172,7 +172,7 @@ test.describe('異常系テスト', () => {
 
     test('Googleログインボタンをクリック後、両方のボタンが無効化される', async ({ page }, testInfo) => {
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await expect(page.getByRole('heading', { name: 'ログイン / 新規登録' })).toBeVisible();
 
       const googleButton = page.getByRole('button', { name: /Google で続ける/ });
@@ -203,7 +203,7 @@ test.describe('異常系テスト', () => {
 
     test('トップページのHTMLにlang属性が設定されている', async ({ page }, testInfo) => {
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const lang = await page.evaluate(() => document.documentElement.lang);
       expect(lang).toBe('ja');
@@ -213,7 +213,7 @@ test.describe('異常系テスト', () => {
 
     test('ログイン画面のアクセシビリティ: ボタンのrole属性が正しい', async ({ page }, testInfo) => {
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await expect(page.getByRole('heading', { name: 'ログイン / 新規登録' })).toBeVisible();
 
       // ボタンが適切なroleを持つ（Google, GitHub, ゲスト の3つ以上）
