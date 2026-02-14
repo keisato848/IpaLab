@@ -1,5 +1,47 @@
 import { describe, it, expect } from 'vitest';
-import { getExamLabel } from '@/lib/exam-utils';
+import { getExamLabel, getExamTypeName } from '@/lib/exam-utils';
+
+describe('getExamTypeName', () => {
+    it('ITパスポート試験のコードを正しく変換する', () => {
+        expect(getExamTypeName('IP')).toBe('ITパスポート試験');
+    });
+
+    it('基本情報技術者試験のコードを正しく変換する', () => {
+        expect(getExamTypeName('FE')).toBe('基本情報技術者試験');
+    });
+
+    it('応用情報技術者試験のコードを正しく変換する', () => {
+        expect(getExamTypeName('AP')).toBe('応用情報技術者試験');
+    });
+
+    it('情報処理安全確保支援士試験のコードを正しく変換する', () => {
+        expect(getExamTypeName('SC')).toBe('情報処理安全確保支援士試験');
+    });
+
+    it('プロジェクトマネージャ試験のコードを正しく変換する', () => {
+        expect(getExamTypeName('PM')).toBe('プロジェクトマネージャ試験');
+    });
+
+    it('ネットワークスペシャリスト試験のコードを正しく変換する', () => {
+        expect(getExamTypeName('NW')).toBe('ネットワークスペシャリスト試験');
+    });
+
+    it('システムアーキテクト試験のコードを正しく変換する', () => {
+        expect(getExamTypeName('SA')).toBe('システムアーキテクト試験');
+    });
+
+    it('ITストラテジスト試験のコードを正しく変換する', () => {
+        expect(getExamTypeName('ST')).toBe('ITストラテジスト試験');
+    });
+
+    it('情報セキュリティマネジメント試験のコードを正しく変換する', () => {
+        expect(getExamTypeName('SG')).toBe('情報セキュリティマネジメント試験');
+    });
+
+    it('未知の試験コードはそのまま返す', () => {
+        expect(getExamTypeName('XX')).toBe('XX');
+    });
+});
 
 describe('getExamLabel', () => {
     describe('基本的な変換', () => {

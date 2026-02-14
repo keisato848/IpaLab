@@ -17,6 +17,8 @@ export interface StudyPlan {
     title: string;
     targetExam: string;
     examDate: string;
+    hoursWeekday?: number; // 平日の学習時間
+    hoursWeekend?: number; // 休日の学習時間
     monthlyGoal: string;
     monthlyGoals?: MonthlyGoal[];
     weeklySchedule: {
