@@ -5,11 +5,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/auth';
 import { getContainer } from '@/lib/cosmos';
 import { StudyPlanJob } from '@/lib/api';
 import { QueueClient, QueueServiceClient } from '@azure/storage-queue';
+import { requireAuth, checkDbContainer, errorResponse } from '@/lib/api-helpers';
 
 // 認証を使用するため動的レンダリングを強制
 export const dynamic = 'force-dynamic';
@@ -24,12 +23,10 @@ const STORAGE_CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING ||
 export async function POST(req: NextRequest) {
     try {
         // 認証チェック
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
-        }
+        const auth = await requireAuth();
+        if (auth.error) return auth.error;
 
-        const userId = session.user.id;
+        const userId = auth.session.user.id;
         const body = await req.json();
 
         // ジョブドキュメントを作成
@@ -52,10 +49,8 @@ export async function POST(req: NextRequest) {
 
         // Cosmos DB に保存
         const container = await getContainer('PlanJobs');
-        if (!container) {
-            console.error('PlanJobs container not available');
-            return NextResponse.json({ error: 'データベース接続エラー' }, { status: 500 });
-        }
+        const dbError = checkDbContainer(container);
+        if (dbError) return dbError;
 
         await container.items.create(job);
 
@@ -88,10 +83,7 @@ export async function POST(req: NextRequest) {
 
     } catch (error: any) {
         console.error('Failed to create job:', error);
-        return NextResponse.json({
-            error: 'ジョブの作成に失敗しました',
-            details: error.message,
-        }, { status: 500 });
+        return errorResponse(`ジョブの作成に失敗しました: ${error.message}`);
     }
 }
 
@@ -102,17 +94,14 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
     try {
         // 認証チェック
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
-        }
+        const auth = await requireAuth();
+        if (auth.error) return auth.error;
 
-        const userId = session.user.id;
+        const userId = auth.session.user.id;
 
         const container = await getContainer('PlanJobs');
-        if (!container) {
-            return NextResponse.json({ error: 'データベース接続エラー' }, { status: 500 });
-        }
+        const dbError = checkDbContainer(container);
+        if (dbError) return dbError;
 
         // userId パーティション内で最新のジョブを取得
         const { resources } = await container.items
@@ -130,9 +119,6 @@ export async function GET(req: NextRequest) {
 
     } catch (error: any) {
         console.error('Failed to get job:', error);
-        return NextResponse.json({
-            error: 'ジョブの取得に失敗しました',
-            details: error.message,
-        }, { status: 500 });
+        return errorResponse(`ジョブの取得に失敗しました: ${error.message}`);
     }
 }

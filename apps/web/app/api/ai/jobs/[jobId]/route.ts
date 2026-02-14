@@ -5,9 +5,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/auth';
 import { getContainer } from '@/lib/cosmos';
+import { requireAuth, checkDbContainer, errorResponse, notFoundResponse } from '@/lib/api-helpers';
 
 interface RouteParams {
     params: Promise<{
@@ -21,39 +20,33 @@ interface RouteParams {
  */
 export async function GET(req: NextRequest, { params }: RouteParams) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
-        }
+        const auth = await requireAuth();
+        if (auth.error) return auth.error;
 
-        const userId = session.user.id;
+        const userId = auth.session.user.id;
         const { jobId } = await params;
 
         const container = await getContainer('PlanJobs');
-        if (!container) {
-            return NextResponse.json({ error: 'データベース接続エラー' }, { status: 500 });
-        }
+        const dbError = checkDbContainer(container);
+        if (dbError) return dbError;
 
         // userId をパーティションキーとして読み取り
         const { resource } = await container.item(jobId, userId).read();
 
         if (!resource) {
-            return NextResponse.json({ error: 'ジョブが見つかりません' }, { status: 404 });
+            return notFoundResponse('ジョブが見つかりません');
         }
 
         // ユーザー確認（念のため）
         if (resource.userId !== userId) {
-            return NextResponse.json({ error: 'アクセス権がありません' }, { status: 403 });
+            return errorResponse('アクセス権がありません', 403);
         }
 
         return NextResponse.json(resource);
 
     } catch (error: any) {
         console.error('Failed to get job:', error);
-        return NextResponse.json({
-            error: 'ジョブの取得に失敗しました',
-            details: error.message,
-        }, { status: 500 });
+        return errorResponse(`ジョブの取得に失敗しました: ${error.message}`);
     }
 }
 
@@ -63,29 +56,26 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
  */
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
-        }
+        const auth = await requireAuth();
+        if (auth.error) return auth.error;
 
-        const userId = session.user.id;
+        const userId = auth.session.user.id;
         const { jobId } = await params;
         const body = await req.json();
 
         const container = await getContainer('PlanJobs');
-        if (!container) {
-            return NextResponse.json({ error: 'データベース接続エラー' }, { status: 500 });
-        }
+        const dbError = checkDbContainer(container);
+        if (dbError) return dbError;
 
         // 現在のジョブを取得
         const { resource: existingJob } = await container.item(jobId, userId).read();
 
         if (!existingJob) {
-            return NextResponse.json({ error: 'ジョブが見つかりません' }, { status: 404 });
+            return notFoundResponse('ジョブが見つかりません');
         }
 
         if (existingJob.userId !== userId) {
-            return NextResponse.json({ error: 'アクセス権がありません' }, { status: 403 });
+            return errorResponse('アクセス権がありません', 403);
         }
 
         // 更新可能なフィールドのみ更新
@@ -106,9 +96,6 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     } catch (error: any) {
         console.error('Failed to update job:', error);
-        return NextResponse.json({
-            error: 'ジョブの更新に失敗しました',
-            details: error.message,
-        }, { status: 500 });
+        return errorResponse(`ジョブの更新に失敗しました: ${error.message}`);
     }
 }

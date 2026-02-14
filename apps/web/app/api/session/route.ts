@@ -2,17 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getContainer } from '@/lib/cosmos';
 import { LearningSessionSchema, LearningSession } from '@ipa-lab/shared';
 import { z } from 'zod';
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/auth";
+import { requireAuth, checkDbContainer, errorResponse, notFoundResponse } from '@/lib/api-helpers';
 
 export const dynamic = 'force-dynamic';
 
 // GET: List sessions for a user (optionally filtered by examId)
 export async function GET(request: NextRequest) {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const auth = await requireAuth();
+    if (auth.error) return auth.error;
 
     try {
         const { searchParams } = new URL(request.url);
@@ -21,11 +18,12 @@ export async function GET(request: NextRequest) {
         const limit = parseInt(searchParams.get('limit') || '50');
 
         const container = await getContainer("LearningSessions");
-        if (!container) throw new Error("Database not initialized");
+        const dbError = checkDbContainer(container);
+        if (dbError) return dbError;
 
         let query = "SELECT * FROM c WHERE c.userId = @userId";
         const parameters: { name: string; value: string }[] = [
-            { name: "@userId", value: session.user.id }
+            { name: "@userId", value: auth.session.user.id }
         ];
 
         if (examId) {
@@ -52,10 +50,7 @@ export async function GET(request: NextRequest) {
 
     } catch (error: any) {
         console.error("Failed to fetch sessions:", error);
-        return NextResponse.json(
-            { error: "Internal Server Error", details: error.message },
-            { status: 500 }
-        );
+        return errorResponse(`Internal Server Error: ${error.message}`);
     }
 }
 
@@ -69,37 +64,33 @@ const UpdateSessionRequest = z.object({
 });
 
 export async function PATCH(request: NextRequest) {
-    const authSession = await getServerSession(authOptions);
-    if (!authSession || !authSession.user) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const auth = await requireAuth();
+    if (auth.error) return auth.error;
 
     try {
         const body = await request.json();
         const parseResult = UpdateSessionRequest.safeParse(body);
 
         if (!parseResult.success) {
-            return NextResponse.json(
-                { error: "Invalid request", details: parseResult.error.format() },
-                { status: 400 }
-            );
+            return errorResponse(`Invalid request: ${JSON.stringify(parseResult.error.format())}`, 400);
         }
 
         const { sessionId, answeredCount, correctCount, lastQuestionNo, status } = parseResult.data;
 
         const container = await getContainer("LearningSessions");
-        if (!container) throw new Error("Database not initialized");
+        const dbError = checkDbContainer(container);
+        if (dbError) return dbError;
 
         // Fetch existing session
-        const { resource: existingSession } = await container.item(sessionId, authSession.user.id).read();
+        const { resource: existingSession } = await container.item(sessionId, auth.session.user.id).read();
 
         if (!existingSession) {
-            return NextResponse.json({ error: "Session not found" }, { status: 404 });
+            return notFoundResponse("Session not found");
         }
 
         // Check ownership
-        if (existingSession.userId !== authSession.user.id) {
-            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        if (existingSession.userId !== auth.session.user.id) {
+            return errorResponse("Forbidden", 403);
         }
 
         // Update fields
@@ -112,15 +103,12 @@ export async function PATCH(request: NextRequest) {
             ...(status === 'completed' && { completedAt: new Date().toISOString() }),
         };
 
-        const { resource } = await container.item(sessionId, authSession.user.id).replace(updatedSession);
+        const { resource } = await container.item(sessionId, auth.session.user.id).replace(updatedSession);
 
         return NextResponse.json(resource, { status: 200 });
 
     } catch (error: any) {
         console.error("Failed to update session:", error);
-        return NextResponse.json(
-            { error: "Internal Server Error", details: error.message },
-            { status: 500 }
-        );
+        return errorResponse(`Internal Server Error: ${error.message}`);
     }
 }
