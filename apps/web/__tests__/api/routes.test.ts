@@ -68,7 +68,7 @@ describe('API エンドポイント', () => {
             const data = await response.json();
 
             expect(response.status).toBe(401);
-            expect(data.error).toBe('Unauthorized');
+            expect(data.error).toBe('認証が必要です');
         });
 
         it('認証されている場合は学習記録を返す', async () => {

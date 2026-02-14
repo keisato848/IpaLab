@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getContainer } from '@/lib/cosmos';
+import { checkDbContainer, errorResponse } from '@/lib/api-helpers';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,13 +23,14 @@ export async function GET(request: NextRequest) {
         const examId = searchParams.get('examId');
 
         if (!userId || !examId) {
-            return NextResponse.json({ error: "userId and examId required" }, { status: 400 });
+            return errorResponse("userId and examId required", 400);
         }
 
         const id = `${userId}-${examId}`;
         try {
             const container = await getContainer("ExamProgress");
-            if (!container) throw new Error("Database not initialized");
+            const dbError = checkDbContainer(container);
+            if (dbError) return dbError;
 
             const { resource } = await container.item(id, userId).read();
             if (!resource) {
@@ -59,10 +61,7 @@ export async function GET(request: NextRequest) {
         }
 
     } catch (error: any) {
-        return NextResponse.json(
-            { error: "Internal Server Error", details: error.message },
-            { status: 500 }
-        );
+        return errorResponse(`Internal Server Error: ${error.message}`);
     }
 }
 
@@ -72,12 +71,13 @@ export async function POST(request: NextRequest) {
         const { userId, examId, bookmarks, statusUpdate } = body;
 
         if (!userId || !examId) {
-            return NextResponse.json({ error: "userId and examId required" }, { status: 400 });
+            return errorResponse("userId and examId required", 400);
         }
 
         const id = `${userId}-${examId}`;
         const container = await getContainer("ExamProgress");
-        if (!container) throw new Error("Database not initialized");
+        const dbError = checkDbContainer(container);
+        if (dbError) return dbError;
 
         // Fetch existing or init
         let progress: ExamProgress;
@@ -125,9 +125,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(resource);
 
     } catch (error: any) {
-        return NextResponse.json(
-            { error: "Internal Server Error", details: error.message },
-            { status: 500 }
-        );
+        return errorResponse(`Internal Server Error: ${error.message}`);
     }
 }

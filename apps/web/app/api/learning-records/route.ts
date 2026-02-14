@@ -2,8 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getContainer } from '@/lib/cosmos';
 import { z } from 'zod';
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/auth";
+import { requireAuth, checkDbContainer, errorResponse } from '@/lib/api-helpers';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,8 +37,8 @@ const LearningRecordSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const auth = await requireAuth();
+    if (auth.error) return auth.error;
 
     try {
         const { searchParams } = new URL(request.url);
@@ -48,10 +47,11 @@ export async function GET(request: NextRequest) {
         const questionId = searchParams.get('questionId');
 
         // Use userId from session for security
-        const actualUserId = session.user.id;
+        const actualUserId = auth.session.user.id;
 
         const container = await getContainer("LearningRecords"); // Updated container call
-        if (!container) throw new Error("Database not initialized");
+        const dbError = checkDbContainer(container);
+        if (dbError) return dbError;
 
         let query = "SELECT * FROM c WHERE c.userId = @userId";
         const parameters = [{ name: "@userId", value: actualUserId }];
@@ -85,13 +85,14 @@ export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
         const container = await getContainer("LearningRecords");
-        if (!container) throw new Error("Database not initialized");
+        const dbError = checkDbContainer(container);
+        if (dbError) return dbError;
 
         if (Array.isArray(body)) {
             // Bulk Insert
             const parseResults = z.array(LearningRecordSchema).safeParse(body);
             if (!parseResults.success) {
-                return NextResponse.json({ error: "Invalid data", details: parseResults.error.format() }, { status: 400 });
+                return errorResponse(`Invalid data: ${JSON.stringify(parseResults.error.format())}`, 400);
             }
 
             const records = parseResults.data;
@@ -125,7 +126,7 @@ export async function POST(request: NextRequest) {
             // Single Insert
             const result = LearningRecordSchema.safeParse(body);
             if (!result.success) {
-                return NextResponse.json({ error: "Invalid data", details: result.error.format() }, { status: 400 });
+                return errorResponse(`Invalid data: ${JSON.stringify(result.error.format())}`, 400);
             }
 
             const record = result.data;
@@ -161,9 +162,6 @@ export async function POST(request: NextRequest) {
         }
 
     } catch (error: any) {
-        return NextResponse.json(
-            { error: "Internal Server Error", details: error.message },
-            { status: 500 }
-        );
+        return errorResponse(`Internal Server Error: ${error.message}`);
     }
 }
