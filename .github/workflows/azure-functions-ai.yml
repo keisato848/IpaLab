@@ -115,12 +115,15 @@ jobs:
           
           # Function App の全 IP が CosmosDB に登録されているか確認
           MISSING=""
-          IFS=',' read -ra FUNC_IP_ARRAY <<< "$FUNC_IPS"
-          for ip in "${FUNC_IP_ARRAY[@]}"; do
+          while IFS= read -r ip; do
+            # 空行はスキップ
+            [ -z "$ip" ] && continue
             if [[ "$COSMOS_IPS" != *"$ip"* ]]; then
               MISSING="$MISSING $ip"
             fi
-          done
+          done <<EOF
+$(printf '%s\n' "$FUNC_IPS" | tr ',' '\n')
+EOF
           
           if [ -n "$MISSING" ]; then
             echo "⚠️ WARNING: 以下の IP が CosmosDB ファイアウォールに未登録:$MISSING"

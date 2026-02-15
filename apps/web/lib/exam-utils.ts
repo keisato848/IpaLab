@@ -1,3 +1,24 @@
+/**
+ * 試験コードから正式名称を取得する
+ * @param code 試験コード (例: "AP", "FE", "SC")
+ * @returns 試験の正式名称 (例: "応用情報技術者試験")
+ */
+export function getExamTypeName(code: string): string {
+    const examTypeMap: Record<string, string> = {
+        'IP': 'ITパスポート試験',
+        'FE': '基本情報技術者試験',
+        'AP': '応用情報技術者試験',
+        'SC': '情報処理安全確保支援士試験',
+        'PM': 'プロジェクトマネージャ試験',
+        'NW': 'ネットワークスペシャリスト試験',
+        'SA': 'システムアーキテクト試験',
+        'ST': 'ITストラテジスト試験',
+        'SG': '情報セキュリティマネジメント試験'
+    };
+    
+    return examTypeMap[code] || code;
+}
+
 export function getExamLabel(examId: string): string {
     // Format: AP-2024-Spring-AM, FE-2023-Fall-PM
     // Target: 応用情報技術者試験 令和6年 春期 (午前)
@@ -10,10 +31,7 @@ export function getExamLabel(examId: string): string {
     const [type, yearStr, season, time] = parts;
 
     // 1. Exam Type
-    let typeLabel = type;
-    if (type === 'AP') typeLabel = '応用情報技術者試験';
-    if (type === 'FE') typeLabel = '基本情報技術者試験';
-    if (type === 'SG') typeLabel = '情報セキュリティマネジメント試験';
+    const typeLabel = getExamTypeName(type);
 
     // 2. Year (AD -> REIWA)
     // 2019 was Reiwa 1 (May onwards, but simplified for exams usually)
