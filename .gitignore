@@ -173,4 +173,11 @@ logs.txt
 apps/web/playwright-report/
 apps/web/test-results/
 apps/web/e2e/test-results/
-# apps/web/e2e/evidence/ — エビデンス報告書のためコミット対象とする
+# # apps/web/e2e/evidence/ — エビデンス報告書のためコミット対象とする — エビデンス報告書のためコミット対象とする
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

@@ -92,6 +92,8 @@ export interface MonthlyGoal {
 export interface StudyPlan {
     title: string;
     examDate: string;
+    hoursWeekday?: number; // 平日の学習時間
+    hoursWeekend?: number; // 休日の学習時間
     monthlyGoal: string; // Current month's goal (summary text, backward compat)
     monthlyGoals?: MonthlyGoal[]; // Quantitative mid-term targets
     weeklySchedule: {
@@ -116,6 +118,20 @@ export interface StudyPlan {
     generatedAt: string;
     // ゲーミフィケーション用累計（クライアント側で計算）
     totalXpEarned?: number;
+}
+
+/**
+ * 学習セッション（手動記録用）
+ */
+export interface StudySession {
+    id: string;
+    userId?: string; // 認証ユーザーの場合のみ
+    startTime: string; // ISO 8601 形式
+    endTime: string; // ISO 8601 形式
+    durationSeconds: number; // 学習時間（秒）
+    category: 'exam' | 'reading' | 'review' | 'other'; // カテゴリ
+    memo?: string; // メモ（任意）
+    createdAt: string; // ISO 8601 形式
 }
 
 export interface UserProgress {
