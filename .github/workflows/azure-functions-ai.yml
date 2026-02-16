@@ -110,14 +110,16 @@ jobs:
           COSMOS_IPS=$(az cosmosdb show \
             --name cosmos-pm-exam-dx-db \
             --resource-group rg-pm-exam-dx-prod-grobal \
-            --query "ipRules[].ipAddressOrRange" -o tsv 2>/dev/null | tr '\n' ',')
-          echo "CosmosDB allowed IPs: $COSMOS_IPS"
+            --query "ipRules[].ipAddressOrRange" -o tsv 2>/dev/null)
+          COSMOS_IPS_DISPLAY=$(echo "$COSMOS_IPS" | tr '\n' ',')
+          echo "CosmosDB allowed IPs: $COSMOS_IPS_DISPLAY"
           
           # Function App の全 IP が CosmosDB に登録されているか確認
           MISSING=""
           IFS=',' read -ra FUNC_IP_ARRAY <<< "$FUNC_IPS"
           for ip in "${FUNC_IP_ARRAY[@]}"; do
-            if [[ "$COSMOS_IPS" != *"$ip"* ]]; then
+            # CosmosDB の IP リストに完全一致するエントリが存在するかをチェック
+            if ! printf '%s\n' "$COSMOS_IPS" | grep -Fxq "$ip"; then
               MISSING="$MISSING $ip"
             fi
           done
