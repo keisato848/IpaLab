@@ -3,6 +3,7 @@ import NextAuth, { NextAuthOptions } from "next-auth"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 import { CosmosAdapter } from "@/lib/auth-adapter"
+import { getContainer } from "@/lib/cosmos"
 
 const providers: NextAuthOptions["providers"] = [];
 
@@ -42,12 +43,25 @@ export const authOptions: NextAuthOptions = {
         async session({ session, token }) {
             if (session.user) {
                 session.user.id = token.sub || "";
+                session.user.role = (token.role as "user" | "admin") || "user";
             }
             return session;
         },
         async jwt({ token, user, account, profile }) {
             if (user) {
                 token.sub = user.id;
+                // CosmosDB から role を取得
+                try {
+                    const container = await getContainer("Users");
+                    if (container) {
+                        const { resource } = await container.item(user.id, user.id).read();
+                        token.role = resource?.role || "user";
+                    } else {
+                        token.role = "user";
+                    }
+                } catch {
+                    token.role = "user";
+                }
             }
             // Google OAuth からプロフィール情報を保持
             if (account?.provider === "google" && profile) {
