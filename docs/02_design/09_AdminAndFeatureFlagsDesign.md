@@ -86,6 +86,7 @@ flowchart LR
 |--------------|---------|------|
 | `/api/admin/feature-flags` | GET | 全フラグ取得 |
 | `/api/admin/feature-flags` | PATCH | フラグ更新 `{ id, enabled }` |
+| `/api/admin/analytics` | GET | 利用状況分析 `?period=7d\|30d\|90d` |
 | `/api/admin/setup` | POST | 初回管理者セットアップ `{ setupToken }` |
 
 ### 公開API（認証不要・読み取り専用）
@@ -132,7 +133,7 @@ export async function requireAdmin() {
 
 | パス | 説明 | アクセス条件 |
 |------|------|------------|
-| `/admin` | フィーチャーフラグ管理 | `role === "admin"` |
+| `/admin` | フィーチャーフラグ管理・利用状況分析 | `role === "admin"` |
 
 ### ナビゲーション
 
@@ -146,8 +147,77 @@ export async function requireAdmin() {
    - トグル操作で即座にAPIを呼び出し更新
    - 成功/エラーメッセージのフィードバック
 
-2. **初回セットアップセクション**（非管理者のみ）
+2. **利用状況分析セクション**
+   - 期間セレクタ（7日間 / 30日間 / 90日間）
+   - 概要カード（総ユーザー数、総セッション数、完了セッション、総回答数、正答率、平均回答時間）
+   - 日別アクティビティ棒グラフ（回答数の推移）
+   - 試験別セッション集計テーブル（セッション数、完了数、完了率プログレスバー）
+   - 最近のユーザーテーブル（名前、メール、ロール、登録日）
+
+3. **初回セットアップセクション**（非管理者のみ）
    - セットアップトークン入力フォーム
+
+---
+
+## 7. 利用状況分析設計
+
+### API
+
+| エンドポイント | メソッド | 説明 |
+|--------------|---------|------|
+| `/api/admin/analytics` | GET | 分析データ取得 `?period=7d\|30d\|90d` |
+
+### レスポンス構造
+
+```typescript
+{
+  period: string;                // リクエストされた期間
+  overview: {
+    totalUsers: number;          // 全ユーザー数
+    adminUsers: number;          // 管理者数
+    guestUsers: number;          // ゲストユーザー数
+    totalSessions: number;       // 期間内セッション数
+    completedSessions: number;   // 完了セッション数
+    activeSessions: number;      // 進行中セッション数
+    avgQuestionsPerSession: number; // セッション当たり平均回答数
+    totalAnswers: number;        // 期間内総回答数
+    correctAnswers: number;      // 正答数
+    correctRate: number;         // 正答率 (%)
+    avgTimeSec: number;          // 平均回答時間 (秒)
+  };
+  dailyActivity: {               // 日別回答データ
+    date: string;
+    count: number;
+    correctCount: number;
+  }[];
+  examBreakdown: {               // 試験別集計
+    examId: string;
+    count: number;
+    completedCount: number;
+  }[];
+  recentUsers: {                 // 直近登録ユーザー (10件)
+    id: string;
+    name: string | null;
+    email: string | null;
+    role: string;
+    createdAt: string;
+    isGuest: boolean;
+  }[];
+}
+```
+
+### データソース
+
+| コンテナ | 取得データ | クエリの概要 |
+|---------|----------|------------|
+| Users | ユーザー統計・最近のユーザー | COUNT, ORDER BY createdAt DESC |
+| LearningSessions | セッション統計・試験別集計 | COUNT, AVG, GROUP BY examId |
+| LearningRecords | 回答統計・日別アクティビティ | COUNT, AVG, GROUP BY date |
+
+### セキュリティ
+
+- `requireAdmin()` による管理者権限チェック必須
+- 個人の学習内容は集計値のみ表示（個別回答データは返さない）
 
 ---
 
@@ -201,3 +271,4 @@ useEffect(() => {
 | 日付 | 内容 |
 |------|------|
 | 2026-02-20 | 初版作成 |
+| 2026-02-20 | 利用状況分析機能を追加（API・ダッシュボードUI） |

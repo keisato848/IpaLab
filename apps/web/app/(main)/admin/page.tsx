@@ -13,10 +13,33 @@ interface FeatureFlag {
     updatedBy: string;
 }
 
+interface AnalyticsData {
+    period: string;
+    overview: {
+        totalUsers: number;
+        adminUsers: number;
+        guestUsers: number;
+        totalSessions: number;
+        completedSessions: number;
+        activeSessions: number;
+        avgQuestionsPerSession: number;
+        totalAnswers: number;
+        correctAnswers: number;
+        correctRate: number;
+        avgTimeSec: number;
+    };
+    dailyActivity: { date: string; count: number; correctCount: number }[];
+    examBreakdown: { examId: string; count: number; completedCount: number }[];
+    recentUsers: { id: string; name: string | null; email: string | null; role: string; createdAt: string; isGuest: boolean }[];
+}
+
 export default function AdminPage() {
     const { data: session, status } = useSession();
     const [flags, setFlags] = useState<FeatureFlag[]>([]);
+    const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+    const [analyticsPeriod, setAnalyticsPeriod] = useState<'7d' | '30d' | '90d'>('30d');
     const [loading, setLoading] = useState(true);
+    const [analyticsLoading, setAnalyticsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [updating, setUpdating] = useState<string | null>(null);
@@ -44,13 +67,28 @@ export default function AdminPage() {
         }
     }, []);
 
+    const fetchAnalytics = useCallback(async (period: string) => {
+        try {
+            setAnalyticsLoading(true);
+            const res = await fetch(`/api/admin/analytics?period=${period}`);
+            if (!res.ok) throw new Error('分析データの取得に失敗しました');
+            const data = await res.json();
+            setAnalytics(data);
+        } catch (err) {
+            console.error('Analytics fetch error:', err);
+        } finally {
+            setAnalyticsLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
         if (isAdmin) {
             fetchFlags();
+            fetchAnalytics(analyticsPeriod);
         } else {
             setLoading(false);
         }
-    }, [isAdmin, fetchFlags]);
+    }, [isAdmin, fetchFlags, fetchAnalytics, analyticsPeriod]);
 
     const toggleFlag = async (id: string, currentEnabled: boolean) => {
         setUpdating(id);
@@ -172,6 +210,178 @@ export default function AdminPage() {
                         </div>
                     </div>
                 )}
+            </div>
+
+            {/* 利用状況分析セクション */}
+            <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>
+                    <span>📊</span>
+                    利用状況分析
+                </h2>
+
+                <div className={styles.periodSelector}>
+                    {(['7d', '30d', '90d'] as const).map(p => (
+                        <button
+                            key={p}
+                            className={`${styles.periodButton} ${analyticsPeriod === p ? styles.periodButtonActive : ''}`}
+                            onClick={() => setAnalyticsPeriod(p)}
+                            disabled={analyticsLoading}
+                        >
+                            {p === '7d' ? '7日間' : p === '30d' ? '30日間' : '90日間'}
+                        </button>
+                    ))}
+                </div>
+
+                {analyticsLoading && !analytics ? (
+                    <div className={styles.loading}>
+                        <span className={styles.spinner}></span>
+                        分析データを読み込み中...
+                    </div>
+                ) : analytics ? (
+                    <>
+                        {/* 概要カード */}
+                        <div className={styles.statsGrid}>
+                            <div className={styles.statCard}>
+                                <span className={styles.statIcon}>👥</span>
+                                <span className={styles.statValue}>{analytics.overview.totalUsers}</span>
+                                <span className={styles.statLabel}>総ユーザー数</span>
+                            </div>
+                            <div className={styles.statCard}>
+                                <span className={styles.statIcon}>📝</span>
+                                <span className={styles.statValue}>{analytics.overview.totalSessions}</span>
+                                <span className={styles.statLabel}>総セッション数</span>
+                            </div>
+                            <div className={styles.statCard}>
+                                <span className={styles.statIcon}>✅</span>
+                                <span className={styles.statValue}>{analytics.overview.completedSessions}</span>
+                                <span className={styles.statLabel}>完了セッション</span>
+                            </div>
+                            <div className={styles.statCard}>
+                                <span className={styles.statIcon}>❓</span>
+                                <span className={styles.statValue}>{analytics.overview.totalAnswers.toLocaleString()}</span>
+                                <span className={styles.statLabel}>総回答数</span>
+                            </div>
+                            <div className={styles.statCard}>
+                                <span className={styles.statIcon}>🎯</span>
+                                <span className={styles.statValue}>{analytics.overview.correctRate.toFixed(1)}%</span>
+                                <span className={styles.statLabel}>正答率</span>
+                            </div>
+                            <div className={styles.statCard}>
+                                <span className={styles.statIcon}>⏱️</span>
+                                <span className={styles.statValue}>{analytics.overview.avgTimeSec.toFixed(1)}s</span>
+                                <span className={styles.statLabel}>平均回答時間</span>
+                            </div>
+                        </div>
+
+                        {/* 日別アクティビティ */}
+                        <h3 className={styles.sectionTitle} style={{ fontSize: '1rem', marginTop: '1.5rem' }}>
+                            📈 日別アクティビティ
+                        </h3>
+                        {analytics.dailyActivity.length > 0 ? (
+                            <div className={styles.barChart}>
+                                {(() => {
+                                    const maxCount = Math.max(...analytics.dailyActivity.map(d => d.count), 1);
+                                    return analytics.dailyActivity.map(day => (
+                                        <div key={day.date} className={styles.barGroup}>
+                                            <div
+                                                className={styles.bar}
+                                                style={{ height: `${(day.count / maxCount) * 100}%` }}
+                                                title={`${day.date}: ${day.count}件（正答: ${day.correctCount}件）`}
+                                            />
+                                            <span className={styles.barLabel}>
+                                                {day.date.slice(5)}
+                                            </span>
+                                        </div>
+                                    ));
+                                })()}
+                            </div>
+                        ) : (
+                            <div className={styles.emptyData}>データがありません</div>
+                        )}
+
+                        {/* 試験別集計 */}
+                        <h3 className={styles.sectionTitle} style={{ fontSize: '1rem', marginTop: '1.5rem' }}>
+                            📋 試験別セッション集計
+                        </h3>
+                        {analytics.examBreakdown.length > 0 ? (
+                            <div className={styles.examTable}>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>試験ID</th>
+                                            <th>セッション数</th>
+                                            <th>完了数</th>
+                                            <th>完了率</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {analytics.examBreakdown.map(exam => {
+                                            const rate = exam.count > 0 ? (exam.completedCount / exam.count) * 100 : 0;
+                                            return (
+                                                <tr key={exam.examId}>
+                                                    <td>{exam.examId}</td>
+                                                    <td>{exam.count}</td>
+                                                    <td>{exam.completedCount}</td>
+                                                    <td>
+                                                        <div className={styles.progressBar}>
+                                                            <div
+                                                                className={styles.progressFill}
+                                                                style={{ width: `${rate}%` }}
+                                                            />
+                                                        </div>
+                                                        {rate.toFixed(0)}%
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <div className={styles.emptyData}>データがありません</div>
+                        )}
+
+                        {/* 最近のユーザー */}
+                        <h3 className={styles.sectionTitle} style={{ fontSize: '1rem', marginTop: '1.5rem' }}>
+                            🆕 最近のユーザー
+                        </h3>
+                        {analytics.recentUsers.length > 0 ? (
+                            <div className={styles.userTable}>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>名前</th>
+                                            <th>メール</th>
+                                            <th>ロール</th>
+                                            <th>登録日</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {analytics.recentUsers.map(user => (
+                                            <tr key={user.id}>
+                                                <td>{user.name || '(未設定)'}</td>
+                                                <td>{user.email || '(なし)'}</td>
+                                                <td>
+                                                    <span className={`${styles.userRole} ${
+                                                        user.role === 'admin' ? styles.roleAdmin :
+                                                        user.isGuest ? styles.roleGuest :
+                                                        styles.roleUser
+                                                    }`}>
+                                                        {user.role === 'admin' ? '管理者' :
+                                                         user.isGuest ? 'ゲスト' : 'ユーザー'}
+                                                    </span>
+                                                </td>
+                                                <td>{formatDate(user.createdAt)}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <div className={styles.emptyData}>データがありません</div>
+                        )}
+                    </>
+                ) : null}
             </div>
         </div>
     );
