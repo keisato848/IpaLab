@@ -116,7 +116,7 @@ export async function updateFeatureFlag(
         await container.items.upsert(flagData);
         return flagData;
     } catch (error) {
-        console.error(`[FeatureFlags] フラグ更新エラー (${id}):`, error);
+        console.error('[FeatureFlags] フラグ更新エラー (%s):', id, error);
         return null;
     }
 }
