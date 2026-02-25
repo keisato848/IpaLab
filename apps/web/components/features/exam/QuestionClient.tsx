@@ -61,7 +61,11 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const [examStats, setExamStats] = useState<{ total: number; correct: number } | null>(null);
     const [allExamRecords, setAllExamRecords] = useState<LearningRecord[]>([]);
 
-    // Stats version counter to protect optimistic updates from stale server data
+    // Stats version counter to protect optimistic updates from stale server data.
+    // 非同期で統計データをフェッチ／保存するたびにバージョン番号をインクリメントし、
+    // フェッチ開始時点のバージョン（例: fetchVersion）と完了時点の statsVersionRef.current を比較することで、
+    // フェッチ中に save 処理などでより新しいバージョンに更新されていた場合は、
+    // その古いフェッチ結果で最新の状態を上書きしないようにする。
     const statsVersionRef = useRef(0);
 
     // Mock Mode Logic
