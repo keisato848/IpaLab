@@ -58,6 +58,7 @@ export const metadata: Metadata = {
 
 import { NextAuthProvider } from "@/components/providers/NextAuthProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { AdProvider } from "@/components/features/ads";
 
 import { TelemetryProvider } from "@/components/providers/TelemetryProvider";
 
@@ -95,9 +96,11 @@ export default function RootLayout({
                 />
                 <TelemetryProvider connectionString={process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING}>
                     <NextAuthProvider>
-                        <ThemeProvider>
-                            {children}
-                        </ThemeProvider>
+                        <AdProvider>
+                            <ThemeProvider>
+                                {children}
+                            </ThemeProvider>
+                        </AdProvider>
                     </NextAuthProvider>
                 </TelemetryProvider>
             </body>
