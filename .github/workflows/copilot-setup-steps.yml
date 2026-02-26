@@ -31,4 +31,4 @@ jobs:
 
     # Customize this step as needed
     - name: Build application
-      run: npx run build
+      run: npm run build
