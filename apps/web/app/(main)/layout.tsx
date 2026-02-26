@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { UserMenu } from '@/components/features/auth/UserMenu';
 import styles from './layout.module.css';
 
@@ -13,6 +14,9 @@ export default function DashboardLayout({
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession();
+
+  const isAdmin = session?.user?.role === 'admin';
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);
@@ -81,6 +85,16 @@ export default function DashboardLayout({
             <span className={styles.icon}>⚙️</span>
             設定
           </Link>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className={`${styles.navItem} ${isActive('/admin') ? styles.active : ''}`}
+              onClick={closeSidebar}
+            >
+              <span className={styles.icon}>🛡️</span>
+              管理
+            </Link>
+          )}
         </nav>
 
         <div className={styles.userSection}>

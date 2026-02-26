@@ -6,7 +6,7 @@ export function CosmosAdapter(): Adapter {
     return {
         async createUser(user: Omit<AdapterUser, "id">) {
             const id = uuidv4();
-            const newUser = { ...user, id };
+            const newUser = { ...user, id, role: "user" };
             const container = await getContainer("Users");
             if (!container) throw new Error("DB not ready");
 

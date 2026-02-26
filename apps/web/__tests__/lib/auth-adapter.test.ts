@@ -58,10 +58,12 @@ describe('CosmosAdapter', () => {
             expect(result).toEqual({
                 ...newUser,
                 id: 'mock-uuid-12345',
+                role: 'user',
             });
             expect(mockUsersContainer.items.create).toHaveBeenCalledWith({
                 ...newUser,
                 id: 'mock-uuid-12345',
+                role: 'user',
             });
         });
 

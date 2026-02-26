@@ -125,7 +125,7 @@ jobs:
           done
           
           if [ -n "$MISSING" ]; then
-            echo "⚠️ WARNING: 以下の IP が CosmosDB ファイアウォールに未登録:$MISSING"
+            echo "⚠️ WARNING - 以下の IP が CosmosDB ファイアウォールに未登録$MISSING"
             echo "CosmosDB の IP ルールを更新してください"
           else
             echo "✅ 全ての Function App アウトバウンド IP が CosmosDB に登録済み"
