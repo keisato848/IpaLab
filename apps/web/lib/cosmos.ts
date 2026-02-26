@@ -90,4 +90,5 @@ export const initDatabase = async () => {
     await database.containers.createIfNotExists({ id: "ExamProgress", partitionKey: "/userId" });
     await database.containers.createIfNotExists({ id: "Metrics", partitionKey: "/type" });
     await database.containers.createIfNotExists({ id: "FeatureFlags", partitionKey: "/id" });
+    await database.containers.createIfNotExists({ id: "PageViews", partitionKey: "/date" });
 };
