@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { guestManager } from '@/lib/guest-manager';
 import { FaCheckCircle, FaTimesCircle, FaBookmark } from 'react-icons/fa';
 import { getLearningRecords, LearningRecord, Question, getExamProgress, createLearningSession } from '@/lib/api';
+import { useAdContext, RewardedAdModal } from '@/components/features/ads';
 import styles from './ExamEntranceClient.module.css';
 
 interface ExamEntranceClientProps {
@@ -23,6 +24,10 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
     const [nextQNo, setNextQNo] = useState<number>(1);
     const [progress, setProgress] = useState<{ completed: number, total: number }>({ completed: 0, total: questions.length });
     const [isLoaded, setIsLoaded] = useState(false);
+
+    const { isRewardedAdEnabled, isAuthenticated } = useAdContext();
+    const [showRewardedAd, setShowRewardedAd] = useState(false);
+    const [pendingStart, setPendingStart] = useState<{ startQNo: number; mode: 'practice' | 'mock' } | null>(null);
 
     const searchParams = useSearchParams();
     const categoryFilter = searchParams.get('category');
@@ -159,17 +164,16 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
 
     const displayCount = displayQuestions.length > 0 ? displayQuestions.length : mockSettings.count;
 
-    const startSession = async (startQNo: number, mode: 'practice' | 'mock') => {
+    // 実際の試験開始処理（広告表示後に呼ばれる）
+    const executeStartSession = useCallback(async (startQNo: number, mode: 'practice' | 'mock') => {
         const userId = session?.user?.id || guestManager.getGuestId();
         if (!userId) {
-            // Redirect to login if no user
             router.push('/login');
             return;
         }
 
         let sessionId: string | undefined;
 
-        // Only create DB session for logged-in users
         if (session?.user?.id) {
             const totalQuestions = questions.length;
             const newSession = await createLearningSession(userId, examId, mode, totalQuestions);
@@ -178,9 +182,44 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
 
         const targetUrl = `/exam/${year}/${type}/${startQNo}?mode=${mode}${sessionId ? `&sessionId=${sessionId}` : ''}`;
         router.push(targetUrl);
+    }, [session, examId, questions, year, type, router]);
+
+    // 広告表示完了時のコールバック
+    const handleAdComplete = useCallback(() => {
+        setShowRewardedAd(false);
+        if (pendingStart) {
+            executeStartSession(pendingStart.startQNo, pendingStart.mode);
+            setPendingStart(null);
+        }
+    }, [pendingStart, executeStartSession]);
+
+    // 広告スキップ時のコールバック
+    const handleAdSkip = useCallback(() => {
+        setShowRewardedAd(false);
+        if (pendingStart) {
+            executeStartSession(pendingStart.startQNo, pendingStart.mode);
+            setPendingStart(null);
+        }
+    }, [pendingStart, executeStartSession]);
+
+    // 試験開始ボタン押下時: リワード広告が有効なら広告を表示、そうでなければ直接開始
+    const startSession = (startQNo: number, mode: 'practice' | 'mock') => {
+        if (isRewardedAdEnabled) {
+            setPendingStart({ startQNo, mode });
+            setShowRewardedAd(true);
+        } else {
+            executeStartSession(startQNo, mode);
+        }
     };
 
     return (
+        <>
+        <RewardedAdModal
+            isOpen={showRewardedAd}
+            onComplete={handleAdComplete}
+            onSkip={handleAdSkip}
+            canSkip={isAuthenticated}
+        />
         <div className={styles.container}>
             <div className={styles.breadcrumb}>
                 <Link href="/exam">演習一覧</Link> &gt; {examLabel}
@@ -293,5 +332,6 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                 }
             </section>
         </div>
+        </>
     );
 }
