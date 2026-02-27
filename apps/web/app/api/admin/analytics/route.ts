@@ -29,6 +29,7 @@ export async function GET(request: Request) {
             dailyActivity,
             examBreakdown,
             recentUsers,
+            visitorStats,
         ] = await Promise.all([
             getUserStats(),
             getSessionStats(sinceISO),
@@ -36,6 +37,7 @@ export async function GET(request: Request) {
             getDailyActivity(sinceISO),
             getExamBreakdown(sinceISO),
             getRecentUsers(10),
+            getVisitorStats(sinceISO),
         ]);
 
         return NextResponse.json({
@@ -49,6 +51,7 @@ export async function GET(request: Request) {
             dailyActivity,
             examBreakdown,
             recentUsers,
+            visitorStats,
         });
     } catch (err) {
         console.error('[Admin Analytics] エラー:', err);
@@ -241,5 +244,110 @@ async function getRecentUsers(limit: number) {
         return resources;
     } catch {
         return [];
+    }
+}
+
+/** 訪問者統計（匿名ユーザー含む） */
+async function getVisitorStats(sinceISO: string) {
+    const container = await getContainer('PageViews');
+    if (!container) {
+        return {
+            totalPageViews: 0,
+            uniqueVisitors: 0,
+            authenticatedVisitors: 0,
+            anonymousVisitors: 0,
+            dailyVisitors: [] as { date: string; total: number; authenticated: number; anonymous: number }[],
+            topPages: [] as { path: string; views: number }[],
+        };
+    }
+
+    try {
+        const [
+            totalViewsResult,
+            uniqueVisitorsResult,
+            authVisitorsResult,
+            anonVisitorsResult,
+            dailyVisitorsResult,
+            topPagesResult,
+        ] = await Promise.all([
+            // 総ページビュー数
+            container.items.query<number>({
+                query: 'SELECT VALUE COUNT(1) FROM c WHERE c.timestamp >= @since',
+                parameters: [{ name: '@since', value: sinceISO }],
+            }).fetchAll(),
+
+            // ユニーク訪問者数（visitorId ベース）
+            container.items.query<number>({
+                query: 'SELECT VALUE COUNT(1) FROM (SELECT DISTINCT c.visitorId FROM c WHERE c.timestamp >= @since)',
+                parameters: [{ name: '@since', value: sinceISO }],
+            }).fetchAll(),
+
+            // 認証済み訪問者数
+            container.items.query<number>({
+                query: 'SELECT VALUE COUNT(1) FROM (SELECT DISTINCT c.visitorId FROM c WHERE c.timestamp >= @since AND c.isAuthenticated = true)',
+                parameters: [{ name: '@since', value: sinceISO }],
+            }).fetchAll(),
+
+            // 匿名訪問者数
+            container.items.query<number>({
+                query: 'SELECT VALUE COUNT(1) FROM (SELECT DISTINCT c.visitorId FROM c WHERE c.timestamp >= @since AND c.isAuthenticated = false)',
+                parameters: [{ name: '@since', value: sinceISO }],
+            }).fetchAll(),
+
+            // 日別訪問者数
+            container.items.query<{
+                date: string;
+                total: number;
+                authenticated: number;
+                anonymous: number;
+            }>({
+                query: `
+                    SELECT
+                        c.date,
+                        COUNT(1) AS total,
+                        SUM(c.isAuthenticated ? 1 : 0) AS authenticated,
+                        SUM(c.isAuthenticated ? 0 : 1) AS anonymous
+                    FROM c
+                    WHERE c.timestamp >= @since
+                    GROUP BY c.date
+                    ORDER BY c.date ASC
+                `,
+                parameters: [{ name: '@since', value: sinceISO }],
+            }).fetchAll(),
+
+            // 人気ページ TOP 10
+            container.items.query<{ path: string; views: number }>({
+                query: `
+                    SELECT
+                        c.path,
+                        COUNT(1) AS views
+                    FROM c
+                    WHERE c.timestamp >= @since
+                    GROUP BY c.path
+                    ORDER BY COUNT(1) DESC
+                    OFFSET 0 LIMIT 10
+                `,
+                parameters: [{ name: '@since', value: sinceISO }],
+            }).fetchAll(),
+        ]);
+
+        return {
+            totalPageViews: totalViewsResult.resources[0] ?? 0,
+            uniqueVisitors: uniqueVisitorsResult.resources[0] ?? 0,
+            authenticatedVisitors: authVisitorsResult.resources[0] ?? 0,
+            anonymousVisitors: anonVisitorsResult.resources[0] ?? 0,
+            dailyVisitors: dailyVisitorsResult.resources,
+            topPages: topPagesResult.resources,
+        };
+    } catch (err) {
+        console.error('[Admin Analytics] 訪問者統計エラー:', err);
+        return {
+            totalPageViews: 0,
+            uniqueVisitors: 0,
+            authenticatedVisitors: 0,
+            anonymousVisitors: 0,
+            dailyVisitors: [],
+            topPages: [],
+        };
     }
 }

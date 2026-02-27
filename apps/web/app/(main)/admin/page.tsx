@@ -31,6 +31,14 @@ interface AnalyticsData {
     dailyActivity: { date: string; count: number; correctCount: number }[];
     examBreakdown: { examId: string; count: number; completedCount: number }[];
     recentUsers: { id: string; name: string | null; email: string | null; role: string; createdAt: string; isGuest: boolean }[];
+    visitorStats: {
+        totalPageViews: number;
+        uniqueVisitors: number;
+        authenticatedVisitors: number;
+        anonymousVisitors: number;
+        dailyVisitors: { date: string; total: number; authenticated: number; anonymous: number }[];
+        topPages: { path: string; views: number }[];
+    };
 }
 
 export default function AdminPage() {
@@ -272,6 +280,86 @@ export default function AdminPage() {
                                 <span className={styles.statLabel}>平均回答時間</span>
                             </div>
                         </div>
+
+                        {/* 訪問者統計（匿名ユーザー含む） */}
+                        <h3 className={styles.sectionTitle} style={{ fontSize: '1rem', marginTop: '1.5rem' }}>
+                            👁️ 訪問者統計
+                        </h3>
+                        <div className={styles.statsGrid}>
+                            <div className={styles.statCard}>
+                                <span className={styles.statIcon}>🌐</span>
+                                <span className={styles.statValue}>{analytics.visitorStats.totalPageViews.toLocaleString()}</span>
+                                <span className={styles.statLabel}>総ページビュー</span>
+                            </div>
+                            <div className={styles.statCard}>
+                                <span className={styles.statIcon}>👤</span>
+                                <span className={styles.statValue}>{analytics.visitorStats.uniqueVisitors}</span>
+                                <span className={styles.statLabel}>ユニーク訪問者</span>
+                            </div>
+                            <div className={styles.statCard}>
+                                <span className={styles.statIcon}>🔓</span>
+                                <span className={styles.statValue}>{analytics.visitorStats.authenticatedVisitors}</span>
+                                <span className={styles.statLabel}>ログインユーザー</span>
+                            </div>
+                            <div className={styles.statCard}>
+                                <span className={styles.statIcon}>👻</span>
+                                <span className={styles.statValue}>{analytics.visitorStats.anonymousVisitors}</span>
+                                <span className={styles.statLabel}>匿名利用者</span>
+                            </div>
+                        </div>
+
+                        {/* 日別訪問者数 */}
+                        {analytics.visitorStats.dailyVisitors.length > 0 && (
+                            <>
+                                <h4 className={styles.flagDescription} style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>
+                                    日別訪問者数
+                                </h4>
+                                <div className={styles.barChart}>
+                                    {(() => {
+                                        const maxCount = Math.max(...analytics.visitorStats.dailyVisitors.map(d => d.total), 1);
+                                        return analytics.visitorStats.dailyVisitors.map(day => (
+                                            <div key={day.date} className={styles.barGroup}>
+                                                <div
+                                                    className={styles.bar}
+                                                    style={{ height: `${(day.total / maxCount) * 100}%` }}
+                                                    title={`${day.date}: ${day.total}PV（認証: ${day.authenticated}, 匿名: ${day.anonymous}）`}
+                                                />
+                                                <span className={styles.barLabel}>
+                                                    {day.date.slice(5)}
+                                                </span>
+                                            </div>
+                                        ));
+                                    })()}
+                                </div>
+                            </>
+                        )}
+
+                        {/* 人気ページ TOP 10 */}
+                        {analytics.visitorStats.topPages.length > 0 && (
+                            <>
+                                <h4 className={styles.flagDescription} style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>
+                                    人気ページ TOP 10
+                                </h4>
+                                <div className={styles.examTable}>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>ページ</th>
+                                                <th>ビュー数</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {analytics.visitorStats.topPages.map(page => (
+                                                <tr key={page.path}>
+                                                    <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{page.path}</td>
+                                                    <td>{page.views.toLocaleString()}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </>
+                        )}
 
                         {/* 日別アクティビティ */}
                         <h3 className={styles.sectionTitle} style={{ fontSize: '1rem', marginTop: '1.5rem' }}>
