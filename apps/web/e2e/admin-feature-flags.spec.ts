@@ -532,7 +532,7 @@ test.describe('6. フィードバック表示テスト', () => {
         await expect(page.locator('text=更新に失敗しました, text=更新エラーが発生しました')).toBeVisible();
         
         // トグル状態が元のまま変わっていないことを確認
-        await expect(adsCheckbox).toHaveJSProperty('checked', initialState);
+        await expect(adsCheckbox).toHaveProperty('checked', initialState);
     });
 });
 
