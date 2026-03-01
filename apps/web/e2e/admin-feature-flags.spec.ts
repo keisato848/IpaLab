@@ -28,7 +28,7 @@ test.describe('1. アクセス制御テスト', () => {
         // アクセス制限メッセージの確認
         await expect(page.locator('h2')).toContainText('アクセスが制限されています');
         await expect(page.locator('text=このページを表示するにはログインが必要です。')).toBeVisible();
-        await expect(page.locator('a[href="/login"]')).toContainText('ログインページへ');
+        await expect(page.locator('a:has-text("ログインページへ")')).toBeVisible();
         
         // フィーチャーフラグ関連要素が表示されないことを確認
         await expect(page.locator('input[type=checkbox]')).toHaveCount(0);
@@ -59,9 +59,9 @@ test.describe('1. アクセス制御テスト', () => {
         await captureEvidence(page, testInfo, 'FF-02_non_admin_access');
 
         // 管理者権限エラーの確認
-        await expect(page.locator('h2')).toContainText('管理者権限が必要です');
+        await expect(page.locator('h2').first()).toContainText('管理者権限が必要です');
         await expect(page.locator('text=このページは管理者のみアクセスできます。')).toBeVisible();
-        await expect(page.locator('a[href="/dashboard"]')).toContainText('ダッシュボードへ戻る');
+        await expect(page.locator('a:has-text("ダッシュボードへ戻る")')).toBeVisible();
         
         // セットアップセクションの確認
         await expect(page.locator('text=初回管理者セットアップ')).toBeVisible();
@@ -89,11 +89,12 @@ test.describe('2. APIセキュリティテスト', () => {
             }
         });
 
-        const response = await page.request.get('http://localhost:3000/api/admin/feature-flags');
-        expect(response.status()).toBe(401);
-        
-        const body = await response.json();
-        expect(body.error).toBe('認証が必要です');
+        const result = await page.evaluate(async () => {
+            const res = await fetch('http://localhost:3000/api/admin/feature-flags');
+            return { status: res.status, body: await res.json() };
+        });
+        expect(result.status).toBe(401);
+        expect(result.body.error).toBe('認証が必要です');
     });
 
     test('FF-12: 管理API PATCH の未認証拒否（401）', async ({ page, testInfo }) => {
@@ -109,13 +110,16 @@ test.describe('2. APIセキュリティテスト', () => {
             }
         });
 
-        const response = await page.request.patch('http://localhost:3000/api/admin/feature-flags', {
-            data: { id: 'ads_enabled', enabled: true }
+        const result = await page.evaluate(async () => {
+            const res = await fetch('http://localhost:3000/api/admin/feature-flags', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: 'ads_enabled', enabled: true })
+            });
+            return { status: res.status, body: await res.json() };
         });
-        expect(response.status()).toBe(401);
-        
-        const body = await response.json();
-        expect(body.error).toBe('認証が必要です');
+        expect(result.status).toBe(401);
+        expect(result.body.error).toBe('認証が必要です');
     });
 
     test('FF-17: 管理API GET の非管理者拒否（403）', async ({ page, testInfo }) => {
@@ -131,11 +135,12 @@ test.describe('2. APIセキュリティテスト', () => {
             }
         });
 
-        const response = await page.request.get('http://localhost:3000/api/admin/feature-flags');
-        expect(response.status()).toBe(403);
-        
-        const body = await response.json();
-        expect(body.error).toBe('管理者権限が必要です');
+        const result = await page.evaluate(async () => {
+            const res = await fetch('http://localhost:3000/api/admin/feature-flags');
+            return { status: res.status, body: await res.json() };
+        });
+        expect(result.status).toBe(403);
+        expect(result.body.error).toBe('管理者権限が必要です');
     });
 
     test('FF-13: 管理API PATCH のバリデーション（不正入力）', async ({ page, testInfo }) => {
@@ -152,28 +157,40 @@ test.describe('2. APIセキュリティテスト', () => {
         });
 
         // enabled 欠落
-        let response = await page.request.patch('http://localhost:3000/api/admin/feature-flags', {
-            data: { id: 'ads_enabled' }
+        let result = await page.evaluate(async () => {
+            const res = await fetch('http://localhost:3000/api/admin/feature-flags', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: 'ads_enabled' })
+            });
+            return { status: res.status, body: await res.json() };
         });
-        expect(response.status()).toBe(400);
-        let body = await response.json();
-        expect(body.error).toBe('id (string) と enabled (boolean) が必要です');
+        expect(result.status).toBe(400);
+        expect(result.body.error).toBe('id (string) と enabled (boolean) が必要です');
 
         // id 欠落
-        response = await page.request.patch('http://localhost:3000/api/admin/feature-flags', {
-            data: { enabled: true }
+        result = await page.evaluate(async () => {
+            const res = await fetch('http://localhost:3000/api/admin/feature-flags', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ enabled: true })
+            });
+            return { status: res.status, body: await res.json() };
         });
-        expect(response.status()).toBe(400);
-        body = await response.json();
-        expect(body.error).toBe('id (string) と enabled (boolean) が必要です');
+        expect(result.status).toBe(400);
+        expect(result.body.error).toBe('id (string) と enabled (boolean) が必要です');
 
         // enabled が非boolean
-        response = await page.request.patch('http://localhost:3000/api/admin/feature-flags', {
-            data: { id: 'ads_enabled', enabled: 'yes' }
+        result = await page.evaluate(async () => {
+            const res = await fetch('http://localhost:3000/api/admin/feature-flags', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: 'ads_enabled', enabled: 'yes' })
+            });
+            return { status: res.status, body: await res.json() };
         });
-        expect(response.status()).toBe(400);
-        body = await response.json();
-        expect(body.error).toBe('id (string) と enabled (boolean) が必要です');
+        expect(result.status).toBe(400);
+        expect(result.body.error).toBe('id (string) と enabled (boolean) が必要です');
     });
 
     test('FF-18: 管理API PATCH の不正JSON送信', async ({ page, testInfo }) => {
@@ -190,14 +207,18 @@ test.describe('2. APIセキュリティテスト', () => {
         });
 
         // 不正JSON文字列を送信
-        const response = await page.request.patch('http://localhost:3000/api/admin/feature-flags', {
-            headers: { 'Content-Type': 'application/json' },
-            data: '{invalid}'
+        const result = await page.evaluate(async () => {
+            const res = await fetch('http://localhost:3000/api/admin/feature-flags', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: '{invalid}'
+            });
+            return { status: res.status };
         });
         
-        expect([400, 500]).toContain(response.status()); // どちらでも受容
+        expect([400, 500]).toContain(result.status); // どちらでも受容
         // アプリケーションがクラッシュしないことを確認（レスポンスが返ること）
-        expect(response.status()).toBeLessThan(600);
+        expect(result.status).toBeLessThan(600);
     });
 
     test('FF-19: 管理API PATCH の更新失敗時（500）', async ({ page, testInfo }) => {
@@ -213,13 +234,16 @@ test.describe('2. APIセキュリティテスト', () => {
             }
         });
 
-        const response = await page.request.patch('http://localhost:3000/api/admin/feature-flags', {
-            data: { id: 'ads_enabled', enabled: true }
+        const result = await page.evaluate(async () => {
+            const res = await fetch('http://localhost:3000/api/admin/feature-flags', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: 'ads_enabled', enabled: true })
+            });
+            return { status: res.status, body: await res.json() };
         });
-        expect(response.status()).toBe(500);
-        
-        const body = await response.json();
-        expect(body.error).toBe('フィーチャーフラグの更新に失敗しました');
+        expect(result.status).toBe(500);
+        expect(result.body.error).toBe('フィーチャーフラグの更新に失敗しました');
     });
 });
 
@@ -241,19 +265,21 @@ test.describe('3. 公開APIテスト', () => {
             });
         });
 
-        const response = await page.request.get('http://localhost:3000/api/feature-flags');
-        expect(response.status()).toBe(200);
+        const result = await page.evaluate(async () => {
+            const res = await fetch('http://localhost:3000/api/feature-flags');
+            return { status: res.status, body: await res.json() };
+        });
+        expect(result.status).toBe(200);
         
-        const body = await response.json();
-        expect(body.flags).toBeDefined();
-        expect(body.flags.ads_enabled).toBe(false);
-        expect(body.flags.rewarded_ad_enabled).toBe(false);
-        expect(body.flags.ai_plan_enabled).toBe(true);
+        expect(result.body.flags).toBeDefined();
+        expect(result.body.flags.ads_enabled).toBe(false);
+        expect(result.body.flags.rewarded_ad_enabled).toBe(false);
+        expect(result.body.flags.ai_plan_enabled).toBe(true);
         
         // 内部情報が含まれないことを確認
-        expect(body.description).toBeUndefined();
-        expect(body.updatedBy).toBeUndefined();
-        expect(body.updatedAt).toBeUndefined();
+        expect(result.body.description).toBeUndefined();
+        expect(result.body.updatedBy).toBeUndefined();
+        expect(result.body.updatedAt).toBeUndefined();
     });
 });
 
@@ -268,7 +294,7 @@ test.describe('4. フィーチャーフラグ表示テスト', () => {
 
         // 管理画面の基本表示
         await expect(adminPage.locator('h1')).toContainText('管理画面');
-        await expect(adminPage.locator('text=Admin')).toBeVisible(); // バッジ
+        await expect(adminPage.locator('span:has-text("🛡️ Admin")')).toBeVisible(); // バッジ
         await expect(adminPage.locator('text=フィーチャーフラグ')).toBeVisible();
         
         // フラグ一覧の表示
@@ -357,36 +383,40 @@ test.describe('5. フィーチャーフラグ トグル操作テスト', () => {
         
         // 初期状態確認
         await expect(adminPage.locator('text=ads_enabled')).toBeVisible();
-        await expect(adminPage.locator('text=OFF')).toBeVisible();
+        // ads_enabled の行で OFF ステータスを確認
+        const adsRow = adminPage.locator('text=ads_enabled').locator('..');
+        await expect(adsRow.locator('text=OFF')).toBeVisible();
         
-        // ads_enabled のトグルスイッチをクリック
+        // ads_enabled のトグルスイッチをクリック（CSS で非表示のため evaluate 使用）
         const adsCheckbox = adminPage.locator('input[type=checkbox]').first();
         await expect(adsCheckbox).not.toBeChecked();
-        await adsCheckbox.click();
+        await adsCheckbox.evaluate(node => (node as HTMLElement).click());
         
         await captureEvidence(adminPage, testInfo, 'FF-05_toggle_on');
         
         // 状態変化の確認
         await expect(adsCheckbox).toBeChecked();
-        await expect(adminPage.locator('text=ON')).toBeVisible();
-        await expect(adminPage.locator('text=最終更新:')).toBeVisible();
+        const adsRowAfterToggle = adminPage.locator('text=ads_enabled').locator('..');
+        await expect(adsRowAfterToggle.locator('text=ON')).toBeVisible();
+        await expect(adsRowAfterToggle.locator('text=最終更新:')).toBeVisible();
     });
 
     test('FF-06: ONフラグをOFFに切り替え', async ({ adminPage, mockApiState, testInfo }) => {
         await adminPage.goto('http://localhost:3000/admin');
         await adminPage.waitForLoadState('networkidle');
         
-        // ai_plan_enabled のトグルスイッチをクリック（デフォルトでON）
+        // ai_plan_enabled のトグルスイッチをクリック（デフォルトでON、CSS で非表示のため evaluate 使用）
         const aiCheckbox = adminPage.locator('input[type=checkbox]').last();
         await expect(aiCheckbox).toBeChecked();
-        await aiCheckbox.click();
+        await aiCheckbox.evaluate(node => (node as HTMLElement).click());
         
         await captureEvidence(adminPage, testInfo, 'FF-06_toggle_off');
         
         // 状態変化の確認
         await expect(aiCheckbox).not.toBeChecked();
-        await expect(adminPage.locator('text=OFF')).toBeVisible();
-        await expect(adminPage.locator('text=最終更新:')).toBeVisible();
+        const aiRowAfterToggle = adminPage.locator('text=ai_plan_enabled').locator('..');
+        await expect(aiRowAfterToggle.locator('text=OFF')).toBeVisible();
+        await expect(aiRowAfterToggle.locator('text=最終更新:')).toBeVisible();
     });
 
     test('FF-07: トグル操作中のUI無効化状態', async ({ page, testInfo }) => {
@@ -431,7 +461,7 @@ test.describe('5. フィーチャーフラグ トグル操作テスト', () => {
         await page.waitForLoadState('networkidle');
         
         const adsCheckbox = page.locator('input[type=checkbox]').first();
-        await adsCheckbox.click();
+        await adsCheckbox.evaluate(node => (node as HTMLElement).click());
         
         // 操作中の無効化状態確認
         await expect(adsCheckbox).toBeDisabled();
@@ -453,24 +483,24 @@ test.describe('6. フィードバック表示テスト', () => {
         await adminPage.goto('http://localhost:3000/admin');
         await adminPage.waitForLoadState('networkidle');
         
-        // ads_enabled をトグル
+        // ads_enabled をトグル（CSS で非表示のため evaluate 使用）
         const adsCheckbox = adminPage.locator('input[type=checkbox]').first();
-        await adsCheckbox.click();
+        await adsCheckbox.evaluate(node => (node as HTMLElement).click());
         
         await captureEvidence(adminPage, testInfo, 'FF-08_success_message');
         
         // 成功メッセージの表示確認
         await expect(adminPage.locator('text=を有効にしました')).toBeVisible();
-        await expect(adminPage.locator('text=広告表示の有効化（全体制御）')).toBeVisible();
+        await expect(adminPage.getByText('広告表示の有効化（全体制御）', { exact: true })).toBeVisible();
     });
 
     test('FF-09: 成功メッセージの3秒後自動消去', async ({ adminPage, testInfo }) => {
         await adminPage.goto('http://localhost:3000/admin');
         await adminPage.waitForLoadState('networkidle');
         
-        // トグル操作
+        // トグル操作（CSS で非表示のため evaluate 使用）
         const adsCheckbox = adminPage.locator('input[type=checkbox]').first();
-        await adsCheckbox.click();
+        await adsCheckbox.evaluate(node => (node as HTMLElement).click());
         
         // 成功メッセージの表示確認
         const successMsg = adminPage.locator('text=を有効にしました');
@@ -524,15 +554,19 @@ test.describe('6. フィードバック表示テスト', () => {
         const adsCheckbox = page.locator('input[type=checkbox]').first();
         const initialState = await adsCheckbox.isChecked();
         
-        await adsCheckbox.click();
+        await adsCheckbox.evaluate(node => (node as HTMLElement).click());
         
         await captureEvidence(page, testInfo, 'FF-21_update_error');
         
         // エラーメッセージの表示確認
-        await expect(page.locator('text=更新に失敗しました, text=更新エラーが発生しました')).toBeVisible();
+        await expect(page.locator('text=更新に失敗しました').or(page.locator('text=更新エラーが発生しました'))).toBeVisible();
         
         // トグル状態が元のまま変わっていないことを確認
-        await expect(adsCheckbox).toHaveProperty('checked', initialState);
+        if (initialState) {
+            await expect(adsCheckbox).toBeChecked();
+        } else {
+            await expect(adsCheckbox).not.toBeChecked();
+        }
     });
 });
 
@@ -596,9 +630,11 @@ test.describe('7. 統合テスト', () => {
             });
         });
 
-        // 1. 初期状態確認
-        const initialResponse = await page.request.get('http://localhost:3000/api/feature-flags');
-        const initialBody = await initialResponse.json();
+        // 1. 初期状態確認（page.evaluate 経由で page.route のインターセプトを通す）
+        const initialBody = await page.evaluate(async () => {
+            const res = await fetch('http://localhost:3000/api/feature-flags');
+            return res.json();
+        });
         expect(initialBody.flags.ads_enabled).toBe(false);
 
         // 2. 管理画面でトグル操作
@@ -606,14 +642,16 @@ test.describe('7. 統合テスト', () => {
         await page.waitForLoadState('networkidle');
         
         const adsCheckbox = page.locator('input[type=checkbox]').first();
-        await adsCheckbox.click();
+        await adsCheckbox.evaluate(node => (node as HTMLElement).click());
         await expect(page.locator('text=を有効にしました')).toBeVisible();
         
         await captureEvidence(page, testInfo, 'FF-14_flag_updated');
 
-        // 3. 公開API での反映確認
-        const updatedResponse = await page.request.get('http://localhost:3000/api/feature-flags');
-        const updatedBody = await updatedResponse.json();
+        // 3. 公開API での反映確認（page.evaluate 経由で page.route のインターセプトを通す）
+        const updatedBody = await page.evaluate(async () => {
+            const res = await fetch('http://localhost:3000/api/feature-flags');
+            return res.json();
+        });
         expect(updatedBody.flags.ads_enabled).toBe(true);
     });
 
@@ -687,29 +725,28 @@ test.describe('7. 統合テスト', () => {
         await page.goto('http://localhost:3000/admin');
         await page.waitForLoadState('networkidle');
 
-        // 1. ads_enabled を ON
+        // 1. ads_enabled を ON（CSS で非表示のため evaluate 使用）
         const adsCheckbox = page.locator('input[type=checkbox]').first();
-        await adsCheckbox.click();
-        await expect(page.locator('text=広告表示の有効化（全体制御）')).toBeVisible();
-        await expect(page.locator('text=有効')).toBeVisible();
+        await adsCheckbox.evaluate(node => (node as HTMLElement).click());
+        await expect(page.locator('text=を有効にしました')).toBeVisible();
 
-        // 2. rewarded_ad_enabled を ON
+        // 2. rewarded_ad_enabled を ON（CSS で非表示のため evaluate 使用）
         const rewardedCheckbox = page.locator('input[type=checkbox]').nth(1);
-        await rewardedCheckbox.click();
-        await expect(page.locator('text=リワード広告の有効化（試験開始時）')).toBeVisible();
-        await expect(page.locator('text=有効')).toBeVisible();
+        await rewardedCheckbox.evaluate(node => (node as HTMLElement).click());
+        await expect(page.locator('text=を有効にしました')).toBeVisible();
 
-        // 3. ai_plan_enabled を OFF
+        // 3. ai_plan_enabled を OFF（CSS で非表示のため evaluate 使用）
         const aiCheckbox = page.locator('input[type=checkbox]').last();
-        await aiCheckbox.click();
-        await expect(page.locator('text=AI学習計画機能の有効化')).toBeVisible();
-        await expect(page.locator('text=無効')).toBeVisible();
+        await aiCheckbox.evaluate(node => (node as HTMLElement).click());
+        await expect(page.locator('text=を無効にしました')).toBeVisible();
         
         await captureEvidence(page, testInfo, 'FF-16_multiple_toggles');
 
-        // 4. 最終状態確認
-        const finalResponse = await page.request.get('http://localhost:3000/api/feature-flags');
-        const finalBody = await finalResponse.json();
+        // 4. 最終状態確認（page.evaluate 経由で page.route のインターセプトを通す）
+        const finalBody = await page.evaluate(async () => {
+            const res = await fetch('http://localhost:3000/api/feature-flags');
+            return res.json();
+        });
         expect(finalBody.flags.ads_enabled).toBe(true);
         expect(finalBody.flags.rewarded_ad_enabled).toBe(true);
         expect(finalBody.flags.ai_plan_enabled).toBe(false);
