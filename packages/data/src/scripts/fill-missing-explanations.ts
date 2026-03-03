@@ -153,6 +153,27 @@ async function main() {
         let data = JSON.parse(content);
         let questions = Array.isArray(data) ? data : (data.questions || []);
 
+        // answers_raw.json から correctOption をバックフィル（needsWork チェック前に実行）
+        const answersPath = path.join(questionsDir, dir, 'answers_raw.json');
+        if (fs.existsSync(answersPath)) {
+            try {
+                const answerData = JSON.parse(fs.readFileSync(answersPath, 'utf-8'));
+                let answers: any[] = [];
+                if (Array.isArray(answerData)) {
+                    answers = answerData;
+                } else if (answerData.answers) {
+                    answers = answerData.answers;
+                } else {
+                    answers = Object.keys(answerData).map(k => ({ qNo: parseInt(k), correctOption: answerData[k] }));
+                }
+
+                const ansMap = new Map(answers.map((a: any) => [a.qNo, a.correctOption]));
+                questions.forEach((q: any) => {
+                    if (!q.correctOption && ansMap.has(q.qNo)) q.correctOption = ansMap.get(q.qNo);
+                });
+            } catch (e) { }
+        }
+
         // Quick check: any missing explanations?
         const needsWork = questions.some((q: any) =>
             q.text && q.options && q.correctOption && (!q.explanation || q.explanation.length <= 20)
@@ -164,29 +185,6 @@ async function main() {
         }
 
         console.log(`Processing ${dir} using ${path.basename(targetPath)}...`);
-
-        // Always try to load answers (backup for FE/AP) if needed - logic preserved
-        if (true) {
-            const answersPath = path.join(questionsDir, dir, 'answers_raw.json');
-            if (fs.existsSync(answersPath)) {
-                try {
-                    const answerData = JSON.parse(fs.readFileSync(answersPath, 'utf-8'));
-                    let answers: any[] = [];
-                    if (Array.isArray(answerData)) {
-                        answers = answerData;
-                    } else if (answerData.answers) {
-                        answers = answerData.answers;
-                    } else {
-                        answers = Object.keys(answerData).map(k => ({ qNo: parseInt(k), correctOption: answerData[k] }));
-                    }
-
-                    const ansMap = new Map(answers.map((a: any) => [a.qNo, a.correctOption]));
-                    questions.forEach((q: any) => {
-                        if (!q.correctOption && ansMap.has(q.qNo)) q.correctOption = ansMap.get(q.qNo);
-                    });
-                } catch (e) { }
-            }
-        }
 
         let updateCount = 0;
         let modifiedInFile = false;
@@ -212,6 +210,31 @@ async function main() {
             await new Promise(r => setTimeout(r, 1000)); // Standard delay
         }
         console.log(`\n  Completed ${dir}. New Explanations: ${updateCount}`);
+
+        // 個別 q*.json ファイルにも解説を反映
+        if (updateCount > 0) {
+            let syncedCount = 0;
+            for (const q of questions) {
+                if (!q.qNo || !q.explanation || q.explanation.length <= 20) continue;
+                const qFilePath = path.join(questionsDir, dir, `q${q.qNo}.json`);
+                if (fs.existsSync(qFilePath)) {
+                    try {
+                        const qData = JSON.parse(fs.readFileSync(qFilePath, 'utf-8'));
+                        if (!qData.explanation || qData.explanation.length <= 20) {
+                            qData.explanation = q.explanation;
+                            if (!qData.correctOption && q.correctOption) {
+                                qData.correctOption = q.correctOption;
+                            }
+                            fs.writeFileSync(qFilePath, JSON.stringify(qData, null, 2));
+                            syncedCount++;
+                        }
+                    } catch (e) { /* ignore */ }
+                }
+            }
+            if (syncedCount > 0) {
+                console.log(`  → ${syncedCount}個の個別q*.jsonファイルに解説を同期`);
+            }
+        }
     }
 }
 
