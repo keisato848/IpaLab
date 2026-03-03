@@ -61,10 +61,16 @@ export default async function ExamQuestionPage({ params }: { params: Promise<{ y
     if (questions.length === 0) {
         try {
             const fsData = await getExamData(examId);
-            // Handle { questions: [...] } structure from raw JSON
-            if (fsData && !Array.isArray(fsData) && 'questions' in fsData) {
-                questions = (fsData as any).questions as Question[];
+            if (fsData && !Array.isArray(fsData)) {
+                if ('qNo' in fsData) {
+                    // Form B: 単一問題オブジェクト { qNo, theme, context, questions: [{subQNo}] }
+                    questions = [fsData] as unknown as Question[];
+                } else if ('questions' in fsData) {
+                    // Form C: ラッパーオブジェクト { questions: [{qNo, theme, context, questions}] }
+                    questions = (fsData as any).questions as Question[];
+                }
             } else if (Array.isArray(fsData)) {
+                // Form A: 配列 [{qNo, theme, context, questions}]
                 questions = fsData as unknown as Question[];
             }
         } catch (e) {

@@ -6,6 +6,7 @@
 |------|------|
 | 2026-03-03 | 初版作成（網羅的調査に基づく対応計画） |
 | 2026-03-03 | q*.json 廃止方針を決定。データ構造を `questions_raw.json` / `questions_transformed.json` に一本化。フェーズ1を「データ構造正規化」に改訂。解説網羅率100%を品質目標に設定 |
+| 2026-03-03 | データファイル形式・データフロー・アプリ読み込み仕様をセクション1.1〜1.3として追記。PM品質指標を修正（問題抽出は100%達成済み） |
 
 ---
 
@@ -32,6 +33,99 @@
 | `PM_SUBQ_NO_EXPLANATION` | 48 | 午後問題の設問で解説が空 |
 | `PM_NO_THEME` / `PM_NO_CONTEXT` | 各36 | 午後問題のテーマ/問題文構造が未設定 |
 | `PM_SUBQ_NO_TEXT` / `PM_SSQ_NO_TEXT` | 7 / 2 | 設問テキストが空 |
+
+### 1.1 データファイル形式
+
+問題データは `packages/data/data/questions/{examId}/` 配下に格納される。ファイルは2種類あり、アプリは以下の優先順位で読み込む。
+
+| ファイル | 用途 | 対象 |
+|----------|------|------|
+| `questions_transformed.json` | **最優先**。PM午後問題の構造化データ（theme/context/設問）を格納 | PM全区分 |
+| `questions_raw.json` | フォールバック。AM問題、または未変換PMの生データを格納 | AM全区分、一部PM |
+
+#### questions_transformed.json の形式
+
+PM の `questions_transformed.json` には **2つの形式** が混在している。
+
+| 形式 | 構造 | 該当 | 例 |
+|------|------|------|-----|
+| **配列形式** | `[ { qNo, theme, context, questions: [...] }, ... ]` | 68ディレクトリ（2016〜2020年代前半） | AP-2016-Fall-PM |
+| **オブジェクト形式** | `{ qNo, theme, context, questions: [...] }` | 36ディレクトリ（2019〜2025年） | SC-2024-Fall-PM |
+
+配列形式は大問が複数格納可能な構造だが、実際はほとんどが要素1個。オブジェクト形式は大問1つのみを直接格納する。
+
+#### questions_raw.json の形式
+
+| 形式 | 構造 | 該当 |
+|------|------|------|
+| **配列形式** | `[ { qNo, question, options, correctOption, explanation }, ... ]` | AM1 (FE/AP/IP) |
+| **オブジェクト形式** | `{ questions: [ { qNo, question, options, correctOption, explanation }, ... ] }` | AM2 (PM/SA/SC/ST) |
+
+### 1.2 データフロー
+
+```
+IPA公式PDF
+  ↓ gemini-extract.ts (Gemini OCR)
+questions_raw.json
+  ↓ transform-batch-all-pm.ts (PM のみ)
+questions_transformed.json（theme/context/設問に構造化）
+  ↓ fill-missing-explanations.ts
+解説が追加された questions_raw.json / questions_transformed.json
+  ↓
+  ├─→ SSG (ssg-helper.ts): JSON.parse して返却
+  └─→ API (LocalQuestionRepository.ts): 配列/オブジェクト両対応で展開
+```
+
+### 1.3 アプリケーション側のデータ読み込み仕様
+
+#### SSG (`apps/web/lib/ssg-helper.ts`)
+
+| 項目 | 内容 |
+|------|------|
+| 読み込み関数 | `getExamData(examId)` |
+| 優先順位 | `questions_transformed.json` → `questions_raw.json` |
+| パース方法 | `JSON.parse(fileContent)` の結果を**そのまま返却** |
+| 配列/オブジェクト判定 | **なし** — パース結果をそのまま呼び出し元に返す |
+| 戻り値型 | `Promise<any[]>`（型アノテーション上は配列だが、実際はオブジェクトも返り得る） |
+
+**注意**: PM の `questions_transformed.json` がオブジェクト形式（`{ qNo, theme, context, questions }`）の場合でも、配列形式（`[ { qNo, theme, context, questions } ]`）の場合でも、パース結果をそのまま返す。呼び出し元のページコンポーネントが両方の形式を処理できる設計になっている。
+
+#### API (`apps/api/src/repositories/LocalQuestionRepository.ts`)
+
+| 項目 | 内容 |
+|------|------|
+| 読み込み関数 | `listByExamId(examId)` |
+| 優先順位 | `questions_transformed.json` → `questions_raw.json` |
+| パース後の分岐 | 3パターンで処理 |
+| キャッシュ | インメモリ、TTL 10分 |
+
+```
+パース後の分岐ロジック:
+  配列の場合     → items = json          （AM問題: 配列形式）
+  json.questions → items = json.questions （PM問題: オブジェクト形式）
+  その他         → items = [json]         （フォールバック）
+```
+
+`qNo` または `id` を持つ要素のみを `Question` として結果に追加。`examId`/`id` が未設定の場合は自動付与する。
+
+#### 試験一覧 (`apps/api/src/repositories/LocalExamRepository.ts`)
+
+| 項目 | 内容 |
+|------|------|
+| 有効判定 | `q1.json`, `questions_transformed.json`, `questions_raw.json` のいずれかが存在すれば有効 |
+| メタデータ | ディレクトリ名から category/year/term/type をパース |
+| キャッシュ | インメモリ、TTL 5分 |
+
+### 1.4 PM品質指標（2026-03-03時点）
+
+| 指標 | 現状 | 目標 | 不足 |
+|------|------|------|------|
+| **問題抽出** | ✅ 100% (607問/104 dirs) | 100% | 達成済み |
+| **theme/context** | 65.4% (68/104 dirs) | 100% | 36 dirs |
+| **正答 (correctOption)** | 43.8% (266/607) | 100% | 341問 |
+| **解説 (explanation)** | 81.4% (494/607) | 100% | 113問 |
+
+※ 配列形式の `questions_transformed.json` 内の `questions` を正しく集計した値。当初「66ディレクトリで問題0件」と誤認したのは、配列形式 `[{ questions: [...] }]` の展開漏れが原因。
 
 ---
 
