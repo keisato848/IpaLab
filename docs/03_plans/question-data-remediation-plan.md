@@ -7,6 +7,7 @@
 | 2026-03-03 | 初版作成（網羅的調査に基づく対応計画） |
 | 2026-03-03 | q*.json 廃止方針を決定。データ構造を `questions_raw.json` / `questions_transformed.json` に一本化。フェーズ1を「データ構造正規化」に改訂。解説網羅率100%を品質目標に設定 |
 | 2026-03-03 | データファイル形式・データフロー・アプリ読み込み仕様をセクション1.1〜1.3として追記。PM品質指標を修正（問題抽出は100%達成済み） |
+| 2026-03-03 | フロントエンド表示検証・修正。remark-gfm v4 升級、Form Bデータ判別修正、入口ページFSフォールバック追加。セクション1.5追記 |
 
 ---
 
@@ -90,6 +91,8 @@ questions_transformed.json（theme/context/設問に構造化）
 
 **注意**: PM の `questions_transformed.json` がオブジェクト形式（`{ qNo, theme, context, questions }`）の場合でも、配列形式（`[ { qNo, theme, context, questions } ]`）の場合でも、パース結果をそのまま返す。呼び出し元のページコンポーネントが両方の形式を処理できる設計になっている。
 
+> **2026-03-03 修正済み**: 戻り値型を `Promise<any[]>` → `Promise<any>` に訂正。呼び出し元で3フォーマット（Form A/B/C）を判別するロジックを実装済み。
+
 #### API (`apps/api/src/repositories/LocalQuestionRepository.ts`)
 
 | 項目 | 内容 |
@@ -126,6 +129,36 @@ questions_transformed.json（theme/context/設問に構造化）
 | **解説 (explanation)** | 81.4% (494/607) | 100% | 113問 |
 
 ※ 配列形式の `questions_transformed.json` 内の `questions` を正しく集計した値。当初「66ディレクトリで問題0件」と誤認したのは、配列形式 `[{ questions: [...] }]` の展開漏れが原因。
+
+### 1.5 フロントエンド表示検証結果（2026-03-03）
+
+#### 発見・修正したバグ
+
+| # | バグ | 影響範囲 | 修正 |
+|---|------|---------|------|
+| 1 | `remark-gfm` 3.0.1 と `react-markdown` 9.0.1 の非互換 | PM問題でMarkdownテーブル含む全ページがクラッシュ（`enterTable TypeError`） | `remark-gfm` 4.0.1 へアップグレード |
+| 2 | Form B（`{qNo, questions:[{subQNo}]}`）をForm C（`{questions:[{qNo}]}`）と誤判別 | SC-2024-Fall-PM/PM 等で「問題が見つかりません」 | `'qNo' in fsData` で判別し `[fsData]` でラップ |
+| 3 | 入口ページ `[type]/page.tsx` に FS フォールバックなし | CosmosDB未接続時に全入口ページで「問題一覧 (0問)」 | `getExamData` による3フォーマット対応フォールバック追加 |
+
+#### データ形式と対応状況
+
+| 形式 | 構造 | 該当数 | 表示結果 |
+|------|------|--------|---------|
+| **Form A**（配列） | `[ { qNo, theme, context, questions } ]` | 68 dirs | ✅ 正常表示 |
+| **Form B**（単一オブジェクト） | `{ qNo, theme, context, questions: [{subQNo}] }` | 2 dirs | ✅ 修正後正常 |
+| **Form C**（ラッパー） | `{ questions: [ { qNo, theme, context, questions } ] }` | 34 dirs | ✅ 正常表示 |
+
+#### レスポンシブ表示検証
+
+| ビューポート | サイズ | レイアウト | 結果 |
+|-------------|--------|-----------|------|
+| デスクトップ | 1440x900 | 分割ペイン（問題文/解答用紙） | ✅ 正常 |
+| タブレット | 768x1024 | タブ切替（📖 問題文 / ✏️ 解答用紙） | ✅ 正常 |
+| モバイル | 375x812 | タブ切替（同上） | ✅ 正常 |
+
+#### 本番環境の問題
+
+本番サイト（shikaku-no.com）では**全ての試験問題が表示されない**（「問題データが見つかりません」）。原因はSSRで CosmosDB のみを参照する構成であり、FSフォールバックが本番では機能しないため。CosmosDB にデータが未同期または接続問題の可能性がある。
 
 ---
 
