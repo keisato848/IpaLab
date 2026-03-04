@@ -54,7 +54,7 @@
         "text": "〔無線LANの脆弱性〕について答えよ。",
         "references": [],
         "answer": null,
-        "explanation": null,
+        "explanation": "### 設問3の解説\n\n無線LANのMACアドレスは、通信のヘッダに含まれており、暗号化されずに送信されるためです。\n\n正規のW-APと同一のSSIDを設定した偽のW-APを設置し、KRACKsを悪用して端末を偽のW-APに接続させる。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -77,7 +77,7 @@
           "fig3"
         ],
         "answer": null,
-        "explanation": null,
+        "explanation": "### 設問4の解説\n\nヘッダの一部や固定的なフィールドなど、同一内容のデータが繰り返し現れる特徴。\n\nECBモードでは同一の「平文ブロック」(c)が同一の暗号文になります。CTRモードでは「カウンタ値」(d)を暗号化し、平文と「排他的論理和」(e)をとります。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -98,7 +98,7 @@
         "text": "〔未知マルウェア対策の改良〕について答えよ。",
         "references": [],
         "answer": null,
-        "explanation": null,
+        "explanation": "### 設問5の解説\n\nHTTP通信の場合、プロキシサーバは通信内容を「解析（または閲覧・取得）」することができます。\n\nCONNECTメソッドでは「ホスト」(g)名が渡されますが、パス(h)部分は暗号化されるため指定できません。",
         "subQuestions": [
           {
             "label": "(1)",
