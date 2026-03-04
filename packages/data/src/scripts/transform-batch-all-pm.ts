@@ -232,12 +232,14 @@ async function main() {
     const args = process.argv.slice(2);
     const force = args.includes('--force');
     const dryRun = args.includes('--dry-run');
+    const checkTheme = args.includes('--check-theme');
     const filterIdx = args.indexOf('--filter');
     const filterPattern = filterIdx !== -1 ? args[filterIdx + 1] : null;
 
     console.log("=== 午後問題 一括構造化変換 ===");
     console.log(`モード: ${dryRun ? 'ドライラン' : '実行'}`);
     console.log(`強制上書き: ${force ? 'はい' : 'いいえ'}`);
+    console.log(`テーマ欠落チェック: ${checkTheme ? 'はい' : 'いいえ'}`);
     if (filterPattern) console.log(`フィルタ: ${filterPattern}`);
 
     // 1. 対象ディレクトリの特定
@@ -267,6 +269,26 @@ async function main() {
         }
 
         if (fs.existsSync(transformedPath) && !force) {
+            // --check-theme: テーマ/コンテキスト欠落を検出し、再変換対象にする
+            if (checkTheme) {
+                try {
+                    const transformed = JSON.parse(fs.readFileSync(transformedPath, 'utf-8'));
+                    const questions = Array.isArray(transformed) ? transformed : [transformed];
+                    const missingTheme = questions.some((q: any) => !q.theme || q.theme.trim() === '');
+                    const missingContext = questions.some((q: any) => !q.context || !q.context.background);
+                    if (missingTheme || missingContext) {
+                        const reasons: string[] = [];
+                        if (missingTheme) reasons.push('theme欠落');
+                        if (missingContext) reasons.push('context欠落');
+                        toProcess.push({ dir, reason: reasons.join(', ') });
+                        continue;
+                    }
+                } catch {
+                    // パースエラー時は再変換対象
+                    toProcess.push({ dir, reason: 'transformed JSON パースエラー' });
+                    continue;
+                }
+            }
             skipped.push({ dir, reason: 'transformed済み（--forceで上書き可）' });
             continue;
         }
