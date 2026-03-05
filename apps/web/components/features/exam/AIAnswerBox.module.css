@@ -216,3 +216,50 @@
         flex-direction: column;
     }
 }
+
+/* スマートフォン向け最適化 */
+@media (max-width: 1023px) {
+    .textarea {
+        font-size: 16px; /* iOS Safari のオートズーム防止 */
+        padding: 0.75rem;
+        min-height: 80px;
+    }
+
+    .container.expanded {
+        padding: 0.75rem;
+        height: 100dvh; /* 仮想キーボードを考慮した動的ビューポート */
+    }
+
+    .container.expanded .textarea {
+        min-height: 30vh;
+    }
+
+    .expandBtn {
+        padding: 0.5rem 0.75rem;
+        font-size: var(--fs-sm);
+    }
+
+    .scoreBtn {
+        padding: 0.6rem 1.2rem;
+        font-size: var(--fs-sm);
+        width: 100%;
+    }
+
+    .resultArea {
+        padding: 0.75rem;
+    }
+
+    .scoreCircle {
+        width: 72px;
+        height: 72px;
+    }
+
+    .scoreValue {
+        font-size: var(--fs-lg);
+    }
+
+    .radarContainer {
+        height: 160px;
+        min-width: 0;
+    }
+}

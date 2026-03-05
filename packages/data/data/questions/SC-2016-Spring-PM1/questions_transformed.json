@@ -36,17 +36,17 @@
           {
             "label": "(1)",
             "text": "本文中の [ a ] に入れる適切な字句を，FQDN で答えよ。",
-            "answer": ""
+            "answer": "u-sha.co.jp"
           },
           {
             "label": "(2)",
             "text": "画面 2-2' を表示した時点で，Web ブラウザのアドレスバーに表示される URL のホスト部を，FQDN で答えよ。",
-            "answer": ""
+            "answer": "secure.example.com"
           },
           {
             "label": "(3)",
             "text": "本文中の [ b ] に入れる適切な字句を解答群の中から選び，記号で答えよ。 (ア: AJAX, イ: HSTS, ウ: JSON, エ: Same Origin Policy)",
-            "answer": ""
+            "answer": "エ"
           }
         ]
       },
@@ -58,12 +58,12 @@
           {
             "label": "(1)",
             "text": "図8中の [ e ], [ f ] に入れる適切な字句を，それぞれ 10 文字以内で答えよ。",
-            "answer": ""
+            "answer": "e: セッションにない, f: トークン不一致"
           },
           {
             "label": "(2)",
             "text": "表2中の [ g ], [ h ] に入れる記号の適切な組合せを答えよ。",
-            "answer": ""
+            "answer": "g: a, h: a"
           }
         ]
       }

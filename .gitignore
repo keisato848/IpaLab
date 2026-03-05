@@ -169,6 +169,12 @@ logs.txt
 # Claude Code
 .claude/
 
+# Playwright MCP スクリーンショット
+.playwright-mcp/
+
+# 環境変数バックアップ
+*.env.local.bak
+
 # Playwright E2E テスト出力
 apps/web/playwright-report/
 apps/web/test-results/

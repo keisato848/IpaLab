@@ -55,6 +55,8 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
     const { context, questions } = question;
     const [selectedDiagram, setSelectedDiagram] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'context' | 'answer'>('context');
+    // モバイルレイアウト: 'tab' (タブ切替) or 'stacked' (上下分割で同時参照)
+    const [mobileLayout, setMobileLayout] = useState<'tab' | 'stacked'>('stacked');
     // Layout Mode: default (3-col/split), focus (2-col/split no nav), paper (answer only)
     const [layoutMode, setLayoutMode] = useState<'default' | 'focus' | 'paper'>('default');
 
@@ -243,23 +245,29 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
             {/* Mobile Tab Navigation (Visible only on small screens) */}
             <div className={styles.mobileNav}>
                 <button
-                    onClick={() => setActiveTab('context')}
-                    className={`${styles.mobileNavButton} ${activeTab === 'context' ? styles.active : ''}`}
+                    onClick={() => { setMobileLayout('tab'); setActiveTab('context'); }}
+                    className={`${styles.mobileNavButton} ${mobileLayout === 'tab' && activeTab === 'context' ? styles.active : ''}`}
                 >
                     📖 問題文
                 </button>
                 <button
-                    onClick={() => setActiveTab('answer')}
-                    className={`${styles.mobileNavButton} ${activeTab === 'answer' ? styles.active : ''}`}
+                    onClick={() => { setMobileLayout('stacked'); }}
+                    className={`${styles.mobileNavButton} ${mobileLayout === 'stacked' ? styles.active : ''}`}
+                >
+                    📄 分割
+                </button>
+                <button
+                    onClick={() => { setMobileLayout('tab'); setActiveTab('answer'); }}
+                    className={`${styles.mobileNavButton} ${mobileLayout === 'tab' && activeTab === 'answer' ? styles.active : ''}`}
                 >
                     ✏️ 解答用紙
                 </button>
             </div>
 
-            <div className={styles.splitContainer}>
+            <div className={`${styles.splitContainer} ${mobileLayout === 'stacked' ? styles.stacked : ''}`}>
                 {/* Left Pane: Context (Scrollable) */}
                 <div
-                    className={`${styles.pane} ${styles.contextPane} ${activeTab === 'context' ? styles.active : ''}`}
+                    className={`${styles.pane} ${styles.contextPane} ${mobileLayout === 'stacked' || activeTab === 'context' ? styles.active : ''}`}
                     style={layoutMode !== 'paper' && activeTab === 'context' ? { width: `${contextWidth}%` } : undefined}
                 >
                     <div className={styles.contextHeader}>
@@ -285,7 +293,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
 
                 {/* Right Pane: Questions (Scrollable) */}
                 <div
-                    className={`${styles.pane} ${styles.answerPane} ${activeTab === 'answer' ? styles.active : ''}`}
+                    className={`${styles.pane} ${styles.answerPane} ${mobileLayout === 'stacked' || activeTab === 'answer' ? styles.active : ''}`}
                     style={layoutMode !== 'paper' && activeTab === 'context' ? { width: `${100 - contextWidth}%` } : undefined}
                 >
                     <div className={styles.answerPaneHeader}>

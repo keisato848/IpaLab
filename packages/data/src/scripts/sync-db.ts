@@ -365,30 +365,35 @@ async function main() {
                     if (isHierarchical) {
                         // --- Case A: Hierarchical PM Question ---
 
-                        // Determine Parent QNo
-                        let parentQNo = (typeof data === 'object' && !Array.isArray(data)) ? data.qNo : null;
-                        if (!parentQNo && data.theme) parentQNo = extractQNo(data.theme);
-                        if (!parentQNo && data.description) parentQNo = extractQNo(data.description);
-                        if (!parentQNo) parentQNo = 99; // Fallback
+                        // data が配列の場合（複数大問がある場合）は各要素を個別にドキュメント化
+                        const hierarchicalItems = Array.isArray(data) ? data : [data];
 
-                        // Determine Description/Context
-                        // New Schema has 'context' object. Old Schema has 'description' string.
-                        // We map 'context' to 'context' field in DB, and keeping 'description' for backward compat or search if possible.
-                        // If context exists, use context.background as description fallback?
+                        for (const item of hierarchicalItems) {
+                            // Determine Parent QNo
+                            let parentQNo = item.qNo || null;
+                            if (!parentQNo && item.theme) parentQNo = extractQNo(item.theme);
+                            if (!parentQNo && item.description) parentQNo = extractQNo(item.description);
+                            if (!parentQNo) parentQNo = 99; // Fallback
 
-                        const contextObj = data.context || null;
-                        const descriptionText = contextObj ? contextObj.background : (data.description || "");
+                            // Determine Description/Context
+                            const contextObj = item.context || null;
+                            const descriptionText = contextObj ? contextObj.background : (item.description || "");
 
-                        itemsToUpsert.push({
-                            id: `${examId}-${parentQNo}`,
-                            examId: examId,
-                            type: type,
-                            qNo: parentQNo,
-                            text: data.theme || `問${parentQNo}`,
-                            description: descriptionText,
-                            context: contextObj, // NEW FIELD
-                            questions: questions
-                        });
+                            // サブクエスチョン: item.questions（3階層）または item.subQuestions（2階層）
+                            const subQuestions = item.questions || item.subQuestions || [];
+
+                            itemsToUpsert.push({
+                                id: `${examId}-${parentQNo}`,
+                                examId: examId,
+                                type: type,
+                                qNo: parentQNo,
+                                text: item.theme || `問${parentQNo}`,
+                                description: descriptionText,
+                                context: contextObj,
+                                explanation: item.explanation || undefined,
+                                questions: subQuestions
+                            });
+                        }
 
                     } else { // --- Case B: Flat List (AM Exams, SC AM2, or PM Independent Questions) ---
                         // This preserves the original logic for AM exams.
