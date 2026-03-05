@@ -322,7 +322,7 @@
     }
 }
 
-/* Mobile Layout: Tab View */
+/* Mobile Layout: Stacked View (問題文と解答を同時参照可能) */
 @media (max-width: 1023px) {
     .mobileNav {
         display: flex;
@@ -333,12 +333,14 @@
         position: relative;
     }
 
+    /* タブ切替モード（デフォルト） */
     .pane {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
+        width: 100% !important;
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.3s ease;
@@ -352,6 +354,93 @@
     .contextPane {
         border-right: none;
         border-bottom: 1px solid var(--border-color);
+        padding: 0.75rem;
+    }
+
+    .answerPane {
+        padding: 0.75rem;
+    }
+
+    /* スタック表示モード（問題文と解答を同時参照） */
+    .splitContainer.stacked {
+        flex-direction: column;
+    }
+
+    .splitContainer.stacked .pane {
+        position: relative;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .splitContainer.stacked .contextPane {
+        width: 100% !important;
+        height: 40vh;
+        min-height: 180px;
+        max-height: 50vh;
+        border-bottom: 2px solid var(--accent-color);
+        flex-shrink: 0;
+        overflow-y: auto;
+    }
+
+    .splitContainer.stacked .answerPane {
+        width: 100% !important;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    /* サブ設問のインデント縮小 */
+    .subQuestionsList {
+        margin-left: 0.5rem;
+    }
+
+    .subQuestionItem {
+        padding: 0.75rem;
+    }
+
+    /* 設問ヘッダーのレイアウト調整 */
+    .subQuestionHeader {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    /* コンテキストヘッダー */
+    .contextHeader {
+        margin-bottom: 0.75rem;
+    }
+
+    .contextTitle {
+        font-size: var(--fs-md);
+    }
+
+    /* 解答ペインヘッダー */
+    .answerPaneHeader {
+        padding: 0.5rem;
+        padding-top: 0;
+        flex-direction: column;
+        gap: 0.25rem;
+        align-items: flex-start;
+    }
+
+    .scoreDisplay {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .questionsList {
+        gap: 1.5rem;
+    }
+
+    /* 図表コンテナ */
+    .diagramContainer {
+        margin: 0.75rem 0;
+        padding: 0.5rem;
+    }
+
+    /* Markdown コンテンツのリストインデント */
+    .markdownContent :global(ul),
+    .markdownContent :global(ol) {
+        margin-left: 1rem;
     }
 }
 

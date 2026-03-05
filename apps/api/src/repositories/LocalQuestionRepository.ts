@@ -76,41 +76,51 @@ export const localQuestionRepository = {
             return [];
         }
 
-        // Read Questions
-        const files = await fs.readdir(questionsDir);
+        // questions_transformed.json を優先、なければ questions_raw.json にフォールバック
+        // q*.json は questions_raw.json と重複するため読み込まない
+        const transformedPath = path.join(questionsDir, 'questions_transformed.json');
+        const rawPath = path.join(questionsDir, 'questions_raw.json');
+
+        let targetFile: string | null = null;
+        if (existsSync(transformedPath)) {
+            targetFile = transformedPath;
+        } else if (existsSync(rawPath)) {
+            targetFile = rawPath;
+        }
+
         const results: Question[] = [];
 
-        for (const file of files) {
-            // Updated to read .json files
-            if (!file.endsWith('.json')) continue;
+        if (!targetFile) {
+            console.warn(`LocalQuestionRepository: No data file found for ${examId}`);
+            return [];
+        }
 
-            const content = await fs.readFile(path.join(questionsDir, file), 'utf-8');
-            try {
-                const json = JSON.parse(content);
-                let items: any[] = [];
+        try {
+            const content = await fs.readFile(targetFile, 'utf-8');
+            const json = JSON.parse(content);
+            let items: any[] = [];
 
-                if (Array.isArray(json)) {
-                    items = json;
-                } else if (json.questions && Array.isArray(json.questions)) {
-                    items = json.questions;
-                } else {
-                    items = [json];
-                }
-
-                for (const q of items) {
-                    // PM questions might have description/context instead of simple text
-                    // And might not have options.
-                    if (q.qNo || q.id) {
-                        // Inject Metadata if missing
-                        if (!q.examId) q.examId = examId;
-                        if (!q.id) q.id = `${examId}-${q.qNo}`;
-                        
-                        results.push(q as Question);
-                    }
-                }
-            } catch (e) {
-                console.error(`Failed to parse ${file}:`, e);
+            if (Array.isArray(json)) {
+                items = json;
+            } else if (json.questions && Array.isArray(json.questions)) {
+                items = json.questions;
+            } else {
+                items = [json];
             }
+
+            for (const q of items) {
+                // PM questions might have description/context instead of simple text
+                // And might not have options.
+                if (q.qNo || q.id) {
+                    // Inject Metadata if missing
+                    if (!q.examId) q.examId = examId;
+                    if (!q.id) q.id = `${examId}-${q.qNo}`;
+                    
+                    results.push(q as Question);
+                }
+            }
+        } catch (e) {
+            console.error(`Failed to parse ${path.basename(targetFile)}:`, e);
         }
 
         const sorted = results.sort((a, b) => (a.qNo || 0) - (b.qNo || 0));

@@ -63,7 +63,7 @@ export async function getAllExamIds(): Promise<string[]> {
  * Replaces DB access for SSG.
  * questions_transformed.json を優先的に読み込み、存在しない場合は questions_raw.json にフォールバックする。
  */
-export async function getExamData(examId: string): Promise<any[]> {
+export async function getExamData(examId: string): Promise<any> {
     try {
         const dataDir = resolveDataDir();
         if (!dataDir) return [];
