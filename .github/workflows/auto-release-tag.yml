@@ -16,10 +16,16 @@ on:
     types: [closed]
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: '対象PRの番号（手動再実行時に指定）'
+        required: false
+        type: string
 
 jobs:
   create-release-tag:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -94,12 +100,10 @@ jobs:
           echo "✅ Created and pushed tag: $NEW_TAG"
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.bump-version.outputs.new_tag }}
-          release_name: Release ${{ steps.bump-version.outputs.new_tag }}
+          name: Release ${{ steps.bump-version.outputs.new_tag }}
           body: |
             ## Changes
             
@@ -113,3 +117,4 @@ jobs:
             **Merged by**: @${{ github.event.pull_request.merged_by.login }}
           draft: false
           prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
