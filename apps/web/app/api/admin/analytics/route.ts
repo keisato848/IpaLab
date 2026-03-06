@@ -1,42 +1,84 @@
 import { NextResponse } from 'next/server';
+import { DefaultAzureCredential } from '@azure/identity';
+import { LogsQueryClient, LogsQueryResultStatus } from '@azure/monitor-query-logs';
 import { requireAdmin } from '@/lib/admin-auth';
 import { getContainer } from '@/lib/cosmos';
+
+const DEFAULT_ANALYTICS_DAYS = 30;
+const MIN_ANALYTICS_DAYS = 1;
+const MAX_ANALYTICS_DAYS = 365;
+const telemetryResourceId = process.env.TELEMETRY_RESOURCE_ID;
+const logsQueryClient = telemetryResourceId ? new LogsQueryClient(new DefaultAzureCredential()) : null;
+
+function parseAnalyticsPeriod(rawPeriod: string | null) {
+    if (!rawPeriod) {
+        return {
+            days: DEFAULT_ANALYTICS_DAYS,
+            period: `${DEFAULT_ANALYTICS_DAYS}d`,
+        };
+    }
+
+    const normalized = rawPeriod.trim().toLowerCase();
+    const match = normalized.match(/^(\d+)(d)?$/);
+
+    if (!match) {
+        return null;
+    }
+
+    const days = Number.parseInt(match[1], 10);
+    if (!Number.isFinite(days) || days < MIN_ANALYTICS_DAYS || days > MAX_ANALYTICS_DAYS) {
+        return null;
+    }
+
+    return {
+        days,
+        period: `${days}d`,
+    };
+}
 
 /**
  * GET /api/admin/analytics
  * ユーザー利用状況の分析データを取得
  *
  * クエリパラメータ:
- * - period: '7d' | '30d' | '90d' (デフォルト: '30d')
+ * - period: '7d' | '30d' | '90d' | '{任意の日数}d' | '{任意の日数}' (デフォルト: '30d')
  */
 export async function GET(request: Request) {
     const { error } = await requireAdmin();
-    if (error) return error;
-
     const { searchParams } = new URL(request.url);
-    const period = searchParams.get('period') || '30d';
+    const parsedPeriod = parseAnalyticsPeriod(searchParams.get('period'));
+    if (!parsedPeriod) {
+        return NextResponse.json(
+            { error: `period は ${MIN_ANALYTICS_DAYS}〜${MAX_ANALYTICS_DAYS} 日の範囲で指定してください` },
+            { status: 400 }
+        );
+    }
 
-    const days = period === '7d' ? 7 : period === '90d' ? 90 : 30;
+    const { days, period } = parsedPeriod;
     const since = new Date();
     since.setDate(since.getDate() - days);
     const sinceISO = since.toISOString();
 
+    const recentUsersSince = new Date();
+    recentUsersSince.setHours(recentUsersSince.getHours() - 24);
+    const recentUsersSinceISO = recentUsersSince.toISOString();
+
     try {
         const [
             userStats,
+            visitorOverview,
             sessionStats,
             recordStats,
-            dailyActivity,
             examBreakdown,
             recentUsers,
             visitorStats,
         ] = await Promise.all([
             getUserStats(),
+            getVisitorOverview(since, days),
             getSessionStats(sinceISO),
             getRecordStats(sinceISO),
-            getDailyActivity(sinceISO),
             getExamBreakdown(sinceISO),
-            getRecentUsers(10),
+            getRecentUsers(recentUsersSinceISO),
             getVisitorStats(sinceISO),
         ]);
 
@@ -45,10 +87,10 @@ export async function GET(request: Request) {
             generatedAt: new Date().toISOString(),
             overview: {
                 ...userStats,
+                ...visitorOverview,
                 ...sessionStats,
                 ...recordStats,
             },
-            dailyActivity,
             examBreakdown,
             recentUsers,
             visitorStats,
@@ -65,28 +107,57 @@ export async function GET(request: Request) {
 /** ユーザー統計 */
 async function getUserStats() {
     const container = await getContainer('Users');
-    if (!container) return { totalUsers: 0, adminUsers: 0, guestUsers: 0 };
+    if (!container) return { guestUsers: 0 };
 
     try {
-        const [totalResult, adminResult, guestResult] = await Promise.all([
-            container.items.query<number>({
-                query: 'SELECT VALUE COUNT(1) FROM c',
-            }).fetchAll(),
-            container.items.query<number>({
-                query: "SELECT VALUE COUNT(1) FROM c WHERE c.role = 'admin'",
-            }).fetchAll(),
+        const [guestResult] = await Promise.all([
             container.items.query<number>({
                 query: 'SELECT VALUE COUNT(1) FROM c WHERE c.isGuest = true',
             }).fetchAll(),
         ]);
 
         return {
-            totalUsers: totalResult.resources[0] ?? 0,
-            adminUsers: adminResult.resources[0] ?? 0,
             guestUsers: guestResult.resources[0] ?? 0,
         };
     } catch {
-        return { totalUsers: 0, adminUsers: 0, guestUsers: 0 };
+        return { guestUsers: 0 };
+    }
+}
+
+/** App Insights 由来の訪問者統計 */
+async function getVisitorOverview(since: Date, days: number) {
+    if (!telemetryResourceId || !logsQueryClient) {
+        console.warn('[Admin Analytics] TELEMETRY_RESOURCE_ID が未設定のため App Insights 集計をスキップします');
+        return { totalUsers: 0 };
+    }
+
+    try {
+        // AppRequests テーブルを使用 (AppPageViews はクライアントサイド SDK が必要なため未送信)
+        // API エンドポイントを除外し、ページリクエストのみ対象とする
+        // UserAuthenticatedId/UserId は Node.js SDK では記録されないため OperationId で代替
+        const result = await logsQueryClient.queryResource(
+            telemetryResourceId,
+            `AppRequests
+            | where TimeGenerated >= ago(${days}d)
+            | where not(Name startswith "GET /api/" or Name startswith "POST /api/" or Name startswith "HEAD ")
+            | extend visitorKey = coalesce(UserAuthenticatedId, UserId, SessionId, OperationId)
+            | where isnotempty(visitorKey)
+            | summarize totalUsers = dcount(visitorKey)`,
+            { startTime: since, endTime: new Date() },
+            { serverTimeoutInSeconds: 30 }
+        );
+
+        if (result.status !== LogsQueryResultStatus.Success) {
+            console.warn('[Admin Analytics] App Insights クエリが部分失敗しました:', result.partialError);
+            return { totalUsers: 0 };
+        }
+
+        const table = result.tables[0];
+        const totalUsers = Number(table?.rows?.[0]?.[0] ?? 0);
+        return { totalUsers: Number.isFinite(totalUsers) ? totalUsers : 0 };
+    } catch (err) {
+        console.error('[Admin Analytics] App Insights 訪問者集計エラー:', err);
+        return { totalUsers: 0 };
     }
 }
 
@@ -128,66 +199,21 @@ async function getSessionStats(sinceISO: string) {
 /** 学習記録統計 */
 async function getRecordStats(sinceISO: string) {
     const container = await getContainer('LearningRecords');
-    if (!container) return { totalAnswers: 0, correctAnswers: 0, correctRate: 0, avgTimeSec: 0 };
+    if (!container) return { totalAnswers: 0 };
 
     try {
-        const [totalResult, correctResult, avgTimeResult] = await Promise.all([
+        const [totalResult] = await Promise.all([
             container.items.query<number>({
                 query: 'SELECT VALUE COUNT(1) FROM c WHERE c.answeredAt >= @since',
                 parameters: [{ name: '@since', value: sinceISO }],
             }).fetchAll(),
-            container.items.query<number>({
-                query: 'SELECT VALUE COUNT(1) FROM c WHERE c.answeredAt >= @since AND c.isCorrect = true',
-                parameters: [{ name: '@since', value: sinceISO }],
-            }).fetchAll(),
-            container.items.query<number>({
-                query: 'SELECT VALUE AVG(c.timeTakenSeconds) FROM c WHERE c.answeredAt >= @since AND c.timeTakenSeconds > 0',
-                parameters: [{ name: '@since', value: sinceISO }],
-            }).fetchAll(),
         ]);
 
-        const total: number = totalResult.resources[0] ?? 0;
-        const correct: number = correctResult.resources[0] ?? 0;
-        const correctRate = total > 0 ? Math.round((correct / total) * 1000) / 10 : 0;
-
         return {
-            totalAnswers: total,
-            correctAnswers: correct,
-            correctRate,
-            avgTimeSec: Math.round((avgTimeResult.resources[0] ?? 0) * 10) / 10,
+            totalAnswers: totalResult.resources[0] ?? 0,
         };
     } catch {
-        return { totalAnswers: 0, correctAnswers: 0, correctRate: 0, avgTimeSec: 0 };
-    }
-}
-
-/** 日別アクティビティ */
-async function getDailyActivity(sinceISO: string) {
-    const container = await getContainer('LearningRecords');
-    if (!container) return [];
-
-    try {
-        const { resources } = await container.items.query<{
-            date: string;
-            count: number;
-            correctCount: number;
-        }>({
-            query: `
-                SELECT 
-                    SUBSTRING(c.answeredAt, 0, 10) AS date,
-                    COUNT(1) AS count,
-                    SUM(c.isCorrect ? 1 : 0) AS correctCount
-                FROM c
-                WHERE c.answeredAt >= @since
-                GROUP BY SUBSTRING(c.answeredAt, 0, 10)
-                ORDER BY SUBSTRING(c.answeredAt, 0, 10) ASC
-            `,
-            parameters: [{ name: '@since', value: sinceISO }],
-        }).fetchAll();
-
-        return resources;
-    } catch {
-        return [];
+        return { totalAnswers: 0 };
     }
 }
 
@@ -220,8 +246,8 @@ async function getExamBreakdown(sinceISO: string) {
     }
 }
 
-/** 最近のユーザー */
-async function getRecentUsers(limit: number) {
+/** 24時間以内に登録したユーザー */
+async function getRecentUsers(sinceISO: string) {
     const container = await getContainer('Users');
     if (!container) return [];
 
@@ -235,10 +261,10 @@ async function getRecentUsers(limit: number) {
             isGuest: boolean;
         }>({
             query: `SELECT c.id, c.name, c.email, c.role, c.createdAt, c.isGuest 
-                    FROM c 
-                    ORDER BY c.createdAt DESC 
-                    OFFSET 0 LIMIT @limit`,
-            parameters: [{ name: '@limit', value: limit }],
+                FROM c 
+                WHERE c.createdAt >= @since
+                ORDER BY c.createdAt DESC`,
+            parameters: [{ name: '@since', value: sinceISO }],
         }).fetchAll();
 
         return resources;
@@ -257,7 +283,6 @@ async function getVisitorStats(sinceISO: string) {
             authenticatedVisitors: 0,
             anonymousVisitors: 0,
             dailyVisitors: [] as { date: string; total: number; authenticated: number; anonymous: number }[],
-            topPages: [] as { path: string; views: number }[],
         };
     }
 
@@ -268,7 +293,6 @@ async function getVisitorStats(sinceISO: string) {
             authVisitorsResult,
             anonVisitorsResult,
             dailyVisitorsResult,
-            topPagesResult,
         ] = await Promise.all([
             // 総ページビュー数
             container.items.query<number>({
@@ -314,21 +338,6 @@ async function getVisitorStats(sinceISO: string) {
                 `,
                 parameters: [{ name: '@since', value: sinceISO }],
             }).fetchAll(),
-
-            // 人気ページ TOP 10
-            container.items.query<{ path: string; views: number }>({
-                query: `
-                    SELECT
-                        c.path,
-                        COUNT(1) AS views
-                    FROM c
-                    WHERE c.timestamp >= @since
-                    GROUP BY c.path
-                    ORDER BY COUNT(1) DESC
-                    OFFSET 0 LIMIT 10
-                `,
-                parameters: [{ name: '@since', value: sinceISO }],
-            }).fetchAll(),
         ]);
 
         return {
@@ -337,7 +346,6 @@ async function getVisitorStats(sinceISO: string) {
             authenticatedVisitors: authVisitorsResult.resources[0] ?? 0,
             anonymousVisitors: anonVisitorsResult.resources[0] ?? 0,
             dailyVisitors: dailyVisitorsResult.resources,
-            topPages: topPagesResult.resources,
         };
     } catch (err) {
         console.error('[Admin Analytics] 訪問者統計エラー:', err);
@@ -347,7 +355,6 @@ async function getVisitorStats(sinceISO: string) {
             authenticatedVisitors: 0,
             anonymousVisitors: 0,
             dailyVisitors: [],
-            topPages: [],
         };
     }
 }
