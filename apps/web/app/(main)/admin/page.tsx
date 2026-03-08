@@ -17,18 +17,13 @@ interface AnalyticsData {
     period: string;
     overview: {
         totalUsers: number;
-        adminUsers: number;
         guestUsers: number;
         totalSessions: number;
         completedSessions: number;
         activeSessions: number;
         avgQuestionsPerSession: number;
         totalAnswers: number;
-        correctAnswers: number;
-        correctRate: number;
-        avgTimeSec: number;
     };
-    dailyActivity: { date: string; count: number; correctCount: number }[];
     examBreakdown: { examId: string; count: number; completedCount: number }[];
     recentUsers: { id: string; name: string | null; email: string | null; role: string; createdAt: string; isGuest: boolean }[];
     visitorStats: {
@@ -37,15 +32,32 @@ interface AnalyticsData {
         authenticatedVisitors: number;
         anonymousVisitors: number;
         dailyVisitors: { date: string; total: number; authenticated: number; anonymous: number }[];
-        topPages: { path: string; views: number }[];
     };
+}
+
+const PRESET_ANALYTICS_PERIODS = [7, 30, 90] as const;
+
+function normalizeAnalyticsPeriodInput(value: string): string | null {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+
+    const days = Number.parseInt(trimmed, 10);
+    if (!Number.isFinite(days) || days < 1 || days > 365) return null;
+
+    return `${days}d`;
+}
+
+function analyticsPeriodToDays(period: string): string {
+    const match = period.match(/^(\d+)/);
+    return match ? match[1] : '30';
 }
 
 export default function AdminPage() {
     const { data: session, status } = useSession();
     const [flags, setFlags] = useState<FeatureFlag[]>([]);
     const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-    const [analyticsPeriod, setAnalyticsPeriod] = useState<'7d' | '30d' | '90d'>('30d');
+    const [analyticsPeriod, setAnalyticsPeriod] = useState('30d');
+    const [customPeriodInput, setCustomPeriodInput] = useState('30');
     const [loading, setLoading] = useState(true);
     const [analyticsLoading, setAnalyticsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -79,11 +91,16 @@ export default function AdminPage() {
         try {
             setAnalyticsLoading(true);
             const res = await fetch(`/api/admin/analytics?period=${period}`);
-            if (!res.ok) throw new Error('分析データの取得に失敗しました');
+            if (!res.ok) {
+                const data = await res.json().catch(() => null);
+                throw new Error(data?.error || '分析データの取得に失敗しました');
+            }
             const data = await res.json();
             setAnalytics(data);
+            setCustomPeriodInput(analyticsPeriodToDays(data.period));
         } catch (err) {
             console.error('Analytics fetch error:', err);
+            setError(err instanceof Error ? err.message : '分析データの取得に失敗しました');
         } finally {
             setAnalyticsLoading(false);
         }
@@ -144,6 +161,25 @@ export default function AdminPage() {
             });
         } catch {
             return iso;
+        }
+    };
+
+    const handleCustomPeriodChange = (value: string) => {
+        setCustomPeriodInput(value);
+
+        if (!value.trim()) {
+            return;
+        }
+
+        const normalizedPeriod = normalizeAnalyticsPeriodInput(value);
+        if (!normalizedPeriod) {
+            setError('分析期間は1〜365日の範囲で入力してください');
+            return;
+        }
+
+        setError(null);
+        if (normalizedPeriod !== analyticsPeriod) {
+            setAnalyticsPeriod(normalizedPeriod);
         }
     };
 
@@ -228,16 +264,43 @@ export default function AdminPage() {
                 </h2>
 
                 <div className={styles.periodSelector}>
-                    {(['7d', '30d', '90d'] as const).map(p => (
+                    {PRESET_ANALYTICS_PERIODS.map(days => {
+                        const periodValue = `${days}d`;
+                        return (
                         <button
-                            key={p}
-                            className={`${styles.periodButton} ${analyticsPeriod === p ? styles.periodButtonActive : ''}`}
-                            onClick={() => setAnalyticsPeriod(p)}
+                            key={periodValue}
+                            className={`${styles.periodButton} ${analyticsPeriod === periodValue ? styles.periodButtonActive : ''}`}
+                            onClick={() => {
+                                setCustomPeriodInput(String(days));
+                                setAnalyticsPeriod(periodValue);
+                            }}
                             disabled={analyticsLoading}
                         >
-                            {p === '7d' ? '7日間' : p === '30d' ? '30日間' : '90日間'}
+                            {days}日間
                         </button>
-                    ))}
+                        );
+                    })}
+                    <div className={styles.customPeriodControls}>
+                        <label htmlFor="analytics-period-days" className={styles.customPeriodLabel}>
+                            任意日数
+                        </label>
+                        <input
+                            id="analytics-period-days"
+                            type="number"
+                            min={1}
+                            max={365}
+                            inputMode="numeric"
+                            className={styles.customPeriodInput}
+                            value={customPeriodInput}
+                            onChange={(e) => handleCustomPeriodChange(e.target.value)}
+                            disabled={analyticsLoading}
+                        />
+                        <span className={styles.customPeriodUnit}>日</span>
+                    </div>
+                </div>
+
+                <div className={styles.flagMeta} style={{ marginBottom: '1rem' }}>
+                    現在の分析期間: {analytics ? analyticsPeriodToDays(analytics.period) : analyticsPeriodToDays(analyticsPeriod)}日間
                 </div>
 
                 {analyticsLoading && !analytics ? (
@@ -252,7 +315,7 @@ export default function AdminPage() {
                             <div className={styles.statCard}>
                                 <span className={styles.statIcon}>👥</span>
                                 <span className={styles.statValue}>{analytics.overview.totalUsers}</span>
-                                <span className={styles.statLabel}>総ユーザー数</span>
+                                <span className={styles.statLabel}>サイト訪問者数</span>
                             </div>
                             <div className={styles.statCard}>
                                 <span className={styles.statIcon}>📝</span>
@@ -268,16 +331,6 @@ export default function AdminPage() {
                                 <span className={styles.statIcon}>❓</span>
                                 <span className={styles.statValue}>{analytics.overview.totalAnswers.toLocaleString()}</span>
                                 <span className={styles.statLabel}>総回答数</span>
-                            </div>
-                            <div className={styles.statCard}>
-                                <span className={styles.statIcon}>🎯</span>
-                                <span className={styles.statValue}>{analytics.overview.correctRate.toFixed(1)}%</span>
-                                <span className={styles.statLabel}>正答率</span>
-                            </div>
-                            <div className={styles.statCard}>
-                                <span className={styles.statIcon}>⏱️</span>
-                                <span className={styles.statValue}>{analytics.overview.avgTimeSec.toFixed(1)}s</span>
-                                <span className={styles.statLabel}>平均回答時間</span>
                             </div>
                         </div>
 
@@ -334,59 +387,6 @@ export default function AdminPage() {
                             </>
                         )}
 
-                        {/* 人気ページ TOP 10 */}
-                        {analytics.visitorStats.topPages.length > 0 && (
-                            <>
-                                <h4 className={styles.flagDescription} style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>
-                                    人気ページ TOP 10
-                                </h4>
-                                <div className={styles.examTable}>
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>ページ</th>
-                                                <th>ビュー数</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {analytics.visitorStats.topPages.map(page => (
-                                                <tr key={page.path}>
-                                                    <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{page.path}</td>
-                                                    <td>{page.views.toLocaleString()}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </>
-                        )}
-
-                        {/* 日別アクティビティ */}
-                        <h3 className={styles.sectionTitle} style={{ fontSize: '1rem', marginTop: '1.5rem' }}>
-                            📈 日別アクティビティ
-                        </h3>
-                        {analytics.dailyActivity.length > 0 ? (
-                            <div className={styles.barChart}>
-                                {(() => {
-                                    const maxCount = Math.max(...analytics.dailyActivity.map(d => d.count), 1);
-                                    return analytics.dailyActivity.map(day => (
-                                        <div key={day.date} className={styles.barGroup}>
-                                            <div
-                                                className={styles.bar}
-                                                style={{ height: `${(day.count / maxCount) * 100}%` }}
-                                                title={`${day.date}: ${day.count}件（正答: ${day.correctCount}件）`}
-                                            />
-                                            <span className={styles.barLabel}>
-                                                {day.date.slice(5)}
-                                            </span>
-                                        </div>
-                                    ));
-                                })()}
-                            </div>
-                        ) : (
-                            <div className={styles.emptyData}>データがありません</div>
-                        )}
-
                         {/* 試験別集計 */}
                         <h3 className={styles.sectionTitle} style={{ fontSize: '1rem', marginTop: '1.5rem' }}>
                             📋 試験別セッション集計
@@ -429,9 +429,9 @@ export default function AdminPage() {
                             <div className={styles.emptyData}>データがありません</div>
                         )}
 
-                        {/* 最近のユーザー */}
+                        {/* 24時間以内の新規ユーザー */}
                         <h3 className={styles.sectionTitle} style={{ fontSize: '1rem', marginTop: '1.5rem' }}>
-                            🆕 最近のユーザー
+                            🆕 24時間以内の新規ユーザー
                         </h3>
                         {analytics.recentUsers.length > 0 ? (
                             <div className={styles.userTable}>
@@ -466,7 +466,7 @@ export default function AdminPage() {
                                 </table>
                             </div>
                         ) : (
-                            <div className={styles.emptyData}>データがありません</div>
+                            <div className={styles.emptyData}>直近24時間の新規ユーザーはありません</div>
                         )}
                     </>
                 ) : null}

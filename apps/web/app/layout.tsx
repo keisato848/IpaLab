@@ -94,15 +94,15 @@ export default function RootLayout({
                         `,
                     }}
                 />
-                <TelemetryProvider connectionString={process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING}>
-                    <NextAuthProvider>
+                <NextAuthProvider>
+                    <TelemetryProvider connectionString={process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING}>
                         <AdProvider>
                             <ThemeProvider>
                                 {children}
                             </ThemeProvider>
                         </AdProvider>
-                    </NextAuthProvider>
-                </TelemetryProvider>
+                    </TelemetryProvider>
+                </NextAuthProvider>
             </body>
         </html>
     );

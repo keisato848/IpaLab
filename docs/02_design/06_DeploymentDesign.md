@@ -274,8 +274,12 @@ export async function GET(req: NextRequest) {
 |--------|---------|------|
 | `APPLICATIONINSIGHTS_CONNECTION_STRING` | SWA, Azure Functions | サーバーサイドテレメトリ |
 | `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` | SWA | ブラウザテレメトリ |
+| `TELEMETRY_RESOURCE_ID` | SWA | 管理画面の利用状況分析で App Insights の訪問者数を取得 |
 | `START_APP_INSIGHTS` | SWA | App Insights 有効化フラグ |
 | `ApplicationInsightsAgent_EXTENSION_VERSION` | SWA | SWA 拡張バージョン (`~3`) |
+
+- ブラウザテレメトリは `TelemetryProvider` が `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` を優先利用する
+- 上記が未設定でも `/api/config/telemetry` からランタイム取得できるため、SWA の静的配信時でも後から設定可能
 
 ### 8.4 host.json 設定（Azure Functions）
 
