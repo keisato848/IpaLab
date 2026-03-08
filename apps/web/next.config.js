@@ -39,6 +39,8 @@ const nextConfig = {
         'diagnostic-channel-publishers',
         'import-in-the-middle',
         'require-in-the-middle',
+        // Azure Monitor Logs SDK (admin analytics)
+        '@azure/monitor-query-logs',
     ],
     images: {
         unoptimized: true,
