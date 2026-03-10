@@ -334,7 +334,7 @@ async function main() {
                     type: type,
                     date: `${yearStr}-${seasonStr === 'S' ? '04' : '10'}-15`, // Approx date
                     stats: {
-                        total: questions.length * (type.includes('PM') ? 1 : 20),
+                        total: type.includes('PM') ? questions.length : (type === 'AM2' ? questions.length : questions.length * 20),
                         completed: 0,
                         correctRate: 0
                     }
