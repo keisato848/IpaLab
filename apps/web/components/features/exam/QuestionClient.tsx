@@ -494,7 +494,9 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
     const examLabel = getExamLabel(examId);
 
-    const isPM = question.isPM || type.includes('PM') || (type === 'AM2' && (question.text && question.text.length > 1000 || question.subQuestions && question.subQuestions.length > 0));
+    // AM2（午前II）は全問四択なので、optionsがある場合はPM扱いしない
+    const hasOptions = question.options && question.options.length > 0;
+    const isPM = question.isPM || type.includes('PM') || (type === 'AM2' && !hasOptions && (question.subQuestions && question.subQuestions.length > 0));
 
     // Custom renderer for ReactMarkdown to handle Mermaid
     const components = {
