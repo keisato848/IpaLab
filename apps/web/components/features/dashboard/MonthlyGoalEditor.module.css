@@ -120,6 +120,11 @@
     cursor: pointer;
 }
 
+.typeSelect option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
 .goalTarget {
     display: flex;
     align-items: center;
