@@ -8,18 +8,23 @@
 
 .dropdown {
     padding: 0.5rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color);
     border-radius: 0.5rem;
-    background-color: white;
+    background-color: var(--bg-primary);
     font-size: var(--fs-sm);
     cursor: pointer;
-    color: #374151;
+    color: var(--text-primary);
 }
 
 .dropdown:focus {
     outline: none;
-    border-color: #2563eb;
-    ring: 2px solid #93c5fd;
+    border-color: var(--accent-color, #2563eb);
+    box-shadow: 0 0 0 2px var(--bg-secondary), 0 0 0 4px var(--accent-color, #2563eb);
+}
+
+.dropdown option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 .header {

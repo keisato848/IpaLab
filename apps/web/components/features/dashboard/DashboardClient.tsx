@@ -680,15 +680,6 @@ export default function DashboardClient() {
                                             if (selected) setStudyPlan(selected);
                                         }
                                     }}
-                                    style={{
-                                        fontSize: '0.9rem',
-                                        padding: '0.2rem 0.6rem',
-                                        borderRadius: '4px',
-                                        border: '1px solid var(--border-color)',
-                                        background: 'var(--bg-secondary)',
-                                        color: 'var(--text-primary)',
-                                        cursor: 'pointer'
-                                    }}
                                 >
                                     {allPlans.length > 1 && <option value="ALL">すべて (合算)</option>}
                                     {allPlans.map(p => (

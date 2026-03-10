@@ -248,6 +248,11 @@
     box-shadow: 0 0 0 2px var(--bg-secondary), 0 0 0 4px var(--accent-color, #0070f3);
 }
 
+.filterSelect option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
 /* Badge Container to align items */
 .badgeContainer {
     margin-top: auto;
