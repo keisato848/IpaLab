@@ -21,6 +21,7 @@ import { test, expect, captureEvidence, setTheme } from './helpers/evidence';
  * │ Z-08 │ ESCキーでモーダルが閉じる                  │ overlay が非表示              │
  * │ Z-09 │ ダークテーマでモーダルが正しく表示される    │ ダークテーマ適用の外観         │
  * │ Z-10 │ 複雑なMermaid図（3 subgraph）の表示検証   │ subgraph が描画されている      │
+ * │ Z-11 │ ピンチズームでスケールが変化する（CDP）    │ scale が変化（Chromium限定）    │
  * └──────────────────────────────────────────────────────────────────────────────────┘
  */
 
@@ -273,6 +274,65 @@ test.describe.skip('図表拡大表示テスト（DiagramViewerModal）', () => 
       expect(svgBox!.height).toBeGreaterThan(100);
 
       await captureEvidence(page, testInfo, 'Z-10_複雑なMermaid図_3subgraph');
+    });
+  });
+
+  // ─── Z-11: ピンチズーム（CDP経由） ───
+
+  test.describe('Z-11: ピンチズームでスケールが変化する', () => {
+
+    test('CDPのマルチタッチイベントでピンチアウト（ズームイン）できる', async ({ page, browserName }, testInfo) => {
+      // CDP は Chromium 限定
+      test.skip(browserName !== 'chromium', 'CDP マルチタッチは Chromium のみ対応');
+
+      await openDiagramModal(page);
+
+      const initialScale = await getZoomScale(page);
+
+      // diagram-zoom-container の中心座標を取得
+      const container = page.getByTestId('diagram-zoom-container');
+      const box = await container.boundingBox();
+      expect(box).not.toBeNull();
+      const cx = Math.round(box!.x + box!.width / 2);
+      const cy = Math.round(box!.y + box!.height / 2);
+
+      // CDP セッションでピンチアウト（2本指を広げる）をシミュレート
+      const client = await page.context().newCDPSession(page);
+
+      // タッチ開始: 中心付近に2本指を置く
+      await client.send('Input.dispatchTouchEvent', {
+        type: 'touchStart',
+        touchPoints: [
+          { x: cx - 20, y: cy, id: 0 },
+          { x: cx + 20, y: cy, id: 1 },
+        ],
+      });
+
+      // 段階的に指を広げる（ピンチアウト = ズームイン）
+      for (let step = 1; step <= 5; step++) {
+        const offset = 20 + step * 15;
+        await client.send('Input.dispatchTouchEvent', {
+          type: 'touchMove',
+          touchPoints: [
+            { x: cx - offset, y: cy, id: 0 },
+            { x: cx + offset, y: cy, id: 1 },
+          ],
+        });
+        await page.waitForTimeout(50);
+      }
+
+      // タッチ終了
+      await client.send('Input.dispatchTouchEvent', {
+        type: 'touchEnd',
+        touchPoints: [],
+      });
+
+      await page.waitForTimeout(300);
+
+      const pinchScale = await getZoomScale(page);
+      expect(pinchScale).toBeGreaterThan(initialScale);
+
+      await captureEvidence(page, testInfo, 'Z-11_ピンチズーム後');
     });
   });
 });
