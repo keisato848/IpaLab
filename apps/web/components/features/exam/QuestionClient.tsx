@@ -52,8 +52,8 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
     // Local state for settings popup
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState<string | null>(isReview ? question.correctOption : null);
-    const [showExplanation, setShowExplanation] = useState(isReview);
+    const [selectedOption, setSelectedOption] = useState<string | null>(null);
+    const [showExplanation, setShowExplanation] = useState(false);
     const [startTime, setStartTime] = useState<number>(Date.now());
 
     // Stats State
@@ -206,10 +206,10 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     };
 
 
-    // Reset state when question changes
+    // Reset state when question changes (reviewモード時は解答・解説を復元)
     useEffect(() => {
-        setSelectedOption(null);
-        setShowExplanation(false);
+        setSelectedOption(isReview ? question.correctOption : null);
+        setShowExplanation(isReview);
         setIsFlagged(false); // Reset Flag
         setStartTime(Date.now());
 
@@ -257,7 +257,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             }
         }
         fetchStats();
-    }, [question.id, question.examId, session]);
+    }, [question.id, question.examId, question.correctOption, isReview, session]);
 
     const formatTime = (seconds: number) => {
         const h = Math.floor(seconds / 3600);
