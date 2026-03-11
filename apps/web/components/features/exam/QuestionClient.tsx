@@ -45,14 +45,15 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const searchParams = useSearchParams();
     const mode = searchParams.get('mode') || 'practice';
     const sessionId = searchParams.get('sessionId'); // [NEW] Get Session ID
+    const isReview = searchParams.get('review') === 'true';
     const router = useRouter();
     const { data: session } = useSession();
     const { showExamStats, toggleShowExamStats } = useTheme();
 
     // Local state for settings popup
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState<string | null>(null);
-    const [showExplanation, setShowExplanation] = useState(false);
+    const [selectedOption, setSelectedOption] = useState<string | null>(isReview ? question.correctOption : null);
+    const [showExplanation, setShowExplanation] = useState(isReview);
     const [startTime, setStartTime] = useState<number>(Date.now());
 
     // Stats State

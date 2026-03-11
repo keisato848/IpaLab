@@ -12,12 +12,29 @@ interface ExamListClientProps {
     initialRecords?: LearningRecord[];
 }
 
+const FILTER_CACHE_KEY = 'ipalab_exam_filter';
+const TIME_FILTER_CACHE_KEY = 'ipalab_exam_time_filter';
+
+function getCachedValue(key: string, fallback: string): string {
+    if (typeof window === 'undefined') return fallback;
+    return localStorage.getItem(key) || fallback;
+}
+
 export default function ExamListClient({ initialExams, initialRecords = [] }: ExamListClientProps) {
     const [exams, setExams] = useState<Exam[]>(initialExams);
     const [isLoading, setIsLoading] = useState(initialExams.length === 0);
-    const [filter, setFilter] = useState('ALL');
-    const [timeFilter, setTimeFilter] = useState('ALL');
+    const [filter, setFilter] = useState(() => getCachedValue(FILTER_CACHE_KEY, 'ALL'));
+    const [timeFilter, setTimeFilter] = useState(() => getCachedValue(TIME_FILTER_CACHE_KEY, 'ALL'));
     const { data: session } = useSession();
+
+    // 選択状態をlocalStorageに保存
+    useEffect(() => {
+        localStorage.setItem(FILTER_CACHE_KEY, filter);
+    }, [filter]);
+
+    useEffect(() => {
+        localStorage.setItem(TIME_FILTER_CACHE_KEY, timeFilter);
+    }, [timeFilter]);
 
     // Fetch exams on client if not provided by server (SSG build time)
     useEffect(() => {

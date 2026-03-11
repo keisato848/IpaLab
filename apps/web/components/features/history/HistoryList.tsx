@@ -13,6 +13,7 @@ export default function HistoryList() {
     const { data: session, status } = useSession();
     const [sessions, setSessions] = useState<LearningSessionInfo[]>([]);
     const [guestRecords, setGuestRecords] = useState<LearningRecord[]>([]);
+    const [fallbackRecords, setFallbackRecords] = useState<LearningRecord[]>([]);
     const [loading, setLoading] = useState(true);
     const isGuest = status !== 'authenticated';
 
@@ -21,9 +22,17 @@ export default function HistoryList() {
             setLoading(true);
             try {
                 if (status === 'authenticated' && session?.user?.id) {
-                    // Fetch sessions for logged-in users
+                    // セッションを取得
                     const fetchedSessions = await getLearningSessions();
                     setSessions(fetchedSessions);
+
+                    // セッションがない場合、個別レコードをフォールバックとして取得
+                    if (fetchedSessions.length === 0) {
+                        const records = await getLearningRecords(session.user.id);
+                        const validRecords = records.filter(r => r && r.answeredAt);
+                        validRecords.sort((a, b) => new Date(b.answeredAt).getTime() - new Date(a.answeredAt).getTime());
+                        setFallbackRecords(validRecords);
+                    }
                 } else {
                     // Guest mode: show legacy records-based view
                     const records = guestManager.getHistory();
@@ -85,7 +94,34 @@ export default function HistoryList() {
     }
 
     // Logged-in users: session-based view
+    // セッションがない場合、個別レコードがあればレコードベースの表示にフォールバック
     if (sessions.length === 0) {
+        if (fallbackRecords.length > 0) {
+            return (
+                <div className={styles.container}>
+                    {fallbackRecords.map((r, i) => (
+                        <div key={i} className={styles.historyCard}>
+                            <div className={styles.cardMain}>
+                                <div className={styles.examTitle}>
+                                    {getExamLabel(r.examId)}
+                                </div>
+                                <div className={styles.questionInfo}>
+                                    <span>問題 {r.questionId.split('-').pop()}</span>
+                                    <span className={r.isCorrect ? styles.tagCorrect : styles.tagIncorrect}>
+                                        {r.isCorrect ? '正解' : '不正解'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className={styles.cardMeta}>
+                                <div className={styles.date}>
+                                    {r.answeredAt ? new Date(r.answeredAt).toLocaleString('ja-JP') : '-'}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            );
+        }
         return (
             <div className={styles.emptyState}>
                 <p>学習履歴がありません。</p>
