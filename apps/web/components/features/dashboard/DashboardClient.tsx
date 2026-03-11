@@ -1184,22 +1184,45 @@ export default function DashboardClient() {
                         <p className={styles.subtitle}>まだ学習履歴がありません。</p>
                     ) : (
                         <ul className={styles.historyList}>
-                            {recentRecords.map((r, i) => (
-                                <li key={i} className={styles.historyItem}>
-                                    <div className={styles.historyMain}>
-                                        <span className={styles.tag}>{r.category || '未分類'}</span>
-                                        <span className={styles.examName}>{getExamLabel(r.examId)} Q{r.questionId?.split('-').pop() || '?'}</span>
-                                    </div>
-                                    <div className={styles.historyMeta}>
-                                        <span className={`${styles.result} ${r.isCorrect ? styles.correct : styles.incorrect}`}>
-                                            {r.isCorrect ? '正解' : '不正解'}
-                                        </span>
-                                        <span className={styles.date}>
-                                            {r.answeredAt ? new Date(r.answeredAt).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
-                                        </span>
-                                    </div>
-                                </li>
-                            ))}
+                            {recentRecords.map((r, i) => {
+                                const qNo = parseInt(r.questionId?.split('-').pop() || '0');
+                                const reviewUrl = qNo > 0 ? `${getQuestionUrl(r.examId, qNo)}&review=true` : null;
+                                return (
+                                    <li key={i} className={styles.historyItem}>
+                                        {reviewUrl ? (
+                                            <Link href={reviewUrl} className={styles.historyLink}>
+                                                <div className={styles.historyMain}>
+                                                    <span className={styles.tag}>{r.category || '未分類'}</span>
+                                                    <span className={styles.examName}>{getExamLabel(r.examId)} Q{r.questionId?.split('-').pop() || '?'}</span>
+                                                </div>
+                                                <div className={styles.historyMeta}>
+                                                    <span className={`${styles.result} ${r.isCorrect ? styles.correct : styles.incorrect}`}>
+                                                        {r.isCorrect ? '正解' : '不正解'}
+                                                    </span>
+                                                    <span className={styles.date}>
+                                                        {r.answeredAt ? new Date(r.answeredAt).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
+                                                    </span>
+                                                </div>
+                                            </Link>
+                                        ) : (
+                                            <>
+                                                <div className={styles.historyMain}>
+                                                    <span className={styles.tag}>{r.category || '未分類'}</span>
+                                                    <span className={styles.examName}>{getExamLabel(r.examId)} Q{r.questionId?.split('-').pop() || '?'}</span>
+                                                </div>
+                                                <div className={styles.historyMeta}>
+                                                    <span className={`${styles.result} ${r.isCorrect ? styles.correct : styles.incorrect}`}>
+                                                        {r.isCorrect ? '正解' : '不正解'}
+                                                    </span>
+                                                    <span className={styles.date}>
+                                                        {r.answeredAt ? new Date(r.answeredAt).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
+                                                    </span>
+                                                </div>
+                                            </>
+                                        )}
+                                    </li>
+                                );
+                            })}
                         </ul>
                     )}
                 </section>
