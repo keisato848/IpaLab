@@ -27,7 +27,8 @@ import { test, expect, captureEvidence, setTheme } from './helpers/evidence';
 
 // SA-2024-Spring-AM2 Q7 のページURL
 // ※ルーティング: /exam/[year]/[type]/[qNo]
-const QUESTION_URL = '/exam/SA-2024-spring-am2/sa/7?mode=practice';
+// ExamListClient.tsx: `/exam/${exam.id}/${startType}` → year=examId, type=AM2
+const QUESTION_URL = '/exam/SA-2024-Spring-AM2/AM2/7?mode=practice';
 
 /**
  * Mermaid 図をクリックしてモーダルを開くヘルパー
@@ -47,7 +48,11 @@ async function openDiagramModal(page: import('@playwright/test').Page) {
  */
 async function getZoomScale(page: import('@playwright/test').Page): Promise<number> {
   const transform = await page.getByTestId('diagram-zoom-container').evaluate(
-    (el) => getComputedStyle(el).transform
+    (el) => {
+      // transform は内部ラッパー div に適用されている
+      const inner = el.firstElementChild as HTMLElement;
+      return inner ? getComputedStyle(inner).transform : getComputedStyle(el).transform;
+    }
   );
   // matrix(a, b, c, d, tx, ty) — a が scaleX
   const match = transform.match(/matrix\(([^,]+)/);
@@ -58,8 +63,7 @@ async function getZoomScale(page: import('@playwright/test').Page): Promise<numb
   return 1.0;
 }
 
-// NOTE: DiagramViewerModal 未実装のため skip。実装完了後に解除すること。
-test.describe.skip('図表拡大表示テスト（DiagramViewerModal）', () => {
+test.describe('図表拡大表示テスト（DiagramViewerModal）', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto(QUESTION_URL);

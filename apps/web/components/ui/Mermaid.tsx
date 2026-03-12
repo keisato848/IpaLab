@@ -2,6 +2,9 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
+
+const DiagramViewerModal = dynamic(() => import('./DiagramViewerModal'), { ssr: false });
 
 interface MermaidProps {
     chart: string;
@@ -12,6 +15,7 @@ const Mermaid: React.FC<MermaidProps> = ({ chart }) => {
     const [svg, setSvg] = useState('');
     const [isError, setIsError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         let isMounted = true;
@@ -62,14 +66,26 @@ const Mermaid: React.FC<MermaidProps> = ({ chart }) => {
     if (isError) return <div className="text-red-500 text-sm p-2 border border-red-300 rounded">図の描画に失敗しました</div>;
 
     return (
-        <div className="mermaid-wrapper min-h-[50px]">
-            {isLoading && !svg && <div className="text-gray-400 text-sm p-2 animate-pulse">Loading diagram...</div>}
+        <>
             <div
-                ref={ref}
-                dangerouslySetInnerHTML={{ __html: svg }}
-                className={`mermaid-diagram my-4 overflow-x-auto ${isLoading ? 'opacity-50' : 'opacity-100'} transition-opacity`}
-            />
-        </div>
+                className="mermaid-wrapper min-h-[50px]"
+                onClick={() => { if (svg) setIsModalOpen(true); }}
+                style={{ cursor: svg ? 'zoom-in' : undefined }}
+            >
+                {isLoading && !svg && <div className="text-gray-400 text-sm p-2 animate-pulse">Loading diagram...</div>}
+                <div
+                    ref={ref}
+                    dangerouslySetInnerHTML={{ __html: svg }}
+                    className={`mermaid mermaid-diagram my-4 overflow-x-auto ${isLoading ? 'opacity-50' : 'opacity-100'} transition-opacity`}
+                />
+            </div>
+            {isModalOpen && svg && (
+                <DiagramViewerModal
+                    svgHtml={svg}
+                    onClose={() => setIsModalOpen(false)}
+                />
+            )}
+        </>
     );
 };
 
