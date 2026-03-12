@@ -67,7 +67,7 @@ test.describe('図表拡大表示テスト（DiagramViewerModal）', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto(QUESTION_URL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
   });
 
   // ─── Z-01: モーダルの開閉 ───
