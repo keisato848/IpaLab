@@ -1,0 +1,130 @@
+/* DiagramViewerModal - フルスクリーンモーダルで図を拡大表示 */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 90vw;
+  max-width: 1200px;
+  height: 85vh;
+  max-height: 85vh;
+  background-color: var(--bg-primary, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  background-color: var(--bg-secondary, #f9fafb);
+  flex-shrink: 0;
+}
+
+.toolbarButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 6px;
+  background-color: var(--bg-primary, #ffffff);
+  color: var(--text-primary, #1f2937);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+  user-select: none;
+}
+
+.toolbarButton:hover {
+  background-color: var(--bg-hover, #f3f4f6);
+  border-color: var(--border-hover, #9ca3af);
+}
+
+.closeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 6px;
+  background-color: var(--bg-primary, #ffffff);
+  color: var(--text-secondary, #6b7280);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+  margin-left: auto;
+  user-select: none;
+}
+
+.closeButton:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.zoomContainer {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  touch-action: none;
+}
+
+.zoomContainer svg {
+  max-width: none;
+  max-height: none;
+}
+
+/* ダークテーマ対応 */
+:global([data-theme="dark"]) .content {
+  background-color: #18181b;
+}
+
+:global([data-theme="dark"]) .toolbar {
+  background-color: #27272a;
+  border-bottom-color: #3f3f46;
+}
+
+:global([data-theme="dark"]) .toolbarButton {
+  background-color: #27272a;
+  border-color: #3f3f46;
+  color: #e4e4e7;
+}
+
+:global([data-theme="dark"]) .toolbarButton:hover {
+  background-color: #3f3f46;
+  border-color: #52525b;
+}
+
+:global([data-theme="dark"]) .closeButton {
+  background-color: #27272a;
+  border-color: #3f3f46;
+  color: #a1a1aa;
+}
+
+:global([data-theme="dark"]) .closeButton:hover {
+  background-color: #450a0a;
+  color: #f87171;
+}
+
+:global([data-theme="dark"]) .zoomContainer {
+  background-color: #18181b;
+}

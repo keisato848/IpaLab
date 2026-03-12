@@ -7,8 +7,8 @@ import path from 'path';
  */
 export default defineConfig({
   testDir: './e2e',
-  /* テストの最大タイムアウト（30秒） */
-  timeout: 30_000,
+  /* テストの最大タイムアウト（60秒：4ワーカー並列実行時のリソース競合対応） */
+  timeout: 60_000,
   /* expect() のタイムアウト */
   expect: {
     timeout: 5_000,
