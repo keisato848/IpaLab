@@ -19,9 +19,10 @@ export function getExamTypeName(code: string): string {
     return examTypeMap[code] || code;
 }
 
-export function getExamLabel(examId: string): string {
+export function getExamLabel(examId: string, options?: { includeWesternYear?: boolean }): string {
     // Format: AP-2024-Spring-AM, FE-2023-Fall-PM
     // Target: 応用情報技術者試験 令和6年 春期 (午前)
+    // With includeWesternYear: 応用情報技術者試験 令和6年(2024年) 春期 (午前)
 
     if (!examId) return '';
 
@@ -40,8 +41,10 @@ export function getExamLabel(examId: string): string {
     let yearLabel = `${year}年`;
     if (year >= 2019) {
         yearLabel = `令和${year - 2018}年`;
+        if (options?.includeWesternYear) yearLabel += `(${year}年)`;
     } else if (year > 1988) {
         yearLabel = `平成${year - 1988}年`;
+        if (options?.includeWesternYear) yearLabel += `(${year}年)`;
     }
 
     // 3. Season

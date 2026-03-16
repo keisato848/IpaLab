@@ -13,26 +13,28 @@ export const dynamicParams = true;
 export const revalidate = 3600;
 
 import { Metadata } from 'next';
+import { getExamLabel } from '@/lib/exam-utils';
 
 export async function generateMetadata({ params }: { params: Promise<{ year: string; type: string; qNo: string }> }): Promise<Metadata> {
     const { year, type, qNo } = await params;
     const typeSuffix = type === 'AM1' ? 'AM' : type;
     const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
+    const examLabel = getExamLabel(examId, { includeWesternYear: true });
 
     try {
         const questions = await questionRepository.listByExamId(examId);
         const question = questions.find((q: any) => q.qNo === parseInt(qNo));
 
-        if (!question) return { title: `Not Found - シカクノ` };
+        if (!question) return { title: `Not Found` };
 
-        // Safe substring for description
-        const desc = question.text ? question.text.substring(0, 120).replace(/\n/g, ' ') + '...' : `情報処理技術者試験 ${year} ${type} 問${qNo}`;
+        // 問題文の先頭を概要として使用
+        const desc = question.text ? question.text.substring(0, 120).replace(/\n/g, ' ') + '...' : `${examLabel} 問${qNo}`;
 
         return {
-            title: `Q${qNo} ${year} ${type} - シカクノ`,
+            title: `${examLabel} Q${qNo}`,
             description: desc,
             openGraph: {
-                title: `Q${qNo} ${year} ${type} (正答率: --%) - シカクノ`,
+                title: `${examLabel} Q${qNo} | シカクノ`,
                 description: desc,
             }
         };

@@ -133,4 +133,26 @@ describe('getExamLabel', () => {
             expect(result).toBe('応用情報技術者試験 令和6年 春期');
         });
     });
+
+    describe('西暦併記オプション', () => {
+        it('令和年に西暦を併記する', () => {
+            const result = getExamLabel('AP-2024-Spring-AM', { includeWesternYear: true });
+            expect(result).toBe('応用情報技術者試験 令和6年(2024年) 春期 (午前)');
+        });
+
+        it('平成年に西暦を併記する', () => {
+            const result = getExamLabel('AP-2018-Fall-AM', { includeWesternYear: true });
+            expect(result).toBe('応用情報技術者試験 平成30年(2018年) 秋期 (午前)');
+        });
+
+        it('オプション未指定では西暦を併記しない', () => {
+            const result = getExamLabel('AP-2024-Spring-AM');
+            expect(result).toBe('応用情報技術者試験 令和6年 春期 (午前)');
+        });
+
+        it('午前IIで西暦併記が正しく動作する', () => {
+            const result = getExamLabel('SA-2024-Spring-AM2', { includeWesternYear: true });
+            expect(result).toBe('システムアーキテクト試験 令和6年(2024年) 春期 (午前II)');
+        });
+    });
 });
