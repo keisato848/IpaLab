@@ -45,21 +45,20 @@ async function openDiagramModal(page: import('@playwright/test').Page) {
 
 /**
  * zoom-container の現在の scale 値を取得するヘルパー
+ * 内部ラッパーの width スタイル（例: "200%"）からスケール値を算出する
  */
 async function getZoomScale(page: import('@playwright/test').Page): Promise<number> {
-  const transform = await page.getByTestId('diagram-zoom-container').evaluate(
+  const widthStyle = await page.getByTestId('diagram-zoom-container').evaluate(
     (el) => {
-      // transform は内部ラッパー div に適用されている
       const inner = el.firstElementChild as HTMLElement;
-      return inner ? getComputedStyle(inner).transform : getComputedStyle(el).transform;
+      return inner ? inner.style.width : '';
     }
   );
-  // matrix(a, b, c, d, tx, ty) — a が scaleX
-  const match = transform.match(/matrix\(([^,]+)/);
+  // "150%" → 1.5 のように変換
+  const match = widthStyle.match(/([\d.]+)%/);
   if (match) {
-    return parseFloat(match[1]);
+    return parseFloat(match[1]) / 100;
   }
-  // transform: none の場合は scale 1.0
   return 1.0;
 }
 
