@@ -133,7 +133,11 @@ export default function DiagramViewerModal({ svgHtml, onClose }: DiagramViewerMo
           onTouchEnd={handleTouchEnd}
         >
           <div
-            style={{ transform: `scale(${scale})`, transformOrigin: 'center center', transition: 'transform 0.2s ease', width: '100%' }}
+            style={{
+              width: `${scale * 100}%`,
+              minWidth: 'fit-content',
+              transition: 'width 0.2s ease',
+            }}
             dangerouslySetInnerHTML={{ __html: modalSvgHtml }}
           />
         </div>
