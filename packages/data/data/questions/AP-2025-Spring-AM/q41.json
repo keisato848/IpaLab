@@ -1,0 +1,26 @@
+{
+  "id": "AP-2025-Spring-AM-41",
+  "qNo": 41,
+  "text": "cookie に Secure 属性を設定しなかったときと比較した，設定したときの Web ブラウザの動作として，適切なものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "cookie に設定された有効期間を過ぎると，Web ブラウザが cookie を無効であると判断する。"
+    },
+    {
+      "id": "b",
+      "text": "URL 内のスキームが https のときだけ，Web ブラウザから cookie が送出される。"
+    },
+    {
+      "id": "c",
+      "text": "Web ブラウザがアクセスする URL 内のパスと cookie に設定されたパスのプレフィックスが一致するときだけ，Web ブラウザから cookie が送出される。"
+    },
+    {
+      "id": "d",
+      "text": "Web ブラウザでは JavaScript による cookie の読出しが禁止される。"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "この問題は、Webのセキュリティに関わるCookieの**`Secure`属性**について正しく理解できているかを問うています。\n\n`Secure`属性は、その名の通り「安全な（Secure）通信のときだけCookieを送信する」という設定です。ここでいう安全な通信とは、**HTTPS**（HTTP over SSL/TLS）による暗号化された通信を指します。\n\n- **b（正解）**: `Secure`属性を付けたCookieは、ブラウザからサーバへデータを送る際、通信がHTTPS（URLが `https://` で始まる）の場合に限定されます。暗号化されていないHTTP通信では送信されないため、通信経路上でCookie情報が盗聴されるリスクを防ぐことができます。\n\n他の選択肢は、それぞれ別のCookie属性に関する説明です。\n- **a**: Cookieの有効期限を設定するのは`Expires`属性や`Max-Age`属性の役割です。\n- **c**: Cookieが有効なURLのパスを限定するのは`Path`属性の役割です。\n- **d**: JavaScriptからのCookie読出しを禁止し、クロスサイトスクリプティング（XSS）攻撃のリスクを軽減するのは`HttpOnly`属性の役割です。",
+  "examId": "AP-2025-Spring-AM"
+}
