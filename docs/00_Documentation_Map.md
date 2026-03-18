@@ -23,6 +23,8 @@ docs/
 │   ├── 01_ConfigurationDesign.md # (New) プロジェクト設定、ツーリング、Monorepo構成詳細
 │   ├── 02_AppStructureDesign.md  # (New) 各アプリケーション(Web/API)の内部構造、モジュール設計
 │   ├── 06_DeploymentDesign.md    # デプロイメント設計（App Service）
+│   ├── 07_GamificationDesign.md  # ゲーミフィケーション機能（XP・レベル・実績）
+│   ├── 10_HeatmapDesign.md       # 学習ヒートマップ描画アルゴリズム（HeatmapWidget）
 │   └── (必要に応じて追加)
 ├── 03_migration/                # [Migration] SWA → App Service 移行計画
 │   ├── 00_Migration_Overview.md     # 移行概要・スケジュール
