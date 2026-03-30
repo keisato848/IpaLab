@@ -2,17 +2,22 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
- * Googleボットのユーザーエージェントパターン
- * SEO維持のためGoogleのクローラーは許可する
+ * 許可する公式クローラーのユーザーエージェントパターン
+ * SEO維持のためGoogleとEdge(Bing)のクローラーは許可する
  */
-const ALLOWED_GOOGLE_BOTS = [
-    'Googlebot',           // Google検索クローラー
-    'Googlebot-Image',     // Google画像検索
-    'Googlebot-News',      // Googleニュース
-    'Googlebot-Video',     // Google動画検索
-    'APIs-Google',         // Google APIs
+const ALLOWED_BOTS = [
+    // Google系
+    'Googlebot',            // Google検索クローラー
+    'Googlebot-Image',      // Google画像検索
+    'Googlebot-News',       // Googleニュース
+    'Googlebot-Video',      // Google動画検索
+    'APIs-Google',          // Google APIs
     'Mediapartners-Google', // Google AdSense
-    'AdsBot-Google',       // Google広告
+    'AdsBot-Google',        // Google広告
+    // Edge(Bing)系
+    'bingbot',              // Bing検索クローラー
+    'adidxbot',             // Microsoft広告クローラー
+    'bingpreview',          // Bingプレビュー
 ];
 
 /**
@@ -28,13 +33,13 @@ const BOT_PATTERNS = [
 ];
 
 /**
- * ユーザーエージェントがGoogleボットかどうかを判定
+ * ユーザーエージェントが許可済みボットかどうかを判定
  */
-function isGoogleBot(userAgent: string): boolean {
+function isAllowedBot(userAgent: string): boolean {
     if (!userAgent) return false;
 
     const lowerUA = userAgent.toLowerCase();
-    return ALLOWED_GOOGLE_BOTS.some(bot =>
+    return ALLOWED_BOTS.some(bot =>
         lowerUA.includes(bot.toLowerCase())
     );
 }
@@ -58,8 +63,8 @@ function isBot(userAgent: string): boolean {
 export function middleware(request: NextRequest) {
     const userAgent = request.headers.get('user-agent') || '';
 
-    // Googleボットは常に許可
-    if (isGoogleBot(userAgent)) {
+    // 許可対象の公式クローラーは通過させる
+    if (isAllowedBot(userAgent)) {
         return NextResponse.next();
     }
 

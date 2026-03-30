@@ -55,7 +55,27 @@ describe('Middleware - ボットブロック機能', () => {
         });
     });
 
-    describe('Google以外のボットのブロック', () => {
+    describe('Edge(Bing)ボットの許可', () => {
+        it('Bingbotを許可する', () => {
+            const request = createRequest('Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)');
+            const response = middleware(request);
+            expect(response.status).toBe(200);
+        });
+
+        it('AdIdxBotを許可する', () => {
+            const request = createRequest('Mozilla/5.0 (compatible; adidxbot/2.0; +http://www.bing.com/bingbot.htm)');
+            const response = middleware(request);
+            expect(response.status).toBe(200);
+        });
+
+        it('BingPreviewを許可する', () => {
+            const request = createRequest('Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingpreview/1.0b) Chrome/79.0.3945.79 Safari/537.36 Edge/79.0.309.68');
+            const response = middleware(request);
+            expect(response.status).toBe(200);
+        });
+    });
+
+    describe('許可対象外ボットのブロック', () => {
         it('一般的なbotパターンをブロックする', () => {
             const request = createRequest('SomeBot/1.0');
             const response = middleware(request);
@@ -88,12 +108,6 @@ describe('Middleware - ボットブロック機能', () => {
 
         it('fetchパターンをブロックする', () => {
             const request = createRequest('DataFetch/2.0');
-            const response = middleware(request);
-            expect(response.status).toBe(403);
-        });
-
-        it('Bingbotをブロックする', () => {
-            const request = createRequest('Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)');
             const response = middleware(request);
             expect(response.status).toBe(403);
         });

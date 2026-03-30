@@ -20,6 +20,16 @@ export default function robots(): MetadataRoute.Robots {
                 allow: '/',
                 disallow: ['/api/', '/private/', '/_next/'],
             },
+            // Edge(Bing)系クローラーも許可
+            {
+                userAgent: [
+                    'bingbot',
+                    'adidxbot',
+                    'bingpreview',
+                ],
+                allow: '/',
+                disallow: ['/api/', '/private/', '/_next/'],
+            },
             // その他すべてのボットは遮断
             {
                 userAgent: '*',

@@ -29,11 +29,33 @@ describe('robots.ts - robots.txt設定', () => {
         }
     });
 
+    it('Edge(Bing)ボットにはサイト全体を許可する', () => {
+        const config = robots();
+
+        // rules配列の2番目の要素がEdge(Bing)ボット用
+        const edgeBotRule = Array.isArray(config.rules) ? config.rules[1] : null;
+        expect(edgeBotRule).toBeDefined();
+
+        if (edgeBotRule && 'userAgent' in edgeBotRule) {
+            expect(edgeBotRule.userAgent).toEqual([
+                'bingbot',
+                'adidxbot',
+                'bingpreview',
+            ]);
+
+            // Edge(Bing)ボットは / を許可
+            expect(edgeBotRule.allow).toBe('/');
+
+            // ただし /api/, /private/, /_next/ は除外
+            expect(edgeBotRule.disallow).toEqual(['/api/', '/private/', '/_next/']);
+        }
+    });
+
     it('その他すべてのボットはサイト全体を遮断する', () => {
         const config = robots();
 
-        // rules配列の2番目の要素が全ボット用
-        const allBotsRule = Array.isArray(config.rules) ? config.rules[1] : null;
+        // rules配列の3番目の要素が全ボット用
+        const allBotsRule = Array.isArray(config.rules) ? config.rules[2] : null;
         expect(allBotsRule).toBeDefined();
 
         if (allBotsRule && 'userAgent' in allBotsRule) {
