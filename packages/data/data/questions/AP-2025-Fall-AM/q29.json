@@ -1,0 +1,26 @@
+{
+  "id": "AP-2025-Fall-AM-29",
+  "qNo": 29,
+  "text": "RDBMS において、同じデータ項目の異なる版を用意することによって、トランザクションの同時実行性を高める仕組みはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "2相ロッキングプロトコル"
+    },
+    {
+      "id": "b",
+      "text": "MVCC"
+    },
+    {
+      "id": "c",
+      "text": "WAL プロトコル"
+    },
+    {
+      "id": "d",
+      "text": "共有ロック"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "",
+  "examId": "AP-2025-Fall-AM"
+}

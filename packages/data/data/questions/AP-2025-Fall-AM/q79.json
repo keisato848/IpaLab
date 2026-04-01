@@ -1,0 +1,26 @@
+{
+  "id": "AP-2025-Fall-AM-79",
+  "qNo": 79,
+  "text": "意匠法において、保護の対象となり得るものはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "独自のGUI"
+    },
+    {
+      "id": "b",
+      "text": "独自のアルゴリズム"
+    },
+    {
+      "id": "c",
+      "text": "独自の通信プロトコル"
+    },
+    {
+      "id": "d",
+      "text": "独自のビジネスモデル"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2025-Fall-AM"
+}

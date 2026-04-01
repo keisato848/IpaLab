@@ -1,0 +1,26 @@
+{
+  "id": "AP-2025-Spring-AM-29",
+  "qNo": 29,
+  "text": "無線 LAN のアクセスポイントや IP 電話機などに，LAN ケーブルを利用して給電も行う仕組みはどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "PLC"
+    },
+    {
+      "id": "b",
+      "text": "PoE"
+    },
+    {
+      "id": "c",
+      "text": "UPS"
+    },
+    {
+      "id": "d",
+      "text": "USB"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "正解は **b: PoE** です。\n\nPoEは「**P**ower **o**ver **E**thernet」の略で、LANケーブルを通じてデータ通信と電力供給を同時に行う技術です。これにより、無線LANアクセスポイントやIP電話機、ネットワークカメラなどを、近くに電源コンセントがない天井や壁にも簡単に設置できます。問題文の「LANケーブルを利用して給電も行う仕組み」と完全に一致するため、PoEが正解となります。\n\n他の選択肢は以下の理由で誤りです。\n*   **a: PLC (Power Line Communication)** は、電力線（電気のコンセント）にデータ信号を乗せて通信する技術であり、PoEとは逆の仕組みです。\n*   **c: UPS (Uninterruptible Power Supply)** は、停電時にコンピュータへ電力を供給するための無停電電源装置（バッテリー）です。\n*   **d: USB (Universal Serial Bus)** は、PCと周辺機器を接続する規格で、給電機能はありますがLANケーブルではなくUSBケーブルを使用します。",
+  "examId": "AP-2025-Spring-AM"
+}
