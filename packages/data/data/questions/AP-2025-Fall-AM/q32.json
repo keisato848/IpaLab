@@ -1,0 +1,26 @@
+{
+  "id": "AP-2025-Fall-AM-32",
+  "qNo": 32,
+  "text": "IPv4のアドレス割当てを行う際に、クラス A~C といった区分にとらわれずに、ネットワークアドレス部とホストアドレス部を任意のブロック単位に区切り、IP アドレスを無駄なく効率的に割り当てる方式はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "CIDR"
+    },
+    {
+      "id": "b",
+      "text": "DHCP"
+    },
+    {
+      "id": "c",
+      "text": "DNS"
+    },
+    {
+      "id": "d",
+      "text": "NAPT"
+    }
+  ],
+  "correctOption": "a",
+  "explanation": "",
+  "examId": "AP-2025-Fall-AM"
+}

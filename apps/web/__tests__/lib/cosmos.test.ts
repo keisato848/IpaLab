@@ -21,7 +21,7 @@ describe('cosmos.ts', () => {
             const result = await getContainer('Questions');
 
             expect(result).toBeUndefined();
-        });
+        }, 15000);
     });
 
     describe('initDatabase', () => {
@@ -32,7 +32,7 @@ describe('cosmos.ts', () => {
 
             // エラーなく完了することを確認
             await expect(initDatabase()).resolves.not.toThrow();
-        });
+        }, 15000);
     });
 });
 

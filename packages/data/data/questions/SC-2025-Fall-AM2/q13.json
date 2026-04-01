@@ -1,0 +1,28 @@
+{
+  "id": "SC-2025-Fall-AM2-13",
+  "qNo": 13,
+  "text": "ある企業で、社内機能として CSIRT, PSIRT, SOC, WHOIS データベースの技術連絡担当組織があるとき、自社製品の脆弱性に起因するリスクに対応するべき社内機能はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "CSIRT"
+    },
+    {
+      "id": "b",
+      "text": "PSIRT"
+    },
+    {
+      "id": "c",
+      "text": "SOC"
+    },
+    {
+      "id": "d",
+      "text": "WHOIS データベースの技術連絡担当組織"
+    }
+  ],
+  "correctOption": "b",
+  "explanation": "この問題では、対応すべき対象が「**自社製品の脆弱性**」である点がポイントです。\n\n**正解の理由:**\n*   **PSIRT** (Product Security Incident Response Team) は、自社が提供する「製品（Product）」やサービスに存在するセキュリティ脆弱性を専門的に管理し、修正プログラムの公開などの対応を行う組織です。自社製品の脆弱性リスクに対応するのは、PSIRTの役割そのものであるため、選択肢bが正解です。\n\n**他の選択肢が誤りの理由:**\n*   **CSIRT** (Computer Security Incident Response Team) は、企業全体のシステムやネットワークに対する広範なセキュリティインシデント（例：外部からのサイバー攻撃）に対応します。\n*   **SOC** (Security Operation Center) は、システムをリアルタイムで監視し、セキュリティ上の異常を検知・分析するのが主な役割です。\n*   **WHOIS** データベースの担当組織は、ドメイン名やIPアドレスの登録者情報管理が目的であり、製品の脆弱性対応とは直接関係ありません。",
+  "examId": "SC-2025-Fall-AM2",
+  "category": null,
+  "subCategory": null
+}

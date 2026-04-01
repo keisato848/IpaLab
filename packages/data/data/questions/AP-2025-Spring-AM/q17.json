@@ -1,0 +1,26 @@
+{
+  "id": "AP-2025-Spring-AM-17",
+  "qNo": 17,
+  "text": "OpenAPI Specification に従った API の定義・開発を支援する機能を提供する OSS はどれか。",
+  "options": [
+    {
+      "id": "a",
+      "text": "curl"
+    },
+    {
+      "id": "b",
+      "text": "OpenAM"
+    },
+    {
+      "id": "c",
+      "text": "Serverspec"
+    },
+    {
+      "id": "d",
+      "text": "Swagger"
+    }
+  ],
+  "correctOption": "d",
+  "explanation": "この問題は、APIの仕様を記述する標準である「OpenAPI Specification」と、それに関連するツールについての知識を問うています。\n\n正解は **d: Swagger** です。\n\n**Swagger**は、REST APIの設計、構築、文書化、利用を支援するための一連のオープンソースツール群の名称です。\n\nもともと、APIの仕様を記述するための標準は「Swagger Specification」と呼ばれていました。この仕様が標準化団体に移管され、「**OpenAPI Specification**」という名前に変更された経緯があります。\nそのため、SwaggerはOpenAPI Specificationに完全準拠しており、APIの定義ファイル（YAMLやJSON形式）から、対話的なドキュメントを自動生成したり、サーバーやクライアントのコードを生成したりする機能を提供し、開発を強力に支援します。\n\n他の選択肢は以下の理由で誤りです。\n*   **a: curl**: サーバーとデータを送受信するためのコマンドラインツールです。APIの動作確認には使えますが、APIの定義や開発支援を主目的としたツールではありません。\n*   **b: OpenAM**: シングルサインオン（SSO）などを実現するための、アクセス管理（認証・認可）に関するソフトウェアです。\n*   **c: Serverspec**: サーバーの設定が意図した通りになっているかを確認するためのテストツールです。",
+  "examId": "AP-2025-Spring-AM"
+}
