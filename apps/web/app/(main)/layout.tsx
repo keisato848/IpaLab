@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { UserMenu } from '@/components/features/auth/UserMenu';
-import { usePageTracker } from '@/hooks/usePageTracker';
 import styles from './layout.module.css';
 
 export default function DashboardLayout({
@@ -17,8 +16,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  // ページビュートラッキング（匿名・認証ユーザー両方）
-  usePageTracker();
+  // ページビュートラッキングは TelemetryProvider（App Insights SDK）が担当
 
   const isAdmin = session?.user?.role === 'admin';
 
