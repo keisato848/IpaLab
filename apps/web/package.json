@@ -25,6 +25,7 @@
         "@azure/storage-queue": "^12.29.0",
         "@google/generative-ai": "^0.24.1",
         "@microsoft/applicationinsights-web": "^3.3.11",
+        "@next/third-parties": "^16.2.2",
         "@types/uuid": "^10.0.0",
         "applicationinsights": "^3.13.0",
         "he": "^1.2.0",
