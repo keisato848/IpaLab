@@ -34,13 +34,16 @@ const QUESTION_URL = '/exam/SA-2024-Spring-AM2/AM2/7?mode=practice';
  * Mermaid 図をクリックしてモーダルを開くヘルパー
  */
 async function openDiagramModal(page: import('@playwright/test').Page) {
-  // Mermaid図（SVG）がレンダリングされるまで待機
+  // Mermaid図（SVG）がレンダリングされるまで待機（30秒：dev serverの初回コンパイル対応）
   const mermaidSvg = page.locator('.mermaid svg').first();
-  await mermaidSvg.waitFor({ state: 'visible', timeout: 15000 });
-  await mermaidSvg.click();
+  await mermaidSvg.waitFor({ state: 'visible', timeout: 30000 });
 
-  // モーダルが開くのを待機
-  await page.getByTestId('diagram-viewer-overlay').waitFor({ state: 'visible' });
+  // .mermaid svg への直接クリックはイベントが .mermaid-wrapper まで伝播しない場合があるため、
+  // onClick ハンドラを持つ .mermaid-wrapper 自体をクリックする
+  await page.locator('.mermaid-wrapper').first().click();
+
+  // モーダルが開くのを待機（15秒：レンダリング完了まで余裕を持たせる）
+  await page.getByTestId('diagram-viewer-overlay').waitFor({ state: 'visible', timeout: 15000 });
 }
 
 /**
