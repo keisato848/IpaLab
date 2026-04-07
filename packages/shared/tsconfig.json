@@ -6,8 +6,7 @@
         "noEmit": false,
         "declaration": true,
         "module": "commonjs",
-        "moduleResolution": "node",
-        "baseUrl": ".",
+        "moduleResolution": "node10",
         "paths": {
             "@ipa-lab/shared": [
                 "./src/index"
