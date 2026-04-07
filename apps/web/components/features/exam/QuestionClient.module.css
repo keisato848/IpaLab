@@ -418,7 +418,7 @@
 
 .optionBtn {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     padding: 1rem;
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
@@ -431,6 +431,7 @@
     position: relative;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
     color: var(--text-primary);
+    width: 100%;
 }
 
 .optionBtn:hover:not(:disabled) {
@@ -489,6 +490,19 @@
 
 .optText {
     flex: 1;
+    min-width: 0;
+}
+
+.optText p:first-child {
+    margin-top: 0;
+}
+
+.optText p:last-child {
+    margin-bottom: 0;
+}
+
+.optText :global(.mermaid-wrapper) {
+    pointer-events: none;
 }
 
 .resultIcon {
