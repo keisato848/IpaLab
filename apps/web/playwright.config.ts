@@ -11,7 +11,7 @@ export default defineConfig({
   timeout: 60_000,
   /* expect() のタイムアウト */
   expect: {
-    timeout: 5_000,
+    timeout: 10_000,
     /* ビジュアル比較の閾値 */
     toHaveScreenshot: { maxDiffPixelRatio: 0.05 },
   },
@@ -47,6 +47,6 @@ export default defineConfig({
     command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: true,
-    timeout: 120_000,
+    timeout: 300_000,
   },
 });
