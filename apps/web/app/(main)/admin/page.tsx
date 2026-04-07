@@ -16,22 +16,23 @@ interface FeatureFlag {
 interface AnalyticsData {
     period: string;
     overview: {
-        totalUsers: number;
         guestUsers: number;
+        registeredUsers: number;
+        conversionRate: number;
         totalSessions: number;
         completedSessions: number;
+        completionRate: number;
         activeSessions: number;
         avgQuestionsPerSession: number;
         totalAnswers: number;
+        correctAnswers: number;
+        accuracyRate: number;
     };
     examBreakdown: { examId: string; count: number; completedCount: number }[];
     recentUsers: { id: string; name: string | null; email: string | null; role: string; createdAt: string; isGuest: boolean }[];
-    visitorStats: {
-        totalPageViews: number;
-        uniqueVisitors: number;
-        authenticatedVisitors: number;
-        anonymousVisitors: number;
-        dailyVisitors: { date: string; total: number; authenticated: number; anonymous: number }[];
+    activityStats: {
+        dau: { date: string; uniqueUsers: number }[];
+        mau: number;
     };
 }
 
@@ -134,14 +135,11 @@ export default function AdminPage() {
 
             const data = await res.json();
 
-            // ローカル状態を更新
             setFlags(prev =>
                 prev.map(f => (f.id === id ? data.flag : f))
             );
 
             setSuccess(`「${data.flag.description}」を${data.flag.enabled ? '有効' : '無効'}にしました`);
-
-            // 成功メッセージを3秒後に消す
             setTimeout(() => setSuccess(null), 3000);
         } catch (err) {
             setError(err instanceof Error ? err.message : '更新エラーが発生しました');
@@ -183,7 +181,6 @@ export default function AdminPage() {
         }
     };
 
-    // 読み込み中
     if (status === 'loading' || (loading && isAdmin)) {
         return (
             <div className={styles.container}>
@@ -195,7 +192,6 @@ export default function AdminPage() {
         );
     }
 
-    // 未認証 or 非管理者
     if (!session || !isAdmin) {
         return (
             <div className={styles.container}>
@@ -267,17 +263,17 @@ export default function AdminPage() {
                     {PRESET_ANALYTICS_PERIODS.map(days => {
                         const periodValue = `${days}d`;
                         return (
-                        <button
-                            key={periodValue}
-                            className={`${styles.periodButton} ${analyticsPeriod === periodValue ? styles.periodButtonActive : ''}`}
-                            onClick={() => {
-                                setCustomPeriodInput(String(days));
-                                setAnalyticsPeriod(periodValue);
-                            }}
-                            disabled={analyticsLoading}
-                        >
-                            {days}日間
-                        </button>
+                            <button
+                                key={periodValue}
+                                className={`${styles.periodButton} ${analyticsPeriod === periodValue ? styles.periodButtonActive : ''}`}
+                                onClick={() => {
+                                    setCustomPeriodInput(String(days));
+                                    setAnalyticsPeriod(periodValue);
+                                }}
+                                disabled={analyticsLoading}
+                            >
+                                {days}日間
+                            </button>
                         );
                     })}
                     <div className={styles.customPeriodControls}>
@@ -310,13 +306,32 @@ export default function AdminPage() {
                     </div>
                 ) : analytics ? (
                     <>
-                        {/* 概要カード */}
+                        {/* ユーザー概要カード */}
                         <div className={styles.statsGrid}>
                             <div className={styles.statCard}>
-                                <span className={styles.statIcon}>👥</span>
-                                <span className={styles.statValue}>{analytics.overview.totalUsers}</span>
-                                <span className={styles.statLabel}>サイト訪問者数</span>
+                                <span className={styles.statIcon}>👤</span>
+                                <span className={styles.statValue}>{analytics.overview.registeredUsers}</span>
+                                <span className={styles.statLabel}>登録ユーザー数</span>
                             </div>
+                            <div className={styles.statCard}>
+                                <span className={styles.statIcon}>👻</span>
+                                <span className={styles.statValue}>{analytics.overview.guestUsers}</span>
+                                <span className={styles.statLabel}>ゲストユーザー数</span>
+                            </div>
+                            <div className={styles.statCard}>
+                                <span className={styles.statIcon}>🔄</span>
+                                <span className={styles.statValue}>{analytics.overview.conversionRate}%</span>
+                                <span className={styles.statLabel}>ゲスト→登録転換率</span>
+                            </div>
+                            <div className={styles.statCard}>
+                                <span className={styles.statIcon}>📅</span>
+                                <span className={styles.statValue}>{analytics.activityStats.mau}</span>
+                                <span className={styles.statLabel}>MAU（直近30日）</span>
+                            </div>
+                        </div>
+
+                        {/* 演習統計カード */}
+                        <div className={styles.statsGrid} style={{ marginTop: '1rem' }}>
                             <div className={styles.statCard}>
                                 <span className={styles.statIcon}>📝</span>
                                 <span className={styles.statValue}>{analytics.overview.totalSessions}</span>
@@ -324,58 +339,36 @@ export default function AdminPage() {
                             </div>
                             <div className={styles.statCard}>
                                 <span className={styles.statIcon}>✅</span>
-                                <span className={styles.statValue}>{analytics.overview.completedSessions}</span>
-                                <span className={styles.statLabel}>完了セッション</span>
+                                <span className={styles.statValue}>{analytics.overview.completionRate}%</span>
+                                <span className={styles.statLabel}>演習完了率</span>
                             </div>
                             <div className={styles.statCard}>
                                 <span className={styles.statIcon}>❓</span>
                                 <span className={styles.statValue}>{analytics.overview.totalAnswers.toLocaleString()}</span>
                                 <span className={styles.statLabel}>総回答数</span>
                             </div>
-                        </div>
-
-                        {/* 訪問者統計（匿名ユーザー含む） */}
-                        <h3 className={styles.sectionTitle} style={{ fontSize: '1rem', marginTop: '1.5rem' }}>
-                            👁️ 訪問者統計
-                        </h3>
-                        <div className={styles.statsGrid}>
                             <div className={styles.statCard}>
-                                <span className={styles.statIcon}>🌐</span>
-                                <span className={styles.statValue}>{analytics.visitorStats.totalPageViews.toLocaleString()}</span>
-                                <span className={styles.statLabel}>総ページビュー</span>
-                            </div>
-                            <div className={styles.statCard}>
-                                <span className={styles.statIcon}>👤</span>
-                                <span className={styles.statValue}>{analytics.visitorStats.uniqueVisitors}</span>
-                                <span className={styles.statLabel}>ユニーク訪問者</span>
-                            </div>
-                            <div className={styles.statCard}>
-                                <span className={styles.statIcon}>🔓</span>
-                                <span className={styles.statValue}>{analytics.visitorStats.authenticatedVisitors}</span>
-                                <span className={styles.statLabel}>ログインユーザー</span>
-                            </div>
-                            <div className={styles.statCard}>
-                                <span className={styles.statIcon}>👻</span>
-                                <span className={styles.statValue}>{analytics.visitorStats.anonymousVisitors}</span>
-                                <span className={styles.statLabel}>匿名利用者</span>
+                                <span className={styles.statIcon}>🎯</span>
+                                <span className={styles.statValue}>{analytics.overview.accuracyRate}%</span>
+                                <span className={styles.statLabel}>全体正解率</span>
                             </div>
                         </div>
 
-                        {/* 日別訪問者数 */}
-                        {analytics.visitorStats.dailyVisitors.length > 0 && (
+                        {/* DAU（日別アクティブユーザー） */}
+                        {analytics.activityStats.dau.length > 0 && (
                             <>
-                                <h4 className={styles.flagDescription} style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>
-                                    日別訪問者数
-                                </h4>
+                                <h3 className={styles.sectionTitle} style={{ fontSize: '1rem', marginTop: '1.5rem' }}>
+                                    📈 DAU（日別アクティブユーザー）
+                                </h3>
                                 <div className={styles.barChart}>
                                     {(() => {
-                                        const maxCount = Math.max(...analytics.visitorStats.dailyVisitors.map(d => d.total), 1);
-                                        return analytics.visitorStats.dailyVisitors.map(day => (
+                                        const maxCount = Math.max(...analytics.activityStats.dau.map(d => d.uniqueUsers), 1);
+                                        return analytics.activityStats.dau.map(day => (
                                             <div key={day.date} className={styles.barGroup}>
                                                 <div
                                                     className={styles.bar}
-                                                    style={{ height: `${(day.total / maxCount) * 100}%` }}
-                                                    title={`${day.date}: ${day.total}PV（認証: ${day.authenticated}, 匿名: ${day.anonymous}）`}
+                                                    style={{ height: `${(day.uniqueUsers / maxCount) * 100}%` }}
+                                                    title={`${day.date}: ${day.uniqueUsers}人`}
                                                 />
                                                 <span className={styles.barLabel}>
                                                     {day.date.slice(5)}
@@ -477,7 +470,6 @@ export default function AdminPage() {
 
 /**
  * 管理者セットアップコンポーネント
- * 管理者が存在しない初回セットアップ時に表示
  */
 function AdminSetup({ session }: { session: any }) {
     const [token, setToken] = useState('');
@@ -541,7 +533,6 @@ function AdminSetup({ session }: { session: any }) {
                 </Link>
             </div>
 
-            {/* 初回セットアップフォーム */}
             <div className={styles.setupSection}>
                 <h2 className={styles.sectionTitle}>
                     <span>🔧</span>
