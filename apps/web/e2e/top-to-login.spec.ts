@@ -214,7 +214,8 @@ test.describe('トップページ → ログイン フロー', () => {
       await page.getByRole('link', { name: /登録なしで/ }).click();
 
       // Step 3: ダッシュボードに遷移
-      await expect(page).toHaveURL(/\/dashboard/);
+      // 開発サーバーの初回コンパイルに時間がかかるため、タイムアウトを延長
+      await expect(page).toHaveURL(/\/dashboard/, { timeout: 15000 });
     });
   });
 
