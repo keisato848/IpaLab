@@ -2,21 +2,48 @@
 'use client';
 
 import { useState } from 'react';
+import { useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
+import 'katex/dist/katex.min.css';
+// @ts-ignore
+import he from 'he';
 import dynamic from 'next/dynamic';
 import { Question } from '@/lib/api';
 import styles from './SCPMExamView.module.css';
+import AIAnswerBox from './AIAnswerBox';
+import { ScoreResult } from './AIAnswerBox';
 // Replaced missing UI components with native elements
 // import { Badge } from '@/components/ui/badge';
 // import { Button } from '@/components/ui/button';
 
 // Dynamic import for Mermaid to avoid SSR issues
 const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false });
-import AIAnswerBox from './AIAnswerBox';
-import { ScoreResult } from './AIAnswerBox';
-import { useRef, useEffect } from 'react';
+
+// Custom renderer for ReactMarkdown to handle Mermaid diagrams
+const markdownComponents = {
+    code({ node, inline, className, children, ...props }: any) {
+        const match = /language-(\w+)/.exec(className || '');
+        if (!inline && match && match[1] === 'mermaid') {
+            const rawChildren = String(children);
+            let chartContent = he.decode(rawChildren).replace(/\n$/, '');
+            chartContent = chartContent.replace(/(\n\s*)note:/gi, '$1%% note:');
+            return <Mermaid chart={chartContent} />;
+        }
+        return !inline && match ? (
+            <code className={className} {...props}>
+                {children}
+            </code>
+        ) : (
+            <code className={className} {...props}>
+                {children}
+            </code>
+        );
+    }
+};
 
 // Dynamic import for Recharts to reduce initial bundle size
 const RechartsPMRadar = dynamic(
@@ -345,7 +372,11 @@ function SubQuestionBlock({ question, index, parentContext, onGrade, initialData
             <div className={styles.subQuestionHeader}>
                 <span className={styles.subQuestionNumber}>Q{question.subQNo || index + 1}</span>
                 <div className={`${styles.markdownContent} ${styles.subQuestionText}`}>
-                    <ReactMarkdown>{question.text}</ReactMarkdown>
+                    <ReactMarkdown
+                        remarkPlugins={[remarkGfm, remarkMath] as any}
+                        rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                        components={markdownComponents}
+                    >{question.text}</ReactMarkdown>
                 </div>
             </div>
 
@@ -377,7 +408,11 @@ function SubQuestionItem({ sq, sIdx, onGrade, initialData }: { sq: any, sIdx: nu
                     {sq.label}
                 </span>
                 <div className={`${styles.markdownContent} ${styles.subQuestionItemText}`}>
-                    <ReactMarkdown>{sq.text}</ReactMarkdown>
+                    <ReactMarkdown
+                        remarkPlugins={[remarkGfm, remarkMath] as any}
+                        rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                        components={markdownComponents}
+                    >{sq.text}</ReactMarkdown>
                 </div>
             </div>
 
