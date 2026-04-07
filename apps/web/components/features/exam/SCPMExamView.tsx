@@ -33,15 +33,7 @@ const markdownComponents = {
             chartContent = chartContent.replace(/(\n\s*)note:/gi, '$1%% note:');
             return <Mermaid chart={chartContent} />;
         }
-        return !inline && match ? (
-            <code className={className} {...props}>
-                {children}
-            </code>
-        ) : (
-            <code className={className} {...props}>
-                {children}
-            </code>
-        );
+        return <code className={className} {...props}>{children}</code>;
     }
 };
 
@@ -162,7 +154,11 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                                 <Mermaid chart={diagram.content} />
                             ) : diagram.type === 'markdown' ? (
                                 <div className={styles.markdownContent}>
-                                    <ReactMarkdown remarkPlugins={[remarkGfm] as any} rehypePlugins={[rehypeRaw] as any}>
+                                    <ReactMarkdown
+                                        remarkPlugins={[remarkGfm, remarkMath] as any}
+                                        rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                                        components={markdownComponents}
+                                    >
                                         {diagram.content}
                                     </ReactMarkdown>
                                 </div>
@@ -180,7 +176,11 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
             // Standard Text
             return (
                 <div key={index} className={styles.markdownContent}>
-                    <ReactMarkdown remarkPlugins={[remarkGfm] as any} rehypePlugins={[rehypeRaw] as any}>
+                    <ReactMarkdown
+                        remarkPlugins={[remarkGfm, remarkMath] as any}
+                        rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                        components={markdownComponents}
+                    >
                         {part}
                     </ReactMarkdown>
                 </div>
