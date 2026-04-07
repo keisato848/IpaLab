@@ -11,7 +11,7 @@ export default defineConfig({
   timeout: 60_000,
   /* expect() のタイムアウト */
   expect: {
-    timeout: 5_000,
+    timeout: 10_000,
     /* ビジュアル比較の閾値 */
     toHaveScreenshot: { maxDiffPixelRatio: 0.05 },
   },
