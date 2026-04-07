@@ -61,6 +61,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AdProvider } from "@/components/features/ads";
 
 import { TelemetryProvider } from "@/components/providers/TelemetryProvider";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 export default function RootLayout({
     children,
@@ -103,6 +104,9 @@ export default function RootLayout({
                         </AdProvider>
                     </TelemetryProvider>
                 </NextAuthProvider>
+                {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+                    <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+                )}
             </body>
         </html>
     );
