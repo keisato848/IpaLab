@@ -436,8 +436,15 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         }
     };
 
-    const handleNext = () => {
+    const handleNext = async () => {
         const currentInt = parseInt(qNo);
+
+        // モック試験モードでは次の問題へ進む前に解答を保存する
+        // （handleOptionClickではisPractice時のみsaveResultを呼ぶため、モック時はここで保存）
+        if (isMock && selectedOption) {
+            await saveResult(selectedOption);
+        }
+
         if (currentInt < totalQuestions) {
             const nextQ = currentInt + 1;
             router.push(`/exam/${year}/${type}/${nextQ}?mode=${mode}${sessionId ? `&sessionId=${sessionId}` : ''}`);
