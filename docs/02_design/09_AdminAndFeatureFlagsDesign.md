@@ -1,4 +1,4 @@
-# 管理者機能・フィーチャーフラグ設計書
+﻿# 管理者機能・フィーチャーフラグ設計書
 
 ## 1. 概要
 
@@ -148,11 +148,13 @@ export async function requireAdmin() {
    - 成功/エラーメッセージのフィードバック
 
 2. **利用状況分析セクション**
-  - 期間セレクタ（7日間 / 30日間 / 90日間）
-  - 任意日数入力（1〜365日、入力時に即時反映）
-  - 概要カード（サイト訪問者数、総セッション数、完了セッション、総回答数）
+   - 期間セレクタ（7日間 / 30日間 / 90日間）
+   - 任意日数入力（1〜365日、入力時に即時反映）
+   - ユーザー概要カード（登録ユーザー数・ゲストユーザー数・ゲスト→登録転換率・MAU）
+   - 演習統計カード（総セッション数・演習完了率・総回答数・全体正解率）
+   - DAU 棒グラフ（日別アクティブユーザー数）
    - 試験別セッション集計テーブル（セッション数、完了数、完了率プログレスバー）
-  - 24時間以内の新規ユーザーテーブル（名前、メール、ロール、登録日）
+   - 24時間以内の新規ユーザーテーブル（名前、メール、ロール、登録日）
 
 3. **初回セットアップセクション**（非管理者のみ）
    - セットアップトークン入力フォーム
@@ -161,32 +163,47 @@ export async function requireAdmin() {
 
 ## 7. 利用状況分析設計
 
+### 計測ツールの役割分担
+
+訪問者数・流入分析は **Google Analytics 4（GA4）** が担い、管理画面は GA4 では取得できないサービス固有の指標に特化する。
+
+| ツール | 担当領域 | 備考 |
+|--------|----------|------|
+| **GA4** | 訪問者数・流入元・直帰率・ページPV | ブラウザ計測、外部サービス |
+| **App Insights** | エラー監視・パフォーマンス・SPA ルート追跡 | TelemetryProvider が自動送信 |
+| **管理画面（Cosmos DB）** | 演習の使われ方・コンテンツ品質・ユーザー定着 | 本設計の対象 |
+
 ### API
 
 | エンドポイント | メソッド | 説明 |
 |--------------|---------|------|
-| `/api/admin/analytics` | GET | 分析データ取得 `?period=7d\|30d\|90d\|{任意の日数}d\|{任意の日数}` |
+| `/api/admin/analytics` | GET | 分析データ取得 `?period=7d\|30d\|90d\|{任意の日数}` |
 
 ### レスポンス構造
 
 ```typescript
 {
-  period: string;                // リクエストされた期間
+  period: string;                   // リクエストされた期間（例: "30d"）
+  generatedAt: string;              // 集計実行日時（ISO 8601）
   overview: {
-    totalUsers: number;          // App Insights のユニーク訪問者数
-    guestUsers: number;          // ゲストユーザー数
-    totalSessions: number;       // 期間内セッション数
-    completedSessions: number;   // 完了セッション数
-    activeSessions: number;      // 進行中セッション数
-    avgQuestionsPerSession: number; // セッション当たり平均回答数
-    totalAnswers: number;        // 期間内総回答数
+    guestUsers: number;             // ゲストユーザー総数（累積）
+    registeredUsers: number;        // 登録ユーザー総数（累積）
+    conversionRate: number;         // ゲスト→登録転換率（%）
+    totalSessions: number;          // 期間内セッション数
+    completedSessions: number;      // 期間内完了セッション数
+    completionRate: number;         // 演習完了率（%）
+    activeSessions: number;         // 現在進行中セッション数（リアルタイム）
+    avgQuestionsPerSession: number; // セッション当たり平均回答数（小数第1位）
+    totalAnswers: number;           // 期間内総回答数
+    correctAnswers: number;         // 期間内正解数
+    accuracyRate: number;           // 全体正解率（%）
   };
-  examBreakdown: {               // 試験別集計
+  examBreakdown: {                  // 試験別集計
     examId: string;
     count: number;
     completedCount: number;
   }[];
-  recentUsers: {                 // 24時間以内に登録したユーザー
+  recentUsers: {                    // 24時間以内に登録したユーザー
     id: string;
     name: string | null;
     email: string | null;
@@ -194,6 +211,10 @@ export async function requireAdmin() {
     createdAt: string;
     isGuest: boolean;
   }[];
+  activityStats: {
+    dau: { date: string; uniqueUsers: number }[];  // 日別アクティブユーザー数
+    mau: number;                    // 直近30日間のアクティブユーザー数（固定）
+  };
 }
 ```
 
@@ -202,57 +223,69 @@ export async function requireAdmin() {
 | 指定例 | 意味 |
 |-------|------|
 | `7d` | 直近7日 |
-| `30d` | 直近30日 |
+| `30d` | 直近30日（デフォルト） |
 | `90d` | 直近90日 |
-| `14d` | 直近14日 |
 | `45` | 直近45日（`45d` と同義） |
 
-- 指定可能範囲は `1〜365日`
-- 不正な値が指定された場合は `400 Bad Request` を返す
+- 指定可能範囲: 1〜365日
+- 不正な値: 400 Bad Request
 
-### App Insights 集計ルール
+### 表示項目一覧・集計仕様
 
-- `overview.totalUsers` は Cosmos DB の `Users` 件数ではなく、Application Insights `AppRequests` のユニーク訪問者数を使用
-- `AppRequests` と `AppPageViews` は**別指標**として扱う
-- `AppRequests`: サーバーサイド SDK (`applicationinsights`) が記録する HTTP リクエスト。現行の「サイト訪問者数」はこの指標をベースに集計する
-- `AppPageViews`: クライアントサイド JS SDK (`@microsoft/applicationinsights-web`) が記録する画面表示イベント。ブラウザ計測用の指標として別管理する
-- Workspace-based な App Insights では Azure Monitor Logs API を経由するため、テーブル名は `AppRequests`、列名は PascalCase を使用
-- API エンドポイント (`/api/`) を除外し、ページリクエストのみを集計する
-- 訪問者の一意判定は `UserAuthenticatedId` → `UserId` → `SessionId` → `OperationId` の順でフォールバック（現状は `OperationId` のみ有効）
-- `TELEMETRY_RESOURCE_ID` が未設定、またはクエリ失敗時は `0` を返す
+#### ユーザー概要カード
 
-### 修正後の表示項目一覧
+| 表示項目 | API フィールド | データソース | 集計粒度 | 集計ロジック |
+|----------|----------------|--------------|----------|-------------|
+| 登録ユーザー数 | `overview.registeredUsers` | Cosmos DB `Users` | 累積（全期間） | `COUNT WHERE isGuest = false` |
+| ゲストユーザー数 | `overview.guestUsers` | Cosmos DB `Users` | 累積（全期間） | `COUNT WHERE isGuest = true` |
+| ゲスト→登録転換率 | `overview.conversionRate` | Cosmos DB `Users` | 累積（全期間） | `registeredUsers / (registeredUsers + guestUsers) × 100`（小数第1位） |
+| MAU（直近30日） | `activityStats.mau` | Cosmos DB `LearningRecords` | 直近30日固定 | `SELECT DISTINCT userId WHERE answeredAt >= 30日前` の件数 |
 
-| 区分 | 表示項目 | API フィールド | データソース | 定義 |
-|------|----------|----------------|--------------|------|
-| 概要カード | サイト訪問者数 | `overview.totalUsers` | Application Insights `AppRequests` | `GET /api/*` と `POST /api/*`、`HEAD` を除外したページリクエストからユニーク訪問者数を集計 |
-| 概要カード | 総セッション数 | `overview.totalSessions` | Cosmos DB `LearningSessions` | 指定期間内に `startedAt >= @since` を満たすセッション件数 |
-| 概要カード | 完了セッション | `overview.completedSessions` | Cosmos DB `LearningSessions` | 指定期間内に `status = 'completed'` のセッション件数 |
-| 概要カード | 総回答数 | `overview.totalAnswers` | Cosmos DB `LearningRecords` | 指定期間内の回答件数 |
-| グラフ | 試験別分布 | `examBreakdown[]` | Cosmos DB `LearningSessions` | `examId` ごとのセッション件数・完了件数 |
-| 一覧 | 24時間以内の新規ユーザー | `recentUsers[]` | Cosmos DB `Users` | `createdAt >= 24時間前` のユーザー一覧 |
-| 統計 | 総ページビュー | `visitorStats.totalPageViews` | Cosmos DB `PageViews` | 独自 `/api/track` で記録したページビュー総数 |
-| 統計 | ユニーク訪問者数 | `visitorStats.uniqueVisitors` | Cosmos DB `PageViews` | 独自 `visitorId` ベースのユニーク訪問者数 |
-| 統計 | 認証済み訪問者数 | `visitorStats.authenticatedVisitors` | Cosmos DB `PageViews` | `isAuthenticated = true` のユニーク訪問者数 |
-| 統計 | 匿名訪問者数 | `visitorStats.anonymousVisitors` | Cosmos DB `PageViews` | `isAuthenticated = false` のユニーク訪問者数 |
-| グラフ | 日別訪問者推移 | `visitorStats.dailyVisitors[]` | Cosmos DB `PageViews` | 日別の総訪問者・認証済み・匿名訪問者数 |
+#### 演習統計カード
 
-### App Insights 指標の定義
+| 表示項目 | API フィールド | データソース | 集計粒度 | 集計ロジック |
+|----------|----------------|--------------|----------|-------------|
+| 総セッション数 | `overview.totalSessions` | Cosmos DB `LearningSessions` | 指定期間 | `COUNT WHERE startedAt >= @since` |
+| 演習完了率 | `overview.completionRate` | Cosmos DB `LearningSessions` | 指定期間 | `completedSessions / totalSessions × 100`（小数第1位） |
+| 総回答数 | `overview.totalAnswers` | Cosmos DB `LearningRecords` | 指定期間 | `COUNT WHERE answeredAt >= @since` |
+| 全体正解率 | `overview.accuracyRate` | Cosmos DB `LearningRecords` | 指定期間 | `COUNT(isCorrect=true) / totalAnswers × 100`（小数第1位） |
 
-| 指標 | テーブル | 用途 | 現在の扱い |
-|------|----------|------|------------|
-| AppRequests | `AppRequests` | サーバーサイドの HTTP リクエスト計測 | 管理画面の「サイト訪問者数」に使用 |
-| AppPageViews | `AppPageViews` | クライアントサイドの画面表示計測 | クライアント JS SDK で送信開始済み。表示項目への反映は将来切替 |
+補足:
+- `completedSessions`: `COUNT WHERE startedAt >= @since AND status = 'completed'`
+- `activeSessions`: `COUNT WHERE status = 'in-progress'`（リアルタイム、期間フィルタなし）
+- `avgQuestionsPerSession`: `AVG(answeredCount) WHERE startedAt >= @since AND answeredCount > 0`（小数第1位）
+- `correctAnswers`: `COUNT WHERE answeredAt >= @since AND isCorrect = true`
 
-### データソース
+#### DAU グラフ
 
-| コンテナ | 取得データ | クエリの概要 |
-|---------|----------|------------|
-| Users | ゲストユーザー数・24時間以内の新規ユーザー | COUNT, WHERE createdAt >= 24時間前, ORDER BY createdAt DESC |
-| LearningSessions | セッション統計・試験別集計 | COUNT, AVG, GROUP BY examId |
-| LearningRecords | 総回答数 | COUNT |
-| Application Insights `AppRequests` | サイト訪問者数 | `AppRequests` を KQL でユニーク集計（API 除外、PascalCase 列名） |
-| Application Insights `AppPageViews` | ブラウザ画面表示イベント | クライアント JS SDK による自動送信。将来の訪問者数切替候補 |
+| 表示項目 | API フィールド | データソース | 集計粒度 | 集計ロジック |
+|----------|----------------|--------------|----------|-------------|
+| 日別アクティブユーザー | `activityStats.dau[]` | Cosmos DB `LearningRecords` | 日次 × 指定期間 | `GROUP BY date, userId` → サーバー側 JS で日別 distinct ユーザー数を集計 |
+
+- Cosmos DB の `SUBSTRING(answeredAt, 0, 10)` で `YYYY-MM-DD` を抽出してグループ化
+- クライアントには `{ date: "2026-03-15", uniqueUsers: 42 }[]` 形式で返却
+
+#### 試験別セッション集計テーブル
+
+| 表示項目 | API フィールド | データソース | 集計粒度 | 集計ロジック |
+|----------|----------------|--------------|----------|-------------|
+| セッション数・完了数 | `examBreakdown[]` | Cosmos DB `LearningSessions` | 試験ID × 指定期間 | `GROUP BY examId`。完了率は UI 側で計算 |
+
+#### 新規ユーザー一覧
+
+| 表示項目 | API フィールド | データソース | 集計粒度 | 集計ロジック |
+|----------|----------------|--------------|----------|-------------|
+| 24時間以内の新規登録 | `recentUsers[]` | Cosmos DB `Users` | 直近24時間固定 | `WHERE createdAt >= 24時間前 ORDER BY createdAt DESC` |
+
+取得フィールド: `id`, `name`, `email`, `role`, `createdAt`, `isGuest`
+
+### データソースまとめ
+
+| Cosmos DB コンテナ | 取得する値 | クエリ本数 |
+|-------------------|-----------|-----------|
+| `Users` | 登録数・ゲスト数・転換率・新規ユーザー一覧 | COUNT×2 ＋ SELECT一覧 |
+| `LearningSessions` | セッション数・完了率・進行中数・平均回答数・試験別内訳 | COUNT×4 ＋ GROUP BY |
+| `LearningRecords` | 総回答数・正解数・正解率・DAU・MAU | COUNT×2 ＋ GROUP BY（DAU）＋ DISTINCT（MAU） |
 
 ### セキュリティ
 
@@ -260,34 +293,6 @@ export async function requireAdmin() {
 - 個人の学習内容は集計値のみ表示（個別回答データは返さない）
 
 ---
-
-## 7. AdProvider との連携
-
-### 変更前（環境変数ベース）
-
-```typescript
-const ADS_ENABLED = process.env.NEXT_PUBLIC_ADS_ENABLED === 'true';
-```
-
-### 変更後（DBフラグ優先、環境変数フォールバック）
-
-```typescript
-// マウント時に /api/feature-flags からフラグを取得
-useEffect(() => {
-    fetch('/api/feature-flags')
-        .then(res => res.json())
-        .then(data => {
-            setAdsFlag(data.flags.ads_enabled ?? fallback);
-            setRewardedAdFlag(data.flags.rewarded_ad_enabled ?? fallback);
-        });
-}, []);
-```
-
-- `GET /api/feature-flags` は30秒キャッシュ
-- API取得失敗時は環境変数 `NEXT_PUBLIC_ADS_ENABLED` にフォールバック
-
----
-
 ## 8. 環境変数
 
 | 変数名 | 説明 | 必須 |
@@ -315,3 +320,5 @@ useEffect(() => {
 | 2026-02-20 | 利用状況分析機能を追加（API・ダッシュボードUI） |
 | 2026-03-06 | 利用状況分析の期間を任意日数で動的指定できるよう更新 |
 | 2026-03-06 | 利用状況分析で `adminUsers` を削除し、`totalUsers` を App Insights 訪問者数へ変更 |
+
+| 2026-04-03 | 計測ツール役割分担を整理。訪問者系指標（App Insights・Cosmos DB PageViews）を廃止しGA4に委譲。管理画面はサービス固有指標（転換率・正解率・DAU/MAU）に特化 |

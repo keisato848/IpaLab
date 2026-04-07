@@ -17,7 +17,7 @@ describe('cosmos.ts', () => {
         it('接続文字列がない場合はundefinedを返す', async () => {
             process.env.COSMOS_DB_CONNECTION = '';
 
-            const { getContainer } = await import('@/lib/cosmos');
+            const { getContainer } = await import('../../lib/cosmos');
             const result = await getContainer('Questions');
 
             expect(result).toBeUndefined();
@@ -28,7 +28,7 @@ describe('cosmos.ts', () => {
         it('接続文字列がない場合は何もしない', async () => {
             process.env.COSMOS_DB_CONNECTION = '';
 
-            const { initDatabase } = await import('@/lib/cosmos');
+            const { initDatabase } = await import('../../lib/cosmos');
 
             // エラーなく完了することを確認
             await expect(initDatabase()).resolves.not.toThrow();
