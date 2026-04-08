@@ -21,21 +21,39 @@
 ```json
 {
   "id": "AP-2023-Spring-AM1-01",
+  "qNo": 1, // 問題番号（検索用）
   "examId": "AP-2023-Spring",
   "type": "AM1", // AM1, AM2, PM1, PM2
-  "type": "AM1", // AM1, AM2, PM1, PM2
-  "category": "Technology", // 大分類 (テクノロジ系)
+  "category": "Technology", // 大分類 (テクノロジ系、マネジメント系、ストラテジ系)
   "subCategory": "Security", // 中分類 (セキュリティ, ネットワーク等)
   "text": "...", // 問題文 (Markdown)
-  "options": [ // 選択肢
+  "options": [ // 選択肢（AM試験の場合）
     { "id": "a", "text": "..." },
     { "id": "b", "text": "..." },
     { "id": "c", "text": "..." },
     { "id": "d", "text": "..." }
   ],
-  "correctOption": "a",
+  "correctOption": "a", // AM試験の正解
   "explanation": "...", // 解説 (Markdown)
-  "createdAt": "2023-01-01T00:00:00Z"
+  "transcription": "...", // 音声読み上げ用テキスト（将来機能）
+  "createdAt": "2023-01-01T00:00:00Z",
+  
+  // PM試験専用フィールド
+  "isPM": false, // PM試験の場合は true
+  "subQuestions": [ // PM試験の設問構造
+    {
+      "subQNo": "設問1",
+      "text": "...",
+      "subQuestions": [
+        {
+          "label": "(1)",
+          "text": "...",
+          "point": 15
+        }
+      ],
+      "choices": { "a": "選択肢A", "b": "選択肢B" }
+    }
+  ]
 }
 ```
 
@@ -86,8 +104,13 @@ OAuthプロバイダ (Google, GitHub) との紐付け情報を管理。
 {
   "id": "uuid-v4-xxxx",
   "userId": "user-guid-12345",
+  "sessionId": "session-uuid-optional", // LearningSessionとの紐付け
   "questionId": "AP-2023-Spring-AM1-01",
+  "examId": "AP-2023-Spring", // 集計用
+  "category": "Technology", // 集計用
+  "subCategory": "Security", // 分析用
   "isCorrect": true,
+  "isFlagged": false, // レビューマーカー
   "answeredAt": "2024-02-01T10:00:00Z",
   "timeTakenSeconds": 45,
   "nextReviewAt": "2024-02-02T10:00:00Z", // SRアルゴリズムによる次回学習推奨日
@@ -96,13 +119,56 @@ OAuthプロバイダ (Google, GitHub) との紐付け情報を管理。
 }
 ```
 
-### 2.6 `Metrics` コンテナ
-予測メトリクスとAI生成履歴を管理します。
+### 2.6 `LearningSessions` コンテナ
+学習セッション（1回の学習トライ）を管理します。Udemy スタイルの進捗追跡に使用。
+
+- **PK:** `/userId`
+- **ID:** `sessionId` (UUID)
+
+**Item Structure Definition:**
+```json
+{
+  "id": "session-uuid-xxxx",
+  "userId": "user-guid-12345",
+  "examId": "AP-2023-Spring",
+  "mode": "practice", // practice | mock
+  "startedAt": "2024-02-01T10:00:00Z",
+  "completedAt": "2024-02-01T11:00:00Z",
+  "status": "completed", // in-progress | completed
+  "totalQuestions": 80,
+  "answeredCount": 75,
+  "correctCount": 60,
+  "lastQuestionNo": 75
+}
+```
+
+### 2.7 `Metrics` コンテナ
+AI 利用メトリクスとシステム分析データを管理します。
 
 - **PK:** `/type`
 - **ID:** メトリクスタイプ + タイムスタンプ
 
-### 2.7 `PlanJobs` コンテナ
+**Item Structure Definition:**
+```json
+{
+  "id": "ai-usage-1707000000000",
+  "type": "ai-usage", // ai-usage | system-performance | user-analytics
+  "timestamp": "2024-02-04T00:00:00Z",
+  "data": {
+    "geminiRequests": 1250,
+    "successfulResponses": 1180,
+    "averageResponseTime": 2.3,
+    "errors": {
+      "timeout": 15,
+      "quota": 5,
+      "other": 50
+    }
+  },
+  "createdAt": "2024-02-04T00:00:00Z"
+}
+```
+
+### 2.8 `PlanJobs` コンテナ
 AI学習計画生成の非同期ジョブを管理します。タイムアウト時のフォールバック処理に使用。
 
 - **PK:** `/userId` (ユーザー単位のクエリを効率化)
@@ -149,8 +215,10 @@ erDiagram
     Users ||--o{ Accounts : has
     Users ||--o{ Sessions : has
     Users ||--o{ LearningRecords : has
+    Users ||--o{ LearningSessions : has
     Users ||--o{ PlanJobs : has
     Questions ||--o{ LearningRecords : referenced_by
+    LearningSessions ||--o{ LearningRecords : contains
 
     Users {
         string id PK
@@ -158,6 +226,8 @@ erDiagram
         string email
         string image
         boolean isGuest
+        string targetExamDate
+        string theme
     }
     
     Accounts {
@@ -169,20 +239,38 @@ erDiagram
 
     Questions {
         string id PK
-        string examId FK
+        int qNo
+        string examId
         string type
         string category
         string subCategory
         string text
         string correctOption
+        boolean isPM
     }
 
     LearningRecords {
         string id PK
         string userId FK
+        string sessionId FK
         string questionId FK
         boolean isCorrect
+        boolean isFlagged
+        datetime answeredAt
         datetime nextReviewAt
+    }
+
+    LearningSessions {
+        string id PK
+        string userId FK
+        string examId FK
+        string mode
+        string status
+        datetime startedAt
+        datetime completedAt
+        int totalQuestions
+        int answeredCount
+        int correctCount
     }
 
     PlanJobs {
@@ -196,5 +284,28 @@ erDiagram
 ```
 
 ## 4. データアクセス方針
-- **Read:** `packages/shared` の型定義を利用し、Azure Functions経由で取得。
-- **Write:** トランザクションは原則不要だが、整合性が必要な場合はStored Procedureを利用(基本は単一アイテム操作)。
+- **Read:** `packages/shared` の型定義を利用し、Next.js API Routes および Azure Functions 経由で取得。
+- **Write:** トランザクションは原則不要だが、整合性が必要な場合は Stored Procedure を利用（基本は単一アイテム操作）。
+- **Partition Strategy**: ユーザー関連データは userId でパーティション分割し、Questions は examId で分割して効率的なクエリを実現。
+
+## 5. パフォーマンス考慮事項
+
+### 5.1 インデックス戦略
+- **LearningRecords**: /userId パーティションキー + questionId での複合インデックス
+- **Questions**: /examId パーティションキー + qNo での順序検索インデックス
+- **LearningSessions**: /userId パーティションキー + startedAt での時系列インデックス
+
+### 5.2 容量見積もり
+- **Questions**: 約 10,000 問 × 5KB = 50MB
+- **LearningRecords**: 1ユーザー年間2万回答 × 500B = 10MB/ユーザー
+- **LearningSessions**: 1ユーザー年間500セッション × 200B = 100KB/ユーザー
+
+## 変更履歴
+
+- **2026-04-07**: リバースエンジニアリングによる大幅更新
+  - Question モデルの拡張（PM試験対応、transcription、qNo フィールド）
+  - LearningSession モデルの追加（セッション追跡機能）
+  - LearningRecord モデルの拡張（sessionId、isFlagged フィールド）
+  - Metrics モデルの詳細化（AI利用メトリクス）
+  - ER図の更新（LearningSessions の関係性追加）
+  - パフォーマンス考慮事項セクションの追加
