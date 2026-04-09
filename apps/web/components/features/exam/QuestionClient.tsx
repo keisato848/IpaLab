@@ -913,7 +913,15 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                     disabled={showExplanation && isPractice}
                                 >
                                     <span className={styles.optId}>{opt.id}</span>
-                                    <span className={styles.optText}>{opt.text}</span>
+                                    <div className={styles.optText}>
+                                        <ReactMarkdown
+                                            remarkPlugins={[remarkGfm, remarkMath] as any}
+                                            rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                                            components={components}
+                                        >
+                                            {opt.text}
+                                        </ReactMarkdown>
+                                    </div>
                                     {showExplanation && isPractice && isSelected && (
                                         <span className={styles.resultIcon}>{isCorrect ? '⭕' : '❌'}</span>
                                     )}

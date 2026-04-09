@@ -8,6 +8,7 @@ export default defineConfig({
         environment: 'jsdom',
         globals: true,
         setupFiles: ['./vitest.setup.ts'],
+        testTimeout: 30000, // API の動的インポート（CosmosDB SDK 等）が重い場合の対応
         include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
         exclude: ['node_modules', '.next', 'e2e'],
         coverage: {
