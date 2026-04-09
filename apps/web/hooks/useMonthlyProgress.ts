@@ -59,16 +59,23 @@ export function useMonthlyProgress(
         );
         const studyDayCount = uniqueDays.size;
 
+        // questionIdで重複排除（同一問題への複数回解答は最新のみ採用）
+        const latestMap = new Map<string, LearningRecord>();
+        [...filteredRecords]
+            .sort((a, b) => new Date(a.answeredAt).getTime() - new Date(b.answeredAt).getTime())
+            .forEach(r => { latestMap.set(r.questionId, r); });
+        const uniqueFilteredRecords = Array.from(latestMap.values());
+
         // 正答数
-        const correctCount = filteredRecords.filter(r => r.isCorrect).length;
+        const correctCount = uniqueFilteredRecords.filter(r => r.isCorrect).length;
 
         // 正答率（%）
-        const accuracy = filteredRecords.length > 0
-            ? Math.round((correctCount / filteredRecords.length) * 100)
+        const accuracy = uniqueFilteredRecords.length > 0
+            ? Math.round((correctCount / uniqueFilteredRecords.length) * 100)
             : 0;
 
-        // 問題数
-        const questionCount = filteredRecords.length;
+        // 問題数（ユニーク問題数）
+        const questionCount = uniqueFilteredRecords.length;
 
         if (!monthlyGoals || monthlyGoals.length === 0) {
             return {
