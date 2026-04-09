@@ -252,15 +252,33 @@ jobs:
     needs: build
     name: Deploy to Staging
     if: github.event_name == 'pull_request'
+    env:
+      # job レベルで env に展開することで、steps の if 条件から空チェックが可能
+      STAGING_APP_NAME: ${{ secrets.AZURE_STAGING_WEBAPP_NAME }}
 
     steps:
+      # Staging シークレットが設定済みか確認（未設定時は後続の Azure ステップをスキップ）
+      # Phase 1-2（Azure リソース作成・GitHub Secrets 登録）完了後に自動で有効化される
+      - name: Check staging secrets
+        id: config-check
+        run: |
+          if [ -z "$STAGING_APP_NAME" ]; then
+            echo "::notice::AZURE_STAGING_WEBAPP_NAME が未設定のため Staging デプロイをスキップします。"
+            echo "::notice::docs/03_plans/staging-environment-setup.md の Phase 1-2 を完了後に自動有効化されます。"
+            echo "configured=false" >> $GITHUB_OUTPUT
+          else
+            echo "configured=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Download artifact from build job
+        if: steps.config-check.outputs.configured == 'true'
         uses: actions/download-artifact@v4
         with:
           name: webapp-artifact
           path: ./deploy
 
       - name: Display deploy structure
+        if: steps.config-check.outputs.configured == 'true'
         run: |
           echo "=== Deploy directory ==="
           ls -la ./deploy
@@ -268,23 +286,26 @@ jobs:
 
       # 本番と同じ Service Principal を使用してログイン
       - name: Azure Login
+        if: steps.config-check.outputs.configured == 'true'
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # 起動コマンドを明示的に設定
       - name: Configure Staging startup command
+        if: steps.config-check.outputs.configured == 'true'
         run: |
           az webapp config set \
-            --name ${{ secrets.AZURE_STAGING_WEBAPP_NAME }} \
+            --name "$STAGING_APP_NAME" \
             --resource-group rg-pm-exam-dx-prod \
             --startup-file "node server.js"
 
       # Staging 環境: IPA コードレスエージェント無効化
       - name: Disable IPA codeless agent on Staging
+        if: steps.config-check.outputs.configured == 'true'
         run: |
           az webapp config appsettings delete \
-            --name ${{ secrets.AZURE_STAGING_WEBAPP_NAME }} \
+            --name "$STAGING_APP_NAME" \
             --resource-group rg-pm-exam-dx-prod \
             --setting-names \
               APPLICATIONINSIGHTS_CONNECTION_STRING \
@@ -304,9 +325,10 @@ jobs:
       # COSMOS_DB_CONNECTION, AUTH_SECRET は Staging 専用シークレットを使用
       # AUTH_TRUST_HOST=true で NextAuth がホスト名を自動検出（NEXTAUTH_URL 不要）
       - name: Configure Staging App Service settings
+        if: steps.config-check.outputs.configured == 'true'
         run: |
           az webapp config appsettings set \
-            --name ${{ secrets.AZURE_STAGING_WEBAPP_NAME }} \
+            --name "$STAGING_APP_NAME" \
             --resource-group rg-pm-exam-dx-prod \
             --settings \
               WEBSITE_RUN_FROM_PACKAGE=1 \
@@ -321,13 +343,15 @@ jobs:
               TELEMETRY_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}"
 
       - name: Deploy to Staging Web App
+        if: steps.config-check.outputs.configured == 'true'
         id: deploy-to-staging
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ secrets.AZURE_STAGING_WEBAPP_NAME }}
+          app-name: ${{ env.STAGING_APP_NAME }}
           package: ./deploy
 
       - name: Azure Logout
+        if: steps.config-check.outputs.configured == 'true'
         run: az logout
 
       # デプロイ完了後、PRにStagingのURLをコメント投稿（既存コメントは更新）
