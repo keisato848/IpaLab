@@ -251,13 +251,18 @@ packages/
 | `GEMINI_API_KEY` | Google AI Studio APIキー |
 | `COSMOS_DB_CONNECTION` | CosmosDB接続文字列（メトリクス保存用） |
 
-## 本番環境
+## 本番環境 / Staging環境
 
-| リソース | URL / 名前 | リージョン |
-|----------|------------|------------|
-| フロントエンド | https://shikaku-no.com | East Asia |
-| AI Function App | func-pm-exam-dx-ai-us | US East 2 |
-| CosmosDB | pm-exam-dx-db | East Asia |
+| 環境 | リソース | URL / 名前 | リージョン |
+|------|----------|------------|------------|
+| **本番** | フロントエンド (App Service) | https://shikaku-no.com | East Asia |
+| **本番** | AI Function App | func-pm-exam-dx-ai-us | US East 2 |
+| **本番** | CosmosDB | pm-exam-dx-db | East Asia |
+| **Staging** | フロントエンド (App Service) | https://app-pm-exam-dx-staging.azurewebsites.net | East Asia |
+| **Staging** | CosmosDB | pm-exam-dx-staging-db | East Asia |
+
+**Staging環境**: PRマージ前の動作確認に使用。PRプッシュ時に自動デプロイされ、PR上にURLがコメントされる。
+本番・Stagingとも同一 App Service Plan (`asp-pm-exam-dx-prod`, B1 Linux) に同居（追加費用なし）。
 
 ## Git 管理対象外ファイルのルール
 
