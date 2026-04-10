@@ -2,6 +2,7 @@ import NextAuth, { NextAuthOptions } from "next-auth"
 
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
+import CredentialsProvider from "next-auth/providers/credentials"
 import { CosmosAdapter } from "@/lib/auth-adapter"
 import { getContainer } from "@/lib/cosmos"
 
@@ -34,6 +35,32 @@ if (process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET) {
     );
 }
 
+
+// Staging bypass provider
+// STAGING_BYPASS_TOKEN が設定されている環境（Staging App Service）でのみ有効化される
+// 本番環境ではこの環境変数が存在しないため、このプロバイダーは登録されない
+if (process.env.STAGING_BYPASS_TOKEN) {
+    providers.push(
+        CredentialsProvider({
+            id: "staging-bypass",
+            name: "Stagingログイン",
+            credentials: {
+                token: { label: "アクセストークン", type: "password" },
+            },
+            async authorize(credentials) {
+                if (credentials?.token === process.env.STAGING_BYPASS_TOKEN) {
+                    return {
+                        id: "staging-keisato848",
+                        name: "keisato848",
+                        email: "keisato848@staging.local",
+                        image: "https://avatars.githubusercontent.com/keisato848",
+                    };
+                }
+                return null;
+            },
+        })
+    );
+}
 
 export const authOptions: NextAuthOptions = {
     providers: providers,

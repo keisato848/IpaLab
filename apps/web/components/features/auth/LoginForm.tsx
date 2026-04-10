@@ -22,11 +22,13 @@ function getErrorMessage(error: string | null): string | null {
     return messages[error] || messages.Default;
 }
 
-export function LoginForm() {
+export function LoginForm({ isStagingMode = false }: { isStagingMode?: boolean }) {
     const searchParams = useSearchParams();
     const errorParam = searchParams.get('error');
     const errorMessage = getErrorMessage(errorParam);
     const [loading, setLoading] = useState<string | null>(null);
+    const [stagingToken, setStagingToken] = useState('');
+    const [stagingError, setStagingError] = useState<string | null>(null);
 
     const handleLogin = async (provider: 'github' | 'google') => {
         setLoading(provider);
@@ -34,6 +36,23 @@ export function LoginForm() {
             await signIn(provider, { callbackUrl: '/dashboard' });
         } catch {
             setLoading(null);
+        }
+    };
+
+    const handleStagingLogin = async () => {
+        if (!stagingToken.trim()) return;
+        setLoading('staging');
+        setStagingError(null);
+        const result = await signIn('staging-bypass', {
+            token: stagingToken,
+            callbackUrl: '/dashboard',
+            redirect: false,
+        });
+        if (result?.error) {
+            setStagingError('トークンが正しくありません。');
+            setLoading(null);
+        } else {
+            window.location.href = '/dashboard';
         }
     };
 
@@ -85,6 +104,32 @@ export function LoginForm() {
                 <a href="/privacy" className={styles.link} target="_blank" rel="noopener noreferrer">プライバシーポリシー</a>
                 に同意したものとみなします。
             </p>
+
+            {isStagingMode && (
+                <div className={styles.stagingSection}>
+                    <p className={styles.stagingLabel}>⚠️ Staging 検証環境</p>
+                    {stagingError && (
+                        <div className={styles.error} role="alert">{stagingError}</div>
+                    )}
+                    <input
+                        type="password"
+                        className={styles.stagingInput}
+                        placeholder="アクセストークンを入力"
+                        value={stagingToken}
+                        onChange={(e) => setStagingToken(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleStagingLogin()}
+                        disabled={loading !== null}
+                    />
+                    <button
+                        className={styles.stagingButton}
+                        onClick={handleStagingLogin}
+                        disabled={loading !== null || !stagingToken.trim()}
+                    >
+                        {loading === 'staging' ? <span className={styles.spinner} /> : null}
+                        <span>Stagingログイン</span>
+                    </button>
+                </div>
+            )}
 
             <div className={styles.divider}>
                 <span>または</span>
