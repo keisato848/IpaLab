@@ -339,7 +339,7 @@ jobs:
               AUTH_GITHUB_SECRET="${{ secrets.AUTH_GITHUB_SECRET }}" \
               AUTH_GOOGLE_ID="${{ secrets.AUTH_GOOGLE_ID }}" \
               AUTH_GOOGLE_SECRET="${{ secrets.AUTH_GOOGLE_SECRET }}" \
-              COSMOS_DB_CONNECTION="${{ secrets.COSMOS_DB_CONNECTION_STAGING }}" \
+              COSMOS_DB_CONNECTION="${{ secrets.COSMOS_DB_CONNECTION }}" \
               TELEMETRY_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}"
 
       - name: Deploy to Staging Web App

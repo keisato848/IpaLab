@@ -8,7 +8,7 @@ PR マージ前の動作確認を可能にするため、Azure App Service に S
 |------|-----|
 | Staging App Service 名 | `app-pm-exam-dx-staging` |
 | App Service Plan | `asp-pm-exam-dx-prod`（本番と同一プラン、追加費用なし）|
-| Staging CosmosDB | `pm-exam-dx-staging-db`（Serverless、使用量課金）|
+| Staging CosmosDB | `pm-exam-dx-db`（**本番と共有**。データ構造変更が必要になった際に分離を検討）|
 | Staging URL | `https://app-pm-exam-dx-staging.azurewebsites.net` |
 
 ## Phase 1: Azure リソース作成
@@ -33,63 +33,13 @@ az webapp config set \
   --startup-file "node server.js"
 ```
 
-### 1-2. Staging CosmosDB の作成（Serverless）
+### 1-2. CosmosDB（本番共有）
 
-```bash
-# CosmosDB アカウント作成（Serverless プラン）
-az cosmosdb create \
-  --name pm-exam-dx-staging-db \
-  --resource-group rg-pm-exam-dx-prod \
-  --kind GlobalDocumentDB \
-  --locations regionName="East Asia" failoverPriority=0 isZoneRedundant=false \
-  --capabilities EnableServerless \
-  --default-consistency-level Session
+CosmosDB は本番の `pm-exam-dx-db` を共有します。Staging 専用の CosmosDB 作成は不要です。
 
-# データベース作成（本番と同じ名前）
-az cosmosdb sql database create \
-  --account-name pm-exam-dx-staging-db \
-  --resource-group rg-pm-exam-dx-prod \
-  --name IpaLabDB
+> **将来の分離タイミング**: データ構造（コンテナ定義・パーティションキー）を変更するような改修が必要になった際に、Serverless プランで別途 `pm-exam-dx-staging-db` を作成することを検討してください。
 
-# コンテナ作成（本番の定義をコピー。パーティションキーは本番と要確認）
-az cosmosdb sql container create \
-  --account-name pm-exam-dx-staging-db \
-  --resource-group rg-pm-exam-dx-prod \
-  --database-name IpaLabDB \
-  --name Users \
-  --partition-key-path "/userId"
-
-az cosmosdb sql container create \
-  --account-name pm-exam-dx-staging-db \
-  --resource-group rg-pm-exam-dx-prod \
-  --database-name IpaLabDB \
-  --name ExamResults \
-  --partition-key-path "/userId"
-
-az cosmosdb sql container create \
-  --account-name pm-exam-dx-staging-db \
-  --resource-group rg-pm-exam-dx-prod \
-  --database-name IpaLabDB \
-  --name AIJobs \
-  --partition-key-path "/userId"
-```
-
-> **注意**: 上記コンテナ名・パーティションキーが本番と一致しているか `packages/data/src/` を確認して合わせること。
-
-### 1-3. Staging CosmosDB の接続文字列を取得
-
-```bash
-az cosmosdb keys list \
-  --name pm-exam-dx-staging-db \
-  --resource-group rg-pm-exam-dx-prod \
-  --type connection-strings \
-  --query "connectionStrings[0].connectionString" \
-  -o tsv
-```
-
-出力された接続文字列を次の Phase 2 で GitHub Secrets に登録する。
-
-### 1-4. OAuth プロバイダーに Staging URL を追加
+### 1-3. OAuth プロバイダーに Staging URL を追加
 
 #### GitHub OAuth App
 
@@ -116,7 +66,6 @@ GitHub リポジトリ > Settings > Secrets and variables > Actions > New reposi
 | Secret 名 | 値 | 説明 |
 |-----------|-----|------|
 | `AZURE_STAGING_WEBAPP_NAME` | `app-pm-exam-dx-staging` | Staging App Service 名 |
-| `COSMOS_DB_CONNECTION_STAGING` | *(Phase 1-3 で取得した接続文字列)* | Staging CosmosDB 接続文字列 |
 | `NEXTAUTH_SECRET_STAGING` | *(下記コマンドで生成)* | Staging 用 NextAuth シークレット |
 
 `NEXTAUTH_SECRET_STAGING` の生成方法:
@@ -129,7 +78,7 @@ GitHub リポジトリ > Settings > Secrets and variables > Actions > New reposi
 openssl rand -base64 32
 ```
 
-> **注意**: 既存の `AZURE_CREDENTIALS`, `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `APPLICATIONINSIGHTS_CONNECTION_STRING` は本番・Staging で共通利用するため追加不要。
+> **注意**: 既存の `AZURE_CREDENTIALS`, `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `APPLICATIONINSIGHTS_CONNECTION_STRING`, `COSMOS_DB_CONNECTION` は本番・Staging で共通利用するため追加不要。
 
 ---
 
@@ -170,7 +119,7 @@ Phase 1〜4 完了後、以下で動作確認する:
 
 - **同一 App Service Plan の共有**: 本番・Staging は同一 B1 Plan を共有するため、CPU/メモリが競合する。本番の負荷が高い場合は Staging を別 Plan（+約 $14/月）へ分離することを検討。
 - **複数 PR 同時進行**: 固定 Staging URL のため、複数 PR が同時に存在する場合は最後にデプロイされた PR の内容が反映される。
-- **データ分離**: Staging は専用の `pm-exam-dx-staging-db` を使用するため、本番データとの混在はなし。
+- **データ共有**: Staging は本番の `pm-exam-dx-db` を共有する。Staging でのテストデータが本番 DB に書き込まれる点に注意。データ構造変更が必要な改修時は専用の `pm-exam-dx-staging-db`（Serverless）を作成して分離すること。
 
 ## 変更履歴
 
