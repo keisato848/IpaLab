@@ -255,6 +255,7 @@ jobs:
     env:
       # job レベルで env に展開することで、steps の if 条件から空チェックが可能
       STAGING_APP_NAME: ${{ secrets.AZURE_STAGING_WEBAPP_NAME }}
+      STAGING_RG: rg-pm-exam-dx-staging
 
     steps:
       # Staging シークレットが設定済みか確認（未設定時は後続の Azure ステップをスキップ）
@@ -297,7 +298,7 @@ jobs:
         run: |
           az webapp config set \
             --name "$STAGING_APP_NAME" \
-            --resource-group rg-pm-exam-dx-prod \
+            --resource-group "$STAGING_RG" \
             --startup-file "node server.js"
 
       # Staging 環境: IPA コードレスエージェント無効化
@@ -306,7 +307,7 @@ jobs:
         run: |
           az webapp config appsettings delete \
             --name "$STAGING_APP_NAME" \
-            --resource-group rg-pm-exam-dx-prod \
+            --resource-group "$STAGING_RG" \
             --setting-names \
               APPLICATIONINSIGHTS_CONNECTION_STRING \
               APPINSIGHTS_CONNECTIONSTRING \
@@ -329,7 +330,7 @@ jobs:
         run: |
           az webapp config appsettings set \
             --name "$STAGING_APP_NAME" \
-            --resource-group rg-pm-exam-dx-prod \
+            --resource-group "$STAGING_RG" \
             --settings \
               WEBSITE_RUN_FROM_PACKAGE=1 \
               WEBSITES_PORT=8080 \
