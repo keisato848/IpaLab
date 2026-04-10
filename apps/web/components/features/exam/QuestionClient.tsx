@@ -239,12 +239,21 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
                 if (eRecords.length > 0) {
                     setAllExamRecords(eRecords);
-                    // Session Stats (Today's records)
-                    const today = new Date().toISOString().split('T')[0];
-                    const todaysRecords = eRecords.filter(r => r && r.answeredAt && r.answeredAt.startsWith(today));
-                    if (todaysRecords.length > 0) {
-                        const sCorrect = todaysRecords.filter(r => r.isCorrect).length;
-                        setSessionStats({ total: todaysRecords.length, correct: sCorrect });
+                    // Session Stats (セッションIDに紐づくレコードのみをカウント)
+                    if (sessionId) {
+                        const sessionRecords = eRecords.filter(r => r && r.sessionId === sessionId);
+                        if (sessionRecords.length > 0) {
+                            const sCorrect = sessionRecords.filter(r => r.isCorrect).length;
+                            setSessionStats({ total: sessionRecords.length, correct: sCorrect });
+                        }
+                    } else {
+                        // セッションIDがない場合は今日のレコードをフォールバック
+                        const today = new Date().toISOString().split('T')[0];
+                        const todaysRecords = eRecords.filter(r => r && r.answeredAt && r.answeredAt.startsWith(today));
+                        if (todaysRecords.length > 0) {
+                            const sCorrect = todaysRecords.filter(r => r.isCorrect).length;
+                            setSessionStats({ total: todaysRecords.length, correct: sCorrect });
+                        }
                     }
 
                     const eCorrect = eRecords.filter(r => r.isCorrect).length;
@@ -257,7 +266,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             }
         }
         fetchStats();
-    }, [question.id, question.examId, question.correctOption, isReview, session]);
+    }, [question.id, question.examId, question.correctOption, isReview, session, sessionId]);
 
     const formatTime = (seconds: number) => {
         const h = Math.floor(seconds / 3600);
