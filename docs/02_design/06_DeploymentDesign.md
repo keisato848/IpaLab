@@ -2,170 +2,194 @@
 
 ## 1. 概要
 
-本ドキュメントは、IpaLab アプリケーションの Azure Static Web Apps (SWA) へのデプロイメント設計を記載する。
-**本設計に違反した変更は、デプロイ失敗（warm-up timeout）を引き起こすため、厳守すること。**
+本ドキュメントは、IpaLab アプリケーションの Azure App Service へのデプロイメント設計を記載する。
+
+> **移行メモ**: 2026年1月に Azure Static Web Apps (SWA) から Azure App Service (Linux B1) へ移行済み。
+> 移行理由: Application Insights の SWA + Next.js Hybrid 環境での出力問題を解決するため。
+> 詳細: `docs/03_migration/01_SWA_to_AppService_Migration_Plan.md` を参照。
 
 ## 2. 技術スタック
 
-| コンポーネント | 技術 | バージョン |
-|---------------|------|-----------|
-| フレームワーク | Next.js | 14.x (App Router) |
-| パッケージ管理 | npm workspaces + Turborepo | - |
-| ホスティング | Azure Static Web Apps | Standard |
-| リージョン | East Asia | - |
+| コンポーネント | 技術 | 詳細 |
+|---------------|------|------|
+| フレームワーク | Next.js | 15.x (App Router) |
+| Node.js | LTS | 20 |
+| パッケージ管理 | npm workspaces + Turborepo | npm@10.9.2 |
+| フロントエンドホスティング | Azure App Service | B1 Linux (East Asia) |
+| AIバックエンド | Azure Functions | Node.js v4 (US East 2) |
+| データベース | CosmosDB Serverless | East Asia |
+| ランタイムモード | Next.js standalone | `output: 'standalone'` |
 
 ## 3. アーキテクチャ構成
 
+### 3.1 環境一覧
+
+| 環境 | App Service 名 | URL | デプロイ契機 | CosmosDB |
+|------|---------------|-----|------------|----------|
+| **本番 (prod)** | `app-pm-exam-dx-prod` | https://shikaku-no.com | `main` ブランチへの push | `pm-exam-dx-db` (Serverless) |
+| **検証 (staging)** | `app-pm-exam-dx-staging` | `https://app-pm-exam-dx-staging.azurewebsites.net` | PR オープン・更新時 | `pm-exam-dx-staging-db` (Serverless) |
+
+両環境とも同一 App Service Plan (`asp-pm-exam-dx-prod`, B1 Linux) に同居。
+
+### 3.2 アーキテクチャ図
+
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    GitHub Repository                     │
-│  ┌─────────────────────────────────────────────────┐    │
-│  │              Monorepo (Turborepo)                │    │
-│  │  ┌──────────┐ ┌──────────┐ ┌──────────────────┐ │    │
-│  │  │ apps/web │ │ apps/api │ │ packages/shared  │ │    │
-│  │  │ (Next.js)│ │ (未使用) │ │ packages/data    │ │    │
-│  │  └──────────┘ └──────────┘ └──────────────────┘ │    │
-│  └─────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────┘
-                          │
-                          │ GitHub Actions
-                          │ (azure-static-web-apps.yml)
-                          ▼
-┌─────────────────────────────────────────────────────────┐
-│              Azure Static Web Apps (SWA)                 │
-│  ┌─────────────────────────────────────────────────┐    │
-│  │         Oryx Build Engine (内部ビルド)           │    │
-│  │  - npm install                                   │    │
-│  │  - npx turbo run build --filter=web             │    │
-│  └─────────────────────────────────────────────────┘    │
-│  ┌─────────────────────────────────────────────────┐    │
-│  │         Next.js Hybrid Rendering                 │    │
-│  │  - SSR (Server-Side Rendering)                  │    │
-│  │  - API Routes                                    │    │
-│  │  - React Server Components                       │    │
-│  └─────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────┘
-```
-
-## 4. ワークフロー設定（重要）
-
-### 4.1 正しい設定（必須）
-
-```yaml
-- name: Build And Deploy
-  uses: Azure/static-web-apps-deploy@v1
-  with:
-    azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-    repo_token: ${{ secrets.GITHUB_TOKEN }}
-    action: "upload"
-    app_location: "/apps/web"        # ← monorepo 内の Next.js アプリパス
-    api_location: ""                 # ← 空（Next.js API routes を使用）
-    output_location: ""              # ← 空（Azure SWA が自動検出）
-    app_build_command: "npx turbo run build --filter=web"  # ← Turborepo ビルド
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                              GitHub Repository                                    │
+│                          Monorepo (Turborepo)                                    │
+│  apps/web (Next.js)  |  apps/api-ai (Az Func)  |  packages/ (shared/data/ui)    │
+└──────────────────────────────────────────────────────────────────────────────────┘
+         │ PR push                                  │ main push
+         ▼ azure-app-service.yml                   ▼ azure-app-service.yml
+┌─────────────────────┐                 ┌──────────────────────────────────────────┐
+│  Staging App Service│                 │         Azure East Asia Region            │
+│  app-pm-exam-dx-    │                 │  ┌────────────────────────────────────┐  │
+│     staging         │                 │  │   App Service (B1 Linux)           │  │
+│  ─────────────────  │                 │  │   app-pm-exam-dx-prod              │  │
+│  Node.js standalone │                 │  │   shikaku-no.com                   │  │
+│  node server.js     │                 │  │   Node.js standalone               │  │
+│                     │                 │  │   node server.js                   │  │
+│  CosmosDB: staging  │                 │  └────────────────────────────────────┘  │
+└─────────────────────┘                 │  ┌────────────────────────────────────┐  │
+         │                              │  │   CosmosDB Serverless              │  │
+         │ PR に Staging URL をコメント   │  │   pm-exam-dx-db                    │  │
+         ▼                              │  └────────────────────────────────────┘  │
+   開発者が動作確認                       └──────────────────────────────────────────┘
+                                                           │
+                                        ┌──────────────────┴───────────────────────┐
+                                        │         Azure US East 2 Region            │
+                                        │  Azure Functions (func-pm-exam-dx-ai-us)  │
+                                        │  ← Gemini API (地域制限: US のみ)         │
+                                        └──────────────────────────────────────────┘
 ```
 
-### 4.2 禁止設定（デプロイ失敗の原因）
+### 3.3 CI/CD フロー
 
-以下の設定は **絶対に使用しないこと**：
+```
+PR 作成・更新
+  → test ジョブ (Vitest)
+  → build ジョブ (standalone)
+  → deploy-staging ジョブ → Staging App Service
+  → PR に「✅ Staging デプロイ完了」コメント投稿
+  → 開発者が Staging URL で動作確認
+  → レビュー・承認 → main へマージ
 
-#### ❌ 禁止 1: standalone モード
-
-```javascript
-// next.config.js - 使用禁止
-module.exports = {
-    output: 'standalone',  // ← 禁止
-}
+main マージ
+  → test ジョブ
+  → build ジョブ
+  → deploy ジョブ → 本番 App Service (shikaku-no.com)
 ```
 
-**理由**: monorepo 構造では standalone 出力が `apps/web/.next/standalone/apps/web/server.js` に生成され、Azure SWA が正しくサーバーを起動できない。
+## 4. ワークフロー設定
 
-#### ❌ 禁止 2: GitHub 側でのプリビルド + skip_app_build
+### 4.1 ワークフローファイル
 
-```yaml
-# 使用禁止
-- name: Build
-  run: npx turbo run build --filter=web
+GitHub Actions ワークフロー: `.github/workflows/azure-app-service.yml`
 
-- name: Build And Deploy
-  with:
-    skip_app_build: true      # ← 禁止
-    output_location: ".next"  # ← 禁止
+| ジョブ | トリガー | 内容 |
+|--------|---------|------|
+| `test` | push / PR / 手動 | Vitest ユニットテスト実行 |
+| `build` | push / PR / 手動 | Next.js standalone ビルド + Artifact作成 |
+| `deploy` | `main` push / 手動のみ | **本番**へデプロイ |
+| `deploy-staging` | PR のみ | **Staging**へデプロイ + PR にURLをコメント |
+
+### 4.2 必要な GitHub Secrets
+
+| Secret名 | 説明 | 対象 |
+|---------|------|------|
+| `AZURE_CREDENTIALS` | Service Principal JSON | 本番・Staging共通 |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | App Insights接続文字列 | 本番・Staging共通 |
+| `AUTH_GITHUB_ID` | GitHub OAuth クライアントID | 本番・Staging共通 |
+| `AUTH_GITHUB_SECRET` | GitHub OAuth シークレット | 本番・Staging共通 |
+| `AUTH_GOOGLE_ID` | Google OAuth クライアントID | 本番・Staging共通 |
+| `AUTH_GOOGLE_SECRET` | Google OAuth シークレット | 本番・Staging共通 |
+| `AZURE_STAGING_WEBAPP_NAME` | `app-pm-exam-dx-staging` | **Staging専用** |
+| `COSMOS_DB_CONNECTION_STAGING` | Staging CosmosDB接続文字列 | **Staging専用** |
+| `NEXTAUTH_SECRET_STAGING` | Staging用 NextAuth シークレット | **Staging専用** |
+
+### 4.3 デプロイパッケージ構造
+
+`npm run build:standalone` により Next.js standalone ビルドを実行し、以下の構造を App Service ルートに配置する。
+
+```
+standalone/          ← App Service デプロイルート
+├── server.js        ← エントリーポイント（起動コマンド: node server.js）
+├── node_modules/    ← 本番に必要な最小モジュール
+├── .next/
+│   ├── static/      ← CSS/JS（standalone外からコピー）
+│   └── server/      ← SSR用バンドル
+└── public/          ← 公開静的ファイル
 ```
 
-**理由**: Azure SWA の Next.js hybrid サポートは、SWA 側でビルドする場合のみ正しく動作する。プリビルドした `.next` フォルダをアップロードしても warm-up が失敗する。
+### 4.4 App Service 起動コマンド
 
-#### ❌ 禁止 3: post-build.js による静的ファイルコピー
-
-```json
-// package.json - 使用禁止
-{
-  "scripts": {
-    "build": "next build && node scripts/post-build.js"  // ← 禁止
-  }
-}
+```bash
+node server.js
 ```
 
-**理由**: standalone モードを前提としたスクリプトであり、Azure SWA ネイティブサポートでは不要。
+各デプロイジョブは `az webapp config set --startup-file "node server.js"` で起動コマンドを明示的に設定する。Oryx のデフォルト検出に依存しない。
 
 ## 5. 環境変数設定
 
-### 5.1 設定場所
+### 5.1 設定方法
 
-| 変数の用途 | 設定場所 |
-|-----------|---------|
-| ビルド時に必要 | Azure SWA 側でビルドするため、Azure Portal の環境変数に設定 |
-| ランタイム時に必要 | Azure Portal の環境変数に設定 |
+App Service の環境変数は **GitHub Actions ワークフロー内で `az webapp config appsettings set` コマンドにより設定**する。Azure Portal 直接設定は次のデプロイで上書きされる可能性があるため非推奨。
 
-### 5.2 必要な環境変数
+### 5.2 本番環境 (app-pm-exam-dx-prod) の必要な環境変数
 
-Azure Portal > Static Web Apps > `swa-pm-exam-dx-prod` > 設定 > 環境変数
+| 変数名 | 用途 | 設定方法 |
+|--------|------|---------|
+| `WEBSITE_RUN_FROM_PACKAGE` | `1` (Oryx バイパス) | CI/CD |
+| `WEBSITES_PORT` | `8080` (Next.js リスニングポート) | CI/CD |
+| `COSMOS_DB_CONNECTION` | CosmosDB 接続文字列 | App Service 設定（ポータル）|
+| `AUTH_SECRET` | NextAuth JWT 暗号化キー | App Service 設定（ポータル）|
+| `AUTH_TRUST_HOST` | `true` (ホスト自動検出) | App Service 設定（ポータル）|
+| `AUTH_GITHUB_ID` | GitHub OAuth | App Service 設定（ポータル）|
+| `AUTH_GITHUB_SECRET` | GitHub OAuth | App Service 設定（ポータル）|
+| `AUTH_GOOGLE_ID` | Google OAuth | App Service 設定（ポータル）|
+| `AUTH_GOOGLE_SECRET` | Google OAuth | App Service 設定（ポータル）|
+| `TELEMETRY_CONNECTION_STRING` | App Insights（IPAコードレス回避用名）| CI/CD |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Google Analytics 4 | App Service 設定（ポータル）|
 
-| 変数名 | 用途 | 必須 |
-|--------|------|------|
-| `COSMOS_DB_CONNECTION` | Cosmos DB 接続文字列 | ✅ |
-| `APPLICATIONINSIGHTS_CONNECTION_STRING` | Application Insights | ✅ |
-| `AUTH_SECRET` | NextAuth セッション暗号化 | ✅ |
-| `AUTH_TRUST_HOST` | NextAuth ホスト信頼 | ✅ |
-| `AUTH_GITHUB_ID` | GitHub OAuth | 任意 |
-| `AUTH_GITHUB_SECRET` | GitHub OAuth | 任意 |
-| `AUTH_GOOGLE_ID` | Google OAuth | 任意 |
-| `AUTH_GOOGLE_SECRET` | Google OAuth | 任意 |
-| `GEMINI_API_KEY` | Gemini AI API | 任意 |
+> **IPA コードレスエージェント無効化**: Linux App Service の IPA は `APPLICATIONINSIGHTS_*` / `APPINSIGHTS_*` プレフィックスや `*_EXTENSION_VERSION` 設定の存在を検出して自動有効化する。手動 SDK の OpenTelemetry セットアップと競合するため、CI/CD デプロイ時に完全削除し `TELEMETRY_CONNECTION_STRING` という独自名で渡す。
+
+### 5.3 Staging環境 (app-pm-exam-dx-staging) の環境変数
+
+Staging 固有の設定はワークフローの `deploy-staging` ジョブで自動設定される。  
+以下の GitHub Secrets は事前に手動で登録が必要:
+
+| Secret名 | 内容 |
+|---------|------|
+| `AZURE_STAGING_WEBAPP_NAME` | `app-pm-exam-dx-staging` |
+| `COSMOS_DB_CONNECTION_STAGING` | pm-exam-dx-staging-db の接続文字列 |
+| `NEXTAUTH_SECRET_STAGING` | `openssl rand -base64 32` で生成 |
 
 ## 6. トラブルシューティング
 
-### 6.1 "Web app warm up timed out" エラー
+### 6.1 App Service 起動失敗
 
-**原因と解決策**:
+**症状**: デプロイ後にアプリが起動しない、503エラーが返る
 
-| 原因 | 解決策 |
-|------|--------|
-| `output: 'standalone'` が有効 | next.config.js から削除 |
-| `skip_app_build: true` を使用 | 削除して Azure SWA 側でビルド |
-| `output_location: ".next"` を指定 | 空文字に変更 |
-| post-build.js が実行されている | package.json から削除 |
-| `navigationFallback` / `responseOverrides` 使用 | staticwebapp.config.json から削除（Next.js hybridでは非サポート） |
+| 原因 | 確認方法 | 解決策 |
+|------|---------|--------|
+| 起動コマンドが残存設定に上書きされている | Azure Portal > App Service > 構成 > 起動コマンドを確認 | CI/CD の `az webapp config set --startup-file "node server.js"` が正しく実行されているか確認 |
+| `.next/static` が欠如 | ローカルで `npm run build:standalone` 後に `apps/web/.next/standalone/.next/static/` の存在を確認 | `azure-app-service.yml` の `Create deployment package` ステップで `../static` コピーが成功しているかログ確認 |
+| `node_modules/next` が欠如 | ビルドログで `node_modules/next/package.json` の確認ステップを参照 | standalone ビルドが正常完了しているか確認 |
 
-**重要**: Next.js hybrid rendering では `staticwebapp.config.json` の以下の設定は**サポートされていません**：
-- `navigationFallback`: Next.js が独自にルーティングを処理するため不要
-- `responseOverrides`: 404等のカスタムハンドリングは Next.js の `not-found.tsx` で実装
-
-Azure SWA はデプロイ時に `/.swa/health.html` にアクセスしてヘルスチェックを行います。
-上記の設定があると、このヘルスチェックが妨げられ warm-up timeout が発生します。
+詳細: `docs/04_reports/AppService_Startup_Failure_RootCause_20260207.md`
 
 ### 6.2 API Route の静的レンダリングエラー
 
 **症状**: ビルド時に以下のエラーが発生
+
 ```
 Error: Route /api/xxx couldn't be rendered statically because it used `headers`.
 ```
 
-**原因**: Next.js はデフォルトで API Route を静的にレンダリングしようとするが、認証（`getServerSession`）やヘッダー（`headers()`）を使用するルートは静的化できない。
-
 **解決策**: 認証やヘッダーを使用する API Route には `dynamic = 'force-dynamic'` を追加する。
 
 ```typescript
-// 必須: 認証を使用するAPIルート
+// 認証を使用するAPIルートに必須
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
@@ -174,37 +198,48 @@ export async function GET(req: NextRequest) {
 }
 ```
 
-**対象ルート一覧**:
-| ルート | 理由 |
-|--------|------|
-| `/api/ai/jobs` | 認証使用 |
-| `/api/ai/jobs/pending` | 認証使用 |
-| `/api/ai/jobs/[jobId]` | 認証使用 |
-| `/api/ai/plan` | 外部APIプロキシ |
-| `/api/ai/generate-plan` | 外部API呼び出し |
-| `/api/config/telemetry` | ランタイム環境変数取得 |
-| `/api/learning-records` | 認証使用 |
-| `/api/exam-progress` | 認証使用 |
-| `/api/session` | 認証使用 |
-| `/api/auth/[...nextauth]` | NextAuth |
+### 6.3 Staging デプロイが失敗する
 
-### 6.3 デプロイ成功の確認ポイント
+**原因別確認**:
 
-1. GitHub Actions ログで `Status: Succeeded` を確認
-2. `Deployment Complete :)` メッセージを確認
-3. warm-up 時間が 200秒以内（通常 150秒程度）
+| 原因 | 確認・解決策 |
+|------|------------|
+| `AZURE_STAGING_WEBAPP_NAME` Secret未登録 | GitHub > Settings > Secrets and variables > Actions で確認 |
+| `COSMOS_DB_CONNECTION_STAGING` Secret未登録 | 同上 |
+| Staging App Service がまだ作成されていない | Azure Portal で `app-pm-exam-dx-staging` の存在を確認 |
+| `AZURE_CREDENTIALS` の Service Principal に Staging App Service へのアクセス権がない | Staging リソースグループへの Contributor 権限を付与 |
 
-### 6.4 動作確認済みコミット
+### 6.4 OAuth コールバックエラー（Staging）
 
-問題が発生した場合、以下のコミットの設定を参照：
+**症状**: Staging 環境でログインすると `redirect_uri_mismatch` エラー
 
-- **コミット**: `1323190` (2025/12/29)
-- **内容**: `fix: Revert standalone output (rely on SWA native Next.js support)`
+**解決策**: OAuth プロバイダーに Staging のコールバック URL を追加する。
+
+- GitHub OAuth App: `https://app-pm-exam-dx-staging.azurewebsites.net/api/auth/callback/github`
+- Google Cloud Console: `https://app-pm-exam-dx-staging.azurewebsites.net/api/auth/callback/google`
+
+### 6.5 デプロイ成功の確認ポイント
+
+1. GitHub Actions で全ジョブが ✅ になることを確認
+2. PR コメントに "✅ Staging デプロイ完了" が投稿されることを確認
+3. Staging URL にアクセスしてトップページが表示されることを確認
+4. `gh pr checks <PR番号>` で `Deploy to Staging` が成功することを確認
 
 ## 7. 変更履歴
 
 | 日付 | 変更内容 | 担当 |
 |------|---------|------|
+| 2026/04/09 | **Staging 環境構築対応** | エージェント |
+| | - Azure App Service Staging (`app-pm-exam-dx-staging`) 追加 | |
+| | - CI/CD に `deploy-staging` ジョブ追加（PRトリガー、PR URLコメント投稿） | |
+| | - 設計書全面改訂（SWA→App Service 実態に更新） | |
+| | - 環境一覧表・CI/CDフロー図を新構成に更新 | |
+| 2026/04/07 | **リバースエンジニアリングによる大幅更新** | エージェント |
+| | - Next.js 16.2.1 に対応 | |
+| | - apps/api, apps/api-ai の存在を正確に反映 | |
+| | - packages/config の追加を反映 | |
+| | - アーキテクチャ図の詳細化（複数リージョン対応） | |
+| | - Azure Functions の手動デプロイ手順明記 | |
 | 2026/02/04 | navigationFallback/responseOverrides 禁止事項追加（warm-up timeout対策） | - |
 | 2026/02/04 | API Route の `dynamic = 'force-dynamic'` 規約追加（セクション6.2） | - |
 | 2026/02/02 | Application Insights 統合設計セクション追加 | - |
