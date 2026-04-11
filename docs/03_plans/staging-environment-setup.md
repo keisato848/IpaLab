@@ -52,10 +52,13 @@ Staging 環境は **本番の OAuth 設定を変更しない** 方針とし、`S
 
 - `apps/web/auth.ts`
    - `STAGING_BYPASS_TOKEN` があるときだけ `staging-bypass` provider を登録
+   - `STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID` がある場合、GitHub アカウント ID から本番 Users/Accounts を引いて実 user id へマッピングする
 - `apps/web/app/login/page.tsx`
    - ランタイムの環境変数を読むため `dynamic = 'force-dynamic'` を付与
 - `apps/web/components/features/auth/LoginForm.tsx`
    - `/api/auth/providers` の応答を参照して、Staging 専用のトークン入力フォームを表示
+
+> **重要**: `STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID` を設定すると、Staging ログイン後の読み書きは本番 DB 上の実ユーザーに対して行われる。Staging 上の学習履歴更新や進捗変更も本番データに反映される。
 
 ---
 
@@ -68,6 +71,7 @@ GitHub リポジトリ > Settings > Secrets and variables > Actions > New reposi
 | `AZURE_STAGING_WEBAPP_NAME` | `app-pm-exam-dx-staging` | Staging App Service 名 |
 | `NEXTAUTH_SECRET_STAGING` | *(下記コマンドで生成)* | Staging 用 NextAuth シークレット |
 | `STAGING_BYPASS_TOKEN` | *(下記コマンドで生成)* | Staging 専用ログイントークン |
+| `STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID` | `72418986` | Staging bypass を本番の `keisato848` ユーザーへマップする GitHub Account ID |
 
 `NEXTAUTH_SECRET_STAGING` の生成方法:
 
@@ -90,6 +94,12 @@ openssl rand -base64 32
 ```
 
 > **注意**: 既存の `AZURE_CREDENTIALS`, `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `APPLICATIONINSIGHTS_CONNECTION_STRING`, `COSMOS_DB_CONNECTION` は本番・Staging で共通利用するため追加不要。
+
+`STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID` の確認方法:
+
+```bash
+gh api users/keisato848 --jq .id
+```
 
 ---
 
@@ -122,6 +132,7 @@ Phase 1〜4 完了後、以下で動作確認する:
 - [ ] Staging URL (`https://app-pm-exam-dx-staging.azurewebsites.net`) にアクセスしてトップページが表示されることを確認
 - [ ] `/login` に "Staging 検証環境" セクションが表示されることを確認
 - [ ] `STAGING_BYPASS_TOKEN` を入力して Staging ログインできることを確認
+- [ ] ダッシュボードに本番 DB の `keisato848` 学習履歴・ユーザー情報が表示されることを確認
 - [ ] ログイン後に問題一覧が表示・解答できることを確認
 - [ ] `main` へのマージ後に本番デプロイが引き続き正常に動作することを確認
 
@@ -139,3 +150,4 @@ Phase 1〜4 完了後、以下で動作確認する:
 |------|------|
 | 2026/04/09 | 初版作成 |
 | 2026/04/11 | Staging 認証方式を OAuth 前提から `STAGING_BYPASS_TOKEN` による Credentials Provider 方式へ更新 |
+| 2026/04/11 | `STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID` により Staging bypass を本番実ユーザーへマッピングできるよう更新 |

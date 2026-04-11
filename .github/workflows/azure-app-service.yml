@@ -342,7 +342,8 @@ jobs:
               AUTH_GOOGLE_SECRET="${{ secrets.AUTH_GOOGLE_SECRET }}" \
               COSMOS_DB_CONNECTION="${{ secrets.COSMOS_DB_CONNECTION }}" \
               TELEMETRY_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}" \
-              STAGING_BYPASS_TOKEN="${{ secrets.STAGING_BYPASS_TOKEN }}"
+              STAGING_BYPASS_TOKEN="${{ secrets.STAGING_BYPASS_TOKEN }}" \
+              STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID="${{ secrets.STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID }}"
 
       - name: Deploy to Staging Web App
         if: steps.config-check.outputs.configured == 'true'

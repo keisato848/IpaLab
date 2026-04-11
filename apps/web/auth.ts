@@ -5,6 +5,11 @@ import Google from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { CosmosAdapter } from "@/lib/auth-adapter"
 import { getContainer } from "@/lib/cosmos"
+import {
+    getDefaultStagingBypassUser,
+    hasStagingBypassTargetConfig,
+    resolveStagingBypassUser,
+} from "@/lib/staging-bypass-user"
 
 const providers: NextAuthOptions["providers"] = [];
 
@@ -48,15 +53,20 @@ if (process.env.STAGING_BYPASS_TOKEN) {
                 token: { label: "アクセストークン", type: "password" },
             },
             async authorize(credentials) {
-                if (credentials?.token === process.env.STAGING_BYPASS_TOKEN) {
-                    return {
-                        id: "staging-keisato848",
-                        name: "keisato848",
-                        email: "keisato848@staging.local",
-                        image: "https://avatars.githubusercontent.com/keisato848",
-                    };
+                if (credentials?.token !== process.env.STAGING_BYPASS_TOKEN) {
+                    return null;
                 }
-                return null;
+
+                const mappedUser = await resolveStagingBypassUser();
+                if (mappedUser) {
+                    return mappedUser;
+                }
+
+                if (hasStagingBypassTargetConfig()) {
+                    return null;
+                }
+
+                return getDefaultStagingBypassUser();
             },
         })
     );
