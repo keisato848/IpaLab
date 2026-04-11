@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { Exam, LearningRecord, getExams } from '@/lib/api';
+import { Exam, LearningRecord, getExams, getLearningRecords } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
 import styles from '@/app/(main)/exam/page.module.css';
 
@@ -26,6 +26,7 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
     const [filter, setFilter] = useState(() => getCachedValue(FILTER_CACHE_KEY, 'ALL'));
     const [timeFilter, setTimeFilter] = useState(() => getCachedValue(TIME_FILTER_CACHE_KEY, 'ALL'));
     const { data: session } = useSession();
+    const [userLearningRecords, setUserLearningRecords] = useState<LearningRecord[]>(initialRecords);
 
     // 選択状態をlocalStorageに保存
     useEffect(() => {
@@ -48,11 +49,22 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
         }
     }, [initialExams.length]);
 
+    // ログイン済みユーザーの学習記録をクライアントサイドで取得
+    useEffect(() => {
+        if (session?.user?.id) {
+            getLearningRecords(session.user.id).then(records => {
+                setUserLearningRecords(records);
+            }).catch(() => {
+                // エラー時は初期値（空配列）のまま
+            });
+        }
+    }, [session?.user?.id]);
+
     // Merge stats with user's learning records
     const examsWithStats = useMemo(() => {
         // Get guest records if not authenticated
-        const userRecords = session?.user?.id 
-            ? initialRecords 
+        const userRecords = session?.user?.id
+            ? userLearningRecords
             : guestManager.getHistory();
 
         return exams.map(exam => {
@@ -71,7 +83,7 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
                 }
             };
         });
-    }, [exams, initialRecords, session?.user?.id]);
+    }, [exams, userLearningRecords, session?.user?.id]);
 
     const filteredExams = useMemo(() => {
         return examsWithStats.filter(e => {
