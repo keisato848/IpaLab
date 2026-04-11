@@ -39,23 +39,23 @@ CosmosDB は本番の `pm-exam-dx-db` を共有します。Staging 専用の Cos
 
 > **将来の分離タイミング**: データ構造（コンテナ定義・パーティションキー）を変更するような改修が必要になった際に、Serverless プランで別途 `pm-exam-dx-staging-db` を作成することを検討してください。
 
-### 1-3. OAuth プロバイダーに Staging URL を追加
+### 1-3. Staging 専用ログイン方式
 
-#### GitHub OAuth App
+Staging 環境は **本番の OAuth 設定を変更しない** 方針とし、`STAGING_BYPASS_TOKEN` による Credentials Provider ログインを使用する。
 
-1. GitHub > Settings > Developer settings > OAuth Apps > 本番アプリを開く
-2. **Authorization callback URL** に追加:
-   ```
-   https://app-pm-exam-dx-staging.azurewebsites.net/api/auth/callback/github
-   ```
+- 対象環境: `app-pm-exam-dx-staging` のみ
+- 本番影響: なし
+- ログイン画面: `/login`
+- 表示条件: `STAGING_BYPASS_TOKEN` が環境変数として設定されていること
 
-#### Google Cloud Console
+実装上の要点:
 
-1. Google Cloud Console > APIs & Services > Credentials > 本番の OAuth 2.0 クライアントを開く
-2. **承認済みのリダイレクト URI** に追加:
-   ```
-   https://app-pm-exam-dx-staging.azurewebsites.net/api/auth/callback/google
-   ```
+- `apps/web/auth.ts`
+   - `STAGING_BYPASS_TOKEN` があるときだけ `staging-bypass` provider を登録
+- `apps/web/app/login/page.tsx`
+   - ランタイムの環境変数を読むため `dynamic = 'force-dynamic'` を付与
+- `apps/web/components/features/auth/LoginForm.tsx`
+   - Staging 専用のトークン入力フォームを表示
 
 ---
 
@@ -67,8 +67,19 @@ GitHub リポジトリ > Settings > Secrets and variables > Actions > New reposi
 |-----------|-----|------|
 | `AZURE_STAGING_WEBAPP_NAME` | `app-pm-exam-dx-staging` | Staging App Service 名 |
 | `NEXTAUTH_SECRET_STAGING` | *(下記コマンドで生成)* | Staging 用 NextAuth シークレット |
+| `STAGING_BYPASS_TOKEN` | *(下記コマンドで生成)* | Staging 専用ログイントークン |
 
 `NEXTAUTH_SECRET_STAGING` の生成方法:
+
+```bash
+# PowerShell の場合
+[Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
+
+# Linux/Mac の場合
+openssl rand -base64 32
+```
+
+`STAGING_BYPASS_TOKEN` の生成方法:
 
 ```bash
 # PowerShell の場合
@@ -109,7 +120,8 @@ Phase 1〜4 完了後、以下で動作確認する:
 - [ ] GitHub Actions で `Deploy to Staging` ジョブが成功することを確認
 - [ ] PR のコメントに "✅ Staging デプロイ完了" と Staging URL が投稿されることを確認
 - [ ] Staging URL (`https://app-pm-exam-dx-staging.azurewebsites.net`) にアクセスしてトップページが表示されることを確認
-- [ ] GitHub / Google ログインが Staging 環境で機能することを確認
+- [ ] `/login` に "Staging 検証環境" セクションが表示されることを確認
+- [ ] `STAGING_BYPASS_TOKEN` を入力して Staging ログインできることを確認
 - [ ] ログイン後に問題一覧が表示・解答できることを確認
 - [ ] `main` へのマージ後に本番デプロイが引き続き正常に動作することを確認
 
@@ -126,3 +138,4 @@ Phase 1〜4 完了後、以下で動作確認する:
 | 日付 | 内容 |
 |------|------|
 | 2026/04/09 | 初版作成 |
+| 2026/04/11 | Staging 認証方式を OAuth 前提から `STAGING_BYPASS_TOKEN` による Credentials Provider 方式へ更新 |
