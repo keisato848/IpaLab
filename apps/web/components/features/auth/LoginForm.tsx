@@ -51,8 +51,6 @@ export function LoginForm({ isStagingMode = false }: { isStagingMode?: boolean }
         };
     }, []);
 
-    const showGoogle = availableProviders === null || Boolean(availableProviders.google);
-    const showGithub = availableProviders === null || Boolean(availableProviders.github);
     const showStagingBypass = isStagingMode || Boolean(availableProviders?.['staging-bypass']);
 
     const handleLogin = async (provider: 'github' | 'google') => {
@@ -95,35 +93,31 @@ export function LoginForm({ isStagingMode = false }: { isStagingMode?: boolean }
             )}
 
             <div className={styles.buttons}>
-                {showGoogle && (
-                    <button
-                        className={`${styles.button} ${styles.google}`}
-                        onClick={() => handleLogin('google')}
-                        disabled={loading !== null}
-                    >
-                        {loading === 'google' ? (
-                            <span className={styles.spinner} />
-                        ) : (
-                            <FaGoogle className={styles.icon} />
-                        )}
-                        <span>Google で続ける</span>
-                    </button>
-                )}
+                <button
+                    className={`${styles.button} ${styles.google}`}
+                    onClick={() => handleLogin('google')}
+                    disabled={loading !== null}
+                >
+                    {loading === 'google' ? (
+                        <span className={styles.spinner} />
+                    ) : (
+                        <FaGoogle className={styles.icon} />
+                    )}
+                    <span>Google で続ける</span>
+                </button>
 
-                {showGithub && (
-                    <button
-                        className={`${styles.button} ${styles.github}`}
-                        onClick={() => handleLogin('github')}
-                        disabled={loading !== null}
-                    >
-                        {loading === 'github' ? (
-                            <span className={styles.spinner} />
-                        ) : (
-                            <FaGithub className={styles.icon} />
-                        )}
-                        <span>GitHub で続ける</span>
-                    </button>
-                )}
+                <button
+                    className={`${styles.button} ${styles.github}`}
+                    onClick={() => handleLogin('github')}
+                    disabled={loading !== null}
+                >
+                    {loading === 'github' ? (
+                        <span className={styles.spinner} />
+                    ) : (
+                        <FaGithub className={styles.icon} />
+                    )}
+                    <span>GitHub で続ける</span>
+                </button>
             </div>
 
             <p className={styles.consent}>
