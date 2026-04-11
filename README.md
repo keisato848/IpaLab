@@ -1,6 +1,6 @@
 # Shikakuno (シカクノ) - IPA 情報処理技術者試験 学習プラットフォーム
 
-[![Azure App Service CI/CD](https://github.com/keisato848/IpaLab/actions/workflows/azure-webapps.yml/badge.svg)](https://github.com/keisato848/IpaLab/actions/workflows/azure-webapps.yml)
+[![Azure App Service CI/CD](https://github.com/keisato848/IpaLab/actions/workflows/azure-app-service.yml/badge.svg)](https://github.com/keisato848/IpaLab/actions/workflows/azure-app-service.yml)
 
 **Shikakuno (シカクノ)** は、IPA（情報処理推進機構）の試験対策に特化したインテリジェントな学習プラットフォームです。最先端の **AI 記述式採点システム** を搭載しており、独学では採点が難しい午後試験の記述式問題に対し、即座に分析的なフィードバックを提供します。
 
@@ -114,9 +114,10 @@ Turborepo を使用したモノレポ構成です。
 
 - `apps/web`: メインの Next.js アプリケーション。UI、APIルート、フロントエンドロジックを含みます。Azure App Service にデプロイされます。
 - `apps/api-ai`: AI 採点用 Azure Functions。US East 2 リージョンにデプロイされ、Gemini API を呼び出します。
-- `apps/api`: **(Legacy)** 旧 Azure Functions API。機能は `apps/web` の API Routes に統合されました。
+- `apps/api`: 汎用 Azure Functions API。East Asia リージョンで稼働し、CosmosDB へのデータアクセスを担います。
 - `packages/data`: 過去問データのスクレイピング、加工、データベース同期用スクリプト。
 - `packages/shared`: モノレポ全体で共有される TypeScript 型定義やユーティリティ関数。
+- `packages/ui`: 共有 UI コンポーネントライブラリ（開発中）。
 - `packages/config`: ESLint や TypeScript の共有設定。
 
 ## 🚀 セットアップ
