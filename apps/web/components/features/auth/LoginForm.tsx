@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { getProviders, signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { FaGithub, FaGoogle } from 'react-icons/fa';
 import styles from './LoginForm.module.css';
@@ -29,6 +29,31 @@ export function LoginForm({ isStagingMode = false }: { isStagingMode?: boolean }
     const [loading, setLoading] = useState<string | null>(null);
     const [stagingToken, setStagingToken] = useState('');
     const [stagingError, setStagingError] = useState<string | null>(null);
+    const [availableProviders, setAvailableProviders] = useState<Record<string, { id: string; name: string; type: string; signinUrl: string; callbackUrl: string }> | null>(null);
+
+    useEffect(() => {
+        let active = true;
+
+        getProviders()
+            .then((providers) => {
+                if (active) {
+                    setAvailableProviders((providers as Record<string, { id: string; name: string; type: string; signinUrl: string; callbackUrl: string }>) ?? {});
+                }
+            })
+            .catch(() => {
+                if (active) {
+                    setAvailableProviders({});
+                }
+            });
+
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    const showGoogle = availableProviders === null || Boolean(availableProviders.google);
+    const showGithub = availableProviders === null || Boolean(availableProviders.github);
+    const showStagingBypass = isStagingMode || Boolean(availableProviders?.['staging-bypass']);
 
     const handleLogin = async (provider: 'github' | 'google') => {
         setLoading(provider);
@@ -70,31 +95,35 @@ export function LoginForm({ isStagingMode = false }: { isStagingMode?: boolean }
             )}
 
             <div className={styles.buttons}>
-                <button
-                    className={`${styles.button} ${styles.google}`}
-                    onClick={() => handleLogin('google')}
-                    disabled={loading !== null}
-                >
-                    {loading === 'google' ? (
-                        <span className={styles.spinner} />
-                    ) : (
-                        <FaGoogle className={styles.icon} />
-                    )}
-                    <span>Google で続ける</span>
-                </button>
+                {showGoogle && (
+                    <button
+                        className={`${styles.button} ${styles.google}`}
+                        onClick={() => handleLogin('google')}
+                        disabled={loading !== null}
+                    >
+                        {loading === 'google' ? (
+                            <span className={styles.spinner} />
+                        ) : (
+                            <FaGoogle className={styles.icon} />
+                        )}
+                        <span>Google で続ける</span>
+                    </button>
+                )}
 
-                <button
-                    className={`${styles.button} ${styles.github}`}
-                    onClick={() => handleLogin('github')}
-                    disabled={loading !== null}
-                >
-                    {loading === 'github' ? (
-                        <span className={styles.spinner} />
-                    ) : (
-                        <FaGithub className={styles.icon} />
-                    )}
-                    <span>GitHub で続ける</span>
-                </button>
+                {showGithub && (
+                    <button
+                        className={`${styles.button} ${styles.github}`}
+                        onClick={() => handleLogin('github')}
+                        disabled={loading !== null}
+                    >
+                        {loading === 'github' ? (
+                            <span className={styles.spinner} />
+                        ) : (
+                            <FaGithub className={styles.icon} />
+                        )}
+                        <span>GitHub で続ける</span>
+                    </button>
+                )}
             </div>
 
             <p className={styles.consent}>
@@ -105,7 +134,7 @@ export function LoginForm({ isStagingMode = false }: { isStagingMode?: boolean }
                 に同意したものとみなします。
             </p>
 
-            {isStagingMode && (
+            {showStagingBypass && (
                 <div className={styles.stagingSection}>
                     <p className={styles.stagingLabel}>⚠️ Staging 検証環境</p>
                     {stagingError && (

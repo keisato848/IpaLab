@@ -55,7 +55,7 @@ Staging 環境は **本番の OAuth 設定を変更しない** 方針とし、`S
 - `apps/web/app/login/page.tsx`
    - ランタイムの環境変数を読むため `dynamic = 'force-dynamic'` を付与
 - `apps/web/components/features/auth/LoginForm.tsx`
-   - Staging 専用のトークン入力フォームを表示
+   - `/api/auth/providers` の応答を参照して、Staging 専用のトークン入力フォームと利用可能な OAuth ボタンを表示
 
 ---
 
