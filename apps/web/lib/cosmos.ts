@@ -80,21 +80,77 @@ export const getContainer = async (name: string): Promise<Container | undefined>
     return db.container(name);
 };
 
+const isCosmosStatus = (error: unknown, expectedStatus: number) => {
+    if (!error || typeof error !== 'object') {
+        return false;
+    }
+
+    const maybeError = error as {
+        code?: number | string;
+        statusCode?: number;
+        message?: string;
+    };
+
+    if (maybeError.statusCode === expectedStatus) {
+        return true;
+    }
+
+    if (typeof maybeError.code === 'number' && maybeError.code === expectedStatus) {
+        return true;
+    }
+
+    if (typeof maybeError.code === 'string' && maybeError.code === String(expectedStatus)) {
+        return true;
+    }
+
+    if (!maybeError.message) {
+        return false;
+    }
+
+    if (expectedStatus === 404) {
+        return maybeError.message.includes('NotFound') || maybeError.message.includes('Resource Not Found');
+    }
+
+    if (expectedStatus === 409) {
+        return maybeError.message.includes('Conflict') || maybeError.message.includes('already exists');
+    }
+
+    return false;
+};
+
 export const ensureContainer = async (name: string): Promise<Container | undefined> => {
     const db = await getDatabase();
     if (!db) return undefined;
 
-    const partitionKey = CONTAINER_PARTITION_KEYS[name];
-    if (!partitionKey) {
-        return db.container(name);
+    const existingContainer = db.container(name);
+    try {
+        await existingContainer.read();
+        return existingContainer;
+    } catch (error) {
+        if (!isCosmosStatus(error, 404)) {
+            throw error;
+        }
     }
 
-    const { container } = await db.containers.createIfNotExists({
-        id: name,
-        partitionKey,
-    });
+    const partitionKey = CONTAINER_PARTITION_KEYS[name];
+    if (!partitionKey) {
+        return existingContainer;
+    }
 
-    return container;
+    try {
+        const { container } = await db.containers.create({
+            id: name,
+            partitionKey,
+        });
+
+        return container;
+    } catch (error) {
+        if (isCosmosStatus(error, 409)) {
+            return existingContainer;
+        }
+
+        throw error;
+    }
 };
 
 // Deprecated: Synchronous access is not supported with lazy initialization.
