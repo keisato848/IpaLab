@@ -96,7 +96,7 @@ sequenceDiagram
     participant Ad as RewardedAdModal
 
     User->>Entrance: 練習モードまたは模試モードを選択
-    Entrance->>SessionCreate: 直近セッション一覧を取得
+    Entrance->>SessionCreate: 試験ごとのセッション履歴を取得
     SessionCreate-->>Entrance: 試行別の進捗・スコアを返却
     opt リワード広告が有効
         Entrance->>Ad: 広告を表示
@@ -145,7 +145,7 @@ sequenceDiagram
 | Page | `apps/web/app/(main)/exam/[year]/[type]/[qNo]/page.tsx` | 問題ページ。対象問題を特定して `QuestionClient` に渡す |
 | Page | `apps/web/app/(main)/exam/[year]/[type]/result/page.tsx` | 結果ページエントリポイント |
 | Component | `apps/web/components/features/exam/ExamListClient.tsx` | 一覧取得、フィルタリング、進捗表示 |
-| Component | `apps/web/components/features/exam/ExamEntranceClient.tsx` | 入口画面、開始位置算出、モード選択、直近セッション一覧表示 |
+| Component | `apps/web/components/features/exam/ExamEntranceClient.tsx` | 入口画面、開始位置算出、モード選択、回ごとのセッション履歴アコーディオン表示 |
 | Component | `apps/web/components/features/exam/QuestionClient.tsx` | 選択式問題の表示、判定、保存、セッション単位の見直し復元 |
 | Component | `apps/web/components/features/exam/ExamResult.tsx` | 結果集計、セッション別の見直しリンク表示 |
 | Repository | `apps/web/lib/repositories/questionRepository.ts` | Questions コンテナから試験問題を取得 |
@@ -253,7 +253,7 @@ sequenceDiagram
 1. 認証済みなら `getLearningRecords()` と `getExamProgress()` と `getLearningSessions(examId)` を同時取得する
 2. ゲストなら localStorage 履歴のみを参照する
 3. 最新回答から `statusMap` を組み立て、履歴が欠ける場合は `ExamProgress.statusMap` をフォールバックに使う
-4. `LearningSessions` から直近の実施履歴カードを構成する
+4. `LearningSessions` から試行回数を算出し、回ごとの実施履歴アコーディオンを構成する
 5. 最初の未回答問題を `nextQNo` とする
 
 ### 10.3 回答保存

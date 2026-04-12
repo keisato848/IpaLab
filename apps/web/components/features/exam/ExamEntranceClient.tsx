@@ -18,6 +18,26 @@ interface ExamEntranceClientProps {
     questions: Question[];
 }
 
+function buildAttemptNumberMap(sessions: LearningSessionInfo[]): Record<string, number> {
+    return sessions
+        .slice()
+        .sort((left, right) => new Date(left.startedAt).getTime() - new Date(right.startedAt).getTime())
+        .reduce<Record<string, number>>((accumulator, session, index) => {
+            accumulator[session.id] = index + 1;
+            return accumulator;
+        }, {});
+}
+
+function formatAttemptDate(dateString: string): string {
+    return new Date(dateString).toLocaleString('ja-JP', {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
 export default function ExamEntranceClient({ year, type, examId, examLabel, questions }: ExamEntranceClientProps) {
     const { data: session } = useSession();
     const router = useRouter();
@@ -44,6 +64,7 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
     const [statusMap, setStatusMap] = useState<Record<string, 'correct' | 'incorrect' | 'review'>>({});
     const [bookmarks, setBookmarks] = useState<Set<string>>(new Set());
     const [recentSessions, setRecentSessions] = useState<LearningSessionInfo[]>([]);
+    const [expandedSessionId, setExpandedSessionId] = useState<string | null>(null);
 
     useEffect(() => {
         async function fetchProgress() {
@@ -63,7 +84,7 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                     [records, examProgressData, sessionHistory] = await Promise.all([
                         getLearningRecords(userId, examId),
                         getExamProgress(userId, examId),
-                        getLearningSessions(examId, undefined, 8)
+                        getLearningSessions(examId)
                     ]);
                     setRecentSessions(sessionHistory);
                 } else {
@@ -147,6 +168,21 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
 
         fetchProgress();
     }, [session, examId, questions]);
+
+    useEffect(() => {
+        if (recentSessions.length === 0) {
+            setExpandedSessionId(null);
+            return;
+        }
+
+        setExpandedSessionId((current) => {
+            if (current && recentSessions.some((item) => item.id === current)) {
+                return current;
+            }
+
+            return recentSessions.find((item) => item.status === 'in-progress')?.id ?? recentSessions[0].id;
+        });
+    }, [recentSessions]);
 
     // ... (btnText, linkHref, mockSettings same)
     const btnText = (progress.completed > 0 && progress.completed < progress.total)
@@ -236,6 +272,8 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
         }
     };
 
+    const attemptNumberMap = buildAttemptNumberMap(recentSessions);
+
     return (
         <>
         <RewardedAdModal
@@ -302,74 +340,118 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                 <section className={styles.attemptsSection}>
                     <div className={styles.attemptsHeader}>
                         <div>
-                            <h2>最近の実施履歴</h2>
-                            <p>各セッションごとに進捗とスコアを確認できます。</p>
+                            <h2>実施履歴</h2>
+                            <p>複数回の履歴を回ごとに開いて、進捗と分析を確認できます。</p>
                         </div>
                         <span className={styles.attemptCount}>{recentSessions.length}件</span>
                     </div>
 
                     <div className={styles.attemptsList}>
                         {recentSessions.map((attempt) => {
-                            const progressPercent = attempt.totalQuestions && attempt.totalQuestions > 0
-                                ? Math.round((attempt.answeredCount / attempt.totalQuestions) * 100)
+                            const totalQuestions = attempt.totalQuestions || questions.length;
+                            const attemptNumber = attemptNumberMap[attempt.id] ?? 1;
+                            const progressPercent = totalQuestions > 0
+                                ? Math.round((attempt.answeredCount / totalQuestions) * 100)
                                 : 0;
-                            const scorePercent = attempt.totalQuestions && attempt.totalQuestions > 0
-                                ? Math.round((attempt.correctCount / attempt.totalQuestions) * 100)
+                            const scorePercent = totalQuestions > 0
+                                ? Math.round((attempt.correctCount / totalQuestions) * 100)
+                                : 0;
+                            const accuracyPercent = attempt.answeredCount > 0
+                                ? Math.round((attempt.correctCount / attempt.answeredCount) * 100)
                                 : 0;
                             const nextQuestionNo = attempt.lastQuestionNo ? attempt.lastQuestionNo + 1 : 1;
-                            const safeQuestionNo = nextQuestionNo > (attempt.totalQuestions || 1) ? 1 : nextQuestionNo;
+                            const safeQuestionNo = nextQuestionNo > totalQuestions ? 1 : nextQuestionNo;
                             const continueHref = `/exam/${year}/${type}/${safeQuestionNo}?mode=${attempt.mode}&sessionId=${attempt.id}`;
                             const resultHref = `/exam/${year}/${type}/result?sessionId=${attempt.id}&mode=${attempt.mode}`;
+                            const isExpanded = expandedSessionId === attempt.id;
+                            const accordionPanelId = `attempt-panel-${attempt.id}`;
+                            const attemptLabel = `第${attemptNumber}回`;
 
                             return (
                                 <article key={attempt.id} className={styles.attemptCard}>
-                                    <div className={styles.attemptTitleRow}>
-                                        <div className={styles.attemptMeta}>
-                                            <span className={styles.attemptBadge}>
-                                                {attempt.mode === 'practice' ? '練習モード' : '模擬試験'}
-                                            </span>
-                                            <span className={`${styles.attemptStatus} ${attempt.status === 'completed' ? styles.attemptStatusDone : styles.attemptStatusActive}`}>
-                                                {attempt.status === 'completed' ? '完了' : '進行中'}
-                                            </span>
-                                        </div>
-                                        <time className={styles.attemptDate} dateTime={attempt.startedAt}>
-                                            {new Date(attempt.startedAt).toLocaleString('ja-JP', {
-                                                year: 'numeric',
-                                                month: 'numeric',
-                                                day: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            })}
-                                        </time>
-                                    </div>
+                                    <button
+                                        type="button"
+                                        className={styles.attemptAccordionButton}
+                                        aria-expanded={isExpanded}
+                                        aria-controls={accordionPanelId}
+                                        onClick={() => {
+                                            setExpandedSessionId((current) => current === attempt.id ? null : attempt.id);
+                                        }}
+                                    >
+                                        <div className={styles.attemptSummary}>
+                                            <div className={styles.attemptTitleRow}>
+                                                <div className={styles.attemptMeta}>
+                                                    <span className={styles.attemptSequence}>{attemptLabel}</span>
+                                                    <span className={styles.attemptBadge}>
+                                                        {attempt.mode === 'practice' ? '練習モード' : '模擬試験'}
+                                                    </span>
+                                                    <span className={`${styles.attemptStatus} ${attempt.status === 'completed' ? styles.attemptStatusDone : styles.attemptStatusActive}`}>
+                                                        {attempt.status === 'completed' ? '完了' : '進行中'}
+                                                    </span>
+                                                </div>
+                                                <time className={styles.attemptDate} dateTime={attempt.startedAt}>
+                                                    {formatAttemptDate(attempt.startedAt)}
+                                                </time>
+                                            </div>
 
-                                    <div className={styles.attemptStats}>
-                                        <div className={styles.attemptStat}>
-                                            <span className={styles.attemptStatLabel}>スコア</span>
-                                            <strong>{scorePercent}%</strong>
+                                            <div className={styles.attemptSummaryStats}>
+                                                <span className={styles.attemptSummaryStat}>進捗 <strong>{attempt.answeredCount}/{totalQuestions}問</strong></span>
+                                                <span className={styles.attemptSummaryStat}>正答率 <strong>{accuracyPercent}%</strong></span>
+                                                <span className={styles.attemptSummaryStat}>所要時間 <strong>{formatAttemptDuration(attempt)}</strong></span>
+                                            </div>
                                         </div>
-                                        <div className={styles.attemptStat}>
-                                            <span className={styles.attemptStatLabel}>進捗</span>
-                                            <strong>{attempt.answeredCount}/{attempt.totalQuestions || questions.length}問</strong>
-                                        </div>
-                                        <div className={styles.attemptStat}>
-                                            <span className={styles.attemptStatLabel}>所要時間</span>
-                                            <strong>{formatAttemptDuration(attempt)}</strong>
-                                        </div>
-                                    </div>
 
-                                    <div className={styles.progressBar}>
-                                        <div className={styles.progressFill} style={{ width: `${progressPercent}%` }}></div>
-                                    </div>
+                                        <span className={`${styles.attemptChevron} ${isExpanded ? styles.attemptChevronOpen : ''}`} aria-hidden="true">
+                                            ▾
+                                        </span>
+                                    </button>
 
-                                    <div className={styles.attemptActions}>
-                                        <Link href={resultHref} className={styles.attemptLink}>
-                                            分析を見る
-                                        </Link>
-                                        <Link href={attempt.status === 'completed' ? resultHref : continueHref} className={styles.attemptSecondaryLink}>
-                                            {attempt.status === 'completed' ? '見直す' : '続きから'}
-                                        </Link>
-                                    </div>
+                                    {isExpanded && (
+                                        <div id={accordionPanelId} className={styles.attemptDetails}>
+                                            <div className={styles.attemptStats}>
+                                                <div className={styles.attemptStat}>
+                                                    <span className={styles.attemptStatLabel}>進捗率</span>
+                                                    <strong>{progressPercent}%</strong>
+                                                </div>
+                                                <div className={styles.attemptStat}>
+                                                    <span className={styles.attemptStatLabel}>総合スコア</span>
+                                                    <strong>{scorePercent}%</strong>
+                                                </div>
+                                                <div className={styles.attemptStat}>
+                                                    <span className={styles.attemptStatLabel}>正答率</span>
+                                                    <strong>{accuracyPercent}%</strong>
+                                                </div>
+                                                <div className={styles.attemptStat}>
+                                                    <span className={styles.attemptStatLabel}>最終到達</span>
+                                                    <strong>Q{attempt.lastQuestionNo || 1}</strong>
+                                                </div>
+                                            </div>
+
+                                            <div className={styles.progressBar}>
+                                                <div className={styles.progressFill} style={{ width: `${progressPercent}%` }}></div>
+                                            </div>
+
+                                            <div className={styles.attemptMetaGrid}>
+                                                <div className={styles.attemptMetaItem}>
+                                                    <span className={styles.attemptStatLabel}>開始日時</span>
+                                                    <strong>{formatAttemptDate(attempt.startedAt)}</strong>
+                                                </div>
+                                                <div className={styles.attemptMetaItem}>
+                                                    <span className={styles.attemptStatLabel}>完了日時</span>
+                                                    <strong>{attempt.completedAt ? formatAttemptDate(attempt.completedAt) : '進行中'}</strong>
+                                                </div>
+                                            </div>
+
+                                            <div className={styles.attemptActions}>
+                                                <Link href={resultHref} className={styles.attemptLink}>
+                                                    分析を見る
+                                                </Link>
+                                                <Link href={attempt.status === 'completed' ? resultHref : continueHref} className={styles.attemptSecondaryLink}>
+                                                    {attempt.status === 'completed' ? '見直す' : '続きから'}
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    )}
                                 </article>
                             );
                         })}
