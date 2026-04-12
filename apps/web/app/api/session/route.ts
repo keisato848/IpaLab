@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getContainer } from '@/lib/cosmos';
+import { ensureContainer } from '@/lib/cosmos';
 import { LearningSessionSchema, LearningSession } from '@ipa-lab/shared';
 import { z } from 'zod';
 import { getServerSession } from "next-auth";
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
         const parsedLimit = Number.parseInt(searchParams.get('limit') || '50', 10);
         const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 50;
 
-        const container = await getContainer("LearningSessions");
+        const container = await ensureContainer("LearningSessions");
         if (!container) throw new Error("Database not initialized");
 
         let query = "SELECT * FROM c WHERE c.userId = @userId";
@@ -95,7 +95,7 @@ export async function PATCH(request: NextRequest) {
 
         const { sessionId, answeredCount, correctCount, lastQuestionNo, status } = parseResult.data;
 
-        const container = await getContainer("LearningSessions");
+        const container = await ensureContainer("LearningSessions");
         if (!container) throw new Error("Database not initialized");
 
         // Fetch existing session

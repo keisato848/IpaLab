@@ -3,7 +3,8 @@ import { NextRequest } from 'next/server';
 
 // CosmosDBのモック
 vi.mock('@/lib/cosmos', () => ({
-    getContainer: vi.fn()
+    getContainer: vi.fn(),
+    ensureContainer: vi.fn()
 }));
 
 // next-authのモック
@@ -141,7 +142,7 @@ describe('API エンドポイント', () => {
     describe('/api/session GET', () => {
         it('examId と status をメモリ上で絞り込んで返す', async () => {
             const { getServerSession } = await import('next-auth');
-            const { getContainer } = await import('@/lib/cosmos');
+            const { ensureContainer } = await import('@/lib/cosmos');
 
             (getServerSession as any).mockResolvedValue({
                 user: { id: 'user-1' }
@@ -175,7 +176,7 @@ describe('API エンドポイント', () => {
                 })
             }));
 
-            (getContainer as any).mockResolvedValue({
+            (ensureContainer as any).mockResolvedValue({
                 items: {
                     query: queryMock
                 }
