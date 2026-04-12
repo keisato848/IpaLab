@@ -18,7 +18,8 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
         const examId = searchParams.get('examId');
         const status = searchParams.get('status'); // 'in-progress', 'completed', or null for all
-        const limit = parseInt(searchParams.get('limit') || '50');
+        const parsedLimit = Number.parseInt(searchParams.get('limit') || '50', 10);
+        const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 50;
 
         const container = await getContainer("LearningSessions");
         if (!container) throw new Error("Database not initialized");
@@ -28,16 +29,6 @@ export async function GET(request: NextRequest) {
             { name: "@userId", value: session.user.id }
         ];
 
-        if (examId) {
-            query += " AND c.examId = @examId";
-            parameters.push({ name: "@examId", value: examId });
-        }
-
-        if (status) {
-            query += " AND c.status = @status";
-            parameters.push({ name: "@status", value: status });
-        }
-
         query += " ORDER BY c.startedAt DESC";
 
         const { resources } = await container.items.query({
@@ -45,8 +36,25 @@ export async function GET(request: NextRequest) {
             parameters
         }).fetchAll();
 
-        // Return limited results
-        const sessions = resources.slice(0, limit) as LearningSession[];
+        const normalizedStatus = status === 'in-progress' || status === 'completed'
+            ? status
+            : null;
+
+        // Filter non-partition fields after the partition-scoped query to avoid
+        // requiring Cosmos composite indexes for examId/status + startedAt sorting.
+        const sessions = (resources as LearningSession[])
+            .filter((item) => {
+                if (examId && item.examId !== examId) {
+                    return false;
+                }
+
+                if (normalizedStatus && item.status !== normalizedStatus) {
+                    return false;
+                }
+
+                return true;
+            })
+            .slice(0, limit);
 
         return NextResponse.json(sessions, { status: 200 });
 
