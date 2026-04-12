@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { guestManager } from '@/lib/guest-manager';
 import { FaCheckCircle, FaTimesCircle, FaBookmark } from 'react-icons/fa';
-import { getLearningRecords, LearningRecord, Question, getExamProgress, createLearningSession } from '@/lib/api';
+import { getLearningRecords, LearningRecord, Question, getExamProgress, createLearningSession, getLearningSessions, LearningSessionInfo } from '@/lib/api';
 import { useAdContext, RewardedAdModal } from '@/components/features/ads';
 import styles from './ExamEntranceClient.module.css';
 
@@ -43,6 +43,7 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
     // State for learning status & bookmarks
     const [statusMap, setStatusMap] = useState<Record<string, 'correct' | 'incorrect' | 'review'>>({});
     const [bookmarks, setBookmarks] = useState<Set<string>>(new Set());
+    const [recentSessions, setRecentSessions] = useState<LearningSessionInfo[]>([]);
 
     useEffect(() => {
         async function fetchProgress() {
@@ -55,17 +56,21 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
             try {
                 let records: LearningRecord[] = [];
                 let examProgressData: Awaited<ReturnType<typeof getExamProgress>> = null;
+                let sessionHistory: LearningSessionInfo[] = [];
 
                 if (session?.user?.id) {
                     // Logged-in user: fetch from API
-                    [records, examProgressData] = await Promise.all([
+                    [records, examProgressData, sessionHistory] = await Promise.all([
                         getLearningRecords(userId, examId),
-                        getExamProgress(userId, examId)
+                        getExamProgress(userId, examId),
+                        getLearningSessions(examId, undefined, 8)
                     ]);
+                    setRecentSessions(sessionHistory);
                 } else {
                     // Guest mode: fetch from localStorage
                     const allRecords = guestManager.getHistory();
                     records = allRecords.filter(r => r.examId === examId);
+                    setRecentSessions([]);
                 }
 
                 // 1. Process Bookmarks (logged-in only)
@@ -105,6 +110,13 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                         }
                     }
                 });
+
+                if (examProgressData?.statusMap) {
+                    Object.entries(examProgressData.statusMap).forEach(([qId, value]) => {
+                        if (newStatusMap[qId]) return;
+                        newStatusMap[qId] = value.isCorrect ? 'correct' : 'incorrect';
+                    });
+                }
 
                 setStatusMap(newStatusMap);
 
@@ -163,6 +175,18 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
     });
 
     const displayCount = displayQuestions.length > 0 ? displayQuestions.length : mockSettings.count;
+
+    const formatAttemptDuration = (attempt: LearningSessionInfo) => {
+        const end = attempt.completedAt ? new Date(attempt.completedAt).getTime() : Date.now();
+        const start = new Date(attempt.startedAt).getTime();
+        const minutes = Math.max(1, Math.round((end - start) / 60000));
+        if (minutes >= 60) {
+            const hours = Math.floor(minutes / 60);
+            const remainMinutes = minutes % 60;
+            return `${hours}時間${remainMinutes}分`;
+        }
+        return `${minutes}分`;
+    };
 
     // 実際の試験開始処理（広告表示後に呼ばれる）
     const executeStartSession = useCallback(async (startQNo: number, mode: 'practice' | 'mock') => {
@@ -273,6 +297,85 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                     </button>
                 </div>
             </header>
+
+            {recentSessions.length > 0 && (
+                <section className={styles.attemptsSection}>
+                    <div className={styles.attemptsHeader}>
+                        <div>
+                            <h2>最近の実施履歴</h2>
+                            <p>各セッションごとに進捗とスコアを確認できます。</p>
+                        </div>
+                        <span className={styles.attemptCount}>{recentSessions.length}件</span>
+                    </div>
+
+                    <div className={styles.attemptsList}>
+                        {recentSessions.map((attempt) => {
+                            const progressPercent = attempt.totalQuestions && attempt.totalQuestions > 0
+                                ? Math.round((attempt.answeredCount / attempt.totalQuestions) * 100)
+                                : 0;
+                            const scorePercent = attempt.totalQuestions && attempt.totalQuestions > 0
+                                ? Math.round((attempt.correctCount / attempt.totalQuestions) * 100)
+                                : 0;
+                            const nextQuestionNo = attempt.lastQuestionNo ? attempt.lastQuestionNo + 1 : 1;
+                            const safeQuestionNo = nextQuestionNo > (attempt.totalQuestions || 1) ? 1 : nextQuestionNo;
+                            const continueHref = `/exam/${year}/${type}/${safeQuestionNo}?mode=${attempt.mode}&sessionId=${attempt.id}`;
+                            const resultHref = `/exam/${year}/${type}/result?sessionId=${attempt.id}&mode=${attempt.mode}`;
+
+                            return (
+                                <article key={attempt.id} className={styles.attemptCard}>
+                                    <div className={styles.attemptTitleRow}>
+                                        <div className={styles.attemptMeta}>
+                                            <span className={styles.attemptBadge}>
+                                                {attempt.mode === 'practice' ? '練習モード' : '模擬試験'}
+                                            </span>
+                                            <span className={`${styles.attemptStatus} ${attempt.status === 'completed' ? styles.attemptStatusDone : styles.attemptStatusActive}`}>
+                                                {attempt.status === 'completed' ? '完了' : '進行中'}
+                                            </span>
+                                        </div>
+                                        <time className={styles.attemptDate} dateTime={attempt.startedAt}>
+                                            {new Date(attempt.startedAt).toLocaleString('ja-JP', {
+                                                year: 'numeric',
+                                                month: 'numeric',
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })}
+                                        </time>
+                                    </div>
+
+                                    <div className={styles.attemptStats}>
+                                        <div className={styles.attemptStat}>
+                                            <span className={styles.attemptStatLabel}>スコア</span>
+                                            <strong>{scorePercent}%</strong>
+                                        </div>
+                                        <div className={styles.attemptStat}>
+                                            <span className={styles.attemptStatLabel}>進捗</span>
+                                            <strong>{attempt.answeredCount}/{attempt.totalQuestions || questions.length}問</strong>
+                                        </div>
+                                        <div className={styles.attemptStat}>
+                                            <span className={styles.attemptStatLabel}>所要時間</span>
+                                            <strong>{formatAttemptDuration(attempt)}</strong>
+                                        </div>
+                                    </div>
+
+                                    <div className={styles.progressBar}>
+                                        <div className={styles.progressFill} style={{ width: `${progressPercent}%` }}></div>
+                                    </div>
+
+                                    <div className={styles.attemptActions}>
+                                        <Link href={resultHref} className={styles.attemptLink}>
+                                            分析を見る
+                                        </Link>
+                                        <Link href={attempt.status === 'completed' ? resultHref : continueHref} className={styles.attemptSecondaryLink}>
+                                            {attempt.status === 'completed' ? '見直す' : '続きから'}
+                                        </Link>
+                                    </div>
+                                </article>
+                            );
+                        })}
+                    </div>
+                </section>
+            )}
 
             <section className={styles.questionList}>
                 <h2>問題一覧 ({displayQuestions.length}問)</h2>

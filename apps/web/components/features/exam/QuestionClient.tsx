@@ -84,6 +84,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
     // AI Score Persistence State
     const [descriptiveHistory, setDescriptiveHistory] = useState<Record<string, { answer: string; result: any }>>({});
+    const [reviewRecord, setReviewRecord] = useState<LearningRecord | null>(null);
 
     // Review Later State
     const [isBookmarked, setIsBookmarked] = useState(false);
@@ -102,6 +103,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
         async function fetchHistoryAndProgress() {
             try {
+                setReviewRecord(null);
                 const userId = session?.user?.id || guestManager.getGuestId();
                 if (!userId) return;
 
@@ -136,10 +138,17 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 // 3. Restore Flag State (if in same session)
                 if (sessionId) {
                     // Filter records for this session and question
-                    const sessionRecord = records.find(r => r.sessionId === sessionId && r.questionId === question.id);
+                    const sessionRecord = records
+                        .filter(r => r.sessionId === sessionId && r.questionId === question.id)
+                        .sort((a, b) => new Date(b.answeredAt).getTime() - new Date(a.answeredAt).getTime())[0];
+
+                    setReviewRecord(sessionRecord || null);
+
                     if (sessionRecord?.isFlagged) {
                         setIsFlagged(true);
                     }
+                } else {
+                    setReviewRecord(null);
                 }
 
             } catch (e) {
@@ -258,6 +267,12 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         }
         fetchStats();
     }, [question.id, question.examId, question.correctOption, isReview, session]);
+
+    useEffect(() => {
+        if (!isReview || !reviewRecord?.selectedOptionId) return;
+        setSelectedOption(reviewRecord.selectedOptionId);
+        setShowExplanation(true);
+    }, [isReview, reviewRecord?.selectedOptionId]);
 
     const formatTime = (seconds: number) => {
         const h = Math.floor(seconds / 3600);
@@ -380,6 +395,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             isCorrect,
             isFlagged, // [NEW]
             sessionId: sessionId || undefined, // [NEW]
+            selectedOptionId: optionId,
             answeredAt: new Date().toISOString(),
             timeTakenSeconds: timeTaken,
         };

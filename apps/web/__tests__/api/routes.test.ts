@@ -27,21 +27,57 @@ describe('API エンドポイント', () => {
                 { id: 'AP-2024-Spring', title: '応用情報 2024春' },
                 { id: 'AP-2024-Fall', title: '応用情報 2024秋' }
             ];
-            
-            (getContainer as any).mockResolvedValue({
+
+            const mockExamContainer = {
                 items: {
                     query: () => ({
                         fetchAll: async () => ({ resources: mockExams })
                     })
                 }
-            });
+            };
+
+            const mockQuestionStatsContainer = {
+                items: {
+                    query: () => ({
+                        fetchAll: async () => ({
+                            resources: [
+                                { examId: 'AP-2024-Spring', total: 80 },
+                                { examId: 'AP-2024-Fall', total: 25 }
+                            ]
+                        })
+                    })
+                }
+            };
+
+            (getContainer as any)
+                .mockResolvedValueOnce(mockExamContainer)
+                .mockResolvedValueOnce(mockQuestionStatsContainer);
 
             const { GET } = await import('@/app/api/exams/route');
             const response = await GET();
             const data = await response.json();
 
             expect(response.status).toBe(200);
-            expect(data).toEqual(mockExams);
+            expect(data).toEqual([
+                {
+                    id: 'AP-2024-Spring',
+                    title: '応用情報 2024春',
+                    stats: {
+                        completed: 0,
+                        correctRate: 0,
+                        total: 80,
+                    },
+                },
+                {
+                    id: 'AP-2024-Fall',
+                    title: '応用情報 2024秋',
+                    stats: {
+                        completed: 0,
+                        correctRate: 0,
+                        total: 25,
+                    },
+                },
+            ]);
         });
 
         it('DB未初期化時はエラーを返す', async () => {

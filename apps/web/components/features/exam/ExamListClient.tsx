@@ -77,7 +77,7 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
             return {
                 ...exam,
                 stats: {
-                    total: exam.stats.total || 80,
+                    total: exam.stats.total > 0 ? exam.stats.total : 0,
                     completed: uniqueAnswered,
                     correctRate: correctRate
                 }
@@ -180,6 +180,9 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
                         else if (exam.id.includes('PM') && !exam.id.startsWith('PM-')) startType = 'PM';
 
                         const linkHref = `/exam/${exam.id}/${startType}`;
+                        const progressPercent = exam.stats.total > 0
+                            ? Math.round((exam.stats.completed / exam.stats.total) * 100)
+                            : 0;
 
                         return (
                             <Link href={linkHref} key={exam.id} className={styles.cardLink}>
@@ -193,7 +196,7 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
                                     <div className={styles.stats}>
                                         <div className={styles.statItem}>
                                             <span className={styles.statLabel}>進捗率</span>
-                                            <span className={styles.statValue}>{Math.round((exam.stats.completed / exam.stats.total) * 100)}%</span>
+                                            <span className={styles.statValue}>{progressPercent}%</span>
                                         </div>
                                         <div className={styles.statItem}>
                                             <span className={styles.statLabel}>正答率</span>
@@ -202,7 +205,7 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
                                     </div>
 
                                     <div className={styles.progressBar}>
-                                        <div className={styles.progressFill} style={{ width: `${(exam.stats.completed / exam.stats.total) * 100}%` }}></div>
+                                        <div className={styles.progressFill} style={{ width: `${progressPercent}%` }}></div>
                                     </div>
                                 </article>
                             </Link>
