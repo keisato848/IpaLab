@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { guestManager } from '@/lib/guest-manager';
-import { FaCheckCircle, FaTimesCircle, FaBookmark } from 'react-icons/fa';
 import { getLearningRecords, LearningRecord, Question, getExamProgress, createLearningSession, getLearningSessions, LearningSessionInfo } from '@/lib/api';
 import { useAdContext, RewardedAdModal } from '@/components/features/ads';
 import styles from './ExamEntranceClient.module.css';
@@ -469,30 +468,14 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                     </p>
                 ) : (
                     <div className={styles.grid}>
-                        {displayQuestions.map(q => {
-                            const status = statusMap[q.id];
-                            const isBookmarked = bookmarks.has(q.id);
-
-                            // Class logic: Status + Bookmark
-                            let statusClass = '';
-                            if (status === 'correct') statusClass = styles.correct;
-                            else if (status === 'incorrect') statusClass = styles.incorrect;
-                            else if (status === 'review') statusClass = styles.review;
-
-                            // Helper for item
-                            return (
+                        {displayQuestions.map(q => (
                                 <Link
                                     href={`/exam/${year}/${type}/${q.qNo}?mode=practice`}
                                     key={q.id}
-                                    className={`${styles.qItem} ${statusClass} ${isBookmarked ? styles.bookmarkedItem : ''}`}
-                                    style={isBookmarked ? { border: '2px solid #f59e0b' } : {}}
+                                    className={styles.qItem}
                                 >
-                                    <span className={styles.qNo} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <span className={styles.qNo}>
                                         Q{q.qNo}
-                                        {status === 'correct' && <FaCheckCircle className={styles.iconCorrect} />}
-                                        {status === 'incorrect' && <FaTimesCircle className={styles.iconIncorrect} />}
-                                        {status === 'review' && <span title="見直し">🚩</span>}
-                                        {isBookmarked && <FaBookmark color="#f59e0b" />}
                                     </span>
 
                                     <p className={styles.qSummary}>{(q.text || "").substring(0, 40)}...</p>
@@ -503,15 +486,9 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                                                 {q.subCategory || q.category}
                                             </span>
                                         )}
-                                        {status && (
-                                            <span className={`${styles.statusBadge} ${status === 'review' ? styles.statusReview : ''}`}>
-                                                {status === 'correct' ? '正解' : (status === 'review' ? '見直し' : '不正解')}
-                                            </span>
-                                        )}
                                     </div>
                                 </Link>
-                            );
-                        })}
+                        ))}
                     </div>
                 )
                 }

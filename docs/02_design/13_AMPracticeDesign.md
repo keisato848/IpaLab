@@ -252,7 +252,7 @@ sequenceDiagram
 
 1. 認証済みなら `getLearningRecords()` と `getExamProgress()` と `getLearningSessions(examId)` を同時取得する
 2. ゲストなら localStorage 履歴のみを参照する
-3. 最新回答から `statusMap` を組み立て、履歴が欠ける場合は `ExamProgress.statusMap` をフォールバックに使う
+3. 最新回答から `statusMap` を組み立て、履歴が欠ける場合は `ExamProgress.statusMap` をフォールバックに使う（※ `statusMap` は `nextQNo` 計算にのみ使用し、問題一覧グリッドには正誤ステータスを表示しない）
 4. `LearningSessions` から試行回数を算出し、回ごとの実施履歴アコーディオンを構成する
 5. 最初の未回答問題を `nextQNo` とする
 
