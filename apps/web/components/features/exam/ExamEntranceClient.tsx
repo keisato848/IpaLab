@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { guestManager } from '@/lib/guest-manager';
 import { getLearningRecords, LearningRecord, Question, getExamProgress, createLearningSession, getLearningSessions, LearningSessionInfo } from '@/lib/api';
@@ -47,17 +47,6 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
     const { isRewardedAdEnabled, isAuthenticated } = useAdContext();
     const [showRewardedAd, setShowRewardedAd] = useState(false);
     const [pendingStart, setPendingStart] = useState<{ startQNo: number; mode: 'practice' | 'mock' } | null>(null);
-
-    const searchParams = useSearchParams();
-    const categoryFilter = searchParams.get('category');
-
-    // Handle filter change
-    const handleFilterChange = (val: string) => {
-        const newUrl = new URL(window.location.href);
-        if (val === 'ALL') newUrl.searchParams.delete('category');
-        else newUrl.searchParams.set('category', val);
-        router.push(newUrl.toString());
-    };
 
     // State for learning status & bookmarks
     const [statusMap, setStatusMap] = useState<Record<string, 'correct' | 'incorrect' | 'review'>>({});
@@ -196,20 +185,7 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
         return { time: 150, count: 80 };
     })();
 
-    const displayQuestions = questions.filter(q => {
-        if (q.qNo >= 99) return false;
-        if (!categoryFilter || categoryFilter === 'ALL') return true;
 
-        const map: Record<string, string> = {
-            'Technology': 'テクノロジ系',
-            'Management': 'マネジメント系',
-            'Strategy': 'ストラテジ系'
-        };
-        const targetJp = map[categoryFilter];
-        return (q.subCategory === targetJp) || (q.category === categoryFilter) || (q.subCategory === categoryFilter);
-    });
-
-    const displayCount = displayQuestions.length > 0 ? displayQuestions.length : mockSettings.count;
 
     const formatAttemptDuration = (attempt: LearningSessionInfo) => {
         const end = attempt.completedAt ? new Date(attempt.completedAt).getTime() : Date.now();
@@ -294,28 +270,6 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                     練習モードでは一問ごとに正誤を確認できます。
                 </p>
 
-                {/* Subcategory Filter UI */}
-                <div className={styles.filterContainer}>
-                    <label className={styles.filterLabel}>分野で絞り込み:</label>
-                    <select
-                        className={styles.filterSelect}
-                        value={categoryFilter || 'ALL'}
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            const newUrl = new URL(window.location.href);
-                            if (val === 'ALL') newUrl.searchParams.delete('category');
-                            else newUrl.searchParams.set('category', val);
-                            const routerMethod = router.push; // Using router push
-                            routerMethod(newUrl.toString());
-                        }}
-                    >
-                        <option value="ALL">指定なし (すべて表示)</option>
-                        <option value="Technology">テクノロジ系</option>
-                        <option value="Management">マネジメント系</option>
-                        <option value="Strategy">ストラテジ系</option>
-                    </select>
-                </div>
-
                 <div className={styles.actions}>
                     <button
                         onClick={() => startSession(nextQNo, 'practice')}
@@ -330,7 +284,7 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                         className={`${styles.btn} ${styles.btnMock}`}
                     >
                         模擬試験モードで開始
-                        <span className={styles.btnSub}>{mockSettings.time}分 / {displayCount}問</span>
+                        <span className={styles.btnSub}>{mockSettings.time}分 / {mockSettings.count}問</span>
                     </button>
                 </div>
             </header>
@@ -457,42 +411,6 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                     </div>
                 </section>
             )}
-
-            <section className={styles.questionList}>
-                <h2>問題一覧 ({displayQuestions.length}問)</h2>
-                {displayQuestions.length === 0 ? (
-                    <p className={styles.noData}>
-                        問題データが見つかりません。<br />
-                        バックエンドAPIが起動しているか、examId ({examId}) が正しいか確認してください。
-                        <br />(フィルタ条件に一致する問題がない可能性があります)
-                    </p>
-                ) : (
-                    <div className={styles.grid}>
-                        {displayQuestions.map(q => (
-                                <Link
-                                    href={`/exam/${year}/${type}/${q.qNo}?mode=practice`}
-                                    key={q.id}
-                                    className={styles.qItem}
-                                >
-                                    <span className={styles.qNo}>
-                                        Q{q.qNo}
-                                    </span>
-
-                                    <p className={styles.qSummary}>{(q.text || "").substring(0, 40)}...</p>
-
-                                    <div className={styles.badgeContainer}>
-                                        {(q.subCategory || q.category) && (
-                                            <span className={styles.subcategoryBadge}>
-                                                {q.subCategory || q.category}
-                                            </span>
-                                        )}
-                                    </div>
-                                </Link>
-                        ))}
-                    </div>
-                )
-                }
-            </section>
         </div>
         </>
     );
