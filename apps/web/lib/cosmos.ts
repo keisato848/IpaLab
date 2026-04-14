@@ -3,6 +3,19 @@ import * as https from 'https';
 
 const CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION || "";
 const DATABASE_NAME = "pm-exam-dx-db";
+const CONTAINER_PARTITION_KEYS: Record<string, string> = {
+    Questions: "/examId",
+    Users: "/id",
+    Accounts: "/userId",
+    Sessions: "/sessionToken",
+    LearningRecords: "/userId",
+    LearningSessions: "/userId",
+    Exams: "/id",
+    ExamProgress: "/userId",
+    Metrics: "/type",
+    FeatureFlags: "/id",
+    PageViews: "/date",
+};
 
 // Singleton instance
 let client: CosmosClient | undefined;
@@ -67,6 +80,87 @@ export const getContainer = async (name: string): Promise<Container | undefined>
     return db.container(name);
 };
 
+const isCosmosStatus = (error: unknown, expectedStatus: number) => {
+    if (!error || typeof error !== 'object') {
+        return false;
+    }
+
+    const maybeError = error as {
+        code?: number | string;
+        statusCode?: number;
+        message?: string;
+    };
+
+    if (maybeError.statusCode === expectedStatus) {
+        return true;
+    }
+
+    if (typeof maybeError.code === 'number' && maybeError.code === expectedStatus) {
+        return true;
+    }
+
+    if (typeof maybeError.code === 'string' && maybeError.code === String(expectedStatus)) {
+        return true;
+    }
+
+    if (!maybeError.message) {
+        return false;
+    }
+
+    if (expectedStatus === 404) {
+        return maybeError.message.includes('NotFound') || maybeError.message.includes('Resource Not Found');
+    }
+
+    if (expectedStatus === 409) {
+        return maybeError.message.includes('Conflict') || maybeError.message.includes('already exists');
+    }
+
+    return false;
+};
+
+const containerCache = new Map<string, Container>();
+
+export const ensureContainer = async (name: string): Promise<Container | undefined> => {
+    const cached = containerCache.get(name);
+    if (cached) return cached;
+
+    const db = await getDatabase();
+    if (!db) return undefined;
+
+    const existingContainer = db.container(name);
+    try {
+        await existingContainer.read();
+        containerCache.set(name, existingContainer);
+        return existingContainer;
+    } catch (error) {
+        if (!isCosmosStatus(error, 404)) {
+            throw error;
+        }
+    }
+
+    const partitionKey = CONTAINER_PARTITION_KEYS[name];
+    if (!partitionKey) {
+        return existingContainer;
+    }
+
+    try {
+        const { container } = await db.containers.create({
+            id: name,
+            partitionKey,
+        });
+
+        containerCache.set(name, container);
+        return container;
+    } catch (error) {
+        if (isCosmosStatus(error, 409)) {
+            containerCache.set(name, existingContainer);
+            return existingContainer;
+        }
+
+        throw error;
+    }
+};
+
 // Deprecated: Synchronous access is not supported with lazy initialization.
 // Converting to async accessors or removing entirely.
 // For backward compatibility during refactor, we remove it to force errors and fix them.
@@ -80,15 +174,9 @@ export const initDatabase = async () => {
     const { database } = await c.databases.createIfNotExists({ id: DATABASE_NAME });
 
     // Create containers with PKs
-    await database.containers.createIfNotExists({ id: "Questions", partitionKey: "/examId" });
-    await database.containers.createIfNotExists({ id: "Users", partitionKey: "/id" });
-    await database.containers.createIfNotExists({ id: "Accounts", partitionKey: "/userId" });
-    await database.containers.createIfNotExists({ id: "Sessions", partitionKey: "/sessionToken" });
-    await database.containers.createIfNotExists({ id: "LearningRecords", partitionKey: "/userId" });
-    await database.containers.createIfNotExists({ id: "LearningSessions", partitionKey: "/userId" });
-    await database.containers.createIfNotExists({ id: "Exams", partitionKey: "/id" });
-    await database.containers.createIfNotExists({ id: "ExamProgress", partitionKey: "/userId" });
-    await database.containers.createIfNotExists({ id: "Metrics", partitionKey: "/type" });
-    await database.containers.createIfNotExists({ id: "FeatureFlags", partitionKey: "/id" });
-    await database.containers.createIfNotExists({ id: "PageViews", partitionKey: "/date" });
+    await Promise.all(
+        Object.entries(CONTAINER_PARTITION_KEYS).map(([id, partitionKey]) =>
+            database.containers.createIfNotExists({ id, partitionKey })
+        )
+    );
 };

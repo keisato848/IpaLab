@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { Exam, LearningRecord, getExams } from '@/lib/api';
+import { Exam, LearningRecord, getExams, getLearningRecords } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
 import styles from '@/app/(main)/exam/page.module.css';
 
@@ -26,6 +26,7 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
     const [filter, setFilter] = useState(() => getCachedValue(FILTER_CACHE_KEY, 'ALL'));
     const [timeFilter, setTimeFilter] = useState(() => getCachedValue(TIME_FILTER_CACHE_KEY, 'ALL'));
     const { data: session } = useSession();
+    const [userLearningRecords, setUserLearningRecords] = useState<LearningRecord[]>(initialRecords);
 
     // 選択状態をlocalStorageに保存
     useEffect(() => {
@@ -48,11 +49,22 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
         }
     }, [initialExams.length]);
 
+    // ログイン済みユーザーの学習記録をクライアントサイドで取得
+    useEffect(() => {
+        if (session?.user?.id) {
+            getLearningRecords(session.user.id).then(records => {
+                setUserLearningRecords(records);
+            }).catch(() => {
+                // エラー時は初期値（空配列）のまま
+            });
+        }
+    }, [session?.user?.id]);
+
     // Merge stats with user's learning records
     const examsWithStats = useMemo(() => {
         // Get guest records if not authenticated
-        const userRecords = session?.user?.id 
-            ? initialRecords 
+        const userRecords = session?.user?.id
+            ? userLearningRecords
             : guestManager.getHistory();
 
         return exams.map(exam => {
@@ -65,13 +77,13 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
             return {
                 ...exam,
                 stats: {
-                    total: exam.stats.total || 80,
+                    total: exam.stats.total > 0 ? exam.stats.total : 0,
                     completed: uniqueAnswered,
                     correctRate: correctRate
                 }
             };
         });
-    }, [exams, initialRecords, session?.user?.id]);
+    }, [exams, userLearningRecords, session?.user?.id]);
 
     const filteredExams = useMemo(() => {
         return examsWithStats.filter(e => {
@@ -168,6 +180,9 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
                         else if (exam.id.includes('PM') && !exam.id.startsWith('PM-')) startType = 'PM';
 
                         const linkHref = `/exam/${exam.id}/${startType}`;
+                        const progressPercent = exam.stats.total > 0
+                            ? Math.round((exam.stats.completed / exam.stats.total) * 100)
+                            : 0;
 
                         return (
                             <Link href={linkHref} key={exam.id} className={styles.cardLink}>
@@ -181,7 +196,7 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
                                     <div className={styles.stats}>
                                         <div className={styles.statItem}>
                                             <span className={styles.statLabel}>進捗率</span>
-                                            <span className={styles.statValue}>{Math.round((exam.stats.completed / exam.stats.total) * 100)}%</span>
+                                            <span className={styles.statValue}>{progressPercent}%</span>
                                         </div>
                                         <div className={styles.statItem}>
                                             <span className={styles.statLabel}>正答率</span>
@@ -190,7 +205,7 @@ export default function ExamListClient({ initialExams, initialRecords = [] }: Ex
                                     </div>
 
                                     <div className={styles.progressBar}>
-                                        <div className={styles.progressFill} style={{ width: `${(exam.stats.completed / exam.stats.total) * 100}%` }}></div>
+                                        <div className={styles.progressFill} style={{ width: `${progressPercent}%` }}></div>
                                     </div>
                                 </article>
                             </Link>

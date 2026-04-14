@@ -70,6 +70,7 @@ export interface LearningRecord {
     isCorrect: boolean;
     isFlagged?: boolean; // New: Flag for review
     sessionId?: string; // New: Session Context
+    selectedOptionId?: string;
     answeredAt: string;
     timeTakenSeconds: number;
     nextReviewAt?: string;
