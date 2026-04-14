@@ -84,7 +84,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
     // AI Score Persistence State
     const [descriptiveHistory, setDescriptiveHistory] = useState<Record<string, { answer: string; result: any }>>({});
-    const [reviewRecord, setReviewRecord] = useState<LearningRecord | null>(null);
+    const [reviewRecord, setReviewRecord] = useState<LearningRecord | null | undefined>(undefined);
 
     // Review Later State
     const [isBookmarked, setIsBookmarked] = useState(false);
@@ -103,7 +103,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
         async function fetchHistoryAndProgress() {
             try {
-                setReviewRecord(null);
+                setReviewRecord(undefined);
                 const userId = session?.user?.id || guestManager.getGuestId();
                 if (!userId) return;
 
@@ -217,8 +217,11 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
     // Reset state when question changes (reviewモード時は解答・解説を復元)
     useEffect(() => {
-        setSelectedOption(isReview ? question.correctOption : null);
-        setShowExplanation(isReview);
+        // Review with session: wait for reviewRecord to restore user's actual selection
+        // Review without session: show correct answer immediately
+        const deferToRecord = isReview && !!sessionId;
+        setSelectedOption(isReview && !deferToRecord ? question.correctOption : null);
+        setShowExplanation(isReview && !deferToRecord);
         setIsFlagged(false); // Reset Flag
         setStartTime(Date.now());
 
@@ -269,10 +272,12 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     }, [question.id, question.examId, question.correctOption, isReview, session]);
 
     useEffect(() => {
-        if (!isReview || !reviewRecord?.selectedOptionId) return;
-        setSelectedOption(reviewRecord.selectedOptionId);
+        if (!isReview || !sessionId) return;
+        if (reviewRecord === undefined) return; // まだ読み込み中
+        // null = レコードなし → 正解を表示, LearningRecord = ユーザーの選択を復元
+        setSelectedOption(reviewRecord?.selectedOptionId ?? question.correctOption);
         setShowExplanation(true);
-    }, [isReview, reviewRecord?.selectedOptionId]);
+    }, [isReview, sessionId, reviewRecord, question.correctOption]);
 
     const formatTime = (seconds: number) => {
         const h = Math.floor(seconds / 3600);

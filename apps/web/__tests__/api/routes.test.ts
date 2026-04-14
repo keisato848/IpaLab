@@ -140,7 +140,7 @@ describe('API エンドポイント', () => {
     });
 
     describe('/api/session GET', () => {
-        it('examId と status をメモリ上で絞り込んで返す', async () => {
+        it('examId と status を Cosmos クエリで絞り込んで返す', async () => {
             const { getServerSession } = await import('next-auth');
             const { ensureContainer } = await import('@/lib/cosmos');
 
@@ -158,20 +158,6 @@ describe('API エンドポイント', () => {
                             status: 'completed',
                             startedAt: '2026-04-12T01:00:00.000Z',
                         },
-                        {
-                            id: 'session-2',
-                            userId: 'user-1',
-                            examId: 'SA-2024-Spring-AM2',
-                            status: 'in-progress',
-                            startedAt: '2026-04-12T00:30:00.000Z',
-                        },
-                        {
-                            id: 'session-3',
-                            userId: 'user-1',
-                            examId: 'AP-2024-Fall',
-                            status: 'completed',
-                            startedAt: '2026-04-11T23:30:00.000Z',
-                        }
                     ]
                 })
             }));
@@ -196,9 +182,11 @@ describe('API エンドポイント', () => {
                 })
             ]);
             expect(queryMock).toHaveBeenCalledWith({
-                query: 'SELECT * FROM c WHERE c.userId = @userId ORDER BY c.startedAt DESC',
+                query: 'SELECT * FROM c WHERE c.userId = @userId AND c.examId = @examId AND c.status = @status ORDER BY c.startedAt DESC OFFSET 0 LIMIT 1',
                 parameters: [
-                    { name: '@userId', value: 'user-1' }
+                    { name: '@userId', value: 'user-1' },
+                    { name: '@examId', value: 'SA-2024-Spring-AM2' },
+                    { name: '@status', value: 'completed' },
                 ]
             });
         });

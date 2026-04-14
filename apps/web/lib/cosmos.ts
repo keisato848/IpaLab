@@ -118,13 +118,19 @@ const isCosmosStatus = (error: unknown, expectedStatus: number) => {
     return false;
 };
 
+const containerCache = new Map<string, Container>();
+
 export const ensureContainer = async (name: string): Promise<Container | undefined> => {
+    const cached = containerCache.get(name);
+    if (cached) return cached;
+
     const db = await getDatabase();
     if (!db) return undefined;
 
     const existingContainer = db.container(name);
     try {
         await existingContainer.read();
+        containerCache.set(name, existingContainer);
         return existingContainer;
     } catch (error) {
         if (!isCosmosStatus(error, 404)) {
@@ -143,9 +149,11 @@ export const ensureContainer = async (name: string): Promise<Container | undefin
             partitionKey,
         });
 
+        containerCache.set(name, container);
         return container;
     } catch (error) {
         if (isCosmosStatus(error, 409)) {
+            containerCache.set(name, existingContainer);
             return existingContainer;
         }
 

@@ -24,39 +24,33 @@ export async function GET(request: NextRequest) {
         const container = await ensureContainer("LearningSessions");
         if (!container) throw new Error("Database not initialized");
 
+        const normalizedStatus = status === 'in-progress' || status === 'completed'
+            ? status
+            : null;
+
         let query = "SELECT * FROM c WHERE c.userId = @userId";
         const parameters: { name: string; value: string }[] = [
             { name: "@userId", value: session.user.id }
         ];
 
-        query += " ORDER BY c.startedAt DESC";
+        if (examId) {
+            query += " AND c.examId = @examId";
+            parameters.push({ name: "@examId", value: examId });
+        }
 
-        const { resources } = await container.items.query({
+        if (normalizedStatus) {
+            query += " AND c.status = @status";
+            parameters.push({ name: "@status", value: normalizedStatus });
+        }
+
+        query += ` ORDER BY c.startedAt DESC OFFSET 0 LIMIT ${limit}`;
+
+        const { resources } = await container.items.query<LearningSession>({
             query,
             parameters
         }).fetchAll();
 
-        const normalizedStatus = status === 'in-progress' || status === 'completed'
-            ? status
-            : null;
-
-        // Filter non-partition fields after the partition-scoped query to avoid
-        // requiring Cosmos composite indexes for examId/status + startedAt sorting.
-        const sessions = (resources as LearningSession[])
-            .filter((item) => {
-                if (examId && item.examId !== examId) {
-                    return false;
-                }
-
-                if (normalizedStatus && item.status !== normalizedStatus) {
-                    return false;
-                }
-
-                return true;
-            })
-            .slice(0, limit);
-
-        return NextResponse.json(sessions, { status: 200 });
+        return NextResponse.json(resources, { status: 200 });
 
     } catch (error: any) {
         console.error("Failed to fetch sessions:", error);
