@@ -168,7 +168,10 @@ export default function ExamResult({ questions, examId, year, type }: ExamResult
                             </div>
                             <span className={styles.colTitle}>{item.text.substring(0, 40)}...</span>
                             <div className={styles.actionArea}>
-                                <Link href={`/exam/${year}/${type}/${item.qNo}?mode=practice`} className={styles.reviewLink}>
+                                <Link
+                                    href={`/exam/${year}/${type}/${item.qNo}?mode=practice&review=true${sessionId ? `&sessionId=${sessionId}` : ''}`}
+                                    className={styles.reviewLink}
+                                >
                                     見直す
                                 </Link>
                             </div>

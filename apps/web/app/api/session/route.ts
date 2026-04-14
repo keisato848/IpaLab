@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getContainer } from '@/lib/cosmos';
+import { ensureContainer } from '@/lib/cosmos';
 import { LearningSessionSchema, LearningSession } from '@ipa-lab/shared';
 import { z } from 'zod';
 import { getServerSession } from "next-auth";
@@ -18,10 +18,15 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
         const examId = searchParams.get('examId');
         const status = searchParams.get('status'); // 'in-progress', 'completed', or null for all
-        const limit = parseInt(searchParams.get('limit') || '50');
+        const parsedLimit = Number.parseInt(searchParams.get('limit') || '50', 10);
+        const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 50;
 
-        const container = await getContainer("LearningSessions");
+        const container = await ensureContainer("LearningSessions");
         if (!container) throw new Error("Database not initialized");
+
+        const normalizedStatus = status === 'in-progress' || status === 'completed'
+            ? status
+            : null;
 
         let query = "SELECT * FROM c WHERE c.userId = @userId";
         const parameters: { name: string; value: string }[] = [
@@ -33,22 +38,19 @@ export async function GET(request: NextRequest) {
             parameters.push({ name: "@examId", value: examId });
         }
 
-        if (status) {
+        if (normalizedStatus) {
             query += " AND c.status = @status";
-            parameters.push({ name: "@status", value: status });
+            parameters.push({ name: "@status", value: normalizedStatus });
         }
 
-        query += " ORDER BY c.startedAt DESC";
+        query += ` ORDER BY c.startedAt DESC OFFSET 0 LIMIT ${limit}`;
 
-        const { resources } = await container.items.query({
+        const { resources } = await container.items.query<LearningSession>({
             query,
             parameters
         }).fetchAll();
 
-        // Return limited results
-        const sessions = resources.slice(0, limit) as LearningSession[];
-
-        return NextResponse.json(sessions, { status: 200 });
+        return NextResponse.json(resources, { status: 200 });
 
     } catch (error: any) {
         console.error("Failed to fetch sessions:", error);
@@ -87,7 +89,7 @@ export async function PATCH(request: NextRequest) {
 
         const { sessionId, answeredCount, correctCount, lastQuestionNo, status } = parseResult.data;
 
-        const container = await getContainer("LearningSessions");
+        const container = await ensureContainer("LearningSessions");
         if (!container) throw new Error("Database not initialized");
 
         // Fetch existing session
