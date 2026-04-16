@@ -75,7 +75,7 @@ describe('context-builder', () => {
         });
 
         it('全カテゴリのプロンプトが定義されている', () => {
-            const categories = ['qa-explain', 'qa-related', 'qa-analysis', 'qa-afternoon', 'site-guide'] as const;
+            const categories = ['qa-explain', 'qa-analysis', 'qa-afternoon', 'site-guide'] as const;
 
             for (const category of categories) {
                 const result = buildPrompt(category, 'test');

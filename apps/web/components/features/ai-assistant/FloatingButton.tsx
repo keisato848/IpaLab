@@ -1,5 +1,6 @@
 'use client';
 
+import RobotIcon from './RobotIcon';
 import styles from './ai-assistant.module.css';
 
 interface FloatingButtonProps {
@@ -15,7 +16,7 @@ export default function FloatingButton({ isOpen, onClick }: FloatingButtonProps)
             aria-label={isOpen ? 'AIアシスタントを閉じる' : 'AIアシスタントを開く'}
             role="button"
         >
-            {isOpen ? '✕' : '💬'}
+            {isOpen ? '✕' : <RobotIcon size={30} />}
         </button>
     );
 }

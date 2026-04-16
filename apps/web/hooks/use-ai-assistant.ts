@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 
-export type Category = 'qa-explain' | 'qa-related' | 'qa-analysis' | 'qa-afternoon' | 'site-guide';
+export type Category = 'qa-explain' | 'qa-analysis' | 'qa-afternoon' | 'site-guide';
 export type PanelState = 'closed' | 'menu' | 'bug-form' | 'category' | 'chat' | 'submitted';
 
 export interface ChatMessage {

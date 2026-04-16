@@ -14,7 +14,7 @@ docs/02_design/18_AiAssistantDesign.md のセクション 5.1「POST /api/ai-ass
    - AiAssistantUsage にレコードを INSERT（id は cuid()、usedAt は ISO 8601）
 
 2. `apps/web/lib/ai-assistant/context-builder.ts` を作成
-   - Category 型: "qa-explain" | "qa-related" | "qa-analysis" | "qa-afternoon" | "site-guide"
+   - Category 型: "qa-explain" | "qa-analysis" | "qa-afternoon" | "site-guide"
    - SYSTEM_PROMPTS: カテゴリごとのシステムプロンプト（設計書セクション 7.1 の内容をそのまま使用）
    - `buildPrompt(category, message, context?): { systemPrompt: string; userMessage: string }`
    - context がある場合、ユーザーメッセージに問題情報ブロックを付与（設計書セクション 7.2 のフォーマット）

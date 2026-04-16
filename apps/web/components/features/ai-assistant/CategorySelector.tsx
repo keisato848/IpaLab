@@ -23,12 +23,6 @@ const CATEGORIES: CategoryOption[] = [
         showCondition: () => true,
     },
     {
-        category: 'qa-related',
-        icon: '🔗',
-        label: '関連知識を知る',
-        showCondition: () => true,
-    },
-    {
         category: 'qa-analysis',
         icon: '❌',
         label: '誤答を分析する',

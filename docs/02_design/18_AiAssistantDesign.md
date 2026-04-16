@@ -88,7 +88,7 @@ graph TD
 | `id` | string | UUID (cuid) |
 | `userId` | string | **Partition Key** |
 | `usedAt` | string | ISO 8601（UTC） |
-| `category` | string | `"qa-explain"` \| `"qa-related"` \| `"qa-analysis"` \| `"qa-afternoon"` \| `"site-guide"` |
+| `category` | string | `"qa-explain"` \| `"qa-analysis"` \| `"qa-afternoon"` \| `"site-guide"` |
 | `questionId` | string? | 演習画面の場合の問題 ID |
 | `examId` | string? | 演習画面の場合の試験 ID |
 
@@ -145,7 +145,7 @@ const CONTAINER_PARTITION_KEYS: Record<string, string> = {
 
 ```typescript
 interface ChatRequest {
-    category: "qa-explain" | "qa-related" | "qa-analysis" | "qa-afternoon" | "site-guide";
+    category: "qa-explain" | "qa-analysis" | "qa-afternoon" | "site-guide";
     message: string;
     context?: {
         questionId: string;
@@ -386,28 +386,19 @@ const AiAssistantWidget = dynamic(
 ```typescript
 const SYSTEM_PROMPTS: Record<Category, string> = {
     "qa-explain": QA_EXPLAIN_PROMPT,
-    "qa-related": QA_RELATED_PROMPT,
     "qa-analysis": QA_ANALYSIS_PROMPT,
     "qa-afternoon": QA_AFTERNOON_PROMPT,
     "site-guide": SITE_GUIDE_PROMPT,
 };
 ```
 
-#### `qa-explain` — 解説深掘り
+#### `qa-explain` — 解説深掘り＋関連知識
 
 ```text
 あなたは情報処理技術者試験の学習アシスタントです。
 与えられた問題の解説をさらに詳しく、初学者にもわかるように説明してください。
 具体例を交えて、なぜその答えが正しいのかを論理的に解説してください。
-回答は日本語で、Markdown 形式で返してください。
-```
-
-#### `qa-related` — 関連知識
-
-```text
-あなたは情報処理技術者試験の学習アシスタントです。
-与えられた問題に関連する概念、用語、過去の類似問題を提示してください。
-体系的な理解を促すように、関連分野のつながりを示してください。
+また、関連する概念、用語、過去の類似問題も提示し、体系的な理解を促してください。
 回答は日本語で、Markdown 形式で返してください。
 ```
 
@@ -624,3 +615,4 @@ export async function captureWithMasking(): Promise<Blob> {
 |------|------|
 | 2026-04-14 | 初版作成 |
 | 2025-07-24 | レビュー指摘反映: currentPage に admin 追加、usedAt を UTC に統一、Root Layout を dynamic import に変更、テレメトリ追加、フォーカストラップ追加 |
+| 2026-04-16 | qa-explain と qa-related を統合（4カテゴリ化）、RobotIcon SVG コンポーネント追加（FAB・チャットアバター） |

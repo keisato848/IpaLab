@@ -8,7 +8,7 @@ import type { Category, ExamContext } from '@/hooks/use-ai-assistant';
 
 export const runtime = 'nodejs';
 
-const VALID_CATEGORIES: Category[] = ['qa-explain', 'qa-related', 'qa-analysis', 'qa-afternoon', 'site-guide'];
+const VALID_CATEGORIES: Category[] = ['qa-explain', 'qa-analysis', 'qa-afternoon', 'site-guide'];
 
 export async function POST(req: NextRequest) {
     // 認証チェック

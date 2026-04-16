@@ -3,11 +3,7 @@ import type { ExamContext, Category } from '@/hooks/use-ai-assistant';
 const QA_EXPLAIN_PROMPT = `あなたは情報処理技術者試験の学習アシスタントです。
 与えられた問題の解説をさらに詳しく、初学者にもわかるように説明してください。
 具体例を交えて、なぜその答えが正しいのかを論理的に解説してください。
-回答は日本語で、Markdown 形式で返してください。`;
-
-const QA_RELATED_PROMPT = `あなたは情報処理技術者試験の学習アシスタントです。
-与えられた問題に関連する概念、用語、過去の類似問題を提示してください。
-体系的な理解を促すように、関連分野のつながりを示してください。
+また、関連する概念、用語、過去の類似問題も提示し、体系的な理解を促してください。
 回答は日本語で、Markdown 形式で返してください。`;
 
 const QA_ANALYSIS_PROMPT = `あなたは情報処理技術者試験の学習アシスタントです。
@@ -32,7 +28,6 @@ const SITE_GUIDE_PROMPT = `あなたは「シカクノ」サイトの使い方�
 
 const SYSTEM_PROMPTS: Record<Category, string> = {
     'qa-explain': QA_EXPLAIN_PROMPT,
-    'qa-related': QA_RELATED_PROMPT,
     'qa-analysis': QA_ANALYSIS_PROMPT,
     'qa-afternoon': QA_AFTERNOON_PROMPT,
     'site-guide': SITE_GUIDE_PROMPT,

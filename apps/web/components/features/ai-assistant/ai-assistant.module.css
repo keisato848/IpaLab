@@ -297,6 +297,19 @@
     align-self: flex-start;
 }
 
+.messageAvatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-bottom: 4px;
+}
+
 .messageBubble {
     padding: 10px 14px;
     border-radius: 12px;
