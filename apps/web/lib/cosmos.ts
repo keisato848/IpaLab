@@ -15,6 +15,8 @@ const CONTAINER_PARTITION_KEYS: Record<string, string> = {
     Metrics: "/type",
     FeatureFlags: "/id",
     PageViews: "/date",
+    AiAssistantUsage: "/userId",
+    BugReports: "/userId",
 };
 
 // Singleton instance
