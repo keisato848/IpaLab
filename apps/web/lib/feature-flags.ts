@@ -33,6 +33,11 @@ const DEFAULT_FLAGS: Omit<FeatureFlag, 'updatedAt' | 'updatedBy'>[] = [
         enabled: true,
         description: 'AI学習計画機能の有効化',
     },
+    {
+        id: 'ai_assistant_enabled',
+        enabled: false,
+        description: 'AIアシスタントウィジェットの有効化',
+    },
 ];
 
 /**

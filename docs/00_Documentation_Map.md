@@ -11,6 +11,7 @@ docs/
 ├── ai-planner-design.md         # AI学習プランナー機能の設計（暫定的に Implementation Level として扱う）
 ├── 01_planning/                 # [Planning Level] 要件定義・基本設計・全体計画
 │   ├── 要件定義書.md            # プロジェクトの目的、機能要件、非機能要件
+│   ├── AIアシスタント要件定義書.md # AIアシスタント機能の要件定義
 │   ├── 基本設計書.md            # アーキテクチャ全体像、技術選定、開発規約概要
 │   ├── 環境設計書.md            # インフラ構成、ネットワーク、CI/CD、セキュリティ
 │   ├── DirectoryPlan.md         # ディレクトリ構造の方針
@@ -31,9 +32,11 @@ docs/
 │   ├── 15_CommonApiAndErrorDesign.md # 共通 API 契約・HTTP ステータス・エラー応答の整理
 │   ├── 16_TelemetryAndMonitoringDesign.md # Application Insights / PageViews / 監視設計
 │   ├── 17_DataLoadingAndSyncBoundaryDesign.md # packages/data と apps/web のデータ境界設計
+│   ├── 18_AiAssistantDesign.md   # AIアシスタントウィジェット（チャット・障害報告）の詳細設計
 │   └── (必要に応じて追加)
 ├── 03_plans/                    # [Execution Plan Level] 整備計画・作業分割・再開用メモ
 │   ├── detailed-design-systematization-plan.md # 機能詳細設計を体系化するための実行計画
+│   ├── ai-assistant-implementation-plan.md # AIアシスタント機能の実装計画（8フェーズ）
 │   └── ...
 ├── 03_migration/                # [Migration] SWA → App Service 移行計画
 │   ├── 00_Migration_Overview.md     # 移行概要・スケジュール
@@ -68,6 +71,7 @@ docs/
 - `15_CommonApiAndErrorDesign.md`
 - `16_TelemetryAndMonitoringDesign.md`
 - `17_DataLoadingAndSyncBoundaryDesign.md`
+- `18_AiAssistantDesign.md`
 
 補足:
 - `ai-planner-design.md` は現状 `docs/` 直下にあるが、内容上は Implementation Level として扱う。

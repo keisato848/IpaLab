@@ -62,6 +62,7 @@ import { AdProvider } from "@/components/features/ads";
 
 import { TelemetryProvider } from "@/components/providers/TelemetryProvider";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import AiAssistantLoader from "@/components/features/ai-assistant/AiAssistantLoader";
 
 export default function RootLayout({
     children,
@@ -100,6 +101,7 @@ export default function RootLayout({
                         <AdProvider>
                             <ThemeProvider>
                                 {children}
+                                <AiAssistantLoader />
                             </ThemeProvider>
                         </AdProvider>
                     </TelemetryProvider>
