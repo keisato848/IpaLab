@@ -40,7 +40,7 @@ export default function AiAssistantWidget() {
 
     // フィーチャーフラグ確認
     useEffect(() => {
-        fetch('/api/feature-flags?id=ai_assistant_enabled')
+        fetch('/api/feature-flags')
             .then(res => res.json())
             .then(data => setFeatureEnabled(data.flags?.ai_assistant_enabled ?? false))
             .catch(() => setFeatureEnabled(false));
@@ -125,7 +125,7 @@ export default function AiAssistantWidget() {
             <FloatingButton isOpen={isOpen} onClick={handleFabClick} />
             {isOpen && (
                 <>
-                    <div className={styles.overlay} onClick={closePanel} />
+                    <div className={styles.overlay} onClick={closePanel} aria-hidden="true" />
                     <AssistantPanel
                     panelState={panelState}
                     messages={messages}
