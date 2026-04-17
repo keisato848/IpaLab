@@ -15,6 +15,7 @@ vi.mock('@/auth', () => ({
 
 vi.mock('@/lib/ai-assistant/github-issues', () => ({
     createBugReportIssue: vi.fn(),
+    isGitHubIssuesConfigured: vi.fn(() => true),
 }));
 
 vi.mock('@/lib/ai-assistant/blob-upload', () => ({
@@ -138,6 +139,82 @@ describe('/api/ai-assistant/bug-report', () => {
         expect(response.status).toBe(200);
         expect(data.issueNumber).toBe(42);
         expect(data.success).toBe(true);
+        expect(mockContainer.items.create).toHaveBeenCalled();
+    });
+
+    it('GITHUB_ISSUES 未設定時は Issue 作成をスキップして 200 を返す (graceful degradation)', async () => {
+        const { getServerSession } = await import('next-auth');
+        (getServerSession as any).mockResolvedValue({ user: { id: 'user-1' } });
+
+        const mockContainer = {
+            items: {
+                query: () => ({
+                    fetchAll: async () => ({ resources: [0] }),
+                }),
+                create: vi.fn().mockResolvedValue({}),
+            },
+        };
+        const { getContainer } = await import('@/lib/cosmos');
+        (getContainer as any).mockResolvedValue(mockContainer);
+
+        const { isGitHubIssuesConfigured, createBugReportIssue } = await import('@/lib/ai-assistant/github-issues');
+        (isGitHubIssuesConfigured as any).mockReturnValueOnce(false);
+
+        const { POST } = await import('@/app/api/ai-assistant/bug-report/route');
+        const formData = new FormData();
+        formData.append('description', '未設定でもCosmosに保存されること');
+        formData.append('pageUrl', 'http://localhost/exam');
+
+        const req = new NextRequest('http://localhost/api/ai-assistant/bug-report', {
+            method: 'POST',
+            body: formData,
+        });
+
+        const response = await POST(req);
+        const data = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(data.success).toBe(true);
+        expect(data.issueNumber).toBeNull();
+        expect(data.issueUrl).toBeNull();
+        expect(createBugReportIssue).not.toHaveBeenCalled();
+        expect(mockContainer.items.create).toHaveBeenCalled();
+    });
+
+    it('GitHub Issue 作成失敗時でも CosmosDB 記録して 200 を返す', async () => {
+        const { getServerSession } = await import('next-auth');
+        (getServerSession as any).mockResolvedValue({ user: { id: 'user-1' } });
+
+        const mockContainer = {
+            items: {
+                query: () => ({
+                    fetchAll: async () => ({ resources: [0] }),
+                }),
+                create: vi.fn().mockResolvedValue({}),
+            },
+        };
+        const { getContainer } = await import('@/lib/cosmos');
+        (getContainer as any).mockResolvedValue(mockContainer);
+
+        const { createBugReportIssue } = await import('@/lib/ai-assistant/github-issues');
+        (createBugReportIssue as any).mockRejectedValueOnce(new Error('GitHub API down'));
+
+        const { POST } = await import('@/app/api/ai-assistant/bug-report/route');
+        const formData = new FormData();
+        formData.append('description', 'GitHubが落ちていてもCosmosに保存');
+        formData.append('pageUrl', 'http://localhost/exam');
+
+        const req = new NextRequest('http://localhost/api/ai-assistant/bug-report', {
+            method: 'POST',
+            body: formData,
+        });
+
+        const response = await POST(req);
+        const data = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(data.success).toBe(true);
+        expect(data.issueNumber).toBeNull();
         expect(mockContainer.items.create).toHaveBeenCalled();
     });
 });
