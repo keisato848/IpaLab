@@ -16,13 +16,13 @@ interface AssistantPanelProps {
     category: Category | null;
     currentPage: 'exam' | 'admin' | 'other';
     examContext: ExamContext | null;
-    bugReportResult: { issueNumber: number; issueUrl: string } | null;
+    bugReportResult: { issueNumber: number | null; issueUrl: string | null } | null;
     onClose: () => void;
     onGoToMenu: () => void;
     onGoToBugForm: () => void;
     onGoToCategory: () => void;
     onGoToChat: (category: Category) => void;
-    onGoToSubmitted: (result: { issueNumber: number; issueUrl: string }) => void;
+    onGoToSubmitted: (result: { issueNumber: number | null; issueUrl: string | null }) => void;
     onAddMessage: (msg: ChatMessage) => void;
     onUpdateLastAssistantMessage: (content: string) => void;
     onSetRemainingQuota: (n: number) => void;
@@ -196,15 +196,23 @@ export default function AssistantPanel({
                     <div className={styles.submittedContainer}>
                         <div className={styles.submittedIcon}>✅</div>
                         <div className={styles.submittedTitle}>報告ありがとうございます</div>
-                        <p>Issue #{bugReportResult.issueNumber} として登録されました。</p>
-                        <a
-                            href={bugReportResult.issueUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={styles.submittedLink}
-                        >
-                            GitHub Issue を確認する
-                        </a>
+                        {bugReportResult.issueNumber !== null ? (
+                            <>
+                                <p>Issue #{bugReportResult.issueNumber} として登録されました。</p>
+                                {bugReportResult.issueUrl && (
+                                    <a
+                                        href={bugReportResult.issueUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={styles.submittedLink}
+                                    >
+                                        GitHub Issue を確認する
+                                    </a>
+                                )}
+                            </>
+                        ) : (
+                            <p>内容を受け付けました。運営チームが確認いたします。</p>
+                        )}
                         <button className={styles.menuButton} onClick={onGoToMenu}>
                             <span className={styles.menuLabel}>メニューに戻る</span>
                         </button>

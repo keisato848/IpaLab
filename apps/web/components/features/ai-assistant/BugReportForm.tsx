@@ -6,7 +6,7 @@ import { appInsights } from '@/components/providers/TelemetryProvider';
 import styles from './ai-assistant.module.css';
 
 interface BugReportFormProps {
-    onSubmitted: (result: { issueNumber: number; issueUrl: string }) => void;
+    onSubmitted: (result: { issueNumber: number | null; issueUrl: string | null }) => void;
 }
 
 export default function BugReportForm({ onSubmitted }: BugReportFormProps) {
@@ -53,9 +53,9 @@ export default function BugReportForm({ onSubmitted }: BugReportFormProps) {
             const data = await res.json();
             appInsights?.trackEvent({
                 name: 'ai_assistant_bug_report',
-                properties: { issueNumber: data.issueNumber },
+                properties: { issueNumber: data.issueNumber ?? null },
             });
-            onSubmitted({ issueNumber: data.issueNumber, issueUrl: data.issueUrl });
+            onSubmitted({ issueNumber: data.issueNumber ?? null, issueUrl: data.issueUrl ?? null });
         } catch (err: any) {
             setError(err.message || '障害報告の送信に失敗しました。しばらく経ってからお試しください。');
         } finally {

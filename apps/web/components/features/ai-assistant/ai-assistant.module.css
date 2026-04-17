@@ -33,6 +33,18 @@
     outline-offset: 3px;
 }
 
+.fabDragging {
+    cursor: grabbing;
+    transform: scale(1.08);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+    transition: none;
+    user-select: none;
+}
+
+.fabDragging:hover {
+    transform: scale(1.08);
+}
+
 /* Panel Container */
 .panel {
     position: fixed;
@@ -584,17 +596,17 @@
     }
 }
 
-/* Overlay for mobile */
+/* Overlay: デスクトップは透明、モバイルは暗くする。いずれもクリックでパネルを閉じる */
 .overlay {
-    display: none;
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: transparent;
+    z-index: 1055;
 }
 
 @media (max-width: 768px) {
     .overlay {
-        display: block;
-        position: fixed;
-        inset: 0;
         background-color: rgba(0, 0, 0, 0.4);
-        z-index: 1055;
     }
 }
