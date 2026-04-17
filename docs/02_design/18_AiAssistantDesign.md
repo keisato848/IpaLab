@@ -623,4 +623,4 @@ export async function captureWithMasking(): Promise<Blob> {
 | 日付 | 内容 |
 |------|------|
 | 2026-04-14 | 初版作成 |
-| 2025-07-24 | レビュー指摘反映: currentPage に admin 追加、usedAt を UTC に統一、Root Layout を dynamic import に変更、テレメトリ追加、フォーカストラップ追加 |
+| 2026-04-17 | レビュー指摘反映: currentPage に admin 追加、usedAt を UTC に統一、Root Layout を dynamic import に変更、テレメトリ追加、フォーカストラップ追加 |

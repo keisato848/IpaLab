@@ -19,13 +19,20 @@ export async function POST(req: NextRequest) {
 
     const userId = session.user.id;
 
+    let body: {
+        category: Category;
+        message: string;
+        context?: ExamContext;
+    };
+
     try {
-        const body = await req.json();
-        const { category, message, context } = body as {
-            category: Category;
-            message: string;
-            context?: ExamContext;
-        };
+        body = await req.json();
+    } catch {
+        return NextResponse.json({ error: 'リクエスト形式が不正です' }, { status: 400 });
+    }
+
+    try {
+        const { category, message, context } = body;
 
         // バリデーション
         if (!category || !VALID_CATEGORIES.includes(category)) {
@@ -63,8 +70,9 @@ export async function POST(req: NextRequest) {
                     // 使用量記録
                     await recordUsage(userId, category, context?.questionId, context?.examId);
 
-                    // 完了メッセージ
-                    const remaining = rateResult.remaining - 1;
+                    // 完了メッセージ（recordUsage後に再計算して整合性を保つ）
+                    const updatedRateResult = await checkRateLimit(userId);
+                    const remaining = updatedRateResult.allowed ? updatedRateResult.remaining : 0;
                     const doneData = JSON.stringify({ done: true, remaining });
                     controller.enqueue(encoder.encode(`data: ${doneData}\n\n`));
                 } catch (error) {

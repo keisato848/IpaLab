@@ -1,7 +1,13 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
 const apiKey = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(apiKey || '');
+
+function getGenAI(): GoogleGenerativeAI {
+    if (!apiKey) {
+        throw new Error('GEMINI_API_KEY が設定されていません');
+    }
+    return new GoogleGenerativeAI(apiKey);
+}
 
 const safetySettings = [
     { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
@@ -14,7 +20,7 @@ export async function* streamChatResponse(
     systemPrompt: string,
     userMessage: string,
 ): AsyncGenerator<string> {
-    const model = genAI.getGenerativeModel({
+    const model = getGenAI().getGenerativeModel({
         model: 'gemini-2.5-flash',
         systemInstruction: systemPrompt,
         safetySettings,

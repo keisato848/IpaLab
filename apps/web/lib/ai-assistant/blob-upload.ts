@@ -11,8 +11,8 @@ export async function uploadScreenshot(buffer: Buffer, userId: string): Promise<
     const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
     const containerClient = blobServiceClient.getContainerClient(containerName);
 
-    // コンテナが存在しない場合は作成
-    await containerClient.createIfNotExists({ access: 'blob' });
+    // コンテナが存在しない場合はプライベートアクセスで作成
+    await containerClient.createIfNotExists();
 
     const blobName = `screenshots/${userId}/${Date.now()}.png`;
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);

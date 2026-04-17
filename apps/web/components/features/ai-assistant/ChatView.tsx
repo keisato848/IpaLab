@@ -141,6 +141,7 @@ export default function ChatView({
             onUpdateLastAssistantMessage('ネットワークに接続できません。接続を確認してください。');
         } finally {
             setIsStreaming(false);
+            textareaRef.current?.focus();
         }
     };
 
