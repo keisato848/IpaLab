@@ -140,19 +140,44 @@ export default function ChatView({
         void fetchAnswer();
     }, [hasTriggered, fetchAnswer]);
 
+    // ストリーミング中で、最後のアシスタントメッセージがまだ空なら（=最初のトークン未着）ロード画面を表示
+    const lastMessage = messages[messages.length - 1];
+    const isWaitingFirstToken =
+        isStreaming &&
+        (!lastMessage || (lastMessage.role === 'assistant' && lastMessage.content.length === 0));
+
     return (
         <div className={styles.chatContainer}>
             <div className={styles.chatMessages} role="log" aria-live="polite">
-                {messages.map((msg) => (
-                    <ChatMessage
-                        key={msg.id}
-                        role={msg.role}
-                        content={msg.content}
-                        timestamp={msg.timestamp}
-                    />
-                ))}
-                {isStreaming && messages.length === 0 && (
-                    <div className={styles.rateLimitMessage}>回答を生成しています...</div>
+                {messages.map((msg) => {
+                    // 空のアシスタントプレースホルダーは表示しない（代わりにローディングを出す）
+                    if (msg.role === 'assistant' && msg.content.length === 0 && isStreaming) {
+                        return null;
+                    }
+                    return (
+                        <ChatMessage
+                            key={msg.id}
+                            role={msg.role}
+                            content={msg.content}
+                            timestamp={msg.timestamp}
+                        />
+                    );
+                })}
+                {isWaitingFirstToken && (
+                    <div className={styles.loadingIndicator} role="status" aria-label="回答を生成中">
+                        <div className={styles.loadingSpinner} aria-hidden="true" />
+                        <div className={styles.loadingText}>
+                            <span>AI が回答を作成しています</span>
+                            <span className={styles.loadingDots} aria-hidden="true">
+                                <span />
+                                <span />
+                                <span />
+                            </span>
+                        </div>
+                        <p className={styles.loadingHint}>
+                            内容によっては 10〜30 秒ほどかかる場合があります
+                        </p>
+                    </div>
                 )}
                 <div ref={messagesEndRef} />
             </div>
