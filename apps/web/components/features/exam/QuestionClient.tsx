@@ -251,12 +251,17 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
                 if (eRecords.length > 0) {
                     setAllExamRecords(eRecords);
-                    // Session Stats (Today's records)
-                    const today = new Date().toISOString().split('T')[0];
-                    const todaysRecords = eRecords.filter(r => r && r.answeredAt && r.answeredAt.startsWith(today));
-                    if (todaysRecords.length > 0) {
-                        const sCorrect = todaysRecords.filter(r => r.isCorrect).length;
-                        setSessionStats({ total: todaysRecords.length, correct: sCorrect });
+                    // Session Stats: sessionId があればセッション単位、なければ当日ベース
+                    let sessionRecords: typeof eRecords;
+                    if (sessionId) {
+                        sessionRecords = eRecords.filter(r => r.sessionId === sessionId);
+                    } else {
+                        const today = new Date().toISOString().split('T')[0];
+                        sessionRecords = eRecords.filter(r => r && r.answeredAt && r.answeredAt.startsWith(today));
+                    }
+                    if (sessionRecords.length > 0) {
+                        const sCorrect = sessionRecords.filter(r => r.isCorrect).length;
+                        setSessionStats({ total: sessionRecords.length, correct: sCorrect });
                     }
 
                     const eCorrect = eRecords.filter(r => r.isCorrect).length;
