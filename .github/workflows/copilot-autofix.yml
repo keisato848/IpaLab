@@ -67,6 +67,26 @@ jobs:
                 assignees: ['copilot']
               });
               console.log('Copilot にアサインしました');
+
+              // 修正ガイダンスをコメントとして追加
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                body: [
+                  '🤖 **Copilot Coding Agent に自動アサインしました**',
+                  '',
+                  '修正時は `.github/agents/bug-fixer.agent.md` のガイドラインに従ってください:',
+                  '',
+                  '1. Issue 本文のページ URL からコンポーネントを特定',
+                  '2. 最小限の変更で修正を実装',
+                  '3. `npm run test:unit` で全テスト通過を確認',
+                  '4. `fix/<要約>` ブランチで PR を作成',
+                  '',
+                  '---',
+                  '*このコメントは copilot-autofix ワークフローにより自動投稿されました*'
+                ].join('\n')
+              });
             } catch (error) {
               console.error('Copilot アサインに失敗:', error.message);
               // Copilot が有効でない場合はコメントで通知
