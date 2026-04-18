@@ -42,13 +42,13 @@ describe('useMonthlyStats', () => {
 
     it('今月のレコードのみカウントする', () => {
         const records = [
-            // 今月 (2026年2月)
-            createRecord({ answeredAt: '2026-02-01T08:00:00Z', isCorrect: true }),
-            createRecord({ answeredAt: '2026-02-05T12:00:00Z', isCorrect: false }),
-            createRecord({ answeredAt: '2026-02-09T09:00:00Z', isCorrect: true }),
+            // 今月 (2026年2月) -- 異なるquestionIdで3問を表現
+            createRecord({ questionId: 'q-1', answeredAt: '2026-02-01T08:00:00Z', isCorrect: true }),
+            createRecord({ questionId: 'q-2', answeredAt: '2026-02-05T12:00:00Z', isCorrect: false }),
+            createRecord({ questionId: 'q-3', answeredAt: '2026-02-09T09:00:00Z', isCorrect: true }),
             // 先月 (2026年1月)
-            createRecord({ answeredAt: '2026-01-15T08:00:00Z', isCorrect: true }),
-            createRecord({ answeredAt: '2026-01-20T08:00:00Z', isCorrect: false }),
+            createRecord({ questionId: 'q-4', answeredAt: '2026-01-15T08:00:00Z', isCorrect: true }),
+            createRecord({ questionId: 'q-5', answeredAt: '2026-01-20T08:00:00Z', isCorrect: false }),
         ];
 
         const { result } = renderHook(() => useMonthlyStats(records, undefined));
@@ -66,11 +66,12 @@ describe('useMonthlyStats', () => {
 
     it('前月比トレンドを正しく計算する', () => {
         const records = [
-            createRecord({ answeredAt: '2026-02-01T08:00:00Z', isCorrect: true }),
-            createRecord({ answeredAt: '2026-02-02T08:00:00Z', isCorrect: true }),
-            createRecord({ answeredAt: '2026-02-03T08:00:00Z', isCorrect: true }),
+            // 今月: 異なるquestionIdで3問を表現
+            createRecord({ questionId: 'q-1', answeredAt: '2026-02-01T08:00:00Z', isCorrect: true }),
+            createRecord({ questionId: 'q-2', answeredAt: '2026-02-02T08:00:00Z', isCorrect: true }),
+            createRecord({ questionId: 'q-3', answeredAt: '2026-02-03T08:00:00Z', isCorrect: true }),
             // 先月
-            createRecord({ answeredAt: '2026-01-10T08:00:00Z', isCorrect: false }),
+            createRecord({ questionId: 'q-4', answeredAt: '2026-01-10T08:00:00Z', isCorrect: false }),
         ];
 
         const { result } = renderHook(() => useMonthlyStats(records, undefined));
@@ -84,9 +85,9 @@ describe('useMonthlyStats', () => {
 
     it('targetExamPrefixでフィルタリングされる', () => {
         const records = [
-            createRecord({ answeredAt: '2026-02-01T08:00:00Z', examId: 'AP-2025-Fall-AM', isCorrect: true }),
-            createRecord({ answeredAt: '2026-02-01T08:00:00Z', examId: 'FE-2025-Fall-AM', isCorrect: false }),
-            createRecord({ answeredAt: '2026-02-02T08:00:00Z', examId: 'AP-2025-Spring-AM', isCorrect: true }),
+            createRecord({ questionId: 'ap-q-1', answeredAt: '2026-02-01T08:00:00Z', examId: 'AP-2025-Fall-AM', isCorrect: true }),
+            createRecord({ questionId: 'fe-q-1', answeredAt: '2026-02-01T08:00:00Z', examId: 'FE-2025-Fall-AM', isCorrect: false }),
+            createRecord({ questionId: 'ap-q-2', answeredAt: '2026-02-02T08:00:00Z', examId: 'AP-2025-Spring-AM', isCorrect: true }),
         ];
 
         const { result } = renderHook(() => useMonthlyStats(records, 'AP'));
@@ -117,8 +118,8 @@ describe('useMonthlyStats', () => {
 
     it('平均解答時間を計算する', () => {
         const records = [
-            createRecord({ answeredAt: '2026-02-01T08:00:00Z', timeTakenSeconds: 30 }),
-            createRecord({ answeredAt: '2026-02-01T09:00:00Z', timeTakenSeconds: 90 }),
+            createRecord({ questionId: 'q-1', answeredAt: '2026-02-01T08:00:00Z', timeTakenSeconds: 30 }),
+            createRecord({ questionId: 'q-2', answeredAt: '2026-02-01T09:00:00Z', timeTakenSeconds: 90 }),
         ];
 
         const { result } = renderHook(() => useMonthlyStats(records, undefined));

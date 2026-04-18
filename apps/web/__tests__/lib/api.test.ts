@@ -387,11 +387,35 @@ describe('API ユーティリティ', () => {
 });
 
 describe('API_BASE 定数', () => {
-    it('クライアント側では相対パスを使用', async () => {
-        // windowが存在する環境をシミュレート
+    const originalNextPublicApiBase = process.env.NEXT_PUBLIC_API_BASE;
+
+    afterEach(() => {
+        process.env.NEXT_PUBLIC_API_BASE = originalNextPublicApiBase;
+    });
+
+    it('クライアント側では環境変数より相対パスを優先する', async () => {
+        process.env.NEXT_PUBLIC_API_BASE = 'http://localhost:3000/api';
+        vi.resetModules();
+
         const { API_BASE } = await import('@/lib/api');
-        
-        // テスト環境ではjsdomでwindowが存在するため相対パス
-        expect(API_BASE).toContain('/api');
+
+        expect(API_BASE).toBe('/api');
+    });
+
+    it('サーバー側では WEBSITE_HOSTNAME から API ベースURLを構築する', async () => {
+        const { resolveApiBaseForRuntime } = await import('@/lib/api');
+
+        const apiBase = resolveApiBaseForRuntime(false, {
+            WEBSITE_HOSTNAME: 'app-pm-exam-dx-staging.azurewebsites.net',
+        } as NodeJS.ProcessEnv);
+
+        expect(apiBase).toBe('https://app-pm-exam-dx-staging.azurewebsites.net/api');
+    });
+
+    it('API サフィックスを重複させずに正規化する', async () => {
+        const { normalizeApiBase } = await import('@/lib/api');
+
+        expect(normalizeApiBase('https://example.com')).toBe('https://example.com/api');
+        expect(normalizeApiBase('https://example.com/api')).toBe('https://example.com/api');
     });
 });

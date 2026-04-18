@@ -84,6 +84,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
     // AI Score Persistence State
     const [descriptiveHistory, setDescriptiveHistory] = useState<Record<string, { answer: string; result: any }>>({});
+    const [reviewRecord, setReviewRecord] = useState<LearningRecord | null | undefined>(undefined);
 
     // Review Later State
     const [isBookmarked, setIsBookmarked] = useState(false);
@@ -102,6 +103,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
         async function fetchHistoryAndProgress() {
             try {
+                setReviewRecord(undefined);
                 const userId = session?.user?.id || guestManager.getGuestId();
                 if (!userId) return;
 
@@ -136,10 +138,17 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 // 3. Restore Flag State (if in same session)
                 if (sessionId) {
                     // Filter records for this session and question
-                    const sessionRecord = records.find(r => r.sessionId === sessionId && r.questionId === question.id);
+                    const sessionRecord = records
+                        .filter(r => r.sessionId === sessionId && r.questionId === question.id)
+                        .sort((a, b) => new Date(b.answeredAt).getTime() - new Date(a.answeredAt).getTime())[0];
+
+                    setReviewRecord(sessionRecord || null);
+
                     if (sessionRecord?.isFlagged) {
                         setIsFlagged(true);
                     }
+                } else {
+                    setReviewRecord(null);
                 }
 
             } catch (e) {
@@ -208,8 +217,11 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
     // Reset state when question changes (reviewモード時は解答・解説を復元)
     useEffect(() => {
-        setSelectedOption(isReview ? question.correctOption : null);
-        setShowExplanation(isReview);
+        // Review with session: wait for reviewRecord to restore user's actual selection
+        // Review without session: show correct answer immediately
+        const deferToRecord = isReview && !!sessionId;
+        setSelectedOption(isReview && !deferToRecord ? question.correctOption : null);
+        setShowExplanation(isReview && !deferToRecord);
         setIsFlagged(false); // Reset Flag
         setStartTime(Date.now());
 
@@ -239,12 +251,17 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
                 if (eRecords.length > 0) {
                     setAllExamRecords(eRecords);
-                    // Session Stats (Today's records)
-                    const today = new Date().toISOString().split('T')[0];
-                    const todaysRecords = eRecords.filter(r => r && r.answeredAt && r.answeredAt.startsWith(today));
-                    if (todaysRecords.length > 0) {
-                        const sCorrect = todaysRecords.filter(r => r.isCorrect).length;
-                        setSessionStats({ total: todaysRecords.length, correct: sCorrect });
+                    // Session Stats: sessionId があればセッション単位、なければ当日ベース
+                    let sessionRecords: typeof eRecords;
+                    if (sessionId) {
+                        sessionRecords = eRecords.filter(r => r.sessionId === sessionId);
+                    } else {
+                        const today = new Date().toISOString().split('T')[0];
+                        sessionRecords = eRecords.filter(r => r && r.answeredAt && r.answeredAt.startsWith(today));
+                    }
+                    if (sessionRecords.length > 0) {
+                        const sCorrect = sessionRecords.filter(r => r.isCorrect).length;
+                        setSessionStats({ total: sessionRecords.length, correct: sCorrect });
                     }
 
                     const eCorrect = eRecords.filter(r => r.isCorrect).length;
@@ -257,7 +274,15 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             }
         }
         fetchStats();
-    }, [question.id, question.examId, question.correctOption, isReview, session]);
+    }, [question.id, question.examId, question.correctOption, isReview, session, sessionId]);
+
+    useEffect(() => {
+        if (!isReview || !sessionId) return;
+        if (reviewRecord === undefined) return; // まだ読み込み中
+        // null = レコードなし → 正解を表示, LearningRecord = ユーザーの選択を復元
+        setSelectedOption(reviewRecord?.selectedOptionId ?? question.correctOption);
+        setShowExplanation(true);
+    }, [isReview, sessionId, reviewRecord, question.correctOption]);
 
     const formatTime = (seconds: number) => {
         const h = Math.floor(seconds / 3600);
@@ -346,6 +371,20 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 [qId]: { answer: data.answer, result: data.result }
             }));
 
+            // AIアシスタントに午後問題コンテキストを通知
+            window.dispatchEvent(new CustomEvent('ai-assistant-context', {
+                detail: {
+                    questionId: qId,
+                    questionText: question.text || question.context?.background || '',
+                    userAnswer: data.answer,
+                    correctAnswer: data.result.modelAnswer || '',
+                    explanation: data.result.feedback || '',
+                    isCorrect,
+                    examId: question.examId,
+                    isDescriptive: true,
+                },
+            }));
+
             // Update All Records for Summary
             setAllExamRecords(prev => {
                 const filtered = prev.filter(r => r.questionId !== qId);
@@ -363,6 +402,23 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         if (isPractice) {
             setShowExplanation(true);
             await saveResult(optionId);
+
+            // AI アシスタントにコンテキストを通知
+            const isCorrect = checkIsCorrect(optionId, question.correctOption);
+            const optionText = question.options?.find(o => o.id === optionId)?.text || optionId;
+            const correctText = question.options?.find(o => o.id === question.correctOption)?.text || question.correctOption;
+            window.dispatchEvent(new CustomEvent('ai-assistant-context', {
+                detail: {
+                    questionId: question.id,
+                    questionText: question.text,
+                    userAnswer: optionText,
+                    correctAnswer: correctText,
+                    explanation: question.explanation || '',
+                    isCorrect,
+                    examId: question.examId,
+                    isDescriptive: false,
+                },
+            }));
         }
     };
 
@@ -380,6 +436,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             isCorrect,
             isFlagged, // [NEW]
             sessionId: sessionId || undefined, // [NEW]
+            selectedOptionId: optionId,
             answeredAt: new Date().toISOString(),
             timeTakenSeconds: timeTaken,
         };
@@ -436,8 +493,15 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         }
     };
 
-    const handleNext = () => {
+    const handleNext = async () => {
         const currentInt = parseInt(qNo);
+
+        // モック試験モードでは次の問題へ進む前に解答を保存する
+        // （handleOptionClickではisPractice時のみsaveResultを呼ぶため、モック時はここで保存）
+        if (isMock && selectedOption) {
+            await saveResult(selectedOption);
+        }
+
         if (currentInt < totalQuestions) {
             const nextQ = currentInt + 1;
             router.push(`/exam/${year}/${type}/${nextQ}?mode=${mode}${sessionId ? `&sessionId=${sessionId}` : ''}`);

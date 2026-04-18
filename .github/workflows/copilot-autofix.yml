@@ -1,0 +1,110 @@
+name: Copilot Auto-Fix
+
+# ==============================================================
+# Issue 自動修復ワークフロー
+#
+# AI アシスタントの障害報告機能から自動起票された Issue を
+# GitHub Copilot Coding Agent に自動アサインし、修正 PR を
+# 自動生成させる。
+#
+# フロー:
+#   1. ユーザーが AI アシスタントで障害報告
+#   2. Issue が `ai-assistant-report` ラベル付きで作成
+#   3. 本ワークフローが `copilot-autofix` ラベルを追加
+#   4. Copilot Coding Agent に Issue をアサイン
+#   5. Copilot が修正ブランチ + PR を自動作成
+#   6. CI テスト通過後、人間がレビュー・マージ
+#
+# 前提条件:
+#   - リポジトリで Copilot Coding Agent が有効化されていること
+#   - copilot-setup-steps.yml が正しく設定されていること
+#
+# 作成日: 2026/04/18
+# ==============================================================
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  issues: write
+
+jobs:
+  assign-copilot:
+    runs-on: ubuntu-latest
+    # ai-assistant-report ラベルが付いた Issue のみ対象
+    if: contains(github.event.issue.labels.*.name, 'ai-assistant-report')
+    
+    steps:
+      - name: Copilot Coding Agent に自動アサイン
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = context.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            console.log(`Issue #${issueNumber} に Copilot を自動アサインします`);
+
+            // copilot-autofix ラベルを追加（既に付いている場合はスキップ）
+            const labels = context.payload.issue.labels.map(l => l.name);
+            if (!labels.includes('copilot-autofix')) {
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                labels: ['copilot-autofix']
+              });
+              console.log('copilot-autofix ラベルを追加しました');
+            }
+
+            // Copilot にアサイン
+            try {
+              await github.rest.issues.addAssignees({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                assignees: ['copilot']
+              });
+              console.log('Copilot にアサインしました');
+
+              // 修正ガイダンスをコメントとして追加
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                body: [
+                  '🤖 **Copilot Coding Agent に自動アサインしました**',
+                  '',
+                  '修正時は `.github/agents/bug-fixer.agent.md` のガイドラインに従ってください:',
+                  '',
+                  '1. Issue 本文のページ URL からコンポーネントを特定',
+                  '2. 最小限の変更で修正を実装',
+                  '3. `npm run test:unit` で全テスト通過を確認',
+                  '4. `fix/<要約>` ブランチで PR を作成',
+                  '',
+                  '---',
+                  '*このコメントは copilot-autofix ワークフローにより自動投稿されました*'
+                ].join('\n')
+              });
+            } catch (error) {
+              console.error('Copilot アサインに失敗:', error.message);
+              // Copilot が有効でない場合はコメントで通知
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                body: [
+                  '⚠️ **Copilot Coding Agent の自動アサインに失敗しました**',
+                  '',
+                  `エラー: \`${error.message}\``,
+                  '',
+                  '手動で以下のいずれかを実行してください:',
+                  '1. Issue を `copilot` にアサイン',
+                  '2. Issue 画面の「Copilot で修正」ボタンをクリック',
+                  '',
+                  '---',
+                  '*このコメントは copilot-autofix ワークフローにより自動投稿されました*'
+                ].join('\n')
+              });
+            }

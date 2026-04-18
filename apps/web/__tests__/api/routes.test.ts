@@ -3,7 +3,8 @@ import { NextRequest } from 'next/server';
 
 // CosmosDBのモック
 vi.mock('@/lib/cosmos', () => ({
-    getContainer: vi.fn()
+    getContainer: vi.fn(),
+    ensureContainer: vi.fn()
 }));
 
 // next-authのモック
@@ -27,21 +28,57 @@ describe('API エンドポイント', () => {
                 { id: 'AP-2024-Spring', title: '応用情報 2024春' },
                 { id: 'AP-2024-Fall', title: '応用情報 2024秋' }
             ];
-            
-            (getContainer as any).mockResolvedValue({
+
+            const mockExamContainer = {
                 items: {
                     query: () => ({
                         fetchAll: async () => ({ resources: mockExams })
                     })
                 }
-            });
+            };
+
+            const mockQuestionStatsContainer = {
+                items: {
+                    query: () => ({
+                        fetchAll: async () => ({
+                            resources: [
+                                { examId: 'AP-2024-Spring', total: 80 },
+                                { examId: 'AP-2024-Fall', total: 25 }
+                            ]
+                        })
+                    })
+                }
+            };
+
+            (getContainer as any)
+                .mockResolvedValueOnce(mockExamContainer)
+                .mockResolvedValueOnce(mockQuestionStatsContainer);
 
             const { GET } = await import('@/app/api/exams/route');
             const response = await GET();
             const data = await response.json();
 
             expect(response.status).toBe(200);
-            expect(data).toEqual(mockExams);
+            expect(data).toEqual([
+                {
+                    id: 'AP-2024-Spring',
+                    title: '応用情報 2024春',
+                    stats: {
+                        completed: 0,
+                        correctRate: 0,
+                        total: 80,
+                    },
+                },
+                {
+                    id: 'AP-2024-Fall',
+                    title: '応用情報 2024秋',
+                    stats: {
+                        completed: 0,
+                        correctRate: 0,
+                        total: 25,
+                    },
+                },
+            ]);
         });
 
         it('DB未初期化時はエラーを返す', async () => {
@@ -99,6 +136,72 @@ describe('API エンドポイント', () => {
 
             expect(response.status).toBe(200);
             expect(data).toEqual(mockRecords);
+        });
+    });
+
+    describe('/api/session GET', () => {
+        it('examId と status を Cosmos クエリで絞り込んで返す', async () => {
+            const { getServerSession } = await import('next-auth');
+            const { ensureContainer } = await import('@/lib/cosmos');
+
+            (getServerSession as any).mockResolvedValue({
+                user: { id: 'user-1' }
+            });
+
+            const queryMock = vi.fn(() => ({
+                fetchAll: async () => ({
+                    resources: [
+                        {
+                            id: 'session-1',
+                            userId: 'user-1',
+                            examId: 'SA-2024-Spring-AM2',
+                            status: 'completed',
+                            startedAt: '2026-04-12T01:00:00.000Z',
+                        },
+                    ]
+                })
+            }));
+
+            (ensureContainer as any).mockResolvedValue({
+                items: {
+                    query: queryMock
+                }
+            });
+
+            const { GET } = await import('@/app/api/session/route');
+            const request = new NextRequest('http://localhost:3000/api/session?examId=SA-2024-Spring-AM2&status=completed&limit=1');
+            const response = await GET(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(200);
+            expect(data).toEqual([
+                expect.objectContaining({
+                    id: 'session-1',
+                    examId: 'SA-2024-Spring-AM2',
+                    status: 'completed'
+                })
+            ]);
+            expect(queryMock).toHaveBeenCalledWith({
+                query: 'SELECT * FROM c WHERE c.userId = @userId AND c.examId = @examId AND c.status = @status ORDER BY c.startedAt DESC OFFSET 0 LIMIT 1',
+                parameters: [
+                    { name: '@userId', value: 'user-1' },
+                    { name: '@examId', value: 'SA-2024-Spring-AM2' },
+                    { name: '@status', value: 'completed' },
+                ]
+            });
+        });
+
+        it('認証されていない場合は401を返す', async () => {
+            const { getServerSession } = await import('next-auth');
+            (getServerSession as any).mockResolvedValue(null);
+
+            const { GET } = await import('@/app/api/session/route');
+            const request = new NextRequest('http://localhost:3000/api/session?examId=SA-2024-Spring-AM2');
+            const response = await GET(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(401);
+            expect(data.error).toBe('Unauthorized');
         });
     });
 

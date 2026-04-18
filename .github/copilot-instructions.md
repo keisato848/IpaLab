@@ -251,13 +251,18 @@ packages/
 | `GEMINI_API_KEY` | Google AI Studio APIキー |
 | `COSMOS_DB_CONNECTION` | CosmosDB接続文字列（メトリクス保存用） |
 
-## 本番環境
+## 本番環境 / Staging環境
 
-| リソース | URL / 名前 | リージョン |
-|----------|------------|------------|
-| フロントエンド | https://shikaku-no.com | East Asia |
-| AI Function App | func-pm-exam-dx-ai-us | US East 2 |
-| CosmosDB | pm-exam-dx-db | East Asia |
+| 環境 | リソース | URL / 名前 | リージョン |
+|------|----------|------------|------------|
+| **本番** | フロントエンド (App Service) | https://shikaku-no.com | East Asia |
+| **本番** | AI Function App | func-pm-exam-dx-ai-us | US East 2 |
+| **本番** | CosmosDB | pm-exam-dx-db | East Asia |
+| **Staging** | フロントエンド (App Service) | https://app-pm-exam-dx-staging.azurewebsites.net | East Asia |
+| **Staging** | CosmosDB | pm-exam-dx-staging-db | East Asia |
+
+**Staging環境**: PRマージ前の動作確認に使用。PRプッシュ時に自動デプロイされ、PR上にURLがコメントされる。
+本番・Stagingとも同一 App Service Plan (`asp-pm-exam-dx-prod`, B1 Linux) に同居（追加費用なし）。
 
 ## Git 管理対象外ファイルのルール
 
@@ -311,6 +316,44 @@ Azure リソースに関する実装、設定変更、障害調査、デプロ�
 - Bicep / ARM テンプレートの作成・変更
 - Azure CLI コマンドの生成・実行
 - Azure リソースの障害調査・トラブルシューティング
+
+## Issue 自動修復（Copilot Coding Agent）
+
+AI アシスタントの障害報告機能から自動起票された Issue は、Copilot Coding Agent が自動的に修正 PR を作成する。
+
+### 自動修復フロー
+
+```
+[ユーザー] → 障害報告 → [Issue 自動起票 (ai-assistant-report)]
+                              ↓
+                    [copilot-autofix.yml]
+                              ↓
+                    [Copilot Coding Agent にアサイン]
+                              ↓
+                    [修正ブランチ + PR 自動作成]
+                              ↓
+                    [CI テスト → 人間レビュー → マージ]
+```
+
+### Copilot Coding Agent がバグ修正する際のガイドライン
+
+1. **Issue 本文を精読**: 報告内容、ページ URL、スクリーンショットから問題を特定
+2. **関連コードを検索**: ページ URL からコンポーネント・ルートを逆引き
+3. **テストを確認**: 既存テストの有無を確認し、修正後もテストが通ることを保証
+4. **最小限の変更**: バグ修正に必要な最小限の変更のみ実施
+5. **ブランチ命名**: `fix/<Issue内容の要約>` 形式
+
+### 対象ラベル
+
+| ラベル | 説明 |
+|--------|------|
+| `ai-assistant-report` | AI アシスタントから自動起票された障害報告（自動修復対象） |
+| `copilot-autofix` | Copilot Coding Agent による自動修復が割り当てられた Issue |
+| `bug` | バグ報告全般 |
+
+### 手動トリガー
+
+自動起票以外の Issue でも、`ai-assistant-report` ラベルを追加すれば Copilot が自動アサインされる。
 
 ## 注意事項
 

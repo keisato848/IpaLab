@@ -5,7 +5,6 @@ tools:
   - search
   - editFiles
   - runCommands
-model: Claude Sonnet 4
 ---
 
 # ドキュメントエージェント — リバースエンジニアリング & Docs-as-Code スペシャリスト
