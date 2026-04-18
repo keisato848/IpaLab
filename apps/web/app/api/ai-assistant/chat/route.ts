@@ -38,10 +38,12 @@ export async function POST(req: NextRequest) {
         if (!category || !VALID_CATEGORIES.includes(category)) {
             return NextResponse.json({ error: '無効なカテゴリです' }, { status: 400 });
         }
-        if (!message || typeof message !== 'string' || message.trim().length === 0) {
-            return NextResponse.json({ error: 'メッセージが空です' }, { status: 400 });
+        // ユーザー入力を廃止したため message は任意。
+        // 未指定や空文字列の場合は context-builder 側でデフォルトトリガーを適用する。
+        if (typeof message !== 'undefined' && typeof message !== 'string') {
+            return NextResponse.json({ error: 'メッセージ形式が不正です' }, { status: 400 });
         }
-        if (message.length > 2000) {
+        if (typeof message === 'string' && message.length > 2000) {
             return NextResponse.json({ error: 'メッセージが長すぎます' }, { status: 400 });
         }
 
@@ -54,8 +56,8 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // プロンプト構築
-        const { systemPrompt, userMessage } = buildPrompt(category, message.trim(), context);
+        // プロンプト構築（message が空の場合は buildPrompt 内でデフォルトトリガーを適用）
+        const { systemPrompt, userMessage } = buildPrompt(category, (message ?? '').trim(), context);
 
         // SSE ストリーミング
         const encoder = new TextEncoder();
