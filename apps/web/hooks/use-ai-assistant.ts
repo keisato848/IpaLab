@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 
-export type Category = 'qa-explain' | 'qa-analysis' | 'qa-afternoon' | 'site-guide';
+export type Category = 'qa-explain' | 'qa-related' | 'qa-analysis' | 'qa-afternoon' | 'site-guide';
 export type PanelState = 'closed' | 'menu' | 'bug-form' | 'category' | 'chat' | 'submitted';
 
 export interface ChatMessage {
@@ -31,7 +31,7 @@ export interface AiAssistantState {
     category: Category | null;
     currentPage: 'exam' | 'admin' | 'other';
     examContext: ExamContext | null;
-    bugReportResult: { issueNumber: number; issueUrl: string } | null;
+    bugReportResult: { issueNumber: number | null; issueUrl: string | null } | null;
 }
 
 export function useAiAssistant() {
@@ -46,7 +46,7 @@ export function useAiAssistant() {
     const [remainingQuota, setRemainingQuota] = useState(10);
     const [category, setCategory] = useState<Category | null>(null);
     const [examContext, setExamContext] = useState<ExamContext | null>(null);
-    const [bugReportResult, setBugReportResult] = useState<{ issueNumber: number; issueUrl: string } | null>(null);
+    const [bugReportResult, setBugReportResult] = useState<{ issueNumber: number | null; issueUrl: string | null } | null>(null);
 
     // 画面遷移時に会話をリセット（初回レンダリングをスキップ）
     const isFirstRender = useRef(true);
@@ -71,7 +71,7 @@ export function useAiAssistant() {
         setPanelState('chat');
     }, []);
 
-    const goToSubmitted = useCallback((result: { issueNumber: number; issueUrl: string }) => {
+    const goToSubmitted = useCallback((result: { issueNumber: number | null; issueUrl: string | null }) => {
         setBugReportResult(result);
         setPanelState('submitted');
     }, []);

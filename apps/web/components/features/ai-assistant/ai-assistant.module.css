@@ -33,6 +33,18 @@
     outline-offset: 3px;
 }
 
+.fabDragging {
+    cursor: grabbing;
+    transform: scale(1.08);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+    transition: none;
+    user-select: none;
+}
+
+.fabDragging:hover {
+    transform: scale(1.08);
+}
+
 /* Panel Container */
 .panel {
     position: fixed;
@@ -297,19 +309,6 @@
     align-self: flex-start;
 }
 
-.messageAvatar {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background-color: var(--accent-color);
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-bottom: 4px;
-}
-
 .messageBubble {
     padding: 10px 14px;
     border-radius: 12px;
@@ -387,6 +386,67 @@
     padding: 12px;
     color: var(--text-secondary);
     font-size: var(--fs-sm);
+}
+
+/* Loading Indicator */
+.loadingIndicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 32px 16px;
+    color: var(--text-secondary);
+}
+
+.loadingSpinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--border-color, rgba(0, 0, 0, 0.1));
+    border-top-color: var(--accent-color, #4a90e2);
+    border-radius: 50%;
+    animation: aiAssistantSpin 0.9s linear infinite;
+}
+
+@keyframes aiAssistantSpin {
+    to { transform: rotate(360deg); }
+}
+
+.loadingText {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--fs-sm);
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.loadingDots {
+    display: inline-flex;
+    gap: 3px;
+}
+
+.loadingDots span {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: var(--accent-color, #4a90e2);
+    animation: aiAssistantDot 1.2s infinite ease-in-out;
+}
+
+.loadingDots span:nth-child(2) { animation-delay: 0.2s; }
+.loadingDots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes aiAssistantDot {
+    0%, 80%, 100% { opacity: 0.25; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1); }
+}
+
+.loadingHint {
+    margin: 0;
+    font-size: var(--fs-xs);
+    color: var(--text-secondary);
+    text-align: center;
 }
 
 /* Bug Report Form */
@@ -597,17 +657,17 @@
     }
 }
 
-/* Overlay for mobile */
+/* Overlay: デスクトップは透明、モバイルは暗くする。いずれもクリックでパネルを閉じる */
 .overlay {
-    display: none;
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: transparent;
+    z-index: 1055;
 }
 
 @media (max-width: 768px) {
     .overlay {
-        display: block;
-        position: fixed;
-        inset: 0;
         background-color: rgba(0, 0, 0, 0.4);
-        z-index: 1055;
     }
 }

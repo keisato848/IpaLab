@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import type { Category, ChatMessage as ChatMessageType, ExamContext } from '@/hooks/use-ai-assistant';
 import ChatMessage from './ChatMessage';
 import { appInsights } from '@/components/providers/TelemetryProvider';
@@ -14,6 +14,7 @@ interface ChatViewProps {
     onAddMessage: (msg: ChatMessageType) => void;
     onUpdateLastAssistantMessage: (content: string) => void;
     onSetRemainingQuota: (n: number) => void;
+    onBackToMenu: () => void;
 }
 
 export default function ChatView({
@@ -24,32 +25,20 @@ export default function ChatView({
     onAddMessage,
     onUpdateLastAssistantMessage,
     onSetRemainingQuota,
+    onBackToMenu,
 }: ChatViewProps) {
-    const [input, setInput] = useState('');
     const [isStreaming, setIsStreaming] = useState(false);
+    const [hasTriggered, setHasTriggered] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     // 自動スクロール
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    const isDisabled = remainingQuota <= 0 || isStreaming;
+    const fetchAnswer = useCallback(async () => {
+        if (remainingQuota <= 0) return;
 
-    const handleSend = async () => {
-        const trimmed = input.trim();
-        if (!trimmed || isDisabled) return;
-
-        // ユーザーメッセージ追加
-        const userMsg: ChatMessageType = {
-            id: crypto.randomUUID(),
-            role: 'user',
-            content: trimmed,
-            timestamp: new Date(),
-        };
-        onAddMessage(userMsg);
-        setInput('');
         setIsStreaming(true);
 
         // アシスタントメッセージのプレースホルダー
@@ -72,7 +61,8 @@ export default function ChatView({
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     category,
-                    message: trimmed,
+                    // ユーザー入力は廃止。サーバー側で固定のシステムプロンプト＋デフォルトトリガーを使用する。
+                    message: '',
                     context: examContext ?? undefined,
                 }),
             });
@@ -93,7 +83,6 @@ export default function ChatView({
                 return;
             }
 
-            // SSE ストリーミング読み取り
             const reader = response.body?.getReader();
             if (!reader) {
                 onUpdateLastAssistantMessage('回答の生成に失敗しました。');
@@ -142,31 +131,54 @@ export default function ChatView({
         } finally {
             setIsStreaming(false);
         }
-    };
+    }, [category, examContext, onAddMessage, onSetRemainingQuota, onUpdateLastAssistantMessage, remainingQuota]);
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
-        }
-    };
+    // パネル表示時に自動で AI 応答を取得（ユーザー入力欄は廃止）
+    useEffect(() => {
+        if (hasTriggered) return;
+        setHasTriggered(true);
+        void fetchAnswer();
+    }, [hasTriggered, fetchAnswer]);
+
+    // ストリーミング中で、最後のアシスタントメッセージがまだ空なら（=最初のトークン未着）ロード画面を表示
+    const lastMessage = messages[messages.length - 1];
+    const isWaitingFirstToken =
+        isStreaming &&
+        (!lastMessage || (lastMessage.role === 'assistant' && lastMessage.content.length === 0));
 
     return (
         <div className={styles.chatContainer}>
             <div className={styles.chatMessages} role="log" aria-live="polite">
-                {messages.length === 0 && (
-                    <div className={styles.rateLimitMessage}>
-                        質問を入力してください
+                {messages.map((msg) => {
+                    // 空のアシスタントプレースホルダーは表示しない（代わりにローディングを出す）
+                    if (msg.role === 'assistant' && msg.content.length === 0 && isStreaming) {
+                        return null;
+                    }
+                    return (
+                        <ChatMessage
+                            key={msg.id}
+                            role={msg.role}
+                            content={msg.content}
+                            timestamp={msg.timestamp}
+                        />
+                    );
+                })}
+                {isWaitingFirstToken && (
+                    <div className={styles.loadingIndicator} role="status" aria-label="回答を生成中">
+                        <div className={styles.loadingSpinner} aria-hidden="true" />
+                        <div className={styles.loadingText}>
+                            <span>AI が回答を作成しています</span>
+                            <span className={styles.loadingDots} aria-hidden="true">
+                                <span />
+                                <span />
+                                <span />
+                            </span>
+                        </div>
+                        <p className={styles.loadingHint}>
+                            内容によっては 10〜30 秒ほどかかる場合があります
+                        </p>
                     </div>
                 )}
-                {messages.map((msg) => (
-                    <ChatMessage
-                        key={msg.id}
-                        role={msg.role}
-                        content={msg.content}
-                        timestamp={msg.timestamp}
-                    />
-                ))}
                 <div ref={messagesEndRef} />
             </div>
 
@@ -176,27 +188,13 @@ export default function ChatView({
                         本日の質問回数上限に達しました。明日またご利用ください。
                     </div>
                 ) : (
-                    <>
-                        <textarea
-                            ref={textareaRef}
-                            className={styles.chatInput}
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            placeholder="質問を入力..."
-                            disabled={isDisabled}
-                            rows={1}
-                            maxLength={2000}
-                        />
-                        <button
-                            className={styles.sendButton}
-                            onClick={handleSend}
-                            disabled={isDisabled || !input.trim()}
-                            aria-label="メッセージを送信"
-                        >
-                            {isStreaming ? '...' : '送信'}
-                        </button>
-                    </>
+                    <button
+                        className={styles.menuButton}
+                        onClick={onBackToMenu}
+                        disabled={isStreaming}
+                    >
+                        <span className={styles.menuLabel}>メニューに戻る</span>
+                    </button>
                 )}
             </div>
         </div>

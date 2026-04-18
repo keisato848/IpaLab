@@ -40,7 +40,7 @@ export default function AiAssistantWidget() {
 
     // フィーチャーフラグ確認
     useEffect(() => {
-        fetch('/api/feature-flags?id=ai_assistant_enabled')
+        fetch('/api/feature-flags')
             .then(res => res.json())
             .then(data => setFeatureEnabled(data.flags?.ai_assistant_enabled ?? false))
             .catch(() => setFeatureEnabled(false));
@@ -103,14 +103,23 @@ export default function AiAssistantWidget() {
             .catch(() => { /* フォールバック: 現在値を維持 */ });
     }, [setRemainingQuota]);
 
+    // パネル展開中は背景ページのスクロールをロックする
+    const isPanelOpen = panelState !== 'closed';
+    useEffect(() => {
+        if (!isPanelOpen) return;
+        const prevOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = prevOverflow;
+        };
+    }, [isPanelOpen]);
+
     // 未ログイン、除外パス、フィーチャーフラグ無効の場合は表示しない
     if (status !== 'authenticated' || !session) return null;
     if (pathname && EXCLUDED_PATHS.includes(pathname)) return null;
     if (featureEnabled !== true) return null;
 
-    const isOpen = panelState !== 'closed';
-
-    const handleFabClick = () => {
+    const isOpen = isPanelOpen;    const handleFabClick = () => {
         if (isOpen) {
             closePanel();
         } else {
@@ -125,7 +134,7 @@ export default function AiAssistantWidget() {
             <FloatingButton isOpen={isOpen} onClick={handleFabClick} />
             {isOpen && (
                 <>
-                    <div className={styles.overlay} onClick={closePanel} />
+                    <div className={styles.overlay} onClick={closePanel} aria-hidden="true" />
                     <AssistantPanel
                     panelState={panelState}
                     messages={messages}

@@ -5,11 +5,14 @@ export async function captureWithMasking(): Promise<Blob> {
         '.user-display-name',
     ];
 
+    const processed = new Set<HTMLElement>();
     const originals: Array<{ el: HTMLElement; text: string }> = [];
 
-    // 1. マスキング
+    // 1. マスキング（要素の重複を排除）
     for (const sel of selectors) {
         document.querySelectorAll<HTMLElement>(sel).forEach(el => {
+            if (processed.has(el)) return;
+            processed.add(el);
             originals.push({ el, text: el.textContent ?? '' });
             el.textContent = '****';
         });
