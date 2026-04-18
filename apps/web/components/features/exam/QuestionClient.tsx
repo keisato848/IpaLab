@@ -366,6 +366,20 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 [qId]: { answer: data.answer, result: data.result }
             }));
 
+            // AIアシスタントに午後問題コンテキストを通知
+            window.dispatchEvent(new CustomEvent('ai-assistant-context', {
+                detail: {
+                    questionId: qId,
+                    questionText: question.text || question.context?.background || '',
+                    userAnswer: data.answer,
+                    correctAnswer: data.result.modelAnswer || '',
+                    explanation: data.result.feedback || '',
+                    isCorrect,
+                    examId: question.examId,
+                    isDescriptive: true,
+                },
+            }));
+
             // Update All Records for Summary
             setAllExamRecords(prev => {
                 const filtered = prev.filter(r => r.questionId !== qId);
@@ -383,6 +397,23 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         if (isPractice) {
             setShowExplanation(true);
             await saveResult(optionId);
+
+            // AI アシスタントにコンテキストを通知
+            const isCorrect = checkIsCorrect(optionId, question.correctOption);
+            const optionText = question.options?.find(o => o.id === optionId)?.text || optionId;
+            const correctText = question.options?.find(o => o.id === question.correctOption)?.text || question.correctOption;
+            window.dispatchEvent(new CustomEvent('ai-assistant-context', {
+                detail: {
+                    questionId: question.id,
+                    questionText: question.text,
+                    userAnswer: optionText,
+                    correctAnswer: correctText,
+                    explanation: question.explanation || '',
+                    isCorrect,
+                    examId: question.examId,
+                    isDescriptive: false,
+                },
+            }));
         }
     };
 
