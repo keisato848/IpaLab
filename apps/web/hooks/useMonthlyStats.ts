@@ -59,16 +59,24 @@ function getMonthRange(year: number, month: number): { start: Date; end: Date } 
  * 指定期間のレコードから統計を計算
  */
 function computeStats(records: LearningRecord[]): MonthlyStat {
-    const questionCount = records.length;
-    const correctCount = records.filter(r => r.isCorrect).length;
+    // questionIdで重複排除（同一問題への複数回解答は最新のみ採用）
+    const latestMap = new Map<string, LearningRecord>();
+    [...records]
+        .sort((a, b) => new Date(a.answeredAt).getTime() - new Date(b.answeredAt).getTime())
+        .forEach(r => { latestMap.set(r.questionId, r); });
+    const uniqueRecords = Array.from(latestMap.values());
+
+    const questionCount = uniqueRecords.length;
+    const correctCount = uniqueRecords.filter(r => r.isCorrect).length;
     const accuracy = questionCount > 0 ? Math.round((correctCount / questionCount) * 100) : 0;
 
+    // 学習日数は全解答履歴（重複含む）でユニーク日数を計算
     const uniqueDays = new Set(
         records.map(r => new Date(r.answeredAt).toISOString().split('T')[0])
     );
     const studyDays = uniqueDays.size;
 
-    const totalTimeSec = records.reduce((sum, r) => sum + (r.timeTakenSeconds || 0), 0);
+    const totalTimeSec = uniqueRecords.reduce((sum, r) => sum + (r.timeTakenSeconds || 0), 0);
     const avgTimeSec = questionCount > 0 ? Math.round(totalTimeSec / questionCount) : 0;
 
     return { questionCount, correctCount, accuracy, studyDays, totalTimeSec, avgTimeSec };

@@ -20,11 +20,13 @@ function lastMonthDate(day: number): string {
     return new Date(now.getFullYear(), now.getMonth() - 1, day, 10).toISOString();
 }
 
-/** テスト用LearningRecordを生成 */
+/** テスト用LearningRecordを生成。questionIdは呼び出し毎に連番で採番し重複を防ぐ */
+let _questionIdCounter = 0;
 function makeRecord(overrides: Partial<LearningRecord> = {}): LearningRecord {
+    _questionIdCounter++;
     return {
         userId: 'test-user',
-        questionId: `AP-2025-Fall-AM-Q${Math.floor(Math.random() * 80) + 1}`,
+        questionId: `AP-2025-Fall-AM-Q${_questionIdCounter}`,
         examId: 'AP-2025-Fall-AM',
         category: 'テクノロジ',
         isCorrect: true,
@@ -290,6 +292,7 @@ describe('useMonthlyProgress', () => {
     describe('プログレスの上限', () => {
         it('progressPercentは100%を超えない', () => {
             const goals = [makeGoal({ type: 'questionCount', targetValue: 2 })];
+            // makeRecord の連番採番により重複なし（各要素が異なる questionId を持つ）
             const records = Array.from({ length: 10 }, (_, i) =>
                 makeRecord({ answeredAt: thisMonthDate(i + 1) })
             );

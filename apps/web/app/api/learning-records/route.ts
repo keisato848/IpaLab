@@ -18,6 +18,7 @@ const LearningRecordSchema = z.object({
     isCorrect: z.boolean().optional(), // Now optional
     isFlagged: z.boolean().optional(), // New: Review Flag
     sessionId: z.string().optional(), // New: Session Context
+    selectedOptionId: z.string().optional(),
     answeredAt: z.string().datetime().optional(), // ISO String
     timeTakenSeconds: z.number().optional(),
     nextReviewAt: z.string().datetime().optional(),

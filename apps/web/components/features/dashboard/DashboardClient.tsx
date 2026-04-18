@@ -320,7 +320,8 @@ export default function DashboardClient() {
         return true;
     });
 
-    const totalAnswered = records.length;
+    // ユニーク問題数（同一questionIdへの複数回解答を1件とカウント）
+    const totalAnswered = new Set(records.map(r => r.questionId)).size;
     const categoryAccuracy = useMemo(() => {
         const categoryStats = new Map<string, { total: number; correct: number }>();
         records.forEach(record => {

@@ -1,6 +1,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getContainer } from '@/lib/cosmos';
+import { ensureContainer } from '@/lib/cosmos';
 import { LearningSessionSchema } from '@ipa-lab/shared';
 import { z } from 'zod';
 
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
         // Validate against full model just in case
         const sessionData = LearningSessionSchema.parse(newSession);
 
-        const container = await getContainer("LearningSessions");
+        const container = await ensureContainer("LearningSessions");
         if (!container) throw new Error("Database not initialized");
         const { resource } = await container.items.create(sessionData);
 

@@ -1,7 +1,34 @@
 const isClient = typeof window !== 'undefined';
-// Force relative path to avoid stagnant .env pointing to 3000
-// Use environment variable for API base, fallback to localhost for dev
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || (isClient ? '/api' : 'http://localhost:3001/api');
+
+export function normalizeApiBase(baseUrl: string): string {
+    const trimmedBaseUrl = baseUrl.replace(/\/$/, '');
+    return trimmedBaseUrl.endsWith('/api') ? trimmedBaseUrl : `${trimmedBaseUrl}/api`;
+}
+
+export function resolveApiBaseForRuntime(
+    runtimeIsClient = isClient,
+    env: NodeJS.ProcessEnv = process.env
+): string {
+    if (runtimeIsClient) {
+        // Client bundles must always call the same origin API to avoid baking localhost into production assets.
+        return '/api';
+    }
+
+    const candidateBaseUrl = [
+        env.INTERNAL_API_BASE,
+        env.NEXT_PUBLIC_API_BASE,
+        env.NEXTAUTH_URL,
+        env.AUTH_URL,
+        env.NEXT_PUBLIC_APP_URL,
+        env.WEBSITE_HOSTNAME ? `https://${env.WEBSITE_HOSTNAME}` : undefined,
+        env.VERCEL_URL ? `https://${env.VERCEL_URL}` : undefined,
+        'http://localhost:3000',
+    ].find((candidate): candidate is string => typeof candidate === 'string' && candidate.trim().length > 0);
+
+    return normalizeApiBase(candidateBaseUrl ?? 'http://localhost:3000');
+}
+
+export const API_BASE = resolveApiBaseForRuntime();
 
 export interface Question {
     id: string;
@@ -43,6 +70,7 @@ export interface LearningRecord {
     isCorrect: boolean;
     isFlagged?: boolean; // New: Flag for review
     sessionId?: string; // New: Session Context
+    selectedOptionId?: string;
     answeredAt: string;
     timeTakenSeconds: number;
     nextReviewAt?: string;

@@ -158,6 +158,64 @@
     margin: 0 0.2rem;
 }
 
+/* Staging 検証環境専用スタイル */
+.stagingSection {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 2px dashed #f59e0b;
+    border-radius: 8px;
+    background: #fffbeb;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.stagingLabel {
+    font-size: var(--fs-sm, 0.875rem);
+    font-weight: 600;
+    color: #92400e;
+    margin: 0;
+}
+
+.stagingInput {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d97706;
+    border-radius: 6px;
+    font-size: var(--fs-sm, 0.875rem);
+    background: #fff;
+    outline: none;
+}
+
+.stagingInput:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+}
+
+.stagingButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #f59e0b;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: var(--fs-sm, 0.875rem);
+    transition: background 0.15s;
+}
+
+.stagingButton:hover:not(:disabled) {
+    background: #d97706;
+}
+
+.stagingButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .link:hover {
     text-decoration: underline;
 }
