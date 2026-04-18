@@ -274,7 +274,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             }
         }
         fetchStats();
-    }, [question.id, question.examId, question.correctOption, isReview, session]);
+    }, [question.id, question.examId, question.correctOption, isReview, session, sessionId]);
 
     useEffect(() => {
         if (!isReview || !sessionId) return;
