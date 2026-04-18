@@ -8,6 +8,10 @@ interface CreateBugReportParams {
     screenshotUrl?: string;
 }
 
+export function isGitHubIssuesConfigured(): boolean {
+    return Boolean(process.env.GITHUB_ISSUES_TOKEN && process.env.GITHUB_ISSUES_REPO);
+}
+
 export async function createBugReportIssue(params: CreateBugReportParams): Promise<{ number: number; html_url: string }> {
     const token = process.env.GITHUB_ISSUES_TOKEN;
     const repo = process.env.GITHUB_ISSUES_REPO;

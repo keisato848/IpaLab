@@ -62,9 +62,18 @@ describe('/api/ai-assistant/chat', () => {
         expect(response.status).toBe(400);
     });
 
-    it('空メッセージの場合は 400 を返す', async () => {
+    it('空メッセージでもデフォルトトリガーで処理され 200 を返す（ユーザー入力廃止仕様）', async () => {
         const { getServerSession } = await import('next-auth');
         (getServerSession as any).mockResolvedValue({ user: { id: 'user-1' } });
+
+        const { checkRateLimit, recordUsage } = await import('@/lib/ai-assistant/rate-limiter');
+        (checkRateLimit as any).mockResolvedValue({ allowed: true, used: 1, remaining: 9 });
+        (recordUsage as any).mockResolvedValue(undefined);
+
+        const { streamChatResponse } = await import('@/lib/ai-assistant/gemini-chat');
+        (streamChatResponse as any).mockImplementation(async function* () {
+            yield 'OK';
+        });
 
         const { POST } = await import('@/app/api/ai-assistant/chat/route');
         const req = new NextRequest('http://localhost/api/ai-assistant/chat', {
@@ -73,7 +82,7 @@ describe('/api/ai-assistant/chat', () => {
         });
 
         const response = await POST(req);
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(200);
     });
 
     it('2000文字超過メッセージの場合は 400 を返す', async () => {

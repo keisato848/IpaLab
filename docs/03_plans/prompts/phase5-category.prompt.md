@@ -8,7 +8,7 @@ docs/02_design/18_AiAssistantDesign.md のセクション 6.2「状態管理」�
 1. `apps/web/components/features/ai-assistant/CategorySelector.tsx` を作成
    - 4つのカテゴリボタンをカード形式で表示:
      - 📖 解説を深掘り (qa-explain)
-     - ❓ 誤答を分析する (qa-analysis)
+     - 🔗 関連知識を知る (qa-related)
      - ❌ 誤答を分析する (qa-analysis) — 不正解時のみ表示
      - 📝 午後問題を解説 (qa-afternoon) — 午後問題の場合のみ表示
    - 選択後、panelState を 'chat' に遷移し category をセット

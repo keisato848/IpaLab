@@ -2,7 +2,6 @@
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import RobotIcon from './RobotIcon';
 import styles from './ai-assistant.module.css';
 
 interface ChatMessageProps {
@@ -16,11 +15,6 @@ export default function ChatMessage({ role, content, timestamp }: ChatMessagePro
 
     return (
         <div className={`${styles.message} ${role === 'user' ? styles.messageUser : styles.messageAssistant}`}>
-            {role === 'assistant' && (
-                <div className={styles.messageAvatar}>
-                    <RobotIcon size={22} />
-                </div>
-            )}
             <div className={`${styles.messageBubble} ${role === 'user' ? styles.bubbleUser : styles.bubbleAssistant}`}>
                 {role === 'user' ? (
                     <p>{content}</p>

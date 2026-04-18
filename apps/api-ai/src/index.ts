@@ -26,3 +26,4 @@ if (connectionString) {
 
 // 関数のインポート（SDK初期化後）
 import './functions/aiPlan';
+import './functions/aiChat';

@@ -52,6 +52,12 @@ describe('context-builder', () => {
             expect(result.userMessage).toBe('テスト質問');
         });
 
+        it('空メッセージの場合はカテゴリごとのデフォルトトリガーを使用する', () => {
+            const result = buildPrompt('qa-explain', '', baseContext);
+            // qa-explain のデフォルトトリガーには「初学者」が含まれる
+            expect(result.userMessage).toContain('初学者');
+        });
+
         it('qa-afternoon カテゴリのプロンプトを返す', () => {
             const result = buildPrompt('qa-afternoon', 'テスト', baseContext);
 
@@ -75,7 +81,7 @@ describe('context-builder', () => {
         });
 
         it('全カテゴリのプロンプトが定義されている', () => {
-            const categories = ['qa-explain', 'qa-analysis', 'qa-afternoon', 'site-guide'] as const;
+            const categories = ['qa-explain', 'qa-related', 'qa-analysis', 'qa-afternoon', 'site-guide'] as const;
 
             for (const category of categories) {
                 const result = buildPrompt(category, 'test');

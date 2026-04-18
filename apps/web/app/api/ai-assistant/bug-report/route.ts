@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { getContainer } from '@/lib/cosmos';
-import { createBugReportIssue } from '@/lib/ai-assistant/github-issues';
+import { createBugReportIssue, isGitHubIssuesConfigured } from '@/lib/ai-assistant/github-issues';
 import { uploadScreenshot } from '@/lib/ai-assistant/blob-upload';
 
 export const runtime = 'nodejs';
@@ -70,14 +70,24 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // GitHub Issue 作成
-        const issueResult = await createBugReportIssue({
-            description,
-            pageUrl,
-            userAgent: userAgent || 'Unknown',
-            errorLogs: errorLogs || undefined,
-            screenshotUrl,
-        });
+        // GitHub Issue 作成（未設定時は graceful degradation）
+        let issueResult: { number: number; html_url: string } | null = null;
+        if (isGitHubIssuesConfigured()) {
+            try {
+                issueResult = await createBugReportIssue({
+                    description,
+                    pageUrl,
+                    userAgent: userAgent || 'Unknown',
+                    errorLogs: errorLogs || undefined,
+                    screenshotUrl,
+                });
+            } catch (e) {
+                console.error('GitHub Issue creation failed:', e);
+                // Issue 作成失敗でも CosmosDB 記録は継続し、障害報告は受付完了として扱う
+            }
+        } else {
+            console.warn('[bug-report] GITHUB_ISSUES_TOKEN/REPO not configured. Storing to CosmosDB only.');
+        }
 
         // CosmosDB に記録
         if (container) {
@@ -89,16 +99,16 @@ export async function POST(req: NextRequest) {
                 pageUrl,
                 userAgent: userAgent || 'Unknown',
                 errorLogs: errorLogs || undefined,
-                githubIssueNumber: issueResult.number,
-                githubIssueUrl: issueResult.html_url,
+                githubIssueNumber: issueResult?.number,
+                githubIssueUrl: issueResult?.html_url,
                 createdAt: new Date().toISOString(),
             });
         }
 
         return NextResponse.json({
             success: true,
-            issueNumber: issueResult.number,
-            issueUrl: issueResult.html_url,
+            issueNumber: issueResult?.number ?? null,
+            issueUrl: issueResult?.html_url ?? null,
         });
     } catch (error: any) {
         console.error('Bug report API error:', error);
