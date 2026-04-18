@@ -625,3 +625,4 @@ export async function captureWithMasking(): Promise<Blob> {
 | 2026-04-14 | 初版作成 |
 | 2026-04-17 | レビュー指摘反映: currentPage に admin 追加、usedAt を UTC に統一、Root Layout を dynamic import に変更、テレメトリ追加、フォーカストラップ追加 |
 | 2026-04-17 | UX改善: FABドラッグ移動(localStorage永続化)、パネル展開時の背景スクロールロック、overlayをデスクトップでもクリック閉じ、障害報告の graceful degradation (GitHub Issues 未設定時でも CosmosDB に保存して受付) |
+| 2026-04-18 | UX/不具合修正: スクリーンショット URL を SAS トークン付きに変更し GitHub Issue から閲覧可能に、障害報告完了画面を「受け付けました」のみのシンプル表示に変更（Issue 番号/URL 非表示）、質問機能の入力欄を廃止しカテゴリ選択ボタン押下のみで AI 応答を取得、システムプロンプトに挨拶文/結びの抑制ルールを追加 |

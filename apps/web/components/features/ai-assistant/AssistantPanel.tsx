@@ -189,6 +189,7 @@ export default function AssistantPanel({
                         onAddMessage={onAddMessage}
                         onUpdateLastAssistantMessage={onUpdateLastAssistantMessage}
                         onSetRemainingQuota={onSetRemainingQuota}
+                        onBackToMenu={onGoToMenu}
                     />
                 )}
 
@@ -196,23 +197,7 @@ export default function AssistantPanel({
                     <div className={styles.submittedContainer}>
                         <div className={styles.submittedIcon}>✅</div>
                         <div className={styles.submittedTitle}>報告ありがとうございます</div>
-                        {bugReportResult.issueNumber !== null ? (
-                            <>
-                                <p>Issue #{bugReportResult.issueNumber} として登録されました。</p>
-                                {bugReportResult.issueUrl && (
-                                    <a
-                                        href={bugReportResult.issueUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={styles.submittedLink}
-                                    >
-                                        GitHub Issue を確認する
-                                    </a>
-                                )}
-                            </>
-                        ) : (
-                            <p>内容を受け付けました。運営チームが確認いたします。</p>
-                        )}
+                        <p>内容を受け付けました。運営チームが確認いたします。</p>
                         <button className={styles.menuButton} onClick={onGoToMenu}>
                             <span className={styles.menuLabel}>メニューに戻る</span>
                         </button>

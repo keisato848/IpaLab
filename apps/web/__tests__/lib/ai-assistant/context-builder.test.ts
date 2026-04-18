@@ -52,6 +52,12 @@ describe('context-builder', () => {
             expect(result.userMessage).toBe('テスト質問');
         });
 
+        it('空メッセージの場合はカテゴリごとのデフォルトトリガーを使用する', () => {
+            const result = buildPrompt('qa-explain', '', baseContext);
+            // qa-explain のデフォルトトリガーには「初学者」が含まれる
+            expect(result.userMessage).toContain('初学者');
+        });
+
         it('qa-afternoon カテゴリのプロンプトを返す', () => {
             const result = buildPrompt('qa-afternoon', 'テスト', baseContext);
 
