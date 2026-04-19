@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { LearningRecord, getLearningRecords, getQuestions, getExams, StudyPlanJob, Question } from '@/lib/api';
@@ -10,12 +11,20 @@ import ThemeToggle from '@/components/common/ThemeToggle';
 import { useUserProgress } from '@/hooks/useUserProgress';
 import { useMonthlyProgress, createDefaultMonthlyGoals } from '@/hooks/useMonthlyProgress';
 import { useMonthlyStats } from '@/hooks/useMonthlyStats';
-import HeatmapWidget from './HeatmapWidget';
-import MonthlyProgressCard from './MonthlyProgressCard';
 import GoalSettingWizard, { StudyPlan, MonthlyGoal } from './GoalSettingWizard';
 import MonthlyGoalEditor from './MonthlyGoalEditor';
 import PlanReadyNotification from './PlanReadyNotification';
 import styles from './DashboardClient.module.css';
+
+// PR-E: 重い可視化コンポーネントは dynamic import で遅延ロード（First Load JS 削減）
+const HeatmapWidget = dynamic(() => import('./HeatmapWidget'), {
+    ssr: false,
+    loading: () => <div style={{ minHeight: 160, opacity: 0.5 }}>読み込み中...</div>,
+});
+const MonthlyProgressCard = dynamic(() => import('./MonthlyProgressCard'), {
+    ssr: false,
+    loading: () => <div style={{ minHeight: 120, opacity: 0.5 }}>読み込み中...</div>,
+});
 
 export default function DashboardClient() {
     const { data: session, status } = useSession();
