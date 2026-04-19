@@ -64,7 +64,7 @@ export default function DashboardClient() {
         return (
             <button
                 type="button"
-                className={`${styles.cardIcon} ${styles.iconButton} ${styles.collapseToggle}${variant === 'light' ? ' ' + styles.collapseToggleLight : ''}`}
+                className={`${styles.collapseToggle}${variant === 'light' ? ' ' + styles.collapseToggleLight : ''}`}
                 aria-expanded={!isCollapsed}
                 aria-controls={`section-body-${id}`}
                 aria-label={isCollapsed ? `${label}を展開` : `${label}を折りたたむ`}
@@ -694,7 +694,8 @@ export default function DashboardClient() {
             </header>
 
             <div className={styles.grid}>
-                <section className={`${styles.card} ${styles.levelCard} ${styles.fullWidthCard}`}>
+                <section className={`${styles.card} ${styles.levelCard} ${styles.fullWidthCard} ${styles.collapsibleSection}`}>
+                    {renderCollapseToggle('level', 'レベル情報', 'light')}
                     <div className={styles.levelHeader}>
                         <div>
                             <div className={styles.levelTitle}>
@@ -705,7 +706,6 @@ export default function DashboardClient() {
                         <div className={styles.levelMeta}>
                             <span>🔥 連続学習: {progress.streakDays}日目</span>
                             <span>🏆 実績: {achievements.unlocked.length}/{achievementTotal}</span>
-                            {renderCollapseToggle('level', 'レベル情報')}
                         </div>
                     </div>
                     {!collapsedSections['level'] && (
@@ -766,7 +766,8 @@ export default function DashboardClient() {
                     )}
                 </section>
                 {/* 1. Goal Section (Hierarchical) - ゲーミフィケーション対応 */}
-                <section className={`${styles.card} ${styles.statusCard} ${styles.fullWidthCard}`}>
+                <section className={`${styles.card} ${styles.statusCard} ${styles.fullWidthCard} ${styles.collapsibleSection}`}>
+                    {renderCollapseToggle('goal', '学習目標')}
                     <div className={styles.cardHeader} style={{ justifyContent: 'space-between', display: 'flex' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             <h3>学習目標</h3>
@@ -800,7 +801,6 @@ export default function DashboardClient() {
                         >
                             ✏️
                         </button>
-                        {renderCollapseToggle('goal', '学習目標')}
                     </div>
                     {!collapsedSections['goal'] && (
                     <div id="section-body-goal">
@@ -1178,10 +1178,8 @@ export default function DashboardClient() {
                 </section>
 
                 {/* 1.5 Monthly Progress Card - 今月の定量進捗 */}
-                <section className={`${styles.statusCard} ${styles.fullWidthCard} ${styles.collapsibleSection}`}>
-                    <div className={styles.collapseBar}>
-                        {renderCollapseToggle('monthly', '今月の進捗')}
-                    </div>
+                <section className={`${styles.fullWidthCard} ${styles.collapsibleSection} ${styles.monthlyProgressWrapper}`}>
+                    {renderCollapseToggle('monthly', '今月の進捗')}
                     {!collapsedSections['monthly'] && (
                     <div id="section-body-monthly">
                         <MonthlyProgressCard stats={monthlyStats} />
@@ -1237,11 +1235,11 @@ export default function DashboardClient() {
                 </section>
 
                 {/* 3. Overall Accuracy Card */}
-                <section className={`${styles.card} ${styles.statusCard}`} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white' }}>
+                <section className={`${styles.card} ${styles.statusCard} ${styles.collapsibleSection}`} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white' }}>
+                    {renderCollapseToggle('accuracy', '通算正答率', 'light')}
                     <div className={styles.cardHeader}>
                         <h3 style={{ color: 'white' }}>通算正答率 {isAllPlans ? '(全体)' : ''}</h3>
                         <span className={styles.cardIcon}>📊</span>
-                        {renderCollapseToggle('accuracy', '通算正答率', 'light')}
                     </div>
                     {!collapsedSections['accuracy'] && (
                     <div id="section-body-accuracy" className={styles.progressContainer} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2rem', padding: '0.5rem 0' }}>
@@ -1286,22 +1284,20 @@ export default function DashboardClient() {
 
                 {/* 4. Heatmap Widget (Replaces placeholders) */}
                 <section className={`${styles.card} ${styles.heatmapCard} ${styles.collapsibleSection}`}>
-                    <div className={styles.collapseBar}>
-                        {renderCollapseToggle('heatmap', '学習ヒートマップ')}
-                    </div>
+                    {renderCollapseToggle('heatmap', '学習ヒートマップ')}
                     {!collapsedSections['heatmap'] && (
-                    <div id="section-body-heatmap">
+                    <div id="section-body-heatmap" className={styles.heatmapBody}>
                         <HeatmapWidget records={records} />
                     </div>
                     )}
                 </section>
 
                 {/* 5. Recent History */}
-                <section className={`${styles.card} ${styles.historyCard}`}>
+                <section className={`${styles.card} ${styles.historyCard} ${styles.collapsibleSection}`}>
+                    {renderCollapseToggle('history', '最近の活動')}
                     <div className={styles.cardHeader}>
                         <h3>最近の活動</h3>
                         <Link href="/history" className={styles.viewAllBtn}>すべて見る</Link>
-                        {renderCollapseToggle('history', '最近の活動')}
                     </div>
                     {!collapsedSections['history'] && (
                     <div id="section-body-history">
