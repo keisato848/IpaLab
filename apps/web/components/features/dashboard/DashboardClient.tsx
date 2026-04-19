@@ -746,7 +746,14 @@ export default function DashboardClient() {
                                 </select>
                             )}
                         </div>
-                        <span className={styles.cardIcon} style={{ cursor: 'pointer' }} onClick={() => setShowWizard(true)}>✏️</span>
+                        <button
+                            type="button"
+                            className={`${styles.cardIcon} ${styles.iconButton}`}
+                            onClick={() => setShowWizard(true)}
+                            aria-label="学習目標を編集"
+                        >
+                            ✏️
+                        </button>
                     </div>
                     {studyPlan ? (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: '100%' }}>

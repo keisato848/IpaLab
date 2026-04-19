@@ -223,6 +223,30 @@
     color: #047857;
 }
 
+/* PR-D: cardIcon / iconButton (a11y: 44x44 min, focus ring) */
+.cardIcon {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+.iconButton {
+    background: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem;
+    border-radius: 8px;
+    color: inherit;
+}
+.iconButton:hover { background: rgba(0, 0, 0, 0.06); }
+.iconButton:focus-visible {
+    outline: 2px solid var(--primary-color, #6366f1);
+    outline-offset: 2px;
+}
+
 /* PR-B: Today's Mission を grid 内で最上部に表示 (主訴: 画面下部にあって遷移しづらい) */
 .todayMissionPriority {
     order: -10;
