@@ -673,6 +673,48 @@ export default function DashboardClient() {
                         />
                     </div>
                     <div className={styles.levelNext}>次のレベルまで {levelInfo.xpToNext} XP</div>
+                    {(() => {
+                        const NEXT_REWARDS: Record<number, { title: string; perk: string }> = {
+                            2: { title: '初心者', perk: '🎖️ 学習者バッジ解放' },
+                            3: { title: '学習者', perk: '📊 カテゴリ別正答率の詳細表示' },
+                            4: { title: '挑戦者', perk: '🔥 連続学習ストリーク表示強化' },
+                            5: { title: '熟練者', perk: '🏅 Lv5実績バッジ獲得' },
+                            6: { title: 'エキスパート', perk: '⭐ プロフィール称号「エキスパート」' },
+                            7: { title: 'マスター', perk: '🎯 マスター記章' },
+                            8: { title: 'グランドマスター', perk: '👑 グランドマスター冠' },
+                            9: { title: 'レジェンド', perk: '💎 レジェンドエフェクト' },
+                            10: { title: '合格請負人', perk: '🏆 最終称号「合格請負人」' },
+                        };
+                        const nextLv = levelInfo.level + 1;
+                        const reward = NEXT_REWARDS[nextLv];
+                        if (!reward) return null;
+                        return (
+                            <div className={styles.nextReward}>
+                                <span className={styles.nextRewardLabel}>NEXT Lv{nextLv}</span>
+                                <span className={styles.nextRewardName}>{reward.title}</span>
+                                <span className={styles.nextRewardPerk}>{reward.perk}</span>
+                            </div>
+                        );
+                    })()}
+                    {(() => {
+                        const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100];
+                        const reached = STREAK_MILESTONES.filter(m => progress.streakDays >= m).pop();
+                        const upcoming = STREAK_MILESTONES.find(m => progress.streakDays < m);
+                        if (!reached && !upcoming) return null;
+                        return (
+                            <div className={styles.streakRow}>
+                                {reached && (
+                                    <span className={styles.streakBadge}>🔥 {reached}日達成</span>
+                                )}
+                                {upcoming && (
+                                    <span className={styles.streakNext}>
+                                        次のマイルストーン: <strong>{upcoming}日</strong>
+                                        （あと {upcoming - progress.streakDays} 日）
+                                    </span>
+                                )}
+                            </div>
+                        );
+                    })()}
                     <div className={styles.levelMeaning}>
                         💡 XPは「正解 +10 / 不正解 +3 / 連続日数ボーナス +5」で増加。レベルアップで称号と統計バッジが解放されます。
                     </div>
@@ -1121,17 +1163,8 @@ export default function DashboardClient() {
                             </span>
                         </div>
                         {isMissionComplete && (
-                            <div style={{ 
-                                textAlign: 'center', 
-                                marginTop: '0.5rem',
-                                padding: '0.3rem 0.6rem',
-                                background: 'rgba(34, 197, 94, 0.1)',
-                                borderRadius: '4px',
-                                color: '#22c55e',
-                                fontSize: '0.85rem',
-                                fontWeight: 'bold'
-                            }}>
-                                🎉 ミッションクリア！ +{todayXpReward} XP 獲得
+                            <div className={styles.missionClearBanner}>
+                                🎉 ミッションクリア！ <strong>+{todayXpReward} XP</strong> 獲得
                             </div>
                         )}
                     </div>
