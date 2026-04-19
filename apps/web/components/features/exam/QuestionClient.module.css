@@ -409,6 +409,77 @@
     color: var(--text-primary);
 }
 
+/* ------------------------------------------------------------------
+ * Markdown lists / code / table — モバイル視認性改善 (fix/explanation-mobile-readability)
+ * 背景: 解説のネスト箇条書きが mobile 375 で li 幅 188→148→108→68px と縮小し
+ *       1行2-3文字になっていた。ブラウザデフォルトの padding-inline-start: 40px が
+ *       ネスト毎に累積するのが直接原因。
+ * ------------------------------------------------------------------ */
+.markdownBody ul,
+.markdownBody ol {
+    padding-inline-start: clamp(1.1em, 4vw, 2em);
+    margin-block: 0.5em 1em;
+}
+
+.markdownBody li {
+    margin-block: 0.25em;
+    line-height: 1.7;
+}
+
+.markdownBody li::marker {
+    color: var(--text-secondary);
+}
+
+/* ネスト2段目以降は更に圧縮 */
+.markdownBody li > ul,
+.markdownBody li > ol {
+    padding-inline-start: clamp(0.9em, 3vw, 1.5em);
+    margin-block: 0.25em 0.5em;
+}
+
+.markdownBody ol {
+    list-style-position: outside;
+}
+
+/* 横切れ防止 */
+.markdownBody pre {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.75em 1em;
+    background: var(--bg-tertiary, rgba(0, 0, 0, 0.04));
+    border-radius: 6px;
+}
+
+.markdownBody code {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.markdownBody table {
+    max-width: 100%;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-collapse: collapse;
+}
+
+.markdownBody table th,
+.markdownBody table td {
+    padding: 0.4em 0.6em;
+    border: 1px solid var(--border-color);
+    font-size: 0.95em;
+}
+
+.markdownBody img {
+    max-width: 100%;
+    height: auto;
+}
+
+.markdownBody a {
+    overflow-wrap: anywhere;
+}
+
 /* Option Buttons */
 .optionsList {
     display: flex;
@@ -845,5 +916,27 @@
         grid-template-columns: 1fr;
         overflow-y: auto;
         /* Allow window scroll on mobile */
+    }
+
+    /* 解説エリアの padding をモバイル時に縮小（24px→12px、コンテンツ幅 +24px 確保） */
+    .explanationBody {
+        padding: 0.75rem;
+        border-radius: 6px;
+    }
+
+    /* モバイル用 typography: 行間圧縮で狭幅の間延びを抑制 */
+    .markdownBody {
+        font-size: 0.95rem;
+        line-height: 1.7;
+    }
+
+    .markdownBody h3 {
+        font-size: 1.1em;
+        padding-bottom: 0.2em;
+        margin-bottom: 12px;
+    }
+
+    .markdownBody p {
+        margin-bottom: 12px;
     }
 }
