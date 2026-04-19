@@ -43,6 +43,38 @@ export default function DashboardClient() {
     const [missionQuestionsLoading, setMissionQuestionsLoading] = useState(false);
     // Monthly Goal Editor State
     const [showGoalEditor, setShowGoalEditor] = useState(false);
+
+    // Collapsible sections (persisted in localStorage)
+    const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem('dashboard:collapsedSections');
+            if (raw) setCollapsedSections(JSON.parse(raw));
+        } catch {}
+    }, []);
+    const toggleSection = (id: string) => {
+        setCollapsedSections(prev => {
+            const next = { ...prev, [id]: !prev[id] };
+            try { localStorage.setItem('dashboard:collapsedSections', JSON.stringify(next)); } catch {}
+            return next;
+        });
+    };
+    const renderCollapseToggle = (id: string, label: string, variant?: 'light') => {
+        const isCollapsed = !!collapsedSections[id];
+        return (
+            <button
+                type="button"
+                className={`${styles.cardIcon} ${styles.iconButton} ${styles.collapseToggle}${variant === 'light' ? ' ' + styles.collapseToggleLight : ''}`}
+                aria-expanded={!isCollapsed}
+                aria-controls={`section-body-${id}`}
+                aria-label={isCollapsed ? `${label}を展開` : `${label}を折りたたむ`}
+                title={isCollapsed ? '展開' : '折りたたむ'}
+                onClick={() => toggleSection(id)}
+            >
+                {isCollapsed ? '▶' : '▼'}
+            </button>
+        );
+    };
     const {
         progress,
         achievements,
@@ -673,8 +705,11 @@ export default function DashboardClient() {
                         <div className={styles.levelMeta}>
                             <span>🔥 連続学習: {progress.streakDays}日目</span>
                             <span>🏆 実績: {achievements.unlocked.length}/{achievementTotal}</span>
+                            {renderCollapseToggle('level', 'レベル情報')}
                         </div>
                     </div>
+                    {!collapsedSections['level'] && (
+                    <div id="section-body-level">
                     <div className={styles.levelBar}>
                         <div
                             className={styles.levelFill}
@@ -727,6 +762,8 @@ export default function DashboardClient() {
                     <div className={styles.levelMeaning}>
                         💡 XPは「正解 +10 / 不正解 +3 / 連続日数ボーナス +5」で増加。レベルアップで称号と統計バッジが解放されます。
                     </div>
+                    </div>
+                    )}
                 </section>
                 {/* 1. Goal Section (Hierarchical) - ゲーミフィケーション対応 */}
                 <section className={`${styles.card} ${styles.statusCard} ${styles.fullWidthCard}`}>
@@ -763,7 +800,10 @@ export default function DashboardClient() {
                         >
                             ✏️
                         </button>
+                        {renderCollapseToggle('goal', '学習目標')}
                     </div>
+                    {!collapsedSections['goal'] && (
+                    <div id="section-body-goal">
                     {studyPlan ? (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: '100%' }}>
                             {/* Monthly Goal - 定量目標 + テキスト */}
@@ -1133,11 +1173,20 @@ export default function DashboardClient() {
                             </button>
                         </div>
                     )}
+                    </div>
+                    )}
                 </section>
 
                 {/* 1.5 Monthly Progress Card - 今月の定量進捗 */}
-                <section className={`${styles.statusCard} ${styles.fullWidthCard}`}>
-                    <MonthlyProgressCard stats={monthlyStats} />
+                <section className={`${styles.statusCard} ${styles.fullWidthCard} ${styles.collapsibleSection}`}>
+                    <div className={styles.collapseBar}>
+                        {renderCollapseToggle('monthly', '今月の進捗')}
+                    </div>
+                    {!collapsedSections['monthly'] && (
+                    <div id="section-body-monthly">
+                        <MonthlyProgressCard stats={monthlyStats} />
+                    </div>
+                    )}
                 </section>
 
                 {/* 2. Today's Status - ゲーミフィケーション対応 */}
@@ -1192,8 +1241,10 @@ export default function DashboardClient() {
                     <div className={styles.cardHeader}>
                         <h3 style={{ color: 'white' }}>通算正答率 {isAllPlans ? '(全体)' : ''}</h3>
                         <span className={styles.cardIcon}>📊</span>
+                        {renderCollapseToggle('accuracy', '通算正答率', 'light')}
                     </div>
-                    <div className={styles.progressContainer} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2rem', padding: '0.5rem 0' }}>
+                    {!collapsedSections['accuracy'] && (
+                    <div id="section-body-accuracy" className={styles.progressContainer} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2rem', padding: '0.5rem 0' }}>
                         {/* Donut Chart - Compact Size */}
                         <div style={{ position: 'relative', width: '80px', height: '80px' }}>
                             <svg width="80" height="80" viewBox="0 0 100 100">
@@ -1230,11 +1281,19 @@ export default function DashboardClient() {
                             </div>
                         </div>
                     </div>
+                    )}
                 </section>
 
                 {/* 4. Heatmap Widget (Replaces placeholders) */}
-                <section className={`${styles.card} ${styles.heatmapCard}`}>
-                    <HeatmapWidget records={records} />
+                <section className={`${styles.card} ${styles.heatmapCard} ${styles.collapsibleSection}`}>
+                    <div className={styles.collapseBar}>
+                        {renderCollapseToggle('heatmap', '学習ヒートマップ')}
+                    </div>
+                    {!collapsedSections['heatmap'] && (
+                    <div id="section-body-heatmap">
+                        <HeatmapWidget records={records} />
+                    </div>
+                    )}
                 </section>
 
                 {/* 5. Recent History */}
@@ -1242,7 +1301,10 @@ export default function DashboardClient() {
                     <div className={styles.cardHeader}>
                         <h3>最近の活動</h3>
                         <Link href="/history" className={styles.viewAllBtn}>すべて見る</Link>
+                        {renderCollapseToggle('history', '最近の活動')}
                     </div>
+                    {!collapsedSections['history'] && (
+                    <div id="section-body-history">
                     {recentRecords.length === 0 ? (
                         <p className={styles.subtitle}>まだ学習履歴がありません。</p>
                     ) : (
@@ -1287,6 +1349,8 @@ export default function DashboardClient() {
                                 );
                             })}
                         </ul>
+                    )}
+                    </div>
                     )}
                 </section>
             </div>
