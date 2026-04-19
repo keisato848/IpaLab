@@ -598,3 +598,37 @@
     font-size: var(--fs-sm);
     color: var(--text-secondary);
 }
+
+/* Collapse toggle button (added with collapsible sections feature) */
+.collapseToggle {
+    margin-left: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.collapseToggle:hover,
+.collapseToggle:focus-visible {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+.collapseToggleLight {
+    color: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+.collapseToggleLight:hover,
+.collapseToggleLight:focus-visible {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+}
+.collapsibleSection {
+    position: relative;
+}
+.collapseBar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.25rem;
+}
