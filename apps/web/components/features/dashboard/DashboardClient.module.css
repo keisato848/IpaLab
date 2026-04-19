@@ -148,6 +148,43 @@
     opacity: 0.85;
 }
 
+.levelMeaning {
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.85rem;
+    background: rgba(255, 255, 255, 0.12);
+    border-left: 3px solid rgba(255, 255, 255, 0.45);
+    border-radius: 6px;
+    font-size: var(--fs-sm);
+    line-height: 1.55;
+    color: inherit;
+    opacity: 0.95;
+}
+
+/* PR-B: Today's Mission を grid 内で最上部に表示 (主訴: 画面下部にあって遷移しづらい) */
+.todayMissionPriority {
+    order: -10;
+    grid-column: span 12;
+    border: 2px solid var(--primary-color, #6366f1);
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.18);
+}
+
+.todayMissionPriority::before {
+    content: '⭐ 今すぐ取り組む';
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--primary-color, #6366f1);
+    background: rgba(99, 102, 241, 0.12);
+    padding: 0.18rem 0.55rem;
+    border-radius: 999px;
+    margin-bottom: 0.5rem;
+}
+
+.levelCard {
+    order: -5;
+}
+
 /* Specific Cards Layout */
 .statusCard {
     grid-column: span 12;

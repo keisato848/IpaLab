@@ -673,6 +673,9 @@ export default function DashboardClient() {
                         />
                     </div>
                     <div className={styles.levelNext}>次のレベルまで {levelInfo.xpToNext} XP</div>
+                    <div className={styles.levelMeaning}>
+                        💡 XPは「正解 +10 / 不正解 +3 / 連続日数ボーナス +5」で増加。レベルアップで称号と統計バッジが解放されます。
+                    </div>
                 </section>
                 {/* 1. Goal Section (Hierarchical) - ゲーミフィケーション対応 */}
                 <section className={`${styles.card} ${styles.statusCard} ${styles.fullWidthCard}`}>
@@ -1080,7 +1083,7 @@ export default function DashboardClient() {
                 </section>
 
                 {/* 2. Today's Status - ゲーミフィケーション対応 */}
-                <section className={`${styles.card} ${styles.statusCard}`}>
+                <section className={`${styles.card} ${styles.statusCard} ${styles.todayMissionPriority}`}>
                     <div className={styles.cardHeader}>
                         <h3>今日の進捗</h3>
                         <span className={styles.cardIcon}>{isMissionComplete ? '🏆' : '🎯'}</span>
