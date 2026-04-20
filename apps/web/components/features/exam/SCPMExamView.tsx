@@ -156,7 +156,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                                 <div className={styles.markdownContent}>
                                     <ReactMarkdown
                                         remarkPlugins={[remarkGfm, remarkMath] as any}
-                                        rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                                        rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                         components={markdownComponents}
                                     >
                                         {diagram.content}
@@ -178,7 +178,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                 <div key={index} className={styles.markdownContent}>
                     <ReactMarkdown
                         remarkPlugins={[remarkGfm, remarkMath] as any}
-                        rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                        rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                         components={markdownComponents}
                     >
                         {part}
@@ -374,7 +374,7 @@ function SubQuestionBlock({ question, index, parentContext, onGrade, initialData
                 <div className={`${styles.markdownContent} ${styles.subQuestionText}`}>
                     <ReactMarkdown
                         remarkPlugins={[remarkGfm, remarkMath] as any}
-                        rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                        rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                         components={markdownComponents}
                     >{question.text}</ReactMarkdown>
                 </div>
@@ -410,7 +410,7 @@ function SubQuestionItem({ sq, sIdx, onGrade, initialData }: { sq: any, sIdx: nu
                 <div className={`${styles.markdownContent} ${styles.subQuestionItemText}`}>
                     <ReactMarkdown
                         remarkPlugins={[remarkGfm, remarkMath] as any}
-                        rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                        rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                         components={markdownComponents}
                     >{sq.text}</ReactMarkdown>
                 </div>

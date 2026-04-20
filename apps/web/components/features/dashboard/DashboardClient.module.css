@@ -148,6 +148,130 @@
     opacity: 0.85;
 }
 
+.levelMeaning {
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.85rem;
+    background: rgba(255, 255, 255, 0.12);
+    border-left: 3px solid rgba(255, 255, 255, 0.45);
+    border-radius: 6px;
+    font-size: var(--fs-sm);
+    line-height: 1.55;
+    color: inherit;
+    opacity: 0.95;
+}
+
+/* PR-C: 次レベル特典 */
+.nextReward {
+    margin-top: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    padding: 0.6rem 0.85rem;
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.18));
+    border-radius: 8px;
+    font-size: var(--fs-sm);
+}
+.nextRewardLabel {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 0.18rem 0.55rem;
+    background: rgba(255, 255, 255, 0.22);
+    border-radius: 999px;
+}
+.nextRewardName { font-weight: 700; }
+.nextRewardPerk { opacity: 0.9; }
+
+/* PR-C: ストリーク */
+.streakRow {
+    margin-top: 0.6rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+    font-size: var(--fs-sm);
+}
+.streakBadge {
+    padding: 0.2rem 0.6rem;
+    background: linear-gradient(90deg, #f97316, #ef4444);
+    color: #fff;
+    border-radius: 999px;
+    font-weight: 700;
+}
+.streakNext { opacity: 0.85; }
+
+/* PR-C: ミッションクリアバナー */
+@keyframes missionClearPulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(34, 197, 94, 0); }
+    50% { box-shadow: 0 0 18px rgba(34, 197, 94, 0.45); }
+}
+.missionClearBanner {
+    text-align: center;
+    margin-top: 0.6rem;
+    padding: 0.55rem 0.9rem;
+    background: linear-gradient(90deg, rgba(34, 197, 94, 0.18), rgba(16, 185, 129, 0.18));
+    border: 1px solid rgba(34, 197, 94, 0.45);
+    border-radius: 8px;
+    color: #15803d;
+    font-size: 0.95rem;
+    font-weight: 700;
+    animation: missionClearPulse 2s ease-in-out infinite;
+}
+.missionClearBanner strong {
+    font-size: 1.1rem;
+    color: #047857;
+}
+
+/* PR-D: cardIcon / iconButton (a11y: 44x44 min, focus ring) */
+.cardIcon {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+.iconButton {
+    background: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem;
+    border-radius: 8px;
+    color: inherit;
+}
+.iconButton:hover { background: rgba(0, 0, 0, 0.06); }
+.iconButton:focus-visible {
+    outline: 2px solid var(--primary-color, #6366f1);
+    outline-offset: 2px;
+}
+
+/* PR-B: Today's Mission を grid 内で最上部に表示 (主訴: 画面下部にあって遷移しづらい) */
+.todayMissionPriority {
+    order: -10;
+    grid-column: span 12;
+    border: 2px solid var(--primary-color, #6366f1);
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.18);
+}
+
+.todayMissionPriority::before {
+    content: '⭐ 今すぐ取り組む';
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--primary-color, #6366f1);
+    background: rgba(99, 102, 241, 0.12);
+    padding: 0.18rem 0.55rem;
+    border-radius: 999px;
+    margin-bottom: 0.5rem;
+}
+
+.levelCard {
+    order: -5;
+}
+
 /* Specific Cards Layout */
 .statusCard {
     grid-column: span 12;
@@ -473,4 +597,71 @@
 .levelUpMessage {
     font-size: var(--fs-sm);
     color: var(--text-secondary);
+}
+
+/* Collapse toggle button (added with collapsible sections feature) */
+.collapsibleSection {
+    position: relative;
+}
+/* Reserve space for the absolute toggle so right-aligned header items don't overlap */
+.collapsibleSection > .cardHeader,
+.collapsibleSection > .levelHeader {
+    padding-right: 44px;
+}
+.collapseToggle {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    line-height: 1;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+.collapseToggle:hover,
+.collapseToggle:focus-visible {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+.collapseToggleLight {
+    color: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.45);
+}
+.collapseToggleLight:hover,
+.collapseToggleLight:focus-visible {
+    background: rgba(255, 255, 255, 0.22);
+    color: #fff;
+}
+/* Wrapper for sections that contain a self-styled inner card (e.g. MonthlyProgressCard).
+   Avoids the double-card visual by removing the outer card chrome. */
+.monthlyProgressWrapper {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+/* Reserve space inside the inner widget header for the absolute toggle.
+   Use a stable data-attribute on MonthlyProgressCard's header instead of a
+   deep descendant selector so small markup changes inside the widget do not
+   break the layout. */
+.monthlyProgressWrapper [data-monthly-card-header] {
+    padding-right: 44px;
+}
+/* Heatmap card body must keep flex centering after collapse wrapping */
+.heatmapBody {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }

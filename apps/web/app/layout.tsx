@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import type { Metadata } from "next";
+import BottomNav from "@/components/layout/BottomNav";
 
 // Removed: export const dynamic = 'force-dynamic';
 // This was causing all pages to be SSR-only, preventing static generation benefits
@@ -100,7 +101,9 @@ export default function RootLayout({
                     <TelemetryProvider connectionString={process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING}>
                         <AdProvider>
                             <ThemeProvider>
-                                {children}
+                                <a href="#main-content" className="skip-link">本文へスキップ</a>
+                                <main id="main-content" tabIndex={-1}>{children}</main>
+                                <BottomNav />
                                 <AiAssistantLoader />
                             </ThemeProvider>
                         </AdProvider>
