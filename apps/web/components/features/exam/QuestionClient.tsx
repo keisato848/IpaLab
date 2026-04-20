@@ -54,6 +54,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [showExplanation, setShowExplanation] = useState(false);
+    const explanationRef = useRef<HTMLDivElement | null>(null);
     const [startTime, setStartTime] = useState<number>(Date.now());
 
     // Stats State
@@ -283,6 +284,24 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         setSelectedOption(reviewRecord?.selectedOptionId ?? question.correctOption);
         setShowExplanation(true);
     }, [isReview, sessionId, reviewRecord, question.correctOption]);
+
+    // EXP05: 解説表示時に解説エリアまでスムーススクロール
+    // prefers-reduced-motion: reduce のユーザーには smooth を強制せず、即時スクロールにフォールバックする
+    useEffect(() => {
+        if (showExplanation && explanationRef.current) {
+            const t = setTimeout(() => {
+                const prefersReducedMotion =
+                    typeof window !== 'undefined' &&
+                    typeof window.matchMedia === 'function' &&
+                    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                explanationRef.current?.scrollIntoView({
+                    behavior: prefersReducedMotion ? 'auto' : 'smooth',
+                    block: 'start',
+                });
+            }, 100);
+            return () => clearTimeout(t);
+        }
+    }, [showExplanation]);
 
     const formatTime = (seconds: number) => {
         const h = Math.floor(seconds / 3600);
@@ -678,7 +697,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                         <div className={styles.markdownBody}>
                             <ReactMarkdown
                                 remarkPlugins={[remarkGfm, remarkMath] as any}
-                                rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                                rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                 components={components}
                             >
                                 {question.text}
@@ -696,7 +715,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                 <div className={styles.markdownBody}>
                                     <ReactMarkdown
                                         remarkPlugins={[remarkGfm, remarkMath] as any}
-                                        rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                                        rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                         components={components}
                                     >
                                         {currentSubQ.text}
@@ -910,7 +929,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     <div className={styles.markdownBody}>
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm, remarkMath] as any}
-                            rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                            rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                             components={components}
                         >
                             {question.text}
@@ -973,7 +992,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                     <div className={styles.optText}>
                                         <ReactMarkdown
                                             remarkPlugins={[remarkGfm, remarkMath] as any}
-                                            rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                                            rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                             components={components}
                                         >
                                             {opt.text}
@@ -989,7 +1008,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
                     {/* Explanation Area (Condensed or Expanded) */}
                     {showExplanation && isPractice && (
-                        <div className={styles.explanationArea}>
+                        <div className={styles.explanationArea} ref={explanationRef}>
                             <div className={`${styles.resultBanner} ${checkIsCorrect(selectedOption, question.correctOption) ? styles.bannerCorrect : styles.bannerIncorrect}`}>
                                 {checkIsCorrect(selectedOption, question.correctOption) ? '正解！' : '不正解...'}
                             </div>
@@ -1104,5 +1123,6 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         </div>
     );
 }
+
 
 
