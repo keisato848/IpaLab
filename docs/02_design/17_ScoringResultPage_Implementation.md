@@ -13,43 +13,52 @@
 apps/web/
 ├─ app/exam/[examId]/result/page.tsx          (Server Component / 既存)
 ├─ components/features/scoring/
-│  ├─ AfternoonScoringResult.tsx              (Client / Top)
-│  ├─ ScoringHeader.tsx                       (総合点ヘッダ)
-│  ├─ PerspectiveCard.tsx                     (観点カード ×4)
-│  ├─ ModelAnswerDiff.tsx                     (差分ビュー → #179)
-│  ├─ ScoringActions.tsx                      (Next Step アクション)
+│  ├─ AfternoonScoringResult.tsx              (Top: format で分岐)
+│  ├─ short-answer/
+│  │  ├─ ShortAnswerResultLayout.tsx
+│  │  ├─ ScoringHeader.tsx
+│  │  ├─ PerspectiveCard.tsx
+│  │  └─ ModelAnswerDiff.tsx                  (→ #179)
+│  ├─ essay/
+│  │  ├─ EssayResultLayout.tsx
+│  │  ├─ EssayRankBadge.tsx                   (A/B/C/D)
+│  │  ├─ SubQuestionTabs.tsx                  (ア/イ/ウ)
+│  │  ├─ PerspectiveRadarChart.tsx
+│  │  ├─ EvidenceQuoteHighlight.tsx
+│  │  ├─ CharacterCountBar.tsx
+│  │  └─ OverallFeedbackPanel.tsx
+│  ├─ ScoringActions.tsx
 │  └─ ScoringResult.module.css
 └─ lib/scoring/
-   ├─ useAfternoonScoringStream.ts            (SSE フック)
+   ├─ useShortAnswerScoringStream.ts
+   ├─ useEssayScoringStream.ts
    └─ types.ts                                 (#175 型定義の再エクスポート)
 ```
 
 ## 3. ストリーミング統合
 
 ```typescript
-// useAfternoonScoringStream.ts
-export function useAfternoonScoringStream(questionId: string, userAnswer: string) {
+// useShortAnswerScoringStream.ts (系統A)
+export function useShortAnswerScoringStream(questionId: string, userAnswer: string) {
   const [perspectives, setPerspectives] = useState<PerspectiveScore[]>([]);
   const [total, setTotal] = useState<TotalScore | null>(null);
-  const [status, setStatus] = useState<'idle' | 'streaming' | 'done' | 'error'>('idle');
-
-  useEffect(() => {
-    const es = new EventSource(`/api/ai/scoring/afternoon/v2?...`);
-    es.addEventListener('perspective', (e) => {
-      setPerspectives((prev) => [...prev, JSON.parse(e.data)]);
-    });
-    es.addEventListener('complete', (e) => {
-      setTotal(JSON.parse(e.data));
-      setStatus('done');
-      es.close();
-    });
-    es.onerror = () => { setStatus('error'); es.close(); };
-    setStatus('streaming');
-    return () => es.close();
-  }, [questionId, userAnswer]);
-
-  return { perspectives, total, status };
+  // ... SSE 受信実装
 }
+
+// useEssayScoringStream.ts (系統B)
+export function useEssayScoringStream(input: EssayInput) {
+  const [subQuestionScores, setSubQuestionScores] = useState<Map<'ア'|'イ'|'ウ', SubQScore>>(new Map());
+  const [overall, setOverall] = useState<{ rank: 'A'|'B'|'C'|'D'; score: number } | null>(null);
+  // ... 小問別 SSE 受信実装
+}
+```
+
+採点結果ページ Top コンポーネントで `result.format` により分岐：
+
+```tsx
+return result.format === 'essay'
+  ? <EssayResultLayout result={result} />
+  : <ShortAnswerResultLayout result={result} />;
 ```
 
 ## 4. レンダリング戦略
