@@ -994,13 +994,101 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                 {checkIsCorrect(selectedOption, question.correctOption) ? '正解！' : '不正解...'}
                             </div>
                             <div className={styles.explanationBody}>
-                                <ReactMarkdown
-                                    remarkPlugins={[remarkGfm, remarkMath] as any}
-                                    rehypePlugins={[rehypeKatex, rehypeRaw] as any}
-                                    components={components}
-                                >
-                                    {question.explanation || '(解説がありません)'}
-                                </ReactMarkdown>
+                                {(() => {
+                                    // EXP08: 解説 Markdown を見出し（##, ###）単位で分割し details/summary でラップ
+                                    // フェンスコードブロック ( ``` / ~~~ ) 内の `##` や `###` は誤分割しないよう
+                                    // フェンス開閉をトラッキングし、フェンス内では heading 判定をスキップする。
+                                    const raw = question.explanation || '(解説がありません)';
+                                    const lines = raw.split(/\r?\n/);
+                                    type Section = { heading: string | null; body: string };
+                                    const sections: Section[] = [];
+                                    let cur: Section = { heading: null, body: '' };
+                                    let inFence = false;
+                                    let fenceChar: '`' | '~' | null = null;
+                                    let fenceLength = 0;
+
+                                    for (const line of lines) {
+                                        const fenceMatch = line.match(/^[ ]{0,3}([`~]{3,})/);
+                                        if (fenceMatch) {
+                                            const marker = fenceMatch[1];
+                                            const markerChar = marker[0] as '`' | '~';
+                                            if (!inFence) {
+                                                inFence = true;
+                                                fenceChar = markerChar;
+                                                fenceLength = marker.length;
+                                            } else if (fenceChar === markerChar && marker.length >= fenceLength) {
+                                                inFence = false;
+                                                fenceChar = null;
+                                                fenceLength = 0;
+                                            }
+                                            cur.body += (cur.body ? '\n' : '') + line;
+                                            continue;
+                                        }
+
+                                        if (!inFence) {
+                                            const m = line.match(/^(#{2,3})\s+(.+?)\s*$/);
+                                            if (m) {
+                                                if (cur.heading !== null || cur.body.trim() !== '') sections.push(cur);
+                                                cur = { heading: m[2], body: '' };
+                                                continue;
+                                            }
+                                        }
+
+                                        cur.body += (cur.body ? '\n' : '') + line;
+                                    }
+                                    if (cur.heading !== null || cur.body.trim() !== '') sections.push(cur);
+
+                                    // 見出しが1個もない場合は従来通り一括描画
+                                    const hasHeadings = sections.some(s => s.heading !== null);
+                                    if (!hasHeadings) {
+                                        return (
+                                            <ReactMarkdown
+                                                remarkPlugins={[remarkGfm, remarkMath] as any}
+                                                rehypePlugins={[rehypeRaw, rehypeKatex] as any}
+                                                components={components}
+                                            >
+                                                {raw}
+                                            </ReactMarkdown>
+                                        );
+                                    }
+
+                                    const PRIMARY_RE = /(正解の理由|正解|解答|答え|ポイント)/;
+                                    return sections.map((s, i) => {
+                                        if (s.heading === null) {
+                                            // 先頭の見出し前テキスト
+                                            if (s.body.trim() === '') return null;
+                                            return (
+                                                <ReactMarkdown
+                                                    key={`pre-${i}`}
+                                                    remarkPlugins={[remarkGfm, remarkMath] as any}
+                                                    rehypePlugins={[rehypeRaw, rehypeKatex] as any}
+                                                    components={components}
+                                                >
+                                                    {s.body}
+                                                </ReactMarkdown>
+                                            );
+                                        }
+                                        const isPrimary = PRIMARY_RE.test(s.heading);
+                                        return (
+                                            <details
+                                                key={`sec-${i}`}
+                                                open={isPrimary}
+                                                className={styles.explanationSection}
+                                            >
+                                                <summary className={styles.explanationSummary}>{s.heading}</summary>
+                                                <div className={styles.explanationSectionBody}>
+                                                    <ReactMarkdown
+                                                        remarkPlugins={[remarkGfm, remarkMath] as any}
+                                                        rehypePlugins={[rehypeRaw, rehypeKatex] as any}
+                                                        components={components}
+                                                    >
+                                                        {s.body || ''}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            </details>
+                                        );
+                                    });
+                                })()}
                             </div>
                         </div>
                     )}

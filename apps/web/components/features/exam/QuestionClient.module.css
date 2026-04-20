@@ -555,6 +555,50 @@
     color: var(--text-primary);
 }
 
+/* EXP08: 解説のセクション分割 (details/summary) */
+.explanationSection {
+    margin: 0.85rem 0;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary, #fff);
+    overflow: hidden;
+}
+.explanationSection[open] {
+    border-color: var(--primary-color, #6366f1);
+    box-shadow: 0 1px 4px rgba(99, 102, 241, 0.08);
+}
+.explanationSummary {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    font-weight: 700;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    user-select: none;
+    color: var(--text-primary);
+}
+.explanationSummary::-webkit-details-marker { display: none; }
+.explanationSummary::before {
+    content: '▶';
+    display: inline-block;
+    font-size: 0.7rem;
+    transition: transform 0.15s ease;
+    color: var(--primary-color, #6366f1);
+}
+.explanationSection[open] > .explanationSummary::before {
+    transform: rotate(90deg);
+}
+.explanationSummary:focus-visible {
+    outline: 2px solid var(--primary-color, #6366f1);
+    outline-offset: -2px;
+}
+.explanationSectionBody {
+    padding: 0.5rem 1rem 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
 /* Footer */
 .footer {
     height: 70px;
