@@ -39,7 +39,7 @@ export default function MonthlyProgressCard({ stats }: MonthlyProgressCardProps)
     return (
         <div className={styles.card}>
             {/* ヘッダー */}
-            <div className={styles.header}>
+            <div className={styles.header} data-monthly-card-header>
                 <div className={styles.title}>
                     📈 今月の進捗
                     <span className={styles.monthLabel}>{monthLabel}</span>
