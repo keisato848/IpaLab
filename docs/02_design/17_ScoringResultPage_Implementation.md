@@ -37,19 +37,68 @@ apps/web/
 
 ## 3. ストリーミング統合
 
+API側は **POST + SSE形式のレスポンス** （→ #176 §2.0）であり、`EventSource`（GET専用）は使用しない。
+クライアントは `fetch` API + `ReadableStream` でレスポンスを受信し、SSEイベントをパースする。
+
 ```typescript
+// lib/scoring/sseClient.ts （共通ユーティリティ）
+export async function* postSseStream(url: string, body: unknown, signal?: AbortSignal) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' },
+    body: JSON.stringify(body),
+    signal,
+  });
+  if (!res.ok || !res.body) throw new Error(`SSE failed: ${res.status}`);
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const events = buffer.split('\n\n');
+    buffer = events.pop() ?? '';
+    for (const ev of events) {
+      const lines = ev.split('\n');
+      const event = lines.find(l => l.startsWith('event:'))?.slice(6).trim();
+      const data = lines.find(l => l.startsWith('data:'))?.slice(5).trim();
+      if (event && data) yield { event, data: JSON.parse(data) };
+    }
+  }
+}
+
 // useShortAnswerScoringStream.ts (系統A)
 export function useShortAnswerScoringStream(questionId: string, userAnswer: string) {
   const [perspectives, setPerspectives] = useState<PerspectiveScore[]>([]);
   const [total, setTotal] = useState<TotalScore | null>(null);
-  // ... SSE 受信実装
+  const [status, setStatus] = useState<'idle'|'streaming'|'done'|'error'>('idle');
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+    (async () => {
+      setStatus('streaming');
+      try {
+        for await (const { event, data } of postSseStream(
+          '/api/ai/scoring/afternoon/short-answer/v2',
+          { questionId, userAnswer, mode: 'stream' },
+          ctrl.signal,
+        )) {
+          if (event === 'perspective') setPerspectives(p => [...p, data]);
+          if (event === 'complete')   { setTotal(data); setStatus('done'); }
+        }
+      } catch { setStatus('error'); }
+    })();
+    return () => ctrl.abort();
+  }, [questionId, userAnswer]);
+
+  return { perspectives, total, status };
 }
 
-// useEssayScoringStream.ts (系統B)
+// useEssayScoringStream.ts (系統B) — 小問別の集約を行う点が異なる
 export function useEssayScoringStream(input: EssayInput) {
-  const [subQuestionScores, setSubQuestionScores] = useState<Map<'ア'|'イ'|'ウ', SubQScore>>(new Map());
-  const [overall, setOverall] = useState<{ rank: 'A'|'B'|'C'|'D'; score: number } | null>(null);
-  // ... 小問別 SSE 受信実装
+  // postSseStream を使い、event === 'perspective' / 'sub_question_complete' / 'complete' を処理
+  // ...
 }
 ```
 

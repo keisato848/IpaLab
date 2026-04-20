@@ -11,11 +11,13 @@
 
 | ソース | 内容 | 取得方法 |
 |---|---|---|
-| `LearningRecord` | 個別問題の解答ログ | CosmosDB Change Feed |
-| `LearningSession` | セッション単位の学習 | 同上 |
-| `ExamProgress` | 模試・試験の進捗 | 同上 |
-| `StudyPlan` | 立てられた計画タスク | 同上 |
-| `AfternoonScoringResult` | AI採点結果（→#176） | 同上 |
+| `LearningRecord` | 個別問題の解答ログ | CosmosDB Change Feed → Service Bus |
+| `LearningSession` | セッション単位の学習 | CosmosDB Change Feed → Service Bus |
+| `ExamProgress` | 模試・試験の進捗 | CosmosDB Change Feed → Service Bus |
+| `StudyPlan` | 立てられた計画タスク | CosmosDB Change Feed → Service Bus |
+| `AfternoonScoringResult` | AI採点結果（→#176） | CosmosDB Change Feed → Service Bus |
+
+> **取得方式の方針**: 各 CosmosDB コンテナの **Change Feed が起点**。集計コンポーネントは Change Feed を直接 polling せず、Change Feed Processor（Functions）が **Service Bus にイベントを中継**し、各アグリゲーターは Service Bus から購読する構成とする。これにより、複数の購読者（Hot/Cold/通知）でイベントを共有でき、再処理・リプレイも容易になる。
 
 ## 3. 集計レイヤー
 
@@ -73,15 +75,22 @@ interface DailyProgressAggregate {
 ## 5. アーキテクチャ
 
 ```
-[App Events] ──► [Event Bus / Service Bus]
-                          │
-              ┌───────────┴───────────┐
-              ▼                        ▼
-     [Hot Aggregator]          [Cold Aggregator]
-     (Functions: 即時)         (Functions: 日次)
-              │                        │
-              ▼                        ▼
-            [Redis]              [CosmosDB]
+[CosmosDB Containers]
+        │ Change Feed
+        ▼
+[Change Feed Processor (Functions)]
+        │ relay
+        ▼
+[Service Bus Topics]
+        │
+        │ subscribe
+        ├────────────────┬────────────────┐
+        ▼                ▼                ▼
+[Hot Aggregator]  [Cold Aggregator]  [Notifications]
+(Functions: 即時) (Functions: 日次)   (#196)
+        │                │
+        ▼                ▼
+     [Redis]        [CosmosDB]
               │                        │
               └────────┬───────────────┘
                        ▼
@@ -95,12 +104,14 @@ interface DailyProgressAggregate {
 
 ## 6. API
 
-### `GET /api/progress/daily?userId=&from=&to=`
-- 期間指定で日次集計を返却
+> **認証方針**: 認証必須API。ユーザー識別は **`session.user.id` を正本とし、query / body の `userId` は受け付けない**。共通設計 `15_CommonApiAndErrorDesign.md` §12.1 に準拠。
+
+### `GET /api/progress/daily?from=&to=`
+- 期間指定で日次集計を返却（対象は認証セッションのユーザー）
 - 当日分は Redis、過去分は CosmosDB
 
-### `GET /api/progress/summary?userId=`
-- 試験日までの累計 / 残タスク / ストリーク
+### `GET /api/progress/summary`
+- 試験日までの累計 / 残タスク / ストリーク（対象は認証セッションのユーザー）
 - ダッシュボードの主要データソース
 
 ## 7. 非機能要件
