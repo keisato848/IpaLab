@@ -62,7 +62,7 @@ interface ReplanningOutput {
     estimatedMinutes: number;
   }>;
   diff: {
-    moved: Array<{ taskId: string; from: string; to: string }>;
+    moved: Array<{ taskId: string; from: string; to: string; reason: string }>;
     inserted: Array<{ taskId: string; at: string; reason: string }>;
     overflowed: Array<{ taskId: string; reason: 'time_shortage' | 'skipped' }>;
   };
@@ -89,13 +89,16 @@ interface ReplanningOutput {
 
 ## 8. API
 
-### `POST /api/study-plan/replan`
-- 入力: `ReplanningInput`
-- 出力: `ReplanningOutput`
-- 認証必須・ユーザーごと
+> **認証方針**: 全APIで認証必須。ユーザー識別は **`session.user.id` を正本とし、query / body の `userId` は受け付けない**。共通設計 `15_CommonApiAndErrorDesign.md` §12.1 に準拠。`ReplanningInput` の `userId` フィールドはサーバ内部処理用のため、APIリクエストでは送信不要（送信されても無視）。
 
-### `GET /api/study-plan/current?userId=`
+### `POST /api/study-plan/replan`
+- 入力: `ReplanningInput`（`userId` はサーバ側でセッションから補完）
+- 出力: `ReplanningOutput`
+- 認証必須
+
+### `GET /api/study-plan/current`
 - 現在の計画を返却（再計画後の状態）
+- 対象ユーザーは認証セッションから取得
 
 ## 9. 非機能要件
 
