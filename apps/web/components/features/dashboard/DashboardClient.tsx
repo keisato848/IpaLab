@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { LearningRecord, getLearningRecords, getQuestions, getExams, StudyPlanJob, Question } from '@/lib/api';
@@ -10,12 +11,20 @@ import ThemeToggle from '@/components/common/ThemeToggle';
 import { useUserProgress } from '@/hooks/useUserProgress';
 import { useMonthlyProgress, createDefaultMonthlyGoals } from '@/hooks/useMonthlyProgress';
 import { useMonthlyStats } from '@/hooks/useMonthlyStats';
-import HeatmapWidget from './HeatmapWidget';
-import MonthlyProgressCard from './MonthlyProgressCard';
 import GoalSettingWizard, { StudyPlan, MonthlyGoal } from './GoalSettingWizard';
 import MonthlyGoalEditor from './MonthlyGoalEditor';
 import PlanReadyNotification from './PlanReadyNotification';
 import styles from './DashboardClient.module.css';
+
+// PR-E: 重い可視化コンポーネントは dynamic import で遅延ロード（First Load JS 削減）
+const HeatmapWidget = dynamic(() => import('./HeatmapWidget'), {
+    ssr: false,
+    loading: () => <div style={{ minHeight: 160, opacity: 0.5 }}>読み込み中...</div>,
+});
+const MonthlyProgressCard = dynamic(() => import('./MonthlyProgressCard'), {
+    ssr: false,
+    loading: () => <div style={{ minHeight: 120, opacity: 0.5 }}>読み込み中...</div>,
+});
 
 export default function DashboardClient() {
     const { data: session, status } = useSession();
@@ -34,6 +43,38 @@ export default function DashboardClient() {
     const [missionQuestionsLoading, setMissionQuestionsLoading] = useState(false);
     // Monthly Goal Editor State
     const [showGoalEditor, setShowGoalEditor] = useState(false);
+
+    // Collapsible sections (persisted in localStorage)
+    const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem('dashboard:collapsedSections');
+            if (raw) setCollapsedSections(JSON.parse(raw));
+        } catch {}
+    }, []);
+    const toggleSection = (id: string) => {
+        setCollapsedSections(prev => {
+            const next = { ...prev, [id]: !prev[id] };
+            try { localStorage.setItem('dashboard:collapsedSections', JSON.stringify(next)); } catch {}
+            return next;
+        });
+    };
+    const renderCollapseToggle = (id: string, label: string, variant?: 'light') => {
+        const isCollapsed = !!collapsedSections[id];
+        return (
+            <button
+                type="button"
+                className={`${styles.collapseToggle}${variant === 'light' ? ' ' + styles.collapseToggleLight : ''}`}
+                aria-expanded={!isCollapsed}
+                aria-controls={`section-body-${id}`}
+                aria-label={isCollapsed ? `${label}を展開` : `${label}を折りたたむ`}
+                title={isCollapsed ? '展開' : '折りたたむ'}
+                onClick={() => toggleSection(id)}
+            >
+                {isCollapsed ? '▶' : '▼'}
+            </button>
+        );
+    };
     const {
         progress,
         achievements,
@@ -653,7 +694,8 @@ export default function DashboardClient() {
             </header>
 
             <div className={styles.grid}>
-                <section className={`${styles.card} ${styles.levelCard} ${styles.fullWidthCard}`}>
+                <section className={`${styles.card} ${styles.levelCard} ${styles.fullWidthCard} ${styles.collapsibleSection}`}>
+                    {renderCollapseToggle('level', 'レベル情報', 'light')}
                     <div className={styles.levelHeader}>
                         <div>
                             <div className={styles.levelTitle}>
@@ -666,6 +708,9 @@ export default function DashboardClient() {
                             <span>🏆 実績: {achievements.unlocked.length}/{achievementTotal}</span>
                         </div>
                     </div>
+                    {collapsedSections['level'] && <div id="section-body-level" hidden aria-hidden="true" />}
+                    {!collapsedSections['level'] && (
+                    <div id="section-body-level">
                     <div className={styles.levelBar}>
                         <div
                             className={styles.levelFill}
@@ -673,9 +718,57 @@ export default function DashboardClient() {
                         />
                     </div>
                     <div className={styles.levelNext}>次のレベルまで {levelInfo.xpToNext} XP</div>
+                    {(() => {
+                        const NEXT_REWARDS: Record<number, { title: string; perk: string }> = {
+                            2: { title: '初心者', perk: '🎖️ 学習者バッジ解放' },
+                            3: { title: '学習者', perk: '📊 カテゴリ別正答率の詳細表示' },
+                            4: { title: '挑戦者', perk: '🔥 連続学習ストリーク表示強化' },
+                            5: { title: '熟練者', perk: '🏅 Lv5実績バッジ獲得' },
+                            6: { title: 'エキスパート', perk: '⭐ プロフィール称号「エキスパート」' },
+                            7: { title: 'マスター', perk: '🎯 マスター記章' },
+                            8: { title: 'グランドマスター', perk: '👑 グランドマスター冠' },
+                            9: { title: 'レジェンド', perk: '💎 レジェンドエフェクト' },
+                            10: { title: '合格請負人', perk: '🏆 最終称号「合格請負人」' },
+                        };
+                        const nextLv = levelInfo.level + 1;
+                        const reward = NEXT_REWARDS[nextLv];
+                        if (!reward) return null;
+                        return (
+                            <div className={styles.nextReward}>
+                                <span className={styles.nextRewardLabel}>NEXT Lv{nextLv}</span>
+                                <span className={styles.nextRewardName}>{reward.title}</span>
+                                <span className={styles.nextRewardPerk}>{reward.perk}</span>
+                            </div>
+                        );
+                    })()}
+                    {(() => {
+                        const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100];
+                        const reached = STREAK_MILESTONES.filter(m => progress.streakDays >= m).pop();
+                        const upcoming = STREAK_MILESTONES.find(m => progress.streakDays < m);
+                        if (!reached && !upcoming) return null;
+                        return (
+                            <div className={styles.streakRow}>
+                                {reached && (
+                                    <span className={styles.streakBadge}>🔥 {reached}日達成</span>
+                                )}
+                                {upcoming && (
+                                    <span className={styles.streakNext}>
+                                        次のマイルストーン: <strong>{upcoming}日</strong>
+                                        （あと {upcoming - progress.streakDays} 日）
+                                    </span>
+                                )}
+                            </div>
+                        );
+                    })()}
+                    <div className={styles.levelMeaning}>
+                        💡 XPは「正解 +10 / 不正解 +3 / 連続日数ボーナス +5」で増加。レベルアップで称号と統計バッジが解放されます。
+                    </div>
+                    </div>
+                    )}
                 </section>
                 {/* 1. Goal Section (Hierarchical) - ゲーミフィケーション対応 */}
-                <section className={`${styles.card} ${styles.statusCard} ${styles.fullWidthCard}`}>
+                <section className={`${styles.card} ${styles.statusCard} ${styles.fullWidthCard} ${styles.collapsibleSection}`}>
+                    {renderCollapseToggle('goal', '学習目標')}
                     <div className={styles.cardHeader} style={{ justifyContent: 'space-between', display: 'flex' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             <h3>学習目標</h3>
@@ -701,8 +794,18 @@ export default function DashboardClient() {
                                 </select>
                             )}
                         </div>
-                        <span className={styles.cardIcon} style={{ cursor: 'pointer' }} onClick={() => setShowWizard(true)}>✏️</span>
+                        <button
+                            type="button"
+                            className={`${styles.cardIcon} ${styles.iconButton}`}
+                            onClick={() => setShowWizard(true)}
+                            aria-label="学習目標を編集"
+                        >
+                            ✏️
+                        </button>
                     </div>
+                    {collapsedSections['goal'] && <div id="section-body-goal" hidden aria-hidden="true" />}
+                    {!collapsedSections['goal'] && (
+                    <div id="section-body-goal">
                     {studyPlan ? (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: '100%' }}>
                             {/* Monthly Goal - 定量目標 + テキスト */}
@@ -1072,15 +1175,23 @@ export default function DashboardClient() {
                             </button>
                         </div>
                     )}
+                    </div>
+                    )}
                 </section>
 
                 {/* 1.5 Monthly Progress Card - 今月の定量進捗 */}
-                <section className={`${styles.statusCard} ${styles.fullWidthCard}`}>
-                    <MonthlyProgressCard stats={monthlyStats} />
+                <section className={`${styles.fullWidthCard} ${styles.collapsibleSection} ${styles.monthlyProgressWrapper}`}>
+                    {renderCollapseToggle('monthly', '今月の進捗')}
+                    {collapsedSections['monthly'] && <div id="section-body-monthly" hidden aria-hidden="true" />}
+                    {!collapsedSections['monthly'] && (
+                    <div id="section-body-monthly">
+                        <MonthlyProgressCard stats={monthlyStats} />
+                    </div>
+                    )}
                 </section>
 
                 {/* 2. Today's Status - ゲーミフィケーション対応 */}
-                <section className={`${styles.card} ${styles.statusCard}`}>
+                <section className={`${styles.card} ${styles.statusCard} ${styles.todayMissionPriority}`}>
                     <div className={styles.cardHeader}>
                         <h3>今日の進捗</h3>
                         <span className={styles.cardIcon}>{isMissionComplete ? '🏆' : '🎯'}</span>
@@ -1118,17 +1229,8 @@ export default function DashboardClient() {
                             </span>
                         </div>
                         {isMissionComplete && (
-                            <div style={{ 
-                                textAlign: 'center', 
-                                marginTop: '0.5rem',
-                                padding: '0.3rem 0.6rem',
-                                background: 'rgba(34, 197, 94, 0.1)',
-                                borderRadius: '4px',
-                                color: '#22c55e',
-                                fontSize: '0.85rem',
-                                fontWeight: 'bold'
-                            }}>
-                                🎉 ミッションクリア！ +{todayXpReward} XP 獲得
+                            <div className={styles.missionClearBanner}>
+                                🎉 ミッションクリア！ <strong>+{todayXpReward} XP</strong> 獲得
                             </div>
                         )}
                     </div>
@@ -1136,12 +1238,15 @@ export default function DashboardClient() {
                 </section>
 
                 {/* 3. Overall Accuracy Card */}
-                <section className={`${styles.card} ${styles.statusCard}`} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white' }}>
+                <section className={`${styles.card} ${styles.statusCard} ${styles.collapsibleSection}`} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white' }}>
+                    {renderCollapseToggle('accuracy', '通算正答率', 'light')}
                     <div className={styles.cardHeader}>
                         <h3 style={{ color: 'white' }}>通算正答率 {isAllPlans ? '(全体)' : ''}</h3>
                         <span className={styles.cardIcon}>📊</span>
                     </div>
-                    <div className={styles.progressContainer} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2rem', padding: '0.5rem 0' }}>
+                    {collapsedSections['accuracy'] && <div id="section-body-accuracy" hidden aria-hidden="true" />}
+                    {!collapsedSections['accuracy'] && (
+                    <div id="section-body-accuracy" className={styles.progressContainer} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2rem', padding: '0.5rem 0' }}>
                         {/* Donut Chart - Compact Size */}
                         <div style={{ position: 'relative', width: '80px', height: '80px' }}>
                             <svg width="80" height="80" viewBox="0 0 100 100">
@@ -1178,19 +1283,30 @@ export default function DashboardClient() {
                             </div>
                         </div>
                     </div>
+                    )}
                 </section>
 
                 {/* 4. Heatmap Widget (Replaces placeholders) */}
-                <section className={`${styles.card} ${styles.heatmapCard}`}>
-                    <HeatmapWidget records={records} />
+                <section className={`${styles.card} ${styles.heatmapCard} ${styles.collapsibleSection}`}>
+                    {renderCollapseToggle('heatmap', '学習ヒートマップ')}
+                    {collapsedSections['heatmap'] && <div id="section-body-heatmap" hidden aria-hidden="true" />}
+                    {!collapsedSections['heatmap'] && (
+                    <div id="section-body-heatmap" className={styles.heatmapBody}>
+                        <HeatmapWidget records={records} />
+                    </div>
+                    )}
                 </section>
 
                 {/* 5. Recent History */}
-                <section className={`${styles.card} ${styles.historyCard}`}>
+                <section className={`${styles.card} ${styles.historyCard} ${styles.collapsibleSection}`}>
+                    {renderCollapseToggle('history', '最近の活動')}
                     <div className={styles.cardHeader}>
                         <h3>最近の活動</h3>
                         <Link href="/history" className={styles.viewAllBtn}>すべて見る</Link>
                     </div>
+                    {collapsedSections['history'] && <div id="section-body-history" hidden aria-hidden="true" />}
+                    {!collapsedSections['history'] && (
+                    <div id="section-body-history">
                     {recentRecords.length === 0 ? (
                         <p className={styles.subtitle}>まだ学習履歴がありません。</p>
                     ) : (
@@ -1235,6 +1351,8 @@ export default function DashboardClient() {
                                 );
                             })}
                         </ul>
+                    )}
+                    </div>
                     )}
                 </section>
             </div>
