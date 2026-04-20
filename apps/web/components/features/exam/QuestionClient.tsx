@@ -286,10 +286,18 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     }, [isReview, sessionId, reviewRecord, question.correctOption]);
 
     // EXP05: 解説表示時に解説エリアまでスムーススクロール
+    // prefers-reduced-motion: reduce のユーザーには smooth を強制せず、即時スクロールにフォールバックする
     useEffect(() => {
         if (showExplanation && explanationRef.current) {
             const t = setTimeout(() => {
-                explanationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const prefersReducedMotion =
+                    typeof window !== 'undefined' &&
+                    typeof window.matchMedia === 'function' &&
+                    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                explanationRef.current?.scrollIntoView({
+                    behavior: prefersReducedMotion ? 'auto' : 'smooth',
+                    block: 'start',
+                });
             }, 100);
             return () => clearTimeout(t);
         }
