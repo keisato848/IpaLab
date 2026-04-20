@@ -183,7 +183,7 @@ export default function AIAnswerBox({
                         <div className={styles.markdownBody}>
                             <ReactMarkdown
                                 remarkPlugins={[remarkGfm, remarkMath] as any}
-                                rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                                rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                             >
                                 {result.feedback}
                             </ReactMarkdown>
@@ -203,7 +203,7 @@ export default function AIAnswerBox({
                             <div className={styles.markdownBody}>
                                 <ReactMarkdown
                                     remarkPlugins={[remarkGfm, remarkMath] as any}
-                                    rehypePlugins={[rehypeKatex, rehypeRaw] as any}
+                                    rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                 >
                                     {result.improvedAnswer}
                                 </ReactMarkdown>
