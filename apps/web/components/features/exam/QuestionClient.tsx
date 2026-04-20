@@ -996,19 +996,45 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                             <div className={styles.explanationBody}>
                                 {(() => {
                                     // EXP08: 解説 Markdown を見出し（##, ###）単位で分割し details/summary でラップ
+                                    // フェンスコードブロック ( ``` / ~~~ ) 内の `##` や `###` は誤分割しないよう
+                                    // フェンス開閉をトラッキングし、フェンス内では heading 判定をスキップする。
                                     const raw = question.explanation || '(解説がありません)';
                                     const lines = raw.split(/\r?\n/);
                                     type Section = { heading: string | null; body: string };
                                     const sections: Section[] = [];
                                     let cur: Section = { heading: null, body: '' };
+                                    let inFence = false;
+                                    let fenceChar: '`' | '~' | null = null;
+                                    let fenceLength = 0;
+
                                     for (const line of lines) {
-                                        const m = line.match(/^(#{2,3})\s+(.+?)\s*$/);
-                                        if (m) {
-                                            if (cur.heading !== null || cur.body.trim() !== '') sections.push(cur);
-                                            cur = { heading: m[2], body: '' };
-                                        } else {
+                                        const fenceMatch = line.match(/^[ ]{0,3}([`~]{3,})/);
+                                        if (fenceMatch) {
+                                            const marker = fenceMatch[1];
+                                            const markerChar = marker[0] as '`' | '~';
+                                            if (!inFence) {
+                                                inFence = true;
+                                                fenceChar = markerChar;
+                                                fenceLength = marker.length;
+                                            } else if (fenceChar === markerChar && marker.length >= fenceLength) {
+                                                inFence = false;
+                                                fenceChar = null;
+                                                fenceLength = 0;
+                                            }
                                             cur.body += (cur.body ? '\n' : '') + line;
+                                            continue;
                                         }
+
+                                        if (!inFence) {
+                                            const m = line.match(/^(#{2,3})\s+(.+?)\s*$/);
+                                            if (m) {
+                                                if (cur.heading !== null || cur.body.trim() !== '') sections.push(cur);
+                                                cur = { heading: m[2], body: '' };
+                                                continue;
+                                            }
+                                        }
+
+                                        cur.body += (cur.body ? '\n' : '') + line;
                                     }
                                     if (cur.heading !== null || cur.body.trim() !== '') sections.push(cur);
 

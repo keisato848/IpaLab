@@ -651,8 +651,11 @@
     box-shadow: none;
     padding: 0;
 }
-/* Reserve space inside the inner widget header for the absolute toggle */
-.monthlyProgressWrapper > div > div > div:first-child {
+/* Reserve space inside the inner widget header for the absolute toggle.
+   Use a stable data-attribute on MonthlyProgressCard's header instead of a
+   deep descendant selector so small markup changes inside the widget do not
+   break the layout. */
+.monthlyProgressWrapper [data-monthly-card-header] {
     padding-right: 44px;
 }
 /* Heatmap card body must keep flex centering after collapse wrapping */
