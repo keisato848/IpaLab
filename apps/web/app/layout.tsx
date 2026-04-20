@@ -102,7 +102,7 @@ export default function RootLayout({
                         <AdProvider>
                             <ThemeProvider>
                                 <a href="#main-content" className="skip-link">本文へスキップ</a>
-                                <div id="main-content">{children}</div>
+                                <main id="main-content" tabIndex={-1}>{children}</main>
                                 <BottomNav />
                                 <AiAssistantLoader />
                             </ThemeProvider>
