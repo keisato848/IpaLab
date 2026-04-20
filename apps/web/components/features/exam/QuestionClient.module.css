@@ -416,28 +416,35 @@
  *       ネスト毎に累積するのが直接原因。
  * ------------------------------------------------------------------ */
 .markdownBody ul,
-.markdownBody ol {
+.markdownBody ol,
+.explanationBody ul,
+.explanationBody ol {
     padding-inline-start: clamp(1.1em, 4vw, 2em);
     margin-block: 0.5em 1em;
 }
 
-.markdownBody li {
+.markdownBody li,
+.explanationBody li {
     margin-block: 0.25em;
     line-height: 1.7;
 }
 
-.markdownBody li::marker {
+.markdownBody li::marker,
+.explanationBody li::marker {
     color: var(--text-secondary);
 }
 
 /* ネスト2段目以降は更に圧縮 */
 .markdownBody li > ul,
-.markdownBody li > ol {
+.markdownBody li > ol,
+.explanationBody li > ul,
+.explanationBody li > ol {
     padding-inline-start: clamp(0.9em, 3vw, 1.5em);
     margin-block: 0.25em 0.5em;
 }
 
-.markdownBody ol {
+.markdownBody ol,
+.explanationBody ol {
     list-style-position: outside;
 }
 
@@ -452,23 +459,40 @@
 }
 
 .markdownBody code {
+    /* `word-break: break-word` は非標準なので overflow-wrap: anywhere に統一 */
     overflow-wrap: anywhere;
-    word-break: break-word;
 }
 
+/*
+ * `display: block` に変更すると `border-collapse: collapse` が効かず
+ * セル境界が二重線になるため、テーブル表示は維持しつつ
+ * border-collapse: separate + 個別 border で見た目を再構築する。
+ * 横スクロールが必要な広いテーブルは max-width / overflow を維持。
+ */
 .markdownBody table {
     max-width: 100%;
-    display: block;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--border-color);
 }
 
 .markdownBody table th,
 .markdownBody table td {
     padding: 0.4em 0.6em;
-    border: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
     font-size: 0.95em;
+}
+
+.markdownBody table th:last-child,
+.markdownBody table td:last-child {
+    border-right: none;
+}
+
+.markdownBody table tr:last-child td {
+    border-bottom: none;
 }
 
 .markdownBody img {
