@@ -70,3 +70,46 @@ a {
   color: inherit;
   text-decoration: none;
 }
+/* PR-D: skip-to-content link (visually hidden until focused) */
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+    background: var(--primary-color, #6366f1);
+    color: #fff;
+    padding: 0.6rem 1rem;
+    border-radius: 0 0 8px 0;
+    text-decoration: none;
+    font-weight: 700;
+}
+.skip-link:focus {
+    left: 0;
+}
+
+/* PR-D: ensure interactive elements meet 44x44px */
+.iconButton {
+    background: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    color: inherit;
+}
+.iconButton:hover { background: rgba(0, 0, 0, 0.06); }
+.iconButton:focus-visible {
+    outline: 2px solid var(--primary-color, #6366f1);
+    outline-offset: 2px;
+}
+
+
+@media (max-width: 768px) {
+  body { padding-bottom: 64px; }
+}
+
