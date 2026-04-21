@@ -1,0 +1,221 @@
+.page {
+  --paper: #f8f3e8;
+  --paper-inner: #fdfaf2;
+  --ink: #1c1814;
+  --ink-soft: #4a4238;
+  --ink-mute: #857a68;
+  --seal: #b23a2f;
+  --seal-dark: #8b1e1e;
+  --line: #d4c9b3;
+  background: var(--paper);
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 38px,
+    rgba(196, 85, 74, 0.04) 38px,
+    rgba(196, 85, 74, 0.04) 39px
+  );
+  min-height: 100vh;
+  padding: 20px 16px 120px;
+  font-family: 'Noto Serif JP', 'Shippori Mincho B1', serif;
+  color: var(--ink);
+}
+
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.header {
+  border-top: 3px double var(--ink);
+  border-bottom: 3px double var(--ink);
+  padding: 18px 4px;
+  margin-bottom: 20px;
+  text-align: center;
+  background: var(--paper-inner);
+}
+.seal {
+  display: inline-block;
+  border: 2px solid var(--seal);
+  color: var(--seal);
+  padding: 2px 10px;
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  margin-bottom: 10px;
+}
+.title {
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 800;
+  font-size: 19px;
+  margin: 0 0 6px;
+  letter-spacing: 0.08em;
+}
+.sub {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.card {
+  background: var(--paper-inner);
+  border: 1px solid var(--line);
+  margin-bottom: 24px;
+  padding: 18px 16px;
+  position: relative;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--seal) 0%,
+    var(--seal) 15%,
+    transparent 15%,
+    transparent 85%,
+    var(--seal) 85%
+  );
+}
+.cardHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.cardLabel {
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: 0.08em;
+}
+.limit {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 11px;
+  color: var(--paper-inner);
+  background: #2f4a3a;
+  padding: 3px 10px;
+  letter-spacing: 0.1em;
+}
+
+.fields {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+}
+.fields label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+.fields select,
+.fields input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.btn {
+  flex: 1;
+  background: var(--seal);
+  color: #fff;
+  border: 1px solid var(--seal);
+  padding: 12px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn.secondary {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--ink-mute);
+}
+
+.results {
+  margin-top: 20px;
+}
+.resultsTitle {
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 800;
+  font-size: 16px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+  margin: 0 0 12px;
+}
+.summary {
+  background: var(--paper-inner);
+  border: 1px solid var(--line);
+  padding: 14px 16px;
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.totalScore {
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 800;
+  font-size: 36px;
+  color: var(--seal-dark);
+  font-variant-numeric: tabular-nums;
+}
+.rank {
+  display: inline-block;
+  padding: 6px 18px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: 0.2em;
+  border-radius: 2px;
+}
+.rank.A { background: #2f4a3a; }
+.rank.B { background: #3a5a8a; }
+.rank.C { background: #b23a2f; }
+.rank.D { background: #8b1e1e; }
+
+.errorBox {
+  background: rgba(178, 58, 47, 0.08);
+  border-left: 3px solid var(--seal);
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--seal-dark);
+}
+
+.subSection {
+  margin-top: 24px;
+}
+.subSection h3 {
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 700;
+  font-size: 15px;
+  border-left: 4px solid var(--seal);
+  padding-left: 10px;
+  margin: 0 0 12px;
+}
