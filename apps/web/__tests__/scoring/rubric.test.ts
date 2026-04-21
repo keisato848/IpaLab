@@ -231,6 +231,18 @@ describe('Issue #175: キーワード辞書', () => {
     expect(sample[0]).toHaveProperty('primary');
   });
 
+  it('全エントリが tier / source / evidence を持つ (監査可能性)', () => {
+    for (const [qid, entries] of Object.entries(SHORT_ANSWER_KEYWORD_DICTIONARY)) {
+      for (const e of entries) {
+        expect(e.tier, `${qid}/${e.primary}: tier`).toMatch(/^T[1-4]$/);
+        expect(e.source, `${qid}/${e.primary}: source`).toBeDefined();
+        expect(e.source.type, `${qid}/${e.primary}: source.type`).toBeTruthy();
+        expect(e.source.refs.length, `${qid}/${e.primary}: source.refs`).toBeGreaterThan(0);
+        expect(e.evidence, `${qid}/${e.primary}: evidence`).toBeTruthy();
+      }
+    }
+  });
+
   it('getRequiredKeywords: 未登録IDなら空配列', () => {
     expect(getRequiredKeywords('UNKNOWN-ID')).toEqual([]);
   });
@@ -239,27 +251,62 @@ describe('Issue #175: キーワード辞書', () => {
     const kws = getRequiredKeywords('AP-2023S-PM-01-q1');
     expect(kws.length).toBeGreaterThan(0);
     expect(kws[0]).toHaveProperty('primary');
+    expect(kws[0]).toHaveProperty('tier');
+  });
+
+  it('getKeywordsByTier: ティアで絞り込みできる', () => {
+    const t1 = Scoring.getKeywordsByTier('AP-2023S-PM-01-q1', ['T1']);
+    expect(t1.every((k) => k.tier === 'T1')).toBe(true);
+    const t1t2 = Scoring.getKeywordsByTier('AP-2023S-PM-01-q1', ['T1', 'T2']);
+    expect(t1t2.length).toBeGreaterThanOrEqual(t1.length);
+  });
+
+  it('TIER_DEFAULT_IMPORTANCE: T1>T2>T3>T4', () => {
+    const m = Scoring.TIER_DEFAULT_IMPORTANCE;
+    expect(m.T1).toBeGreaterThan(m.T2);
+    expect(m.T2).toBeGreaterThan(m.T3);
+    expect(m.T3).toBeGreaterThan(m.T4);
+    expect(m.T4).toBe(0);
   });
 
   it('detectMatchedKeywords: primary 一致を検出', () => {
-    const required = [{ primary: '多要素認証' }, { primary: '権限昇格' }];
+    const required = [
+      { primary: '多要素認証', tier: 'T1' as const, source: { type: 'ipa_official' as const, refs: ['x'] }, evidence: 'e' },
+      { primary: '権限昇格', tier: 'T2' as const, source: { type: 'ipa_model_answer' as const, refs: ['x'] }, evidence: 'e' },
+    ];
     const r = detectMatchedKeywords('多要素認証を導入することで対策する', required);
     expect(r.matched).toContain('多要素認証');
     expect(r.missing).toContain('権限昇格');
+    expect(r.byTier.T1.matched).toContain('多要素認証');
+    expect(r.byTier.T2.missing).toContain('権限昇格');
   });
 
   it('detectMatchedKeywords: synonym 一致でも primary が記録される', () => {
-    const required = [{ primary: '多要素認証', synonyms: ['MFA', '多段階認証'] }];
+    const required = [
+      {
+        primary: '多要素認証',
+        synonyms: ['MFA', '多段階認証'],
+        tier: 'T1' as const,
+        source: { type: 'ipa_official' as const, refs: ['x'] },
+        evidence: 'e',
+      },
+    ];
     const r = detectMatchedKeywords('MFA を全社で展開した', required);
     expect(r.matched).toEqual(['多要素認証']);
     expect(r.missing).toEqual([]);
+    expect(r.byTier.T1.matched).toEqual(['多要素認証']);
   });
 
   it('detectMatchedKeywords: 空文字列は全 missing', () => {
-    const required = [{ primary: 'A' }, { primary: 'B' }];
+    const required = [
+      { primary: 'A', tier: 'T1' as const, source: { type: 'ipa_official' as const, refs: ['x'] }, evidence: 'e' },
+      { primary: 'B', tier: 'T3' as const, source: { type: 'textbook' as const, refs: ['y'] }, evidence: 'e' },
+    ];
     const r = detectMatchedKeywords('', required);
     expect(r.matched).toEqual([]);
     expect(r.missing).toEqual(['A', 'B']);
+    expect(r.byTier.T1.missing).toEqual(['A']);
+    expect(r.byTier.T3.missing).toEqual(['B']);
   });
 });
 
