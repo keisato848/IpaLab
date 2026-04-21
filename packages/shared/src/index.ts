@@ -1,6 +1,9 @@
 // Export Models
 export * from './types/models';
 
+// Afternoon AI scoring (Issue #175)
+export * as Scoring from './scoring';
+
 export const sharedTest = () => {
     return "Hello from shared package!";
 };
