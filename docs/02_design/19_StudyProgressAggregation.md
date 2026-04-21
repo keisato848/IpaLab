@@ -139,3 +139,43 @@ interface DailyProgressAggregate {
 ## 10. 関連
 
 - #188 動的再計画エンジン / #194 統合ダッシュボード / #195 ストリーク機能
+
+---
+
+## 11. Phase 1 MVP実装 (#187)
+
+> Service Bus / Redis / Change Feed Processor を伴う完全構成は将来段階。Phase 1 では **on-demand 集計 + 任意永続化** の最小構成で再計画エンジン (#188) と編集UI (#189) を解禁する。
+
+### 11.1 構成
+
+LearningRecord (Cosmos) -> aggregateDailyProgress (純粋関数) -> GET /api/user-progress/daily (リアルタイム返却) / POST .../daily/recompute (DailyProgress に upsert)
+
+### 11.2 主要モジュール
+
+| モジュール | 役割 |
+|---|---|
+| apps/web/lib/progress/aggregateDailyProgress.ts | 純粋関数。LearningRecord → DailyProgress[] に変換。同 questionId は最新採用、UTC 日付集計、status 判定。 |
+| apps/web/lib/repositories/dailyProgressRepository.ts | Cosmos CRUD。upsert / upsertMany / findByUserAndDateRange |
+| apps/web/app/api/user-progress/daily/route.ts | GET: on-demand 集計を返す |
+| apps/web/app/api/user-progress/daily/recompute/route.ts | POST: 再集計して永続化 (冪等) |
+
+### 11.3 ステータス判定表
+
+| plannedCount | actual | status |
+|---:|---:|---|
+| 未指定 / 0 | 0 | none |
+| 未指定 / 0 | ≥1 | completed |
+| ≥1 | 0 | none |
+| ≥1 | < planned | partial |
+| ≥1 | ≥ planned | completed |
+
+### 11.4 認証
+
+- GET /api/user-progress/daily: NextAuth セッション必須。常に session.user.id を採用。
+- POST .../recompute: NextAuth セッション or x-recompute-secret ヘッダ。後者は管理用 (cron / 手動再集計) で body.userId を尊重。
+
+### 11.5 Phase 2 への発展
+
+- Layer A (Hot Path: Redis) の追加 → 当日分のレイテンシ削減
+- Layer B (バッチ): 現状の recompute を Azure Functions Timer / GitHub Actions cron からキック
+- ストリーク・派生メトリクスは別 Issue で summarizeDailyProgress を拡張
