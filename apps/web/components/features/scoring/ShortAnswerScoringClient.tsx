@@ -9,7 +9,10 @@
  */
 
 import { useMemo, useState } from 'react';
+import type { Scoring } from '@ipa-lab/shared';
+type ModelAnswerDiff = Scoring.ModelAnswerDiff;
 import { GenkoyoshiInput } from './GenkoyoshiInput';
+import { ModelAnswerDiffView } from './ModelAnswerDiffView';
 import { PerspectiveCard, PerspectiveCardData } from './PerspectiveCard';
 import { useScoringStream } from './useScoringStream';
 import styles from './ScoringPage.module.css';
@@ -19,6 +22,8 @@ export interface ShortAnswerSampleQuestion {
   label: string;
   charLimit: number;
   questionText: string;
+  /** 差分ハイライト用（クライアント側 diff フォールバックで使用） */
+  modelAnswer?: string;
 }
 
 export interface ShortAnswerScoringClientProps {
@@ -29,6 +34,7 @@ interface CompleteData {
   totalScore?: number;
   maxScore?: number;
   perspectiveScores?: PerspectiveCardData[];
+  modelAnswerDiff?: ModelAnswerDiff;
 }
 
 export function ShortAnswerScoringClient({ samples }: ShortAnswerScoringClientProps): JSX.Element {
@@ -159,6 +165,17 @@ export function ShortAnswerScoringClient({ samples }: ShortAnswerScoringClientPr
                     </span>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {complete && current?.modelAnswer && (
+              <div className={styles.subSection}>
+                <h3>模範解答との差分</h3>
+                <ModelAnswerDiffView
+                  userAnswer={answer}
+                  modelAnswer={current.modelAnswer}
+                  diff={complete.modelAnswerDiff}
+                />
               </div>
             )}
           </section>
