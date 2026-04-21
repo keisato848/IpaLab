@@ -31,6 +31,11 @@ const markdownComponents = {
             const rawChildren = String(children);
             let chartContent = he.decode(rawChildren).replace(/\n$/, '');
             chartContent = chartContent.replace(/(\n\s*)note:/gi, '$1%% note:');
+            // Fix node labels with special characters (< > <-  -> etc) by wrapping in quotes
+            chartContent = chartContent.replace(/(\w+)\[([^\]"]*(?:<-|->|<>|x\s+x)[^\]"]*)\]/g, (_match: string, nodeId: string, label: string) => {
+                // Wrap label in quotes to escape special characters
+                return `${nodeId}["${label}"]`;
+            });
             return <Mermaid chart={chartContent} />;
         }
         return <code className={className} {...props}>{children}</code>;

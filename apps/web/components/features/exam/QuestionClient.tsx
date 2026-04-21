@@ -592,6 +592,12 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 // Hotfix for common invalid mermaid syntax in datasets
                 // 1. Comment out "note:" lines that aren't valid formatting
                 chartContent = chartContent.replace(/(\n\s*)note:/gi, '$1%% note:');
+                // 2. Fix node labels with special characters (< > <-  -> etc) by wrapping in quotes
+                // Match patterns like: NodeId[label with special chars]
+                chartContent = chartContent.replace(/(\w+)\[([^\]"]*(?:<-|->|<>|x\s+x)[^\]"]*)\]/g, (_match: string, nodeId: string, label: string) => {
+                    // Wrap label in quotes to escape special characters
+                    return `${nodeId}["${label}"]`;
+                });
                 return <Mermaid chart={chartContent} />;
             }
             return !inline && match ? (
