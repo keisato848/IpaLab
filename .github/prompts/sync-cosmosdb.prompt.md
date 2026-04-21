@@ -73,6 +73,25 @@ npx tsx packages/data/src/scripts/sync-db.ts
 npx tsx packages/data/src/scripts/sync-db.ts --exam <試験ID>
 ```
 
+### 4.5. 同期結果の検証 (必須)
+
+`sync-db` の実行直後、IP 解放前に **必ず** カバレッジ検証を実行する。
+これは Issue #208 の「ローカル JSON はあるが Cosmos に未投入」のギャップを
+本番投入前に検出するためのガードレール。
+
+```powershell
+npx tsx packages/data/src/scripts/verify-data-coverage.ts
+```
+
+- 終了コード `0`: 全 examId に DB レコードあり (OK)
+- 終了コード `1`: ギャップ検出。問題の examId を確認して `sync-db --exam` で再投入
+- 終了コード `2`: 接続失敗 (IP 許可漏れ等)
+
+特定試験のみ確認する場合:
+```powershell
+npx tsx packages/data/src/scripts/verify-data-coverage.ts --exam SA-2024-Spring-PM1
+```
+
 ### 5. ファイアウォールから IP を削除
 
 同期完了後、追加した IP を必ず削除する。ステップ2で登録済みだった場合も削除する。
