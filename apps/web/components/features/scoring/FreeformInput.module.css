@@ -1,0 +1,56 @@
+.wrap {
+  margin: 8px 0 4px;
+}
+
+.input {
+  width: 100%;
+  min-height: 220px;
+  border: 2px solid #c4554a;
+  background: #fff;
+  padding: 12px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #1c1814;
+  resize: vertical;
+  outline: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 28px,
+    rgba(196, 85, 74, 0.35) 28px,
+    rgba(196, 85, 74, 0.35) 29px
+  );
+}
+.input:focus {
+  box-shadow: 0 0 0 3px rgba(196, 85, 74, 0.2);
+}
+
+.counter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 11px;
+  color: #857a68;
+  letter-spacing: 0.1em;
+}
+.counter .count {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.counter.under {
+  color: #857a68;
+}
+.counter.ok {
+  color: #2f4a3a;
+}
+.counter.over {
+  color: #b23a2f;
+  font-weight: 700;
+}
+.counter.fatal {
+  color: #8b1e1e;
+  font-weight: 700;
+}

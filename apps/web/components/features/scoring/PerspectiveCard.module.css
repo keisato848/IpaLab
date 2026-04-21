@@ -1,0 +1,91 @@
+.card {
+  background: #fdfaf2;
+  border: 1px solid #d4c9b3;
+  border-left: 4px solid #2f4a3a;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  color: #1c1814;
+  animation: cardIn 0.25s ease-out;
+}
+.card.error {
+  border-left-color: #b23a2f;
+}
+.card.streaming {
+  opacity: 0.6;
+}
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.name {
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: #1c1814;
+}
+.score {
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 800;
+  font-size: 22px;
+  color: #2f4a3a;
+  font-variant-numeric: tabular-nums;
+}
+.score.low {
+  color: #b23a2f;
+}
+.weight {
+  font-size: 11px;
+  color: #857a68;
+  letter-spacing: 0.05em;
+}
+
+.rationale {
+  margin: 6px 0;
+  line-height: 1.7;
+  color: #4a4238;
+}
+
+.kw {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.kwBadge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  background: rgba(47, 74, 58, 0.1);
+  color: #2f4a3a;
+}
+.kwBadge.missing {
+  background: rgba(178, 58, 47, 0.1);
+  color: #b23a2f;
+}
+
+.section {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #857a68;
+  letter-spacing: 0.05em;
+}
+.section strong {
+  color: #4a4238;
+  font-weight: 700;
+}
