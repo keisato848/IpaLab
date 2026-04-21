@@ -94,13 +94,4 @@ describe('POST /api/ai/scoring/afternoon/essay/v2 (skeleton)', () => {
     );
     expect(res.status).toBe(401);
   });
-  it('認証済みでも現状は 501', async () => {
-    const { getServerSession } = await import('next-auth');
-    (getServerSession as ReturnType<typeof vi.fn>).mockResolvedValue({ user: { id: 'u1' } });
-    const { POST } = await import('@/app/api/ai/scoring/afternoon/essay/v2/route');
-    const res = await POST(
-      new NextRequest('http://localhost/api/ai/scoring/afternoon/essay/v2', { method: 'POST' }),
-    );
-    expect(res.status).toBe(501);
-  });
 });
