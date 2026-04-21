@@ -1,0 +1,162 @@
+.root {
+  border: 1px solid var(--ipa-grid, #d6cdb8);
+  border-radius: 8px;
+  background: var(--ipa-paper, #fdfbf4);
+  padding: 12px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--ipa-grid, #d6cdb8);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--ipa-ink, #2c2620);
+}
+
+.tab.active {
+  border-bottom-color: var(--ipa-seal, #8b3a3a);
+  font-weight: 600;
+  color: var(--ipa-seal, #8b3a3a);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--ipa-seal, #8b3a3a);
+  outline-offset: 2px;
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.panels.single {
+  grid-template-columns: 1fr;
+}
+
+.panel {
+  border: 1px solid var(--ipa-grid, #d6cdb8);
+  border-radius: 6px;
+  padding: 10px;
+  background: #fff;
+}
+
+.panelHead {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--ipa-seal, #8b3a3a);
+}
+
+.text {
+  margin: 0;
+  line-height: 2;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+.seg {
+  background: transparent;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+
+.icon {
+  font-size: 10px;
+  margin-right: 2px;
+}
+
+/* 不足: オレンジ＋点線下線 */
+.addition {
+  color: #b85c1a;
+  background: rgba(249, 176, 81, 0.18);
+  text-decoration: underline dotted #b85c1a 2px;
+  text-underline-offset: 3px;
+}
+
+/* 過剰: 赤＋波線 */
+.deletion {
+  color: #a33;
+  background: rgba(200, 75, 75, 0.15);
+  text-decoration: line-through wavy #a33 1.5px;
+}
+
+/* 言い換え */
+.rephrasing {
+  color: #245a96;
+}
+
+.list {
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.listTerm {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ipa-seal, #8b3a3a);
+}
+
+.listItems {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.listItems li {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.emptyList {
+  padding: 12px;
+  text-align: center;
+  color: #666;
+  font-size: 13px;
+}
+
+/* 色覚多様性モード: ハッチパターンでも判別 */
+@media (prefers-contrast: more) {
+  .addition {
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent 0 4px,
+      rgba(184, 92, 26, 0.5) 4px 5px
+    );
+  }
+  .deletion {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent 0 4px,
+      rgba(170, 51, 51, 0.5) 4px 5px
+    );
+  }
+}
+
+.mobileOnly {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .panels {
+    grid-template-columns: 1fr;
+  }
+  .mobileOnly {
+    display: inline-block;
+  }
+}
