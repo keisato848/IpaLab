@@ -112,3 +112,28 @@ export const LearningRecordSchema = z.object({
 });
 
 export type LearningRecord = z.infer<typeof LearningRecordSchema>;
+
+// ---------- Daily Progress Aggregation (#187) ----------
+
+/** 日次進捗サマリ。`{userId}-{date}` を id とし userId を Partition Key とする。 */
+export const DailyProgressSchema = z.object({
+    id: z.string(), // `${userId}-${date}` (e.g. "user1-2026-04-21")
+    userId: z.string(),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), // YYYY-MM-DD (UTC)
+    questionCount: z.number().int().min(0),
+    correctCount: z.number().int().min(0),
+    accuracy: z.number().min(0).max(100), // 0-100
+    totalTimeSeconds: z.number().int().min(0),
+    sessionCount: z.number().int().min(0),
+    /** 試験種別ごとの内訳 (examId -> {count, correct}) */
+    examBreakdown: z.record(z.string(), z.object({
+        count: z.number().int().min(0),
+        correct: z.number().int().min(0),
+    })).default({}),
+    /** 計画タスクとの照合結果 */
+    plannedQuestionCount: z.number().int().min(0).optional(),
+    /** 完了状態 (none: 未着手 / partial: 部分完了 / completed: 計画達成) */
+    status: z.enum(['none', 'partial', 'completed']),
+    aggregatedAt: z.string().datetime(),
+});
+export type DailyProgress = z.infer<typeof DailyProgressSchema>;

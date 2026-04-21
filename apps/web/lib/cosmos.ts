@@ -10,6 +10,7 @@ const CONTAINER_PARTITION_KEYS: Record<string, string> = {
     Sessions: "/sessionToken",
     LearningRecords: "/userId",
     LearningSessions: "/userId",
+    DailyProgress: "/userId",
     Exams: "/id",
     ExamProgress: "/userId",
     Metrics: "/type",
