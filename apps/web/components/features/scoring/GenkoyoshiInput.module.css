@@ -1,0 +1,125 @@
+.wrap {
+  position: relative;
+  margin: 8px 0 4px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 0;
+  border: 2px solid var(--genko-grid, #c4554a);
+  background: #fff;
+  position: relative;
+  pointer-events: none;
+}
+.grid::before {
+  content: '';
+  position: absolute;
+  top: 6%;
+  bottom: 6%;
+  left: 50%;
+  width: 1px;
+  background: var(--genko-grid, #c4554a);
+  opacity: 0.5;
+}
+
+.cell {
+  aspect-ratio: 1 / 1;
+  border-right: 1px solid rgba(196, 85, 74, 0.35);
+  border-bottom: 1px solid rgba(196, 85, 74, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Noto Serif JP', 'Shippori Mincho B1', serif;
+  font-size: clamp(15px, 4.2vw, 22px);
+  font-weight: 500;
+  color: #1c1814;
+  background: transparent;
+  position: relative;
+  user-select: none;
+  min-height: 28px;
+}
+.cell:nth-child(10n) {
+  border-right: none;
+}
+.cell.filled {
+  background: rgba(28, 24, 20, 0.015);
+}
+.cell.overflow {
+  color: #b23a2f;
+  background: rgba(196, 85, 74, 0.1);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 16px;
+  resize: none;
+  overflow: hidden;
+  z-index: 3;
+  cursor: text;
+  -webkit-user-select: text;
+  user-select: text;
+  line-height: 1;
+}
+.overlay::selection {
+  background: rgba(196, 85, 74, 0.25);
+}
+
+.wrap.focused .grid {
+  box-shadow: 0 0 0 3px rgba(196, 85, 74, 0.25);
+}
+
+.tapHint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 11px;
+  color: #857a68;
+  letter-spacing: 0.2em;
+  opacity: 0.8;
+  z-index: 2;
+  transition: opacity 0.2s;
+}
+.wrap.hasContent .tapHint,
+.wrap.focused .tapHint {
+  opacity: 0;
+}
+
+.counter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 11px;
+  color: #857a68;
+  letter-spacing: 0.1em;
+}
+.counter .count {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.counter.near {
+  color: #b23a2f;
+}
+.counter.over {
+  color: #8b1e1e;
+  font-weight: 700;
+}
