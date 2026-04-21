@@ -588,10 +588,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             const match = /language-(\w+)/.exec(className || '');
             if (!inline && match && match[1] === 'mermaid') {
                 const rawChildren = String(children);
-                let chartContent = he.decode(rawChildren).replace(/\n$/, '');
-                // Hotfix for common invalid mermaid syntax in datasets
-                // 1. Comment out "note:" lines that aren't valid formatting
-                chartContent = chartContent.replace(/(\n\s*)note:/gi, '$1%% note:');
+                const chartContent = he.decode(rawChildren).replace(/\n$/, '');
                 return <Mermaid chart={chartContent} />;
             }
             return !inline && match ? (

@@ -3,6 +3,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { sanitizeMermaid } from '@/lib/mermaid/sanitize';
 
 const DiagramViewerModal = dynamic(() => import('./DiagramViewerModal'), { ssr: false });
 
@@ -37,8 +38,8 @@ const Mermaid: React.FC<MermaidProps> = ({ chart }) => {
                 if (!ref.current) return;
 
                 const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
-                // Use renderAsync or render
-                const { svg } = await mermaid.render(id, chart);
+                const sanitized = sanitizeMermaid(chart);
+                const { svg } = await mermaid.render(id, sanitized);
 
                 if (isMounted) {
                     setSvg(svg);
