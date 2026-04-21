@@ -29,8 +29,7 @@ const markdownComponents = {
         const match = /language-(\w+)/.exec(className || '');
         if (!inline && match && match[1] === 'mermaid') {
             const rawChildren = String(children);
-            let chartContent = he.decode(rawChildren).replace(/\n$/, '');
-            chartContent = chartContent.replace(/(\n\s*)note:/gi, '$1%% note:');
+            const chartContent = he.decode(rawChildren).replace(/\n$/, '');
             return <Mermaid chart={chartContent} />;
         }
         return <code className={className} {...props}>{children}</code>;
