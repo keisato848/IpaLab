@@ -9,6 +9,10 @@ import {
   scoreToRank,
 } from './rubrics/essay';
 import { SHORT_ANSWER_RUBRIC } from './rubrics/shortAnswer';
+import {
+  KEYWORD_COVERAGE_PENALTIES,
+  type MatchResult,
+} from './keywords/dictionary';
 
 /**
  * 採点結果アグリゲータ
@@ -19,6 +23,35 @@ import { SHORT_ANSWER_RUBRIC } from './rubrics/shortAnswer';
  */
 
 // ---------- 系統A ----------
+
+/**
+ * `keyword_coverage` 観点のスコア (0-100) を、ティア別ミス数から決定論的に算出する。
+ *
+ * これは LLM 採点と独立した **ルールベース下限値** として機能する：
+ *  - LLM が緩く採点しても T1/T2 が欠落していれば本関数で確実に減点される
+ *  - 採点の説明可能性を担保（「T1: 多要素認証 missing → -25」をUIで表示可能）
+ *
+ * バックエンド (#176) では LLM 観点スコアと本関数の値の min を採用する想定:
+ *   `final_keyword_coverage = min(llm_score, scoreKeywordCoverage(matchResult))`
+ *
+ * @param match `detectMatchedKeywords` の戻り値
+ * @returns 0-100 のスコア + 内訳 (UIフィードバック用)
+ */
+export function scoreKeywordCoverage(match: MatchResult): {
+  score: number;
+  penalties: { tier: 'T1' | 'T2' | 'T3'; missCount: number; deduction: number }[];
+} {
+  const penalties: { tier: 'T1' | 'T2' | 'T3'; missCount: number; deduction: number }[] = [];
+  let totalDeduction = 0;
+  for (const tier of ['T1', 'T2', 'T3'] as const) {
+    const missCount = match.byTier[tier].missing.length;
+    const deduction = missCount * KEYWORD_COVERAGE_PENALTIES[tier];
+    if (missCount > 0) penalties.push({ tier, missCount, deduction });
+    totalDeduction += deduction;
+  }
+  const score = Math.max(0, 100 - totalDeduction);
+  return { score, penalties };
+}
 
 /**
  * 系統A: 観点別スコアから 0-100 の加重平均を算出

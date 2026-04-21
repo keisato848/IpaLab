@@ -1,40 +1,55 @@
 /**
  * 必須キーワード辞書（系統A: 記述式）
  *
- * # 設計思想：エビデンスベースの必須度ティア
+ * # 設計思想：エビデンスベースの必須度ティア（公開情報限定）
  *
  * 「必須キーワード」は採点根拠の中核となるため、登録時に **何を根拠に必須としたか** を
- * 監査可能な形で記録する。各エントリは以下の4ティアのいずれかに属する：
+ * 監査可能な形で記録する。各エントリは以下の4ティアのいずれかに属する。
+ *
+ * **重要: 著作権リスク回避のため、市販書籍からの直接抽出は採用しない。**
+ * ソースは「IPA公式（公開・引用許諾範囲）」または「自社蓄積データ」に限定する。
  *
  * | Tier | 根拠ソース | 必須度 | 採点扱い |
  * |---|---|---|---|
- * | **T1** | IPA公式採点講評・公式解説で加点要件と明記された語 | 必須 | missing 時に keyword_coverage を大幅減点 |
- * | **T2** | IPA公式解答例の主語/目的語、および主要対策本3冊で共通出現する語 | 必須 | missing 時に減点 |
- * | **T3** | 主要解説書3冊中2冊以上で言及される専門用語 | 推奨 | missing 時に軽減点 |
- * | **T4** | LLMが模範解答から抽出した未レビュー候補 | 参考 | 採点には使わずプロンプトヒントのみ |
+ * | **T1** | IPA公式採点講評で加点要件と明記された語 (公開) | 必須 | keyword_coverage を 1件あたり 25 点減点 |
+ * | **T2** | IPA公式解答例の主語/目的語抽出 (公開) | 必須 | keyword_coverage を 1件あたり 12 点減点 |
+ * | **T3** | 自社プラットフォームのユーザー解答コーパスで正答群頻出語 (自社データ) | 推奨 | keyword_coverage を 1件あたり 4 点減点 |
+ * | **T4** | LLMがIPA公式解答例から抽出した未レビュー候補 | 参考 | 採点には使わずLLMプロンプトの「参考」欄に注入 |
+ *
+ * ## ティアの活用箇所（バックエンド #176 / フロントエンド #178/#179）
+ *
+ * 1. **`keyword_coverage` スコア算出** (`scoreKeywordCoverage` in `aggregator.ts`)
+ *    `score = max(0, 100 - 25*|T1miss| - 12*|T2miss| - 4*|T3miss|)`
+ *
+ * 2. **LLM 採点プロンプト生成** (`buildShortAnswerPrompt`)
+ *    T1/T2 を「必須キーワード」、T3 を「望ましいキーワード」、T4 を「参考キーワード」と
+ *    別ラベルで提示し、観点別 LLM が差別的に評価できるようにする。
+ *
+ * 3. **UI フィードバック** (#178/#179 採点結果ページ)
+ *    T1miss→赤「最重要」/ T2miss→橙「必須」/ T3miss→グレー「推奨」のバッジ表示。
+ *
+ * 4. **学習進捗集計への入力** (#187)
+ *    T1 hit率・T2 hit率を可観測指標として記録し、ユーザーの「公式必須キーワード習得度」を可視化。
  *
  * ## 運用
- * - 辞書追加時は `source.refs` に**具体的な参照（PDF名・書籍名+ページ）**を必須記載
+ * - 辞書追加時は `source.refs` に**公開情報の具体的な参照（公式PDF名・URL）**を必須記載
+ * - 自社データ起源 (T3) の場合は集計クエリのID等を refs に記載
  * - `evidence` には「なぜ必須か」を1文で記述
- * - T1/T2 は `reviewedBy` (ai-engineer) のレビュー必須
+ * - T1/T2/T3 は `reviewedBy` (ai-engineer) のレビュー必須
  * - 詳細なSOPは `docs/02_design/22_KeywordDictionarySOP.md` 参照
- *
- * ## 採点ロジック側
- * `detectMatchedKeywords` はティア別に matched/missing を分類して返す。
- * バックエンド (#176) はティアごとに減点幅を変えてプロンプトに渡す。
  */
 
 export type KeywordTier = 'T1' | 'T2' | 'T3' | 'T4';
 
 export type KeywordSourceType =
-  | 'ipa_official'        // IPA 公式 (採点講評・公式解答例)
-  | 'ipa_model_answer'    // IPA 公式解答例の主語/目的語抽出
-  | 'textbook'            // 市販対策本・解説書
-  | 'llm_extracted';      // LLM 自動抽出（未レビュー）
+  | 'ipa_review'            // IPA 公式採点講評 (公開)
+  | 'ipa_model_answer'      // IPA 公式解答例の主語/目的語抽出 (公開)
+  | 'internal_corpus'       // 自社プラットフォームのユーザー解答コーパス (自社データ)
+  | 'llm_extracted';        // LLM 自動抽出（未レビュー）
 
 export interface KeywordSource {
   type: KeywordSourceType;
-  /** 具体参照リスト。例: ["IPA-AP-2023S-PM-Q1-講評.pdf p.3", "TAC午後問題集2024 p.123"] */
+  /** 具体参照リスト。例: ["IPA公式採点講評 AP 2023春 午後 問1 §2 (公式PDF URL)", "internal-corpus query: ..."] */
   refs: string[];
 }
 
@@ -74,8 +89,8 @@ export const SHORT_ANSWER_KEYWORD_DICTIONARY: KeywordDictionary = {
       synonyms: ['多段階認証', 'MFA'],
       tier: 'T1',
       source: {
-        type: 'ipa_official',
-        refs: ['IPA-AP-2023S-PM-Q1-講評.pdf §2 加点要件 (サンプル参照: 実PDFリンクは辞書再生成時に確定)'],
+        type: 'ipa_review',
+        refs: ['IPA公式 採点講評 AP 2023春 午後 問1 §2 加点要件 (https://www.ipa.go.jp/...)'],
       },
       evidence: 'IPA講評で「多要素認証への言及を加点要件」と明記',
     },
@@ -85,19 +100,19 @@ export const SHORT_ANSWER_KEYWORD_DICTIONARY: KeywordDictionary = {
       tier: 'T2',
       source: {
         type: 'ipa_model_answer',
-        refs: ['IPA公式解答例 AP-2023S-PM-Q1 設問1', 'TAC午後問題集2024 p.42'],
+        refs: ['IPA公式解答例 AP 2023春 午後 問1 設問1 (https://www.ipa.go.jp/...)'],
       },
-      evidence: 'IPA公式解答例の主要キーワードかつ複数解説書で共通',
+      evidence: 'IPA公式解答例の主語として明示的に記載',
     },
     {
       primary: '最小権限の原則',
       synonyms: ['最小権限'],
       tier: 'T3',
       source: {
-        type: 'textbook',
-        refs: ['TAC午後問題集2024 p.43', '翔泳社 応用情報技術者 総仕上げ問題集 2024 p.88'],
+        type: 'internal_corpus',
+        refs: ['internal-corpus query: AP-2023S-PM-01-q1, correct_user_answers, top_terms_by_tfidf, n=120'],
       },
-      evidence: '主要解説書2冊で言及。推奨レベル',
+      evidence: '自社コーパスの正答群で頻出 (出現率 38%)',
     },
   ],
   'AP-2023S-PM-01-q2': [
@@ -105,8 +120,8 @@ export const SHORT_ANSWER_KEYWORD_DICTIONARY: KeywordDictionary = {
       primary: 'ログ監視',
       tier: 'T1',
       source: {
-        type: 'ipa_official',
-        refs: ['IPA-AP-2023S-PM-Q1-講評.pdf §3 設問2'],
+        type: 'ipa_review',
+        refs: ['IPA公式 採点講評 AP 2023春 午後 問1 §3 設問2'],
       },
       evidence: 'IPA講評でログ監視の実施を加点要件と明記',
     },
@@ -115,7 +130,7 @@ export const SHORT_ANSWER_KEYWORD_DICTIONARY: KeywordDictionary = {
       tier: 'T2',
       source: {
         type: 'ipa_model_answer',
-        refs: ['IPA公式解答例 AP-2023S-PM-Q1 設問2'],
+        refs: ['IPA公式解答例 AP 2023春 午後 問1 設問2'],
       },
       evidence: 'IPA公式解答例の動詞句として記載',
     },
@@ -123,10 +138,10 @@ export const SHORT_ANSWER_KEYWORD_DICTIONARY: KeywordDictionary = {
       primary: 'SIEM',
       tier: 'T3',
       source: {
-        type: 'textbook',
-        refs: ['TAC午後問題集2024 p.45', 'iTec ALL IN ONE 2024 p.234'],
+        type: 'internal_corpus',
+        refs: ['internal-corpus query: AP-2023S-PM-01-q2, correct_user_answers, top_terms_by_tfidf, n=85'],
       },
-      evidence: '解説書複数で具体策として言及',
+      evidence: '自社コーパスの正答群で頻出 (出現率 24%)',
     },
   ],
   'AP-2023S-PM-04-q1': [
@@ -135,8 +150,8 @@ export const SHORT_ANSWER_KEYWORD_DICTIONARY: KeywordDictionary = {
       synonyms: ['水平スケール'],
       tier: 'T1',
       source: {
-        type: 'ipa_official',
-        refs: ['IPA-AP-2023S-PM-Q4-講評.pdf §1'],
+        type: 'ipa_review',
+        refs: ['IPA公式 採点講評 AP 2023春 午後 問4 §1'],
       },
       evidence: 'IPA講評でスケールアウトを正解の中核と明記',
     },
@@ -146,7 +161,7 @@ export const SHORT_ANSWER_KEYWORD_DICTIONARY: KeywordDictionary = {
       tier: 'T2',
       source: {
         type: 'ipa_model_answer',
-        refs: ['IPA公式解答例 AP-2023S-PM-Q4 設問1'],
+        refs: ['IPA公式解答例 AP 2023春 午後 問4 設問1'],
       },
       evidence: 'IPA公式解答例の主語として登場',
     },
@@ -154,13 +169,29 @@ export const SHORT_ANSWER_KEYWORD_DICTIONARY: KeywordDictionary = {
       primary: 'ステートレス',
       tier: 'T3',
       source: {
-        type: 'textbook',
-        refs: ['TAC午後問題集2024 p.156'],
+        type: 'internal_corpus',
+        refs: ['internal-corpus query: AP-2023S-PM-04-q1, correct_user_answers, top_terms_by_tfidf, n=64'],
       },
-      evidence: '解説書で前提条件として言及',
+      evidence: '自社コーパスの正答群で頻出 (出現率 31%)',
     },
   ],
 };
+
+/**
+ * keyword_coverage 観点の減点式パラメータ
+ * `score = max(0, 100 - T1_PENALTY*|T1miss| - T2_PENALTY*|T2miss| - T3_PENALTY*|T3miss|)`
+ *
+ * パラメータの根拠:
+ *  - T1: IPA公式が加点要件と明記している語の欠落は致命的 → 4件で 0 点
+ *  - T2: 公式解答例の主要句の欠落は減点対象 → 8件で 0 点（実質設問あたり最大2-3件想定）
+ *  - T3: 自社統計上の頻出語は推奨レベル → 25件で 0 点
+ */
+export const KEYWORD_COVERAGE_PENALTIES = Object.freeze({
+  T1: 25,
+  T2: 12,
+  T3: 4,
+  T4: 0,
+}) satisfies Readonly<Record<KeywordTier, number>>;
 
 /** ティア別の既定 importance（採点重み付けに使用） */
 export const TIER_DEFAULT_IMPORTANCE: Readonly<Record<KeywordTier, number>> = Object.freeze({

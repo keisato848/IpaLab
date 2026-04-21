@@ -271,7 +271,7 @@ describe('Issue #175: キーワード辞書', () => {
 
   it('detectMatchedKeywords: primary 一致を検出', () => {
     const required = [
-      { primary: '多要素認証', tier: 'T1' as const, source: { type: 'ipa_official' as const, refs: ['x'] }, evidence: 'e' },
+      { primary: '多要素認証', tier: 'T1' as const, source: { type: 'ipa_review' as const, refs: ['x'] }, evidence: 'e' },
       { primary: '権限昇格', tier: 'T2' as const, source: { type: 'ipa_model_answer' as const, refs: ['x'] }, evidence: 'e' },
     ];
     const r = detectMatchedKeywords('多要素認証を導入することで対策する', required);
@@ -287,7 +287,7 @@ describe('Issue #175: キーワード辞書', () => {
         primary: '多要素認証',
         synonyms: ['MFA', '多段階認証'],
         tier: 'T1' as const,
-        source: { type: 'ipa_official' as const, refs: ['x'] },
+        source: { type: 'ipa_review' as const, refs: ['x'] },
         evidence: 'e',
       },
     ];
@@ -299,8 +299,8 @@ describe('Issue #175: キーワード辞書', () => {
 
   it('detectMatchedKeywords: 空文字列は全 missing', () => {
     const required = [
-      { primary: 'A', tier: 'T1' as const, source: { type: 'ipa_official' as const, refs: ['x'] }, evidence: 'e' },
-      { primary: 'B', tier: 'T3' as const, source: { type: 'textbook' as const, refs: ['y'] }, evidence: 'e' },
+      { primary: 'A', tier: 'T1' as const, source: { type: 'ipa_review' as const, refs: ['x'] }, evidence: 'e' },
+      { primary: 'B', tier: 'T3' as const, source: { type: 'internal_corpus' as const, refs: ['y'] }, evidence: 'e' },
     ];
     const r = detectMatchedKeywords('', required);
     expect(r.matched).toEqual([]);
@@ -308,10 +308,80 @@ describe('Issue #175: キーワード辞書', () => {
     expect(r.byTier.T1.missing).toEqual(['A']);
     expect(r.byTier.T3.missing).toEqual(['B']);
   });
+
+  it('seed 辞書は公開情報のみ参照（書籍出版社が出現しない）', () => {
+    const dict = Scoring.SHORT_ANSWER_KEYWORD_DICTIONARY;
+    const allRefs = Object.values(dict).flat().flatMap(e => e.source.refs).join('\n');
+    expect(allRefs).not.toMatch(/TAC|翔泳社|iTec|出版/);
+    const allTypes = new Set(Object.values(dict).flat().map(e => e.source.type));
+    expect(allTypes.has('textbook' as never)).toBe(false);
+    for (const t of allTypes) {
+      expect(['ipa_review', 'ipa_model_answer', 'internal_corpus', 'llm_extracted']).toContain(t);
+    }
+  });
+});
+
+describe('Issue #175: scoreKeywordCoverage (ティア別減点)', () => {
+  const make = (
+    t1m: string[] = [], t2m: string[] = [], t3m: string[] = [],
+    t1ok: string[] = [], t2ok: string[] = [], t3ok: string[] = []
+  ): Scoring.MatchResult => ({
+    matched: [...t1ok, ...t2ok, ...t3ok],
+    missing: [...t1m, ...t2m, ...t3m],
+    byTier: {
+      T1: { matched: t1ok, missing: t1m },
+      T2: { matched: t2ok, missing: t2m },
+      T3: { matched: t3ok, missing: t3m },
+      T4: { matched: [], missing: [] },
+    },
+  });
+
+  it('全 hit 時は 100 点', () => {
+    const r = Scoring.scoreKeywordCoverage(make([], [], [], ['a'], ['b'], ['c']));
+    expect(r.score).toBe(100);
+    expect(r.penalties).toEqual([]);
+  });
+
+  it('T1 1件 missing → -25 = 75点', () => {
+    const r = Scoring.scoreKeywordCoverage(make(['x']));
+    expect(r.score).toBe(75);
+    expect(r.penalties).toEqual([{ tier: 'T1', missCount: 1, deduction: 25 }]);
+  });
+
+  it('T1=2 + T2=1 + T3=2 → 100 - 50 - 12 - 8 = 30点', () => {
+    const r = Scoring.scoreKeywordCoverage(make(['a', 'b'], ['c'], ['d', 'e']));
+    expect(r.score).toBe(30);
+    expect(r.penalties).toHaveLength(3);
+  });
+
+  it('合計減点が100超でも下限0でクランプ', () => {
+    const r = Scoring.scoreKeywordCoverage(make(['a', 'b', 'c', 'd', 'e']));
+    expect(r.score).toBe(0);
+  });
+
+  it('T4 missing は減点に影響しない', () => {
+    const match: Scoring.MatchResult = {
+      matched: [], missing: ['x'],
+      byTier: {
+        T1: { matched: [], missing: [] },
+        T2: { matched: [], missing: [] },
+        T3: { matched: [], missing: [] },
+        T4: { matched: [], missing: ['x'] },
+      },
+    };
+    expect(Scoring.scoreKeywordCoverage(match).score).toBe(100);
+  });
+
+  it('KEYWORD_COVERAGE_PENALTIES: T1>T2>T3, T4=0', () => {
+    const p = Scoring.KEYWORD_COVERAGE_PENALTIES;
+    expect(p.T1).toBeGreaterThan(p.T2);
+    expect(p.T2).toBeGreaterThan(p.T3);
+    expect(p.T4).toBe(0);
+  });
 });
 
 describe('Issue #175: 採点プロンプト雛形', () => {
-  it('buildShortAnswerPrompt: 必須要素を含む', () => {
+  it('buildShortAnswerPrompt: 必須要素を含む (string[] 互換モード)', () => {
     const p = buildShortAnswerPrompt({
       perspective: SHORT_ANSWER_PERSPECTIVE_MAP.keyword_coverage,
       questionText: 'Qテキスト',
@@ -327,6 +397,23 @@ describe('Issue #175: 採点プロンプト雛形', () => {
     expect(p).toContain('100字以内');
     expect(p).toContain('ユーザー解答');
     expect(p).toContain('JSON');
+  });
+
+  it('buildShortAnswerPrompt: KeywordEntry[] はティアラベル付きで整形される', () => {
+    const p = buildShortAnswerPrompt({
+      perspective: SHORT_ANSWER_PERSPECTIVE_MAP.keyword_coverage,
+      questionText: 'Q', modelAnswer: 'M',
+      requiredKeywords: [
+        { primary: 'K1', tier: 'T1', source: { type: 'ipa_review', refs: ['x'] }, evidence: 'e' },
+        { primary: 'K3', tier: 'T3', source: { type: 'internal_corpus', refs: ['y'] }, evidence: 'e' },
+      ],
+      charLimit: 50, userAnswer: 'U',
+    });
+    expect(p).toContain('【最重要・IPA公式講評の加点要件】');
+    expect(p).toContain('K1');
+    expect(p).toContain('【推奨・自社統計の頻出語】');
+    expect(p).toContain('K3');
+    expect(p).toContain('T1)>必須(T2)>推奨(T3)');
   });
 
   it('buildShortAnswerPrompt: キーワード未指定時は「（指定なし）」', () => {
