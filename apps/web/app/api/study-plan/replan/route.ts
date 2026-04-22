@@ -62,9 +62,15 @@ const StudyPlanShape = z
     })
     .passthrough();
 
+const ManualMoveSchema = z.object({
+    fromDate: DateString,
+    toDate: DateString,
+});
+
 const BodySchema = z.object({
     plan: StudyPlanShape,
     today: DateString.optional(),
+    manualMoves: z.array(ManualMoveSchema).optional(),
 });
 
 function todayUtc(): string {
@@ -107,7 +113,7 @@ export async function POST(request: NextRequest) {
             to: today,
         });
 
-        const result = replan({ plan, dailyProgress, today });
+        const result = replan({ plan, dailyProgress, today, manualMoves: parsed.data.manualMoves });
         return NextResponse.json(result);
     } catch (e) {
         const message = e instanceof Error ? e.message : 'Internal Error';

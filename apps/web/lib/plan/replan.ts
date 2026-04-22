@@ -30,13 +30,13 @@ export interface ReplanMove {
     fromDate: string;
     toDate: string;
     questionCount: number;
-    reason: 'unfulfilled_carry_forward' | 'capacity_overflow_pushed';
+    reason: 'unfulfilled_carry_forward' | 'capacity_overflow_pushed' | 'manual_move';
 }
 
 export interface ReplanOverflow {
     fromDate: string;
     questionCount: number;
-    reason: 'no_future_capacity' | 'past_exam_date';
+    reason: 'no_future_capacity' | 'past_exam_date' | 'manual_move_invalid';
 }
 
 export interface ReplanDiff {
@@ -44,6 +44,8 @@ export interface ReplanDiff {
     overflowed: ReplanOverflow[];
     totalDebtQuestions: number;
     redistributedQuestions: number;
+    /** v1.5: manualMoves で適用された件数 */
+    manualMovesApplied?: number;
 }
 
 export interface ReplanResult {
@@ -51,7 +53,17 @@ export interface ReplanResult {
     diff: ReplanDiff;
     warnings: string[];
     generatedAt: string;
-    algorithmVersion: '1.0';
+    algorithmVersion: '1.0' | '1.5';
+}
+
+/**
+ * v1.5: ユーザが D&D / 移動ボタンで指示した「タスク単位の移動」。
+ * fromDate / toDate はいずれも `today` 以降かつ `examDate` 以前である必要がある。
+ * 不正な move は overflowed (reason: 'manual_move_invalid') として返却される。
+ */
+export interface ManualMove {
+    fromDate: string;
+    toDate: string;
 }
 
 export interface ReplanInput {
@@ -60,6 +72,8 @@ export interface ReplanInput {
     dailyProgress: DailyProgress[];
     /** 今日の日付 YYYY-MM-DD (UTC)。 */
     today: string;
+    /** v1.5: タスク単位の手動移動指示。空配列または未指定なら v1.0 と同等の挙動 */
+    manualMoves?: ManualMove[];
     options?: ReplanOptions;
 }
 
@@ -76,6 +90,7 @@ export function replan(input: ReplanInput): ReplanResult {
     const opts = { ...DEFAULT_OPTS, ...(input.options ?? {}) };
     const now = (input.options?.now ?? (() => new Date().toISOString()))();
     const { plan, dailyProgress, today } = input;
+    const manualMoves = input.manualMoves ?? [];
 
     const progressByDate = new Map<string, DailyProgress>();
     for (const p of dailyProgress) progressByDate.set(p.date, p);
@@ -109,11 +124,41 @@ export function replan(input: ReplanInput): ReplanResult {
 
     futureDays.sort((a, b) => a.date.localeCompare(b.date));
 
-    // --- 2. debt をグリーディに未来日へ詰め込む ---------------------------------------
-    // タスク完了状態 (各 future day の現在割当量)
+    // 各 future day の現在割当量
     const assigned = new Map<string, number>();
     for (const d of futureDays) assigned.set(d.date, d.planned);
 
+    // --- 1.5. manualMoves を先に適用 -------------------------------------------
+    let manualMovesApplied = 0;
+    const futureDateSet = new Set(futureDays.map((d) => d.date));
+    for (const mv of manualMoves) {
+        const fromValid = futureDateSet.has(mv.fromDate);
+        const toValid = futureDateSet.has(mv.toDate);
+        if (!fromValid || !toValid || mv.fromDate === mv.toDate) {
+            const fromQty = assigned.get(mv.fromDate) ?? 0;
+            if (fromQty > 0) {
+                overflowed.push({
+                    fromDate: mv.fromDate,
+                    questionCount: fromQty,
+                    reason: 'manual_move_invalid',
+                });
+            }
+            continue;
+        }
+        const qty = assigned.get(mv.fromDate) ?? 0;
+        if (qty <= 0) continue;
+        assigned.set(mv.fromDate, 0);
+        assigned.set(mv.toDate, (assigned.get(mv.toDate) ?? 0) + qty);
+        moved.push({
+            fromDate: mv.fromDate,
+            toDate: mv.toDate,
+            questionCount: qty,
+            reason: 'manual_move',
+        });
+        manualMovesApplied += 1;
+    }
+
+    // --- 2. debt をグリーディに未来日へ詰め込む ---------------------------------------
     let remaining = totalDebt;
     for (const debt of pastDebts) {
         let toRedistribute = debt.debt;
@@ -176,9 +221,10 @@ export function replan(input: ReplanInput): ReplanResult {
             overflowed,
             totalDebtQuestions: totalDebt,
             redistributedQuestions: totalDebt - remaining,
+            manualMovesApplied,
         },
         warnings,
         generatedAt: now,
-        algorithmVersion: '1.0',
+        algorithmVersion: manualMoves.length > 0 ? '1.5' : '1.0',
     };
 }
