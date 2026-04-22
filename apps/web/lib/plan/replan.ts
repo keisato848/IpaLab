@@ -90,7 +90,7 @@ export function replan(input: ReplanInput): ReplanResult {
     const pastDebts: { date: string; debt: number }[] = [];
 
     plan.weeklySchedule.forEach((week, wi) => {
-        week.dailyTasks.forEach((task, ti) => {
+        (week.dailyTasks ?? []).forEach((task, ti) => {
             if (task.date < today) {
                 const actual = progressByDate.get(task.date)?.questionCount ?? 0;
                 const required = Math.ceil(task.questionCount * opts.completionThreshold);
@@ -147,7 +147,7 @@ export function replan(input: ReplanInput): ReplanResult {
         ...plan,
         weeklySchedule: plan.weeklySchedule.map((week) => ({
             ...week,
-            dailyTasks: week.dailyTasks.map((task) => {
+            dailyTasks: (week.dailyTasks ?? []).map((task) => {
                 if (task.date < today) return { ...task };
                 if (task.date > plan.examDate) return { ...task };
                 const newCount = assigned.get(task.date) ?? task.questionCount;

@@ -1,3 +1,6 @@
+import type { StudyPlan } from '@/lib/types/studyPlan';
+export type { StudyPlan, MonthlyGoal, DailyTask, WeeklyScheduleItem, Difficulty } from '@/lib/types/studyPlan';
+
 const isClient = typeof window !== 'undefined';
 
 export function normalizeApiBase(baseUrl: string): string {
@@ -106,46 +109,6 @@ export interface StudyPlanJob {
     completedAt?: string;
     notifiedAt?: string; // ユーザーに通知した時刻
     dismissed?: boolean; // ユーザーが通知を破棄した場合
-}
-
-export interface MonthlyGoal {
-    id: string;
-    label: string;
-    type: 'questionCount' | 'accuracy' | 'studyDays' | 'correctCount' | 'custom';
-    targetValue: number;
-    unit: string;
-    iconEmoji: string;
-}
-
-export interface StudyPlan {
-    title: string;
-    examDate: string;
-    hoursWeekday?: number; // 平日の学習時間
-    hoursWeekend?: number; // 休日の学習時間
-    monthlyGoal: string; // Current month's goal (summary text, backward compat)
-    monthlyGoals?: MonthlyGoal[]; // Quantitative mid-term targets
-    weeklySchedule: {
-        weekNumber: number;
-        startDate: string; // ISO Date
-        endDate: string; // ISO Date
-        theme?: string; // 週のテーマ（例: ネットワーク基礎）
-        goal: string;
-        dailyTasks: {
-            date: string; // ISO Date "YYYY-MM-DD"
-            missionTitle?: string; // ミッション名（ゲーム風）
-            goal: string;
-            questionCount: number;
-            targetCategory?: string; // e.g. "セキュリティ"
-            targetExamId?: string; // e.g. "AP-2023-Fall"
-            difficulty?: 'easy' | 'normal' | 'hard'; // 難易度
-            xpReward?: number; // 獲得XP
-            isCompleted?: boolean; // 完了フラグ（クライアント側で管理）
-        }[];
-        focus?: string; // "Weakness Reinforcement"
-    }[];
-    generatedAt: string;
-    // ゲーミフィケーション用累計（クライアント側で計算）
-    totalXpEarned?: number;
 }
 
 /**
