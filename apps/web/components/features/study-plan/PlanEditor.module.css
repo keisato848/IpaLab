@@ -1,0 +1,258 @@
+/**
+ * StudyPlan 編集 UI のスタイル (#189 Phase 1)
+ */
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 12px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.toolbarLabel {
+    font-weight: 600;
+    color: #374151;
+    margin-right: 8px;
+}
+
+.button {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #111827;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.button:hover:not(:disabled) {
+    background: #f3f4f6;
+}
+
+.button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.primary {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+
+.primary:hover:not(:disabled) {
+    background: #1d4ed8;
+}
+
+.danger {
+    background: #ffffff;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+.calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.weekdayHeader {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    padding: 4px 0;
+}
+
+.cell {
+    min-height: 76px;
+    padding: 6px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #ffffff;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-family: inherit;
+}
+
+.cell:hover {
+    border-color: #93c5fd;
+    background: #eff6ff;
+}
+
+.cell:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 1px;
+}
+
+.cellEmpty {
+    background: transparent;
+    border-style: dashed;
+    cursor: default;
+}
+
+.cellRest {
+    background: #fef2f2;
+    border-color: #fca5a5;
+}
+
+.cellFocus {
+    background: #fef3c7;
+    border-color: #fbbf24;
+}
+
+.cellDate {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.cellCount {
+    font-size: 13px;
+    color: #111827;
+}
+
+.cellMode {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: auto;
+}
+
+.cellModeRest {
+    color: #b91c1c;
+}
+
+.cellModeFocus {
+    color: #b45309;
+}
+
+.modalBackdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+}
+
+.modal {
+    background: #ffffff;
+    border-radius: 12px;
+    max-width: 720px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: auto;
+    padding: 24px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.modalTitle {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.modalActions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.diffSection {
+    margin-bottom: 16px;
+}
+
+.diffSectionTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.diffList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 13px;
+}
+
+.diffList li {
+    padding: 4px 8px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.warning {
+    background: #fef3c7;
+    border-left: 4px solid #fbbf24;
+    padding: 8px 12px;
+    border-radius: 4px;
+    color: #92400e;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.error {
+    background: #fef2f2;
+    border-left: 4px solid #f87171;
+    padding: 8px 12px;
+    border-radius: 4px;
+    color: #991b1b;
+    font-size: 13px;
+}
+
+.legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.legendSwatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid #e5e7eb;
+}
+
+@media (max-width: 480px) {
+    .cell {
+        min-height: 60px;
+        padding: 4px;
+    }
+    .cellCount {
+        font-size: 11px;
+    }
+    .calendarGrid {
+        gap: 3px;
+    }
+}

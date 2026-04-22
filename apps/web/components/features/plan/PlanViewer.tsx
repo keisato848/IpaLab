@@ -2,16 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { StudyPlan } from '../dashboard/GoalSettingWizard';
+import type { StudyPlan } from '@/lib/types/studyPlan';
 import { LearningRecord, getLearningRecords } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
 import Link from 'next/link';
+import PlanEditor from '@/components/features/study-plan/PlanEditor';
 
 export default function PlanViewer() {
     const { data: session, status } = useSession();
     const [plans, setPlans] = useState<StudyPlan[]>([]);
     const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
     const [dailyCounts, setDailyCounts] = useState<Record<string, number>>({});
+    const [editing, setEditing] = useState(false);
 
     // 1. Load Plans
     useEffect(() => {
@@ -89,6 +91,14 @@ export default function PlanViewer() {
         const newPlans = plans.map(p => p.id === updatedPlan.id ? updatedPlan : p);
         setPlans(newPlans);
         localStorage.setItem('studyPlans', JSON.stringify(newPlans));
+    };
+
+    /** PlanEditor からの「適用」を受けて、現在選択中の plan を更新する */
+    const handleApplyEdit = (newPlan: StudyPlan) => {
+        if (!activePlan) return;
+        const merged: StudyPlan = { ...newPlan, id: activePlan.id };
+        handleUpdatePlan(merged);
+        setEditing(false);
     };
 
     if (plans.length === 0) {
@@ -181,22 +191,46 @@ export default function PlanViewer() {
                                     )}
                                 </div>
                             </div>
-                            <button
-                                onClick={() => handleDelete(activePlan.id)}
-                                style={{
-                                    padding: '0.5rem 1rem',
-                                    background: '#ef4444',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.8rem'
-                                }}
-                            >
-                                削除
-                            </button>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button
+                                    onClick={() => setEditing(e => !e)}
+                                    style={{
+                                        padding: '0.5rem 1rem',
+                                        background: editing ? 'var(--bg-secondary)' : 'var(--primary-color, #2563eb)',
+                                        color: editing ? 'var(--text-primary)' : 'white',
+                                        border: '1px solid var(--border-color, transparent)',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer',
+                                        fontSize: '0.85rem'
+                                    }}
+                                >
+                                    {editing ? '編集モード解除' : '✏️ 計画を編集'}
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(activePlan.id)}
+                                    style={{
+                                        padding: '0.5rem 1rem',
+                                        background: '#ef4444',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer',
+                                        fontSize: '0.8rem'
+                                    }}
+                                >
+                                    削除
+                                </button>
+                            </div>
                         </div>
 
+                        {editing ? (
+                            <PlanEditor
+                                plan={activePlan}
+                                onApply={handleApplyEdit}
+                                onCancel={() => setEditing(false)}
+                            />
+                        ) : (
+                            <>
                         <h3 style={{ marginBottom: '1rem' }}>週間スケジュール</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             {activePlan.weeklySchedule.map((week, i) => {
@@ -284,6 +318,8 @@ export default function PlanViewer() {
                                 );
                             })}
                         </div>
+                            </>
+                        )}
                     </div>
                 ) : (
                     <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>

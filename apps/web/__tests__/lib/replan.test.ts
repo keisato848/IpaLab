@@ -196,4 +196,22 @@ describe('replan', () => {
         expect(r.diff.totalDebtQuestions).toBe(0);
         expect(r.plan.weeklySchedule[0].dailyTasks[1].questionCount).toBe(5);
     });
+
+    it('does not throw when a week has undefined dailyTasks (regression: defense-in-depth for #189)', () => {
+        const plan = buildPlan([
+            { date: '2026-04-21', questionCount: 5 },
+            { date: '2026-04-22', questionCount: 5 },
+        ]);
+        // 未生成週を末尾に追加（dailyTasks 欠落）
+        plan.weeklySchedule.push({
+            weekNumber: 2,
+            startDate: '2026-04-28',
+            endDate: '2026-05-04',
+            goal: 'transition week (not yet generated)',
+        } as unknown as (typeof plan.weeklySchedule)[number]);
+
+        expect(() => replan({ plan, dailyProgress: [], today: '2026-04-21', options: { now } })).not.toThrow();
+        const r = replan({ plan, dailyProgress: [], today: '2026-04-21', options: { now } });
+        expect(r.plan.weeklySchedule[1].dailyTasks).toEqual([]);
+    });
 });
