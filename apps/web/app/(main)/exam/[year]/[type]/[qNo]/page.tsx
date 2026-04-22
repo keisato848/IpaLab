@@ -50,33 +50,47 @@ export default async function ExamQuestionPage({ params }: { params: Promise<{ y
     const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
 
     // Fetch Questions
+    // 状態を3種類に区別する:
+    //   - 'ok'              : DB から問題セットを取得できた（その後 qNo 不一致なら本物の Not Found）
+    //   - 'db_error'        : DB アクセスで例外発生（接続/権限/タイムアウト等）
+    //   - 'data_unavailable': DB は応答したが、当該 examId のデータが0件（同期漏れの可能性大）
     let questions: Question[] = [];
+    let loadStatus: 'ok' | 'db_error' | 'data_unavailable' = 'ok';
+    let dbError: unknown = null;
+
     try {
-        // Build Optimization: Use DB directly
         const data = await questionRepository.listByExamId(examId);
         questions = data as unknown as Question[];
+        if (questions.length === 0) {
+            loadStatus = 'data_unavailable';
+            console.warn(`[Page] Cosmos returned 0 questions for examId=${examId}. Possible sync gap.`);
+        }
     } catch (e) {
-        // console.warn(`[Page] Data load failed for ${examId}.`);
+        loadStatus = 'db_error';
+        dbError = e;
+        console.error(`[Page] Cosmos query failed for examId=${examId}:`, e instanceof Error ? e.message : e);
     }
 
-    // Fallback to Filesystem (for local dev without DB)
-    if (questions.length === 0) {
+    // Filesystem フォールバック: ローカル/開発時のみ有効。
+    // 本番(standalone build)では packages/data が同梱されないため事実上動作しない。
+    // 同期漏れを本番で隠蔽しないよう、明示的に開発環境のみ実行する。
+    if (questions.length === 0 && process.env.NODE_ENV !== 'production') {
         try {
             const fsData = await getExamData(examId);
             if (fsData && !Array.isArray(fsData)) {
                 if ('qNo' in fsData) {
-                    // Form B: 単一問題オブジェクト { qNo, theme, context, questions: [{subQNo}] }
                     questions = [fsData] as unknown as Question[];
                 } else if ('questions' in fsData) {
-                    // Form C: ラッパーオブジェクト { questions: [{qNo, theme, context, questions}] }
                     questions = (fsData as any).questions as Question[];
                 }
             } else if (Array.isArray(fsData)) {
-                // Form A: 配列 [{qNo, theme, context, questions}]
                 questions = fsData as unknown as Question[];
             }
+            if (questions.length > 0) {
+                console.info(`[Page] Loaded ${questions.length} questions from filesystem fallback for ${examId} (dev only).`);
+            }
         } catch (e) {
-            console.warn(`[Page] FS Data load failed for ${examId}.`);
+            console.warn(`[Page] FS Data load failed for ${examId}:`, e instanceof Error ? e.message : e);
         }
     }
 
@@ -85,11 +99,28 @@ export default async function ExamQuestionPage({ params }: { params: Promise<{ y
     const question = questions.find(q => q.qNo === qNoInt);
 
     if (!question) {
+        // examId 配下のデータが0件 or DBエラー → "見つからない"ではなく"準備中/障害"として案内
+        const isDataMissing = loadStatus !== 'ok' || questions.length === 0;
+        const heading = isDataMissing
+            ? `この試験のデータが見つかりません`
+            : `問題が見つかりません (Q${qNo})`;
+        const message = isDataMissing
+            ? loadStatus === 'db_error'
+                ? `データ取得時にエラーが発生しました。時間をおいて再度お試しください。問題が継続する場合は管理者にご連絡ください。`
+                : `この試験 (${examId}) の問題データはまだ準備されていません。データ同期が完了していない可能性があります。`
+            : `番号が正しいか確認してください。`;
+
+        // observability: 失敗の根本原因をサーバーログに残す（Application Insights 連携を期待）
+        console.warn(
+            `[Page] Question render failed: examId=${examId}, qNo=${qNo}, status=${loadStatus}, total=${questions.length}` +
+            (dbError instanceof Error ? `, error=${dbError.message}` : '')
+        );
+
         return (
             <div className={styles.container} style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <div style={{ textAlign: 'center' }}>
-                    <h1>問題が見つかりません (Q{qNo})</h1>
-                    <p>番号が正しいか確認してください。</p>
+                    <h1>{heading}</h1>
+                    <p>{message}</p>
                     <Link href={`/exam/${year}/${type}`} style={{ color: '#0070f3', textDecoration: 'underline' }}>
                         問題一覧に戻る
                     </Link>
