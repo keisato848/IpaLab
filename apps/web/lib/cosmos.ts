@@ -11,6 +11,7 @@ const CONTAINER_PARTITION_KEYS: Record<string, string> = {
     LearningRecords: "/userId",
     LearningSessions: "/userId",
     DailyProgress: "/userId",
+    StudyPlan: "/userId",
     Exams: "/id",
     ExamProgress: "/userId",
     Metrics: "/type",

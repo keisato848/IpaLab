@@ -444,3 +444,99 @@ export async function getLatestStudyPlanJob(userId: string): Promise<StudyPlanJo
         return null;
     }
 }
+
+// --- Study Plan Persistence (#212) ---
+
+/**
+ * 認証ユーザーの学習計画一覧を取得。
+ * 401 / ネットワークエラー時は null を返す（呼び出し側で localStorage へフォールバック）。
+ */
+export async function listStudyPlans(): Promise<StudyPlan[] | null> {
+    try {
+        const res = await fetch(`${API_BASE}/study-plan`, { cache: 'no-store' });
+        if (res.status === 401) return null;
+        if (!res.ok) throw new Error(res.statusText);
+        return (await res.json()) as StudyPlan[];
+    } catch (e) {
+        console.warn('listStudyPlans failed (falling back to localStorage):', e);
+        return null;
+    }
+}
+
+/** 単一計画を upsert (PUT)。失敗時は null。 */
+export async function upsertStudyPlan(plan: StudyPlan): Promise<StudyPlan | null> {
+    try {
+        const res = await fetch(`${API_BASE}/study-plan/${encodeURIComponent(plan.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(plan),
+        });
+        if (!res.ok) throw new Error(`PUT failed: ${res.status}`);
+        return (await res.json()) as StudyPlan;
+    } catch (e) {
+        console.warn('upsertStudyPlan failed:', e);
+        return null;
+    }
+}
+
+/** 計画削除。サーバ側に存在しなくても true を返す。 */
+export async function deleteStudyPlan(id: string): Promise<boolean> {
+    try {
+        const res = await fetch(`${API_BASE}/study-plan/${encodeURIComponent(id)}`, {
+            method: 'DELETE',
+        });
+        return res.ok || res.status === 404;
+    } catch (e) {
+        console.warn('deleteStudyPlan failed:', e);
+        return false;
+    }
+}
+
+/**
+ * localStorage の `studyPlans` をサーバへ一括移行。
+ * 一度成功したら `studyPlans:migratedFor:<userId>` フラグを立てて二度走らない。
+ *
+ * @returns 移行件数。スキップ時は -1。
+ */
+export async function migrateLocalStudyPlansToServer(userId: string): Promise<number> {
+    if (typeof window === 'undefined') return -1;
+    const flagKey = `studyPlans:migratedFor:${userId}`;
+    if (localStorage.getItem(flagKey)) return -1;
+
+    const raw = localStorage.getItem('studyPlans');
+    if (!raw) {
+        localStorage.setItem(flagKey, new Date().toISOString());
+        return 0;
+    }
+
+    let plans: StudyPlan[] = [];
+    try {
+        plans = JSON.parse(raw);
+    } catch {
+        return -1;
+    }
+    if (!Array.isArray(plans) || plans.length === 0) {
+        localStorage.setItem(flagKey, new Date().toISOString());
+        return 0;
+    }
+
+    // id 欠落データを補正
+    const normalized = plans.map((p) =>
+        p.id ? p : { ...p, id: typeof crypto !== 'undefined' ? crypto.randomUUID() : `legacy-${Date.now()}` },
+    );
+
+    try {
+        const res = await fetch(`${API_BASE}/study-plan`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(normalized),
+        });
+        if (!res.ok) throw new Error(`migrate POST failed: ${res.status}`);
+        const data = await res.json();
+        localStorage.setItem(flagKey, new Date().toISOString());
+        return typeof data?.count === 'number' ? data.count : normalized.length;
+    } catch (e) {
+        console.warn('migrateLocalStudyPlansToServer failed:', e);
+        return -1;
+    }
+}
