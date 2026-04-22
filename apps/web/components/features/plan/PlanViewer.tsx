@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import type { StudyPlan } from '@/lib/types/studyPlan';
-import { LearningRecord, getLearningRecords } from '@/lib/api';
+import { LearningRecord, getLearningRecords, listStudyPlans, upsertStudyPlan, deleteStudyPlan, migrateLocalStudyPlansToServer } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
 import Link from 'next/link';
 import PlanEditor from '@/components/features/study-plan/PlanEditor';
@@ -15,36 +15,55 @@ export default function PlanViewer() {
     const [dailyCounts, setDailyCounts] = useState<Record<string, number>>({});
     const [editing, setEditing] = useState(false);
 
-    // 1. Load Plans
+    // 1. Load Plans (#212: server-first when authenticated)
     useEffect(() => {
-        const savedPlansStr = localStorage.getItem('studyPlans');
-        let loadedPlans: StudyPlan[] = [];
+        let cancelled = false;
 
-        if (savedPlansStr) {
-            try {
-                loadedPlans = JSON.parse(savedPlansStr);
-            } catch (e) { console.error(e); }
-        } else {
-            // Legacy fallback
+        const loadFromLocalStorage = (): StudyPlan[] => {
+            const savedPlansStr = localStorage.getItem('studyPlans');
+            if (savedPlansStr) {
+                try { return JSON.parse(savedPlansStr); } catch (e) { console.error(e); }
+            }
             const legacy = localStorage.getItem('studyPlan');
             if (legacy) {
                 try {
                     const p = JSON.parse(legacy);
                     if (!p.id) p.id = 'legacy';
-                    loadedPlans = [p];
-                } catch (e) { }
+                    return [p];
+                } catch { /* noop */ }
             }
-        }
+            return [];
+        };
 
-        setPlans(loadedPlans);
-        if (loadedPlans.length > 0) {
-            // Default to nearest future or last
-            const sorted = [...loadedPlans].sort((a, b) => new Date(a.examDate).getTime() - new Date(b.examDate).getTime());
-            const future = sorted.filter(p => new Date(p.examDate) >= new Date(new Date().setHours(0, 0, 0, 0)));
-            const active = future.length > 0 ? future[0] : sorted[sorted.length - 1];
-            setSelectedPlanId(active.id);
-        }
-    }, []);
+        const apply = (loadedPlans: StudyPlan[]) => {
+            if (cancelled) return;
+            setPlans(loadedPlans);
+            if (loadedPlans.length > 0) {
+                const sorted = [...loadedPlans].sort((a, b) => new Date(a.examDate).getTime() - new Date(b.examDate).getTime());
+                const future = sorted.filter(p => new Date(p.examDate) >= new Date(new Date().setHours(0, 0, 0, 0)));
+                const active = future.length > 0 ? future[0] : sorted[sorted.length - 1];
+                setSelectedPlanId(active.id);
+            }
+        };
+
+        const run = async () => {
+            if (status === 'authenticated' && session?.user?.id) {
+                await migrateLocalStudyPlansToServer(session.user.id);
+                const fromServer = await listStudyPlans();
+                if (cancelled) return;
+                if (fromServer) {
+                    localStorage.setItem('studyPlans', JSON.stringify(fromServer));
+                    apply(fromServer);
+                    return;
+                }
+            }
+            apply(loadFromLocalStorage());
+        };
+
+        if (status !== 'loading') run();
+
+        return () => { cancelled = true; };
+    }, [status, session?.user?.id]);
 
     // 2. Load Progress Records
     useEffect(() => {
@@ -85,12 +104,18 @@ export default function PlanViewer() {
         if (selectedPlanId === id) {
             setSelectedPlanId(newPlans.length > 0 ? newPlans[0].id : null);
         }
+        if (status === 'authenticated') {
+            deleteStudyPlan(id).catch(() => {});
+        }
     };
 
     const handleUpdatePlan = (updatedPlan: StudyPlan) => {
         const newPlans = plans.map(p => p.id === updatedPlan.id ? updatedPlan : p);
         setPlans(newPlans);
         localStorage.setItem('studyPlans', JSON.stringify(newPlans));
+        if (status === 'authenticated') {
+            upsertStudyPlan(updatedPlan).catch(() => {});
+        }
     };
 
     /** PlanEditor からの「適用」を受けて、現在選択中の plan を更新する */
