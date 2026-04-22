@@ -3,46 +3,9 @@
 import { useState, useEffect } from 'react';
 import styles from './GoalSettingWizard.module.css';
 import { getExamTypeName } from '@/lib/exam-utils';
+import type { StudyPlan, MonthlyGoal } from '@/lib/types/studyPlan';
 
-export interface MonthlyGoal {
-    id: string;
-    label: string;
-    type: 'questionCount' | 'accuracy' | 'studyDays' | 'correctCount' | 'custom';
-    targetValue: number;
-    unit: string;
-    iconEmoji: string;
-}
-
-export interface StudyPlan {
-    id: string;
-    title: string;
-    targetExam: string;
-    examDate: string;
-    hoursWeekday?: number; // 平日の学習時間
-    hoursWeekend?: number; // 休日の学習時間
-    monthlyGoal: string;
-    monthlyGoals?: MonthlyGoal[];
-    weeklySchedule: {
-        weekNumber: number;
-        startDate: string;
-        endDate: string;
-        theme?: string; // 週のテーマ
-        goal: string;
-        dailyTasks: {
-            date: string;
-            missionTitle?: string; // ミッション名（ゲーム風）
-            goal: string;
-            questionCount: number;
-            targetCategory: string;
-            targetExamId?: string;
-            difficulty?: 'easy' | 'normal' | 'hard';
-            xpReward?: number;
-            isCompleted?: boolean;
-        }[];
-    }[];
-    generatedAt: string;
-    totalXpEarned?: number;
-}
+export type { StudyPlan, MonthlyGoal };
 
 interface GoalSettingWizardProps {
     onClose: () => void;
