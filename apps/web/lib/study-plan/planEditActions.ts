@@ -47,7 +47,7 @@ export function applyEditState(plan: StudyPlan, edits: EditState): StudyPlan {
         ...plan,
         weeklySchedule: plan.weeklySchedule.map((week) => ({
             ...week,
-            dailyTasks: week.dailyTasks.map((task) => {
+            dailyTasks: (week.dailyTasks ?? []).map((task) => {
                 const mode = edits[task.date] ?? 'normal';
                 const baseline = task.questionCount;
                 let questionCount = baseline;
@@ -108,7 +108,7 @@ export function clearEditState(): EditState {
 export function listAllDates(plan: StudyPlan): string[] {
     const dates: string[] = [];
     for (const week of plan.weeklySchedule) {
-        for (const task of week.dailyTasks) {
+        for (const task of week.dailyTasks ?? []) {
             dates.push(task.date);
         }
     }

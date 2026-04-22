@@ -93,4 +93,42 @@ describe('listAllDates', () => {
     it('returns dates sorted', () => {
         expect(listAllDates(basePlan)).toEqual(['2025-01-06', '2025-01-07', '2025-01-08']);
     });
+
+    it('handles weeks where dailyTasks is undefined (regression: #189 staging crash)', () => {
+        const planWithEmptyWeek: StudyPlan = {
+            ...basePlan,
+            weeklySchedule: [
+                ...basePlan.weeklySchedule,
+                {
+                    weekNumber: 2,
+                    startDate: '2025-01-13',
+                    endDate: '2025-01-19',
+                    goal: 'transition week (not yet generated)',
+                    // dailyTasks is intentionally omitted
+                } as unknown as (typeof basePlan.weeklySchedule)[number],
+            ],
+        };
+        expect(() => listAllDates(planWithEmptyWeek)).not.toThrow();
+        expect(listAllDates(planWithEmptyWeek)).toEqual(['2025-01-06', '2025-01-07', '2025-01-08']);
+    });
+});
+
+describe('applyEditState (regression)', () => {
+    it('does not throw when a week has no dailyTasks', () => {
+        const planWithEmptyWeek: StudyPlan = {
+            ...basePlan,
+            weeklySchedule: [
+                ...basePlan.weeklySchedule,
+                {
+                    weekNumber: 2,
+                    startDate: '2025-01-13',
+                    endDate: '2025-01-19',
+                    goal: 'transition week',
+                } as unknown as (typeof basePlan.weeklySchedule)[number],
+            ],
+        };
+        expect(() => applyEditState(planWithEmptyWeek, {})).not.toThrow();
+        const next = applyEditState(planWithEmptyWeek, {});
+        expect(next.weeklySchedule[1].dailyTasks).toEqual([]);
+    });
 });

@@ -52,7 +52,7 @@ function weekdayIndex(date: string): number {
 function buildDateMap(plan: StudyPlan): Map<string, DailyTask> {
     const map = new Map<string, DailyTask>();
     for (const week of plan.weeklySchedule) {
-        for (const task of week.dailyTasks) {
+        for (const task of week.dailyTasks ?? []) {
             map.set(task.date, task);
         }
     }
@@ -162,6 +162,26 @@ export default function PlanEditor({ plan, onApply, onCancel }: Props) {
         window.addEventListener('keydown', handler);
         return () => window.removeEventListener('keydown', handler);
     }, [showModal]);
+
+    if (allDates.length === 0) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.warning} role="status">
+                    この計画には編集可能な日次タスクがありません。詳細タスクが生成された計画を選択してください。
+                </div>
+                {onCancel && (
+                    <button
+                        type="button"
+                        className={`${styles.button} ${styles.danger}`}
+                        onClick={onCancel}
+                        style={{ alignSelf: 'flex-start' }}
+                    >
+                        編集を終了
+                    </button>
+                )}
+            </div>
+        );
+    }
 
     return (
         <div className={styles.container}>
