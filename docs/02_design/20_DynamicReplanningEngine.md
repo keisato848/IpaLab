@@ -124,3 +124,79 @@ interface ReplanningOutput {
 ## 12. 関連
 
 - #187 進捗集計基盤 / #189 計画編集UI / #191 レコメンドエンジン
+
+---
+
+## 13. Phase 1 MVP実装 (#188)
+
+> 設計書 §1〜§12 のうち、**v1.0 グリーディ + 制約充足** に絞った最小実装。AI を介さない決定論的アルゴリズムで「ユーザー編集にも即時反応」(<1s) を実現する。AI 苦手挿入 (v1.5) や OR-Tools 最適化 (v2.0) は後続で `replan()` を差し替え可能。
+
+### 13.1 構成
+
+```
+[StudyPlan (client localStorage / future Cosmos)]
+                │
+                ▼ POST /api/study-plan/replan { plan, today? }
+[NextAuth session] → userId
+                │
+                ▼
+[learningRecordRepository.findByUserId]
+                │
+                ▼
+[aggregateDailyProgress] → DailyProgress[] (#187)
+                │
+                ▼
+[replan() 純粋関数]
+                │
+                ▼
+[ReplanResult { plan, diff, warnings }]
+```
+
+### 13.2 主要モジュール
+
+| モジュール | 役割 |
+|---|---|
+| `apps/web/lib/plan/replan.ts` | 純粋関数。debt 計算 → 未来日にグリーディ配分 |
+| `apps/web/app/api/study-plan/replan/route.ts` | API エンドポイント。認証 + 集計 + replan |
+
+### 13.3 アルゴリズム (v1.0)
+
+1. **debt 計算**: 過去日 (`date < today`) の各 dailyTask について `required = ceil(planned * completionThreshold)` と `actual = DailyProgress.questionCount` を比較し、`debt = max(0, required - actual)`
+2. **未来日抽出**: `today <= date <= examDate` のみ対象。`date > examDate` は触らない
+3. **キャパシティ**: 各未来日 `cap = max(baseCapacity=5, ceil(planned * capacityBoost=1.5))`
+4. **配分**: pastDebts を日付昇順で走査し、futureDays に対しグリーディに `room = cap - currentAssigned` の範囲で詰める
+5. **オーバーフロー**: 配分しきれない問題は `overflowed` に積み、warning を返す
+
+### 13.4 デフォルトパラメータ
+
+| パラメータ | 値 | 意味 |
+|---|---:|---|
+| `capacityBoost` | 1.5 | 元計画 questionCount を最大 1.5 倍まで膨らませる |
+| `baseCapacity` | 5 | 休息日(planned=0) でも最低 5 問は吸収可能 |
+| `completionThreshold` | 1.0 | 計画通り達成で debt=0 |
+
+### 13.5 API
+
+`POST /api/study-plan/replan`
+
+- 認証: NextAuth セッション必須。`session.user.id` を正本
+- Request body: `{ plan: StudyPlan, today?: "YYYY-MM-DD" }` （today 省略時は UTC 現在日）
+- Response: `{ plan: StudyPlan, diff: ReplanDiff, warnings: string[], generatedAt, algorithmVersion: "1.0" }`
+
+### 13.6 制約充足の保証 (テスト網羅)
+
+- ✅ debt なし → 計画不変
+- ✅ debt あり → 未来日の questionCount が増加
+- ✅ examDate を超える日には絶対に積まない
+- ✅ 未来日が無いと全 debt が overflowed + warning
+- ✅ 休息日 (planned=0) も baseCapacity まで吸収
+- ✅ 入力 plan は不変 (immutable copy)
+- ✅ moved entries に `unfulfilled_carry_forward` reason
+- ✅ completionThreshold で部分達成を許容
+
+### 13.7 Phase 2 への発展
+
+- `pinnedRestDays` / `pinnedFocusDays` をオプション追加
+- 苦手分野 (#191) を `weakAreaInjections` として優先割込み
+- バッチ実行: Azure Functions Timer から全ユーザーに対し `replan` → DB 永続化
+- AI Reasoning: warnings に「なぜこの再配分か」の自然言語説明を付与
