@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { LearningRecord, getLearningRecords, getQuestions, getExams, StudyPlanJob, Question } from '@/lib/api';
+import { LearningRecord, getLearningRecords, getQuestions, getExams, StudyPlanJob, Question, listStudyPlans, upsertStudyPlan, migrateLocalStudyPlansToServer } from '@/lib/api';
 import { guestManager } from '@/lib/guest-manager';
 import { getExamLabel } from '@/lib/exam-utils';
 import ThemeToggle from '@/components/common/ThemeToggle';
@@ -129,60 +129,75 @@ export default function DashboardClient() {
 
     // 2. Load Plan & Check URL Action
     useEffect(() => {
-        // Migration & Load Logic
-        const savedPlansStr = localStorage.getItem('studyPlans');
-        let allPlans: StudyPlan[] = [];
+        let cancelled = false;
 
-        if (savedPlansStr) {
-            try {
-                const parsed = JSON.parse(savedPlansStr);
-                setAllPlans(parsed);
-                allPlans = parsed;
-            } catch (e) {
-                console.error("Failed to parse studyPlans", e);
+        const hydrateFromPlans = (allPlans: StudyPlan[]) => {
+            if (cancelled) return;
+            setAllPlans(allPlans);
+            if (allPlans.length === 0) return;
+            const sorted = [...allPlans].sort((a, b) => new Date(a.examDate).getTime() - new Date(b.examDate).getTime());
+            const future = sorted.filter(p => new Date(p.examDate) >= new Date(new Date().setHours(0, 0, 0, 0)));
+            let active = future.length > 0 ? future[0] : sorted[sorted.length - 1];
+            if (active && !active.monthlyGoals) {
+                const defaults = createDefaultMonthlyGoals(active.weeklySchedule || []);
+                active = { ...active, monthlyGoals: defaults };
+                const updatedPlans = allPlans.map(p => p.id === active.id ? active : p);
+                localStorage.setItem('studyPlans', JSON.stringify(updatedPlans));
+                setAllPlans(updatedPlans);
+                // 認証ユーザーは server にも反映（best-effort, 非同期）
+                if (status === 'authenticated') {
+                    upsertStudyPlan(active).catch(() => {});
+                }
             }
-        } else {
-            // Check legacy single plan
+            setStudyPlan(active);
+        };
+
+        const loadFromLocalStorage = (): StudyPlan[] => {
+            const savedPlansStr = localStorage.getItem('studyPlans');
+            if (savedPlansStr) {
+                try {
+                    return JSON.parse(savedPlansStr);
+                } catch (e) {
+                    console.error("Failed to parse studyPlans", e);
+                    return [];
+                }
+            }
+            // legacy single plan migration
             const legacyPlanStr = localStorage.getItem('studyPlan');
             if (legacyPlanStr) {
                 try {
                     const legacyPlan = JSON.parse(legacyPlanStr);
-                    // Add ID if missing (legacy)
                     if (!legacyPlan.id) legacyPlan.id = crypto.randomUUID();
-                    allPlans = [legacyPlan];
-                    setAllPlans(allPlans);
-                    localStorage.setItem('studyPlans', JSON.stringify(allPlans));
+                    const arr = [legacyPlan];
+                    localStorage.setItem('studyPlans', JSON.stringify(arr));
+                    return arr;
                 } catch (e) {
                     console.error("Failed to migrate legacy plan", e);
                 }
             }
-        }
+            return [];
+        };
 
-        // Determine Active Plan
-        // Strategy: 1. If URL has ?planId=... use that. 
-        // 2. Else find nearest future exam.
-        // 3. Else fallback to first.
-
-        if (allPlans.length > 0) {
-            // Pick the one with closest future date.
-            const sorted = [...allPlans].sort((a, b) => new Date(a.examDate).getTime() - new Date(b.examDate).getTime());
-            // Filter future or today
-            const future = sorted.filter(p => new Date(p.examDate) >= new Date(new Date().setHours(0, 0, 0, 0)));
-
-            let active = future.length > 0 ? future[0] : sorted[sorted.length - 1]; // Nearest future or latest past
-
-            // monthlyGoals が未設定のプランにデフォルト値を自動付与
-            if (active && !active.monthlyGoals) {
-                const defaults = createDefaultMonthlyGoals(active.weeklySchedule || []);
-                active = { ...active, monthlyGoals: defaults };
-                // localStorageも更新
-                const updatedPlans = allPlans.map(p => p.id === active.id ? active : p);
-                localStorage.setItem('studyPlans', JSON.stringify(updatedPlans));
-                setAllPlans(updatedPlans);
+        const run = async () => {
+            // 1) 認証済み: localStorage → server へ一括移行（初回のみ）
+            //    その後 server → state、エラー時は localStorage へフォールバック
+            if (status === 'authenticated' && session?.user?.id) {
+                await migrateLocalStudyPlansToServer(session.user.id);
+                const fromServer = await listStudyPlans();
+                if (cancelled) return;
+                if (fromServer) {
+                    // server が正本。localStorage はオフラインフォールバック用に同期更新
+                    localStorage.setItem('studyPlans', JSON.stringify(fromServer));
+                    hydrateFromPlans(fromServer);
+                    return;
+                }
+                // server エラー → localStorage フォールバック
             }
+            // 2) 未認証 / フォールバック: localStorage 経路
+            hydrateFromPlans(loadFromLocalStorage());
+        };
 
-            setStudyPlan(active);
-        }
+        run();
 
         // Check query param for replan trigger
         const params = new URLSearchParams(window.location.search);
@@ -190,7 +205,9 @@ export default function DashboardClient() {
             setShowWizard(true);
             window.history.replaceState({}, '', '/dashboard');
         }
-    }, []);
+
+        return () => { cancelled = true; };
+    }, [status, session?.user?.id]);
 
     // 2.5. Check for pending completed jobs (async job notification)
     useEffect(() => {
@@ -246,19 +263,15 @@ export default function DashboardClient() {
         const allPlansStr = localStorage.getItem('studyPlans');
         let allPlans: StudyPlan[] = allPlansStr ? JSON.parse(allPlansStr) : [];
 
-        // Check if updating existing (by ID) -- though Wizard generates NEW ID currently. 
-        // If we want to support "Edit", we need to pass ID to Wizard. 
-        // For Re-plan, we usually Replace or Add New. 
-        // If "Re-plan" means "Update schedule for same exam", maybe we should remove old one?
-        // Let's just append for now to be safe (History). User can delete later.
-        // Wait, if 10 re-plans, array grows. 
-        // Better: Remove any existing plan for the SAME examId and SAME examDate? 
-        // Or just by ID if updating.
-
-        // Current Wizard generates NEW ID every time. 
-        // Let's Append.
+        // Current Wizard generates NEW ID every time. Append for history.
         allPlans.push(plan);
         localStorage.setItem('studyPlans', JSON.stringify(allPlans));
+        setAllPlans(allPlans);
+
+        // Server 永続化 (#212): 認証済みなら best-effort で upsert
+        if (status === 'authenticated') {
+            upsertStudyPlan(plan).catch(() => {});
+        }
 
         setShowWizard(false);
     };
@@ -484,6 +497,10 @@ export default function DashboardClient() {
             setAllPlans(updatedPlans);
             const refreshed = updatedPlans.find(plan => plan.id === studyPlan.id) || studyPlan;
             setStudyPlan(refreshed);
+            // #212: server にも反映（best-effort）
+            if (status === 'authenticated') {
+                upsertStudyPlan(refreshed).catch(() => {});
+            }
         } catch (error) {
             console.error("Failed to update studyPlans completion state", error);
         }
