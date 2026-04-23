@@ -48,12 +48,22 @@ export async function GET(_request: NextRequest) {
     try {
         const today = todayKey();
         const from = addDays(today, -(WINDOW_DAYS - 1));
+        const fromIso = `${from}T00:00:00.000Z`;
+        // 排他的上限。toIso は today の翌日 00:00 で today 当日分も含める
+        const toIso = `${addDays(today, 1)}T00:00:00.000Z`;
 
-        const [records, persistedDailyProgresses, plans] = await Promise.all([
-            learningRecordRepository.findByUserId(userId),
+        const [records, persistedDailyProgresses, plansResult] = await Promise.all([
+            learningRecordRepository.findByUserIdInDateRange(userId, fromIso, toIso),
             dailyProgressRepository.findByUserAndDateRange(userId, from, today),
-            studyPlanRepository.listByUser(userId).catch(() => []),
+            studyPlanRepository
+                .listByUser(userId)
+                .then((rows) => ({ ok: true as const, rows }))
+                .catch((err: unknown) => {
+                    console.error('[api/profile/performance] studyPlanRepository.listByUser failed', err);
+                    return { ok: false as const, rows: [] };
+                }),
         ]);
+        const plans = plansResult.rows;
 
         // 永続化された DailyProgress に加え、リアルタイム集計でフォールバック
         // (バッチ未実行の最新分も拾うため、Records から再集計したものを優先する)

@@ -6,7 +6,7 @@
  * - replan v2.0 (#222) の重み付け、ヘルスチェック (#220)、可視化UI (#219) で参照
  */
 
-/** 曜日別カテゴリ正答率の集計 */
+/** カテゴリ別正答率の集計 */
 export interface CategoryAccuracy {
     /** 解答数 */
     total: number;
