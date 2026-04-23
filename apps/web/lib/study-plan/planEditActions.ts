@@ -1,23 +1,23 @@
 /**
  * StudyPlan 編集の純粋関数 (#189 設計書 ｧ9.1)
  *
- * v1.0 の `replan(input)` は `pinnedRestDays` / `pinnedFocusDays` を直接扱えないため、
+ * v1.0 の `replan(input)` は `pinnedRestDays` を直接扱えないため、
  * Phase 1 では「plan を書き換えてから replan に渡す」方式を採用する:
  *   - 休日 ON: 対象日の questionCount を 0 に → debt として未来日へ再配分
- *   - 集中日 ON: 対象日の questionCount を round(base * 1.5) に → 吸収枠を拡張
  *
- * 元の questionCount は `restDayBaseline` で保持し、OFF 復帰時に元に戻せるようにする。
+ * 元の questionCount は `_baseline` で保持し、OFF 復帰時に元に戻せるようにする。
  * 入力 plan は immutable に扱い、必ず新しいオブジェクトを返す。
+ *
+ * Note: 集中日 (focus) モードは v2.0 適応型計画の方針 (#217) により廃止。
+ * 「特定日に多く解きたい」ニーズは #211 のタスク D&D で代替する。
  */
 
 import type { StudyPlan, DailyTask, WeeklyScheduleItem } from '@/lib/types/studyPlan';
 
-export type EditMode = 'rest' | 'focus' | 'normal';
+export type EditMode = 'rest' | 'normal';
 
 /** 編集状態（カレンダー上のオーバーレイ）。日付 -> モード */
 export type EditState = Record<string, EditMode>;
-
-const FOCUS_MULTIPLIER = 1.5;
 
 interface AppliedTask extends DailyTask {
     /** 編集前の元の問題数（roundtrip 用） */
@@ -36,7 +36,6 @@ interface AppliedPlan extends StudyPlan {
  * 編集 state を plan に反映した新しい plan を返す。
  *
  * - mode='rest'   : questionCount = 0
- * - mode='focus'  : questionCount = round(baseline * 1.5)
  * - mode='normal' : 何もしない（baseline と同じ）
  *
  * baseline は「呼び出し時点の plan の questionCount」を採用する。
@@ -50,12 +49,7 @@ export function applyEditState(plan: StudyPlan, edits: EditState): StudyPlan {
             dailyTasks: (week.dailyTasks ?? []).map((task) => {
                 const mode = edits[task.date] ?? 'normal';
                 const baseline = task.questionCount;
-                let questionCount = baseline;
-                if (mode === 'rest') {
-                    questionCount = 0;
-                } else if (mode === 'focus') {
-                    questionCount = Math.round(baseline * FOCUS_MULTIPLIER);
-                }
+                const questionCount = mode === 'rest' ? 0 : baseline;
                 return {
                     ...task,
                     questionCount,
@@ -70,19 +64,10 @@ export function applyEditState(plan: StudyPlan, edits: EditState): StudyPlan {
 /**
  * 単一日のモードを切り替える。
  *
- * UI のクリック1回で normal -> rest -> focus -> normal とローテーション。
+ * UI のクリック1回で normal ⇄ rest をトグル。
  */
 export function cycleEditMode(current: EditMode | undefined): EditMode {
-    switch (current) {
-        case 'rest':
-            return 'focus';
-        case 'focus':
-            return 'normal';
-        case 'normal':
-        case undefined:
-        default:
-            return 'rest';
-    }
+    return current === 'rest' ? 'normal' : 'rest';
 }
 
 /** 単一日を直接指定モードに設定（明示ボタン用） */

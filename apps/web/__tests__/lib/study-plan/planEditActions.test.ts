@@ -49,25 +49,18 @@ describe('applyEditState', () => {
         expect(next.weeklySchedule[0].dailyTasks[1].questionCount).toBe(0);
     });
 
-    it('focus mode multiplies questionCount by 1.5 (rounded)', () => {
-        const edits: EditState = { '2025-01-08': 'focus' };
-        const next = applyEditState(basePlan, edits);
-        expect(next.weeklySchedule[0].dailyTasks[2].questionCount).toBe(18);
-    });
-
     it('does not mutate the input plan', () => {
         const snapshot = JSON.parse(JSON.stringify(basePlan));
-        applyEditState(basePlan, { '2025-01-06': 'rest', '2025-01-08': 'focus' });
+        applyEditState(basePlan, { '2025-01-06': 'rest', '2025-01-07': 'rest' });
         expect(basePlan).toEqual(snapshot);
     });
 });
 
 describe('cycleEditMode', () => {
-    it('rotates undefined -> rest -> focus -> normal -> rest', () => {
+    it('toggles between normal and rest', () => {
         expect(cycleEditMode(undefined)).toBe('rest');
-        expect(cycleEditMode('rest')).toBe('focus');
-        expect(cycleEditMode('focus')).toBe('normal');
         expect(cycleEditMode('normal')).toBe('rest');
+        expect(cycleEditMode('rest')).toBe('normal');
     });
 });
 
@@ -79,7 +72,7 @@ describe('setEditMode', () => {
     });
 
     it('sets non-normal modes', () => {
-        expect(setEditMode({}, '2025-01-06', 'focus')).toEqual({ '2025-01-06': 'focus' });
+        expect(setEditMode({}, '2025-01-06', 'rest')).toEqual({ '2025-01-06': 'rest' });
     });
 
     it('returns a new object (immutability)', () => {
