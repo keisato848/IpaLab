@@ -1,0 +1,191 @@
+.card {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.subtitle {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    margin: 4px 0 0;
+}
+
+.metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.metric {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 14px 16px;
+    backdrop-filter: blur(4px);
+}
+
+.metricLabel {
+    font-size: 0.75rem;
+    opacity: 0.85;
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+}
+
+.metricValue {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.metricBadge {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.section {
+    margin-top: 16px;
+}
+
+.sectionTitle {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 0 0 10px;
+    opacity: 0.95;
+}
+
+.weekdayChart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 80px;
+    gap: 6px;
+}
+
+.weekdayBarWrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.weekdayBar {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 4px 4px 0 0;
+    min-height: 2px;
+    transition: height 0.3s ease;
+}
+
+.weekdayBarToday {
+    background: #fbbf24;
+    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.35);
+}
+
+.weekdayLabel {
+    font-size: 0.7rem;
+    opacity: 0.85;
+}
+
+.categories {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.categoryRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+}
+
+.categoryName {
+    flex: 0 0 90px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.categoryBarTrack {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.categoryBarFill {
+    height: 100%;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+.categoryBarFillWeak {
+    background: #fca5a5;
+}
+
+.categoryRate {
+    flex: 0 0 48px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.8rem;
+}
+
+.empty {
+    text-align: center;
+    padding: 24px 0;
+    opacity: 0.85;
+    font-size: 0.9rem;
+}
+
+.collapseBtn {
+    background: rgba(255, 255, 255, 0.18);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.collapseBtn:hover {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+@media (prefers-color-scheme: dark) {
+    .card {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+}

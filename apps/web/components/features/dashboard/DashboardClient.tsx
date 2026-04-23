@@ -13,6 +13,7 @@ import { useMonthlyProgress, createDefaultMonthlyGoals } from '@/hooks/useMonthl
 import { useMonthlyStats } from '@/hooks/useMonthlyStats';
 import GoalSettingWizard, { StudyPlan, MonthlyGoal } from './GoalSettingWizard';
 import MonthlyGoalEditor from './MonthlyGoalEditor';
+import PerformanceInsights from './PerformanceInsights';
 import PlanHealthToast from './PlanHealthToast';
 import PlanReadyNotification from './PlanReadyNotification';
 import { usePlanHealthCheck } from '@/hooks/usePlanHealthCheck';
@@ -717,6 +718,7 @@ export default function DashboardClient() {
             </header>
 
             <div className={styles.grid}>
+                <PerformanceInsights enabled={status === 'authenticated'} />
                 <section className={`${styles.card} ${styles.levelCard} ${styles.fullWidthCard} ${styles.collapsibleSection}`}>
                     {renderCollapseToggle('level', 'レベル情報', 'light')}
                     <div className={styles.levelHeader}>
