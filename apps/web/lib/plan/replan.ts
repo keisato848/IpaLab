@@ -10,7 +10,8 @@
  * - 試験日 (`plan.examDate`) を超える日には絶対に積まない（overflowed として返す）
  * - 純粋関数。I/O ゼロ。
  *
- * 設計書: docs/02_design/20_DynamicReplanningEngine.md §13 (Phase 1 MVP)
+ * 設計書: docs/02_design/20_DynamicReplanningEngine.md §13 は v1.0 / v1.5 のベース挙動の参照。
+ * v2.0（曜日ペース重み × 弱点重み付け）の仕様根拠: 関連 Issue #222
  * 関連 Issue: #188 (P2-A-2), #222 (v2.0)
  */
 
@@ -271,13 +272,15 @@ function rankDaysByProfileWeight<T extends { date: string; category?: string }>(
     profile: PerformanceProfile,
 ): T[] {
     const paceMean = mean(profile.paceByWeekday);
-    const accuracyMap = new Map<string, number>();
-    for (const c of profile.accuracyByCategory) accuracyMap.set(c.category, c.accuracy);
+    const accuracyMap = profile.accuracyByCategory; // Record<string, CategoryAccuracy>
 
     const weighted = days.map((day, idx) => {
         const dow = new Date(`${day.date}T00:00:00.000Z`).getUTCDay();
-        const paceWeight = paceMean > 0 ? profile.paceByWeekday[dow] / paceMean : 1;
-        const acc = day.category ? accuracyMap.get(day.category) : undefined;
+        // 曜日ペースが 0 の日 (= その曜日に学習実績なし) は中立扱い (1.0)。
+        // そうしないと 0 重みでその曜日に一切詰まらず、平日空白などで詰まらない計画になる。
+        const dayPace = profile.paceByWeekday[dow];
+        const paceWeight = paceMean > 0 && dayPace > 0 ? dayPace / paceMean : 1;
+        const acc = day.category ? accuracyMap[day.category]?.rate : undefined;
         const weaknessWeight =
             acc !== undefined && acc < WEAKNESS_THRESHOLD ? WEAKNESS_BOOST : 1;
         return { day, idx, weight: paceWeight * weaknessWeight };
