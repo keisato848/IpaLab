@@ -69,6 +69,12 @@ export default function PlanHealthToast({
             aria-live="polite"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
+            onFocusCapture={() => setPaused(true)}
+            onBlurCapture={(e) => {
+                // フォーカスがトースト内の別要素に移っただけなら pause を維持
+                if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+                setPaused(false);
+            }}
         >
             <button
                 type="button"

@@ -35,7 +35,10 @@ export default function DashboardClient() {
 
     // #221 計画ヘルスチェック (認証済みユーザのみ)
     const { health: planHealth, visible: planHealthVisible, dismiss: dismissPlanHealth } =
-        usePlanHealthCheck(status === 'authenticated');
+        usePlanHealthCheck({
+            userId: session?.user?.id ?? '',
+            enabled: status === 'authenticated',
+        });
 
     // Goal Setting State
     const [studyPlan, setStudyPlan] = useState<StudyPlan | null>(null);
@@ -1439,9 +1442,13 @@ export default function DashboardClient() {
                     health={planHealth}
                     onAction={() => {
                         dismissPlanHealth('apply');
-                        if (planHealth.suggestion.action === 'open_replan') {
+                        const action = planHealth.suggestion.action;
+                        if (action === 'open_replan') {
                             // 既存の計画編集ページへ
                             window.location.href = '/plan';
+                        } else if (action === 'increase_pace') {
+                            // 絶好調: 計画ブースト導線として /plan へ
+                            window.location.href = '/plan?action=boost';
                         }
                     }}
                     onLater={() => dismissPlanHealth('later')}

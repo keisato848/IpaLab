@@ -1,7 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 import {
+    loadSuppression,
     nextSuppressionState,
+    saveSuppression,
     shouldShowToast,
     type PlanHealthSuppressionState,
 } from '@/lib/plan/healthSuppression';
@@ -44,6 +46,14 @@ describe('shouldShowToast', () => {
         };
         expect(shouldShowToast('on_fire', s, NOW)).toBe(true);
     });
+
+    it('nextAllowedAt が不正 (NaN) なら永久非表示を避けて表示', () => {
+        const s: PlanHealthSuppressionState = {
+            lastStatus: 'slight_delay',
+            nextAllowedAt: 'not-a-date',
+        };
+        expect(shouldShowToast('slight_delay', s, NOW)).toBe(true);
+    });
 });
 
 describe('nextSuppressionState', () => {
@@ -57,8 +67,42 @@ describe('nextSuppressionState', () => {
         expect(new Date(s.nextAllowedAt).getTime() - NOW.getTime()).toBe(3 * 24 * 60 * 60 * 1000);
     });
 
-    it('close は 7 日後まで', () => {
+    it('close も 3 日後まで (later と同等)', () => {
         const s = nextSuppressionState('on_track', 'close', NOW)!;
-        expect(new Date(s.nextAllowedAt).getTime() - NOW.getTime()).toBe(7 * 24 * 60 * 60 * 1000);
+        expect(new Date(s.nextAllowedAt).getTime() - NOW.getTime()).toBe(3 * 24 * 60 * 60 * 1000);
+    });
+});
+
+describe('localStorage userId scoping', () => {
+    beforeEach(() => {
+        window.localStorage.clear();
+    });
+
+    it('userId 別にスコープされる (ユーザ切り替えで引き継がれない)', () => {
+        const stateA: PlanHealthSuppressionState = {
+            lastStatus: 'slight_delay',
+            nextAllowedAt: '2026-04-30T00:00:00.000Z',
+        };
+        saveSuppression('userA', stateA);
+        expect(loadSuppression('userA')).toEqual(stateA);
+        expect(loadSuppression('userB')).toBeNull();
+    });
+
+    it('null 保存でクリアできる', () => {
+        const s: PlanHealthSuppressionState = {
+            lastStatus: 'slight_delay',
+            nextAllowedAt: '2026-04-30T00:00:00.000Z',
+        };
+        saveSuppression('userA', s);
+        saveSuppression('userA', null);
+        expect(loadSuppression('userA')).toBeNull();
+    });
+
+    it('空 userId は no-op', () => {
+        saveSuppression('', {
+            lastStatus: 'on_track',
+            nextAllowedAt: '2026-04-30T00:00:00.000Z',
+        });
+        expect(loadSuppression('')).toBeNull();
     });
 });
