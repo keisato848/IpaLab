@@ -34,8 +34,8 @@ export function evaluatePlanHealth(
     options: HealthCheckOptions = {},
 ): PlanHealthResult {
     const now = options.now?.() ?? new Date().toISOString();
-    const rate = profile.recentAchievementRate;
-    const onFireDays = profile.consecutiveOnFireDays;
+    const rate = normalizeAchievementRate(profile.recentAchievementRate);
+    const onFireDays = normalizeConsecutiveOnFireDays(profile.consecutiveOnFireDays);
 
     const status = classifyStatus(rate, onFireDays);
     const suggestion = buildSuggestion(status, rate, onFireDays);
@@ -49,6 +49,17 @@ export function evaluatePlanHealth(
         suggestion,
         evaluatedAt: now,
     };
+}
+
+/** 不正値 (NaN/Infinity/負数) は 0 に補正。純粋関数として防御的に扱う。 */
+function normalizeAchievementRate(rate: number): number {
+    if (typeof rate !== 'number' || !Number.isFinite(rate)) return 0;
+    return Math.max(0, rate);
+}
+
+function normalizeConsecutiveOnFireDays(days: number): number {
+    if (typeof days !== 'number' || !Number.isFinite(days)) return 0;
+    return Math.max(0, Math.floor(days));
 }
 
 function classifyStatus(rate: number, onFireDays: number): PlanHealthStatus {
