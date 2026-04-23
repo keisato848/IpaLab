@@ -165,4 +165,22 @@ describe('replan v2.0 (profile-weighted)', () => {
         expect(result.algorithmVersion).toBe('2.0');
         expect(result.diff.totalDebtQuestions).toBe(5);
     });
+
+    it('特定曜日の paceByWeekday が 0 でもその日に詰まる (中立扱い)', () => {
+        // 4/24 (金) を 0 に設定。weight 0 でその曜日に詰まらない問題の回帰防止。
+        const plan = buildPlanWithCategories([
+            { date: '2026-04-22', questionCount: 5 },
+            { date: '2026-04-24', questionCount: 5 }, // 金曜
+        ]);
+        const result = replan({
+            plan,
+            dailyProgress: [dp('2026-04-22', 0)],
+            today: '2026-04-23',
+            // [Sun, Mon, Tue, Wed, Thu, Fri, Sat]
+            profile: profile({ paceByWeekday: [5, 5, 5, 5, 5, 0, 5] }),
+            options: { now, capacityBoost: 5, baseCapacity: 10 },
+        });
+        const fri = result.plan.weeklySchedule[0].dailyTasks.find((t) => t.date === '2026-04-24');
+        expect(fri?.questionCount).toBeGreaterThan(5);
+    });
 });

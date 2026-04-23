@@ -9,6 +9,7 @@
 
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { z } from 'zod';
 
 import { authOptions } from '@/auth';
 import { evaluatePlanHealth } from '@/lib/plan/healthCheck';
@@ -16,9 +17,27 @@ import type { PerformanceProfile } from '@/lib/types/performanceProfile';
 
 export const dynamic = 'force-dynamic';
 
-interface HealthCheckRequestBody {
-    profile?: PerformanceProfile;
-}
+const CategoryAccuracySchema = z.object({
+    total: z.number().nonnegative(),
+    correct: z.number().nonnegative(),
+    rate: z.number().min(0).max(1),
+});
+
+const PerformanceProfileSchema = z.object({
+    userId: z.string(),
+    generatedAt: z.string(),
+    paceByWeekday: z.array(z.number().nonnegative()).length(7),
+    recentAchievementRate: z.number().nonnegative().finite(),
+    consecutiveOnFireDays: z.number().int().nonnegative().finite(),
+    accuracyByCategory: z.record(z.string(), CategoryAccuracySchema),
+    continuityRate: z.number().min(0).max(1),
+    consecutiveStudyDays: z.number().int().nonnegative(),
+    paceRatio: z.number().nonnegative().finite(),
+});
+
+const RequestBodySchema = z.object({
+    profile: PerformanceProfileSchema,
+});
 
 export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
@@ -26,23 +45,24 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    let body: HealthCheckRequestBody = {};
+    let raw: unknown = {};
     try {
         const text = await request.text();
-        if (text) body = JSON.parse(text) as HealthCheckRequestBody;
+        if (text) raw = JSON.parse(text);
     } catch {
         return NextResponse.json({ error: 'INVALID_JSON' }, { status: 400 });
     }
 
-    if (!body.profile) {
+    const parsed = RequestBodySchema.safeParse(raw);
+    if (!parsed.success) {
         return NextResponse.json(
-            { error: 'MISSING_PROFILE', message: 'profile を request body に含めてください' },
+            { error: 'INVALID_INPUT', issues: parsed.error.issues },
             { status: 400 },
         );
     }
 
     try {
-        const result = evaluatePlanHealth(body.profile);
+        const result = evaluatePlanHealth(parsed.data.profile as PerformanceProfile);
         return NextResponse.json(result);
     } catch (error) {
         console.error('[health-check] failed', error);
