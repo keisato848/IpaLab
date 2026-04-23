@@ -51,12 +51,11 @@ function buildPlanWithCategories(
 function profile(overrides: Partial<PerformanceProfile> = {}): PerformanceProfile {
     return {
         userId: 'u1',
-        windowDays: 28,
         // [Sun, Mon, Tue, Wed, Thu, Fri, Sat]
         paceByWeekday: [10, 1, 1, 1, 1, 1, 10],
         recentAchievementRate: 1,
         consecutiveOnFireDays: 0,
-        accuracyByCategory: [],
+        accuracyByCategory: {},
         continuityRate: 1,
         consecutiveStudyDays: 7,
         paceRatio: 1,
@@ -122,10 +121,10 @@ describe('replan v2.0 (profile-weighted)', () => {
             today: '2026-04-23',
             profile: profile({
                 paceByWeekday: [1, 1, 1, 1, 1, 1, 1], // 曜日重み均等
-                accuracyByCategory: [
-                    { category: 'NW', accuracy: 0.5, totalCount: 100 },
-                    { category: 'DB', accuracy: 0.9, totalCount: 100 },
-                ],
+                accuracyByCategory: {
+                    NW: { total: 100, correct: 50, rate: 0.5 },
+                    DB: { total: 100, correct: 90, rate: 0.9 },
+                },
             }),
             options: { now, capacityBoost: 2, baseCapacity: 5 },
         });

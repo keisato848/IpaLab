@@ -271,13 +271,12 @@ function rankDaysByProfileWeight<T extends { date: string; category?: string }>(
     profile: PerformanceProfile,
 ): T[] {
     const paceMean = mean(profile.paceByWeekday);
-    const accuracyMap = new Map<string, number>();
-    for (const c of profile.accuracyByCategory) accuracyMap.set(c.category, c.accuracy);
+    const accuracyMap = profile.accuracyByCategory;
 
     const weighted = days.map((day, idx) => {
         const dow = new Date(`${day.date}T00:00:00.000Z`).getUTCDay();
         const paceWeight = paceMean > 0 ? profile.paceByWeekday[dow] / paceMean : 1;
-        const acc = day.category ? accuracyMap.get(day.category) : undefined;
+        const acc = day.category ? accuracyMap[day.category]?.rate : undefined;
         const weaknessWeight =
             acc !== undefined && acc < WEAKNESS_THRESHOLD ? WEAKNESS_BOOST : 1;
         return { day, idx, weight: paceWeight * weaknessWeight };

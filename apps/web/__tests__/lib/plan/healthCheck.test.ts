@@ -8,11 +8,10 @@ const NOW = '2026-04-23T00:00:00.000Z';
 function profile(overrides: Partial<PerformanceProfile> = {}): PerformanceProfile {
     return {
         userId: 'u1',
-        windowDays: 28,
         paceByWeekday: [0, 0, 0, 0, 0, 0, 0],
         recentAchievementRate: 1.0,
         consecutiveOnFireDays: 0,
-        accuracyByCategory: [],
+        accuracyByCategory: {},
         continuityRate: 0,
         consecutiveStudyDays: 0,
         paceRatio: 1,
