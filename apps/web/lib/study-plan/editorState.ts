@@ -1,11 +1,11 @@
 /**
  * StudyPlan 編集 UI Phase 2 (#211): タスク単位 D&D 移動。
  *
- * Phase 1 (#189) の `EditState` (休 / 集中 / 通常) に加え、
+ * Phase 1 (#189) の `EditState` (休 / 通常) に加え、
  * v1.5 では「ある日のタスク全量を別の日に移動」する `moves` を持つ。
  *
  * data shape:
- *   - modes: Record<date, EditMode>          // 休/集中トグル
+ *   - modes: Record<date, EditMode>          // 休/通常トグル
  *   - moves: Record<fromDate, toDate>        // D&D / 移動ボタン
  *
  * 同じ fromDate に対する複数指示は最後勝ち。toDate は重複可（複数日が同じ日に集まる）。
