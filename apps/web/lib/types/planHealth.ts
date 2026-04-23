@@ -4,7 +4,7 @@
  * - 直近 7 日達成率と on_fire 連続日数からヘルスを判定
  * - AI 不使用の純粋関数で算出
  *
- * 関連: docs/02_design/22_AdaptiveStudyPlan.md (作成予定)
+ * 関連設計は docs/02_design/ 配下の学習計画系ドキュメントを参照
  */
 
 export type PlanHealthStatus =

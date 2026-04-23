@@ -8,11 +8,10 @@ const NOW = '2026-04-23T00:00:00.000Z';
 function profile(overrides: Partial<PerformanceProfile> = {}): PerformanceProfile {
     return {
         userId: 'u1',
-        windowDays: 28,
         paceByWeekday: [0, 0, 0, 0, 0, 0, 0],
         recentAchievementRate: 1.0,
         consecutiveOnFireDays: 0,
-        accuracyByCategory: [],
+        accuracyByCategory: {},
         continuityRate: 0,
         consecutiveStudyDays: 0,
         paceRatio: 1,
@@ -80,5 +79,24 @@ describe('evaluatePlanHealth', () => {
 
     it('evaluatedAt は now() の戻り値', () => {
         expect(evaluatePlanHealth(profile(), opts).evaluatedAt).toBe(NOW);
+    });
+
+    it('不正値 (NaN/Infinity/負数) は防御的に補正される', () => {
+        const r1 = evaluatePlanHealth(profile({ recentAchievementRate: Number.NaN }), opts);
+        expect(r1.achievementRate).toBe(0);
+        expect(r1.status).toBe('major_delay');
+
+        const r2 = evaluatePlanHealth(
+            profile({ recentAchievementRate: Number.POSITIVE_INFINITY }),
+            opts,
+        );
+        expect(r2.achievementRate).toBe(0);
+
+        const r3 = evaluatePlanHealth(
+            profile({ recentAchievementRate: 1.5, consecutiveOnFireDays: Number.NaN }),
+            opts,
+        );
+        expect(r3.consecutiveOnFireDays).toBe(0);
+        expect(r3.status).toBe('on_track');
     });
 });
