@@ -12,7 +12,9 @@ interface UsePerformanceProfileResult {
 
 /**
  * GET /api/profile/performance を取得するシンプルフック。
- * 可視化UI (#219) とヘルスチェック (#221) の両方から利用される想定。
+ * 可視化UI (#219) とヘルスチェック (#221) の両方から利用される想定だが、
+ * **DashboardClient で 1 回だけ呼び出し、結果を子コンポーネントに props として配る**
+ * ことで API 二重呼び出しを避ける運用とする (#228 PR レビュー対応)。
  */
 export function usePerformanceProfile(enabled: boolean = true): UsePerformanceProfileResult {
     const [profile, setProfile] = useState<PerformanceProfile | null>(null);
@@ -20,7 +22,12 @@ export function usePerformanceProfile(enabled: boolean = true): UsePerformancePr
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!enabled) return;
+        if (!enabled) {
+            // disabled に切り替わったら state をリセット (loading=true 残留対策)
+            setLoading(false);
+            setError(null);
+            return;
+        }
         let aborted = false;
 
         async function run() {
@@ -32,12 +39,13 @@ export function usePerformanceProfile(enabled: boolean = true): UsePerformancePr
                     if (!aborted) setError(`status ${res.status}`);
                     return;
                 }
-                const data = (await res.json()) as PerformanceProfile;
-                if (!aborted) setProfile(data);
+                const json = (await res.json()) as { profile: PerformanceProfile };
+                if (!aborted) setProfile(json.profile);
             } catch (e) {
                 if (!aborted) setError(e instanceof Error ? e.message : 'unknown');
             } finally {
-                if (!aborted) setLoading(false);
+                // aborted でも loading=true で残らないよう必ずリセット
+                setLoading(false);
             }
         }
         void run();

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
+import type { PerformanceProfile } from '@/lib/types/performanceProfile';
 
 import styles from './PerformanceInsights.module.css';
 
@@ -13,6 +13,15 @@ const PACE_RATIO_COLD = 0.85;
 
 interface PerformanceInsightsProps {
     enabled?: boolean;
+    /**
+     * profile / loading / error は親 (DashboardClient) で `usePerformanceProfile` を
+     * 1 回だけ呼び出し、その結果を子コンポーネントとヘルスチェックフックに共有する。
+     * これにより同一 API (`/api/profile/performance`) の二重呼び出しを回避する (#228 PR レビュー対応)。
+     */
+    profile: PerformanceProfile | null;
+    loading: boolean;
+    error: string | null;
+    onRetry?: () => void;
 }
 
 interface PaceMood {
@@ -46,8 +55,13 @@ function formatPercent(rate: number): string {
  * - 曜日別ペース棒グラフ (今日強調)
  * - カテゴリ別正答率 (60%未満は弱点として赤強調)
  */
-export default function PerformanceInsights({ enabled = true }: PerformanceInsightsProps) {
-    const { profile, loading } = usePerformanceProfile(enabled);
+export default function PerformanceInsights({
+    enabled = true,
+    profile,
+    loading,
+    error,
+    onRetry,
+}: PerformanceInsightsProps) {
     const [collapsed, setCollapsed] = useState(false);
 
     const todayWeekday = useMemo(() => new Date().getDay(), []);
@@ -68,6 +82,23 @@ export default function PerformanceInsights({ enabled = true }: PerformanceInsig
         return (
             <section className={styles.card} aria-busy="true">
                 <div className={styles.empty}>📊 学習ペースを集計中...</div>
+            </section>
+        );
+    }
+    if (error && !profile) {
+        return (
+            <section className={styles.card} role="alert">
+                <div className={styles.empty}>
+                    ⚠️ 学習ペースの取得に失敗しました ({error})
+                    {onRetry && (
+                        <>
+                            <br />
+                            <button type="button" className={styles.collapseBtn} onClick={onRetry}>
+                                再試行
+                            </button>
+                        </>
+                    )}
+                </div>
             </section>
         );
     }
