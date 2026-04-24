@@ -686,11 +686,40 @@ export default function DashboardClient() {
     const [quickStartUrl, setQuickStartUrl] = useState("/exam");
     const [quickStartLabel, setQuickStartLabel] = useState("クイックスタート (続きから)");
 
+    // 学習計画がある場合は「今日の問題一覧」を eager に読み込み、
+    // クイックスタートが同じ問題群を指すようにする (UX 一貫性)。
     useEffect(() => {
+        if (!studyPlan || isAllPlans || !todayGoalData) return;
+        if (missionQuestions.length > 0 || missionQuestionsLoading) return;
+        void loadMissionQuestions();
+        // loadMissionQuestions / missionQuestionsLoading は state なので deps は studyPlan/todayGoalData のみで十分
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [studyPlan?.id, isAllPlans, todayGoalData?.date]);
+
+    useEffect(() => {
+        // 計画がある & 今日のミッション問題が読み込み済みなら、
+        // 「今日の問題一覧」と同じ最初の未回答問題を指す。
+        if (studyPlan && !isAllPlans && todayGoalData && missionQuestions.length > 0) {
+            const firstUnanswered = missionQuestions.find(
+                (q) => !isMissionQuestionAnswered(q.examId, q.qNo),
+            );
+            const target = firstUnanswered ?? missionQuestions[0];
+            if (target) {
+                setQuickStartUrl(getQuestionUrl(target.examId, target.qNo));
+                setQuickStartLabel(
+                    firstUnanswered
+                        ? 'クイックスタート (今日の問題)'
+                        : 'クイックスタート (今日の問題を見直す)',
+                );
+                return;
+            }
+        }
+
         if (statsRecords.length === 0) {
             const defaultExam = studyPlan && !isAllPlans ? getTargetExam(studyPlan) : 'AP';
             // Default URL if no history
             setQuickStartUrl(`/exam?active=${defaultExam}`);
+            setQuickStartLabel('クイックスタート (続きから)');
             return;
         }
         const lastRecord = statsRecords[0];
@@ -709,7 +738,10 @@ export default function DashboardClient() {
 
         // Simple fallback url construction
         setQuickStartUrl(`/exam/${yearPart}/${typeUrl}/${nextQNo}?mode=practice`);
-    }, [statsRecords, studyPlan, isAllPlans]);
+        setQuickStartLabel('クイックスタート (続きから)');
+        // isMissionQuestionAnswered/getQuestionUrl はクロージャだが render 毎に作られる純粋関数なので deps に入れない
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [statsRecords, studyPlan, isAllPlans, todayGoalData, missionQuestions, todayRecords]);
 
     return (
         <div className={styles.page}>
