@@ -247,12 +247,22 @@
     outline-offset: 2px;
 }
 
-/* PR-B: Today's Mission を grid 内で最上部に表示 (主訴: 画面下部にあって遷移しづらい) */
+/* 使用頻度順にダッシュボードを並び替え (デッドスペース解消) */
+/* 1段目: 今日の進捗 (CTA) + 通算正答率 + ヒートマップ で 4+4+4=12 */
+/* 2段目以降: Level → 今月 → 履歴 → 学習目標 (fullWidth) */
 .todayMissionPriority {
-    order: -10;
-    grid-column: span 12;
+    order: 1;
     border: 2px solid var(--primary-color, #6366f1);
     box-shadow: 0 4px 16px rgba(99, 102, 241, 0.18);
+}
+
+/* 通算正答率: statusCard 単独 (fullWidthCard でも todayMissionPriority でもない) */
+.statusCard:not(.fullWidthCard):not(.todayMissionPriority) {
+    order: 2;
+}
+
+.heatmapCard {
+    order: 3;
 }
 
 .todayMissionPriority::before {
@@ -269,7 +279,20 @@
 }
 
 .levelCard {
-    order: -5;
+    order: 4;
+}
+
+.monthlyProgressWrapper {
+    order: 5;
+}
+
+.historyCard {
+    order: 6;
+}
+
+/* 学習目標 (statusCard + fullWidthCard) は最下段に */
+.statusCard.fullWidthCard {
+    order: 7;
 }
 
 /* Specific Cards Layout */
