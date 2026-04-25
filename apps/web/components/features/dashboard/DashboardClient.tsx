@@ -685,6 +685,11 @@ export default function DashboardClient() {
     // 4. Quick Start Logic
     const [quickStartUrl, setQuickStartUrl] = useState("/exam");
     const [quickStartLabel, setQuickStartLabel] = useState("クイックスタート (続きから)");
+    // 計画あり時に「今日のミッションが空 / 計画上のタスクなし」の場合に開くガイドモーダル
+    const [quickStartFallbackReason, setQuickStartFallbackReason] = useState<
+        null | 'no-task-today' | 'no-questions'
+    >(null);
+    const [showQuickStartFallbackModal, setShowQuickStartFallbackModal] = useState(false);
 
     // 学習計画がある場合は「今日の問題一覧」を eager に読み込み、
     // クイックスタートが同じ問題群を指すようにする (UX 一貫性)。
@@ -699,7 +704,32 @@ export default function DashboardClient() {
     useEffect(() => {
         // 計画がある & 今日のミッション問題が読み込み済みなら、
         // 「今日の問題一覧」と同じ最初の未回答問題を指す。
+        if (studyPlan && !isAllPlans) {
+            // 計画はあるが「今日のタスクなし (休養日 / 計画期間外)」
+            if (!todayGoalData) {
+                setQuickStartFallbackReason('no-task-today');
+                setQuickStartLabel('クイックスタート');
+                setQuickStartUrl('');
+                return;
+            }
+            // ロード中はラベルだけ更新し、URL は触らない (誤遷移防止)
+            if (missionQuestionsLoading) {
+                setQuickStartFallbackReason(null);
+                setQuickStartLabel('クイックスタート (準備中…)');
+                setQuickStartUrl('');
+                return;
+            }
+            // ロード済みでもミッション 0 件 → モーダル誘導
+            if (missionQuestions.length === 0) {
+                setQuickStartFallbackReason('no-questions');
+                setQuickStartLabel('クイックスタート');
+                setQuickStartUrl('');
+                return;
+            }
+        }
+
         if (studyPlan && !isAllPlans && todayGoalData && missionQuestions.length > 0) {
+            setQuickStartFallbackReason(null);
             const firstUnanswered = missionQuestions.find(
                 (q) => !isMissionQuestionAnswered(q.examId, q.qNo),
             );
@@ -715,6 +745,8 @@ export default function DashboardClient() {
             }
         }
 
+        // ここに到達するのは isAllPlans / 計画なし のケース
+        setQuickStartFallbackReason(null);
         if (statsRecords.length === 0) {
             const defaultExam = studyPlan && !isAllPlans ? getTargetExam(studyPlan) : 'AP';
             // Default URL if no history
@@ -741,7 +773,7 @@ export default function DashboardClient() {
         setQuickStartLabel('クイックスタート (続きから)');
         // isMissionQuestionAnswered/getQuestionUrl はクロージャだが render 毎に作られる純粋関数なので deps に入れない
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [statsRecords, studyPlan, isAllPlans, todayGoalData, missionQuestions, todayRecords]);
+    }, [statsRecords, studyPlan, isAllPlans, todayGoalData, missionQuestions, missionQuestionsLoading, todayRecords]);
 
     return (
         <div className={styles.page}>
@@ -1309,7 +1341,21 @@ export default function DashboardClient() {
                             </div>
                         )}
                     </div>
-                    <Link href={quickStartUrl} className={styles.quickStartBtn}>{quickStartLabel}</Link>
+                    {quickStartFallbackReason || !quickStartUrl ? (
+                        <button
+                            type="button"
+                            className={styles.quickStartBtn}
+                            disabled={!quickStartFallbackReason}
+                            onClick={() => {
+                                if (quickStartFallbackReason) setShowQuickStartFallbackModal(true);
+                            }}
+                            style={!quickStartFallbackReason ? { opacity: 0.6, cursor: 'wait' } : undefined}
+                        >
+                            {quickStartLabel}
+                        </button>
+                    ) : (
+                        <Link href={quickStartUrl} className={styles.quickStartBtn}>{quickStartLabel}</Link>
+                    )}
                 </section>
 
                 {/* 3. Overall Accuracy Card */}
@@ -1512,6 +1558,67 @@ export default function DashboardClient() {
                     onSave={handleSaveMonthlyGoals}
                     onClose={() => setShowGoalEditor(false)}
                 />
+            )}
+            {showQuickStartFallbackModal && (
+                <div className={styles.missionOverlay} onClick={() => setShowQuickStartFallbackModal(false)}>
+                    <div className={styles.missionPopup} onClick={(e) => e.stopPropagation()}>
+                        <h3 className={styles.missionTitle}>
+                            {quickStartFallbackReason === 'no-task-today'
+                                ? '🌿 今日は計画上のタスクがありません'
+                                : '⚠️ 今日のミッション問題が見つかりません'}
+                        </h3>
+                        <p className={styles.missionSubtitle}>
+                            {quickStartFallbackReason === 'no-task-today'
+                                ? '今日は学習計画に予定されたタスクがありません。代わりに何をしますか？'
+                                : '本日のミッション問題を取得できませんでした。代わりに何をしますか？'}
+                        </p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
+                            {(() => {
+                                const planExam = studyPlan && !isAllPlans ? getTargetExam(studyPlan) : 'AP';
+                                const last = statsRecords[0];
+                                let continueUrl = `/exam?active=${planExam}`;
+                                if (last?.examId && last?.questionId) {
+                                    const parts = last.examId.split('-');
+                                    if (parts.length >= 2) {
+                                        const typeSuffix = parts[parts.length - 1];
+                                        const yearPart = parts.slice(0, parts.length - 1).join('-');
+                                        const typeUrl = typeSuffix === 'AM' ? 'AM1' : typeSuffix;
+                                        const lastQNo = parseInt(last.questionId.split('-').pop() || '0');
+                                        continueUrl = `/exam/${yearPart}/${typeUrl}/${lastQNo + 1}?mode=practice`;
+                                    }
+                                }
+                                const listUrl = `/exam?active=${planExam}`;
+                                return (
+                                    <>
+                                        <Link
+                                            href={continueUrl}
+                                            className={styles.missionButton}
+                                            onClick={() => setShowQuickStartFallbackModal(false)}
+                                        >
+                                            ▶️ 次の問題に進む
+                                        </Link>
+                                        <Link
+                                            href={listUrl}
+                                            className={styles.missionButton}
+                                            style={{ background: 'var(--surface-2, #e5e7eb)', color: 'var(--text-primary)' }}
+                                            onClick={() => setShowQuickStartFallbackModal(false)}
+                                        >
+                                            📋 問題一覧を見る
+                                        </Link>
+                                        <button
+                                            type="button"
+                                            className={styles.missionButton}
+                                            style={{ background: 'transparent', color: 'var(--text-secondary)' }}
+                                            onClick={() => setShowQuickStartFallbackModal(false)}
+                                        >
+                                            閉じる
+                                        </button>
+                                    </>
+                                );
+                            })()}
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
