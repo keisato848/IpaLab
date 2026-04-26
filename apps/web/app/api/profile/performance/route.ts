@@ -52,9 +52,23 @@ export async function GET(_request: NextRequest) {
         // 排他的上限。toIso は today の翌日 00:00 で today 当日分も含める
         const toIso = `${addDays(today, 1)}T00:00:00.000Z`;
 
+        // 各リポジトリ呼び出しは個別に catch し、1 つの依存先障害で API 全体が
+        // 500 にならないよう劣化フォールバックする。
+        // 特に DailyProgress コンテナは #207 で新設のため、共用 Cosmos に
+        // プロビジョン未済の環境では 404 を返し得る。
         const [records, persistedDailyProgresses, plansResult] = await Promise.all([
-            learningRecordRepository.findByUserIdInDateRange(userId, fromIso, toIso),
-            dailyProgressRepository.findByUserAndDateRange(userId, from, today),
+            learningRecordRepository
+                .findByUserIdInDateRange(userId, fromIso, toIso)
+                .catch((err: unknown) => {
+                    console.error('[api/profile/performance] learningRecordRepository.findByUserIdInDateRange failed', err);
+                    return [] as Awaited<ReturnType<typeof learningRecordRepository.findByUserIdInDateRange>>;
+                }),
+            dailyProgressRepository
+                .findByUserAndDateRange(userId, from, today)
+                .catch((err: unknown) => {
+                    console.error('[api/profile/performance] dailyProgressRepository.findByUserAndDateRange failed', err);
+                    return [] as Awaited<ReturnType<typeof dailyProgressRepository.findByUserAndDateRange>>;
+                }),
             studyPlanRepository
                 .listByUser(userId)
                 .then((rows) => ({ ok: true as const, rows }))
@@ -98,6 +112,7 @@ export async function GET(_request: NextRequest) {
 
         return NextResponse.json({ profile });
     } catch (e) {
+        console.error('[api/profile/performance] unhandled error', e);
         const message = e instanceof Error ? e.message : 'Internal Error';
         return NextResponse.json({ error: 'INTERNAL_ERROR', message }, { status: 500 });
     }

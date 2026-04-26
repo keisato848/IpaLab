@@ -36,7 +36,17 @@ export function usePerformanceProfile(enabled: boolean = true): UsePerformancePr
             try {
                 const res = await fetch('/api/profile/performance', { credentials: 'include' });
                 if (!res.ok) {
-                    if (!aborted) setError(`status ${res.status}`);
+                    // body の message を取り出してエラー詳細に含める (診断性向上)
+                    let detail = '';
+                    try {
+                        const body = (await res.json()) as { message?: string; error?: string };
+                        detail = body.message ?? body.error ?? '';
+                    } catch {
+                        // body が JSON でない場合は無視
+                    }
+                    if (!aborted) {
+                        setError(detail ? `status ${res.status}: ${detail}` : `status ${res.status}`);
+                    }
                     return;
                 }
                 const json = (await res.json()) as { profile: PerformanceProfile };
