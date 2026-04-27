@@ -800,6 +800,7 @@ export default function DashboardClient() {
                     profile={performanceProfile}
                     loading={performanceProfileLoading}
                     error={performanceProfileError}
+                    className={styles.fullWidthCard}
                 />
                 <section className={`${styles.card} ${styles.levelCard} ${styles.fullWidthCard} ${styles.collapsibleSection}`}>
                     {renderCollapseToggle('level', 'レベル情報', 'light')}
