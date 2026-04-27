@@ -1,10 +1,10 @@
-import { getContainer } from '@/lib/cosmos';
+import { ensureContainer } from '@/lib/cosmos';
 import { Question, QuestionSchema } from '@ipa-lab/shared';
 import { SqlQuerySpec } from '@azure/cosmos';
 
 export const questionRepository = {
     async getById(id: string, examId: string): Promise<Question | null> {
-        const container = await getContainer("Questions");
+        const container = await ensureContainer("Questions");
         if (!container) throw new Error("Database not initialized");
         const { resource } = await container.item(id, examId).read();
         if (!resource) return null;
@@ -12,7 +12,7 @@ export const questionRepository = {
     },
 
     async listByExamId(examId: string): Promise<Question[]> {
-        const container = await getContainer("Questions");
+        const container = await ensureContainer("Questions");
         if (!container) throw new Error("Database not initialized");
         const querySpec: SqlQuerySpec = {
             query: "SELECT * FROM c WHERE c.examId = @examId ORDER BY c.qNo ASC",
@@ -23,7 +23,7 @@ export const questionRepository = {
     },
 
     async create(question: Question): Promise<Question> {
-        const container = await getContainer("Questions");
+        const container = await ensureContainer("Questions");
         if (!container) throw new Error("Database not initialized");
         // Validation
         const validated = QuestionSchema.parse(question);
@@ -33,7 +33,7 @@ export const questionRepository = {
 
     // For Analytics/SubCategory filtering
     async listBySubCategory(subCategory: string): Promise<Question[]> {
-        const container = await getContainer("Questions");
+        const container = await ensureContainer("Questions");
         if (!container) throw new Error("Database not initialized");
         const querySpec: SqlQuerySpec = {
             query: "SELECT * FROM c WHERE c.subCategory = @subCategory",

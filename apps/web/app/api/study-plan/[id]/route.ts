@@ -23,6 +23,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
         }
         return NextResponse.json(plan);
     } catch (error) {
+        console.error('[study-plan/[id] GET] failed', error);
         const message = error instanceof Error ? error.message : 'Unknown error';
         return NextResponse.json(
             { error: 'Internal Server Error', details: message },
@@ -60,6 +61,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         const saved = await studyPlanRepository.upsert(session.user.id, parsed.data);
         return NextResponse.json(saved);
     } catch (error) {
+        console.error('[study-plan/[id] PUT] failed', error);
         const message = error instanceof Error ? error.message : 'Unknown error';
         return NextResponse.json(
             { error: 'Internal Server Error', details: message },
@@ -85,6 +87,7 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
         }
         return NextResponse.json({ ok: true });
     } catch (error) {
+        console.error('[study-plan/[id] DELETE] failed', error);
         const message = error instanceof Error ? error.message : 'Unknown error';
         return NextResponse.json(
             { error: 'Internal Server Error', details: message },
