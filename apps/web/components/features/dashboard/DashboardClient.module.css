@@ -291,6 +291,14 @@
     grid-column: span 12;
 }
 
+/* fullWidthCard はモバイル/デスクトップ両方で span 12 を保証する。
+ * バグ修正: 以前は @media (min-width: 1024px) 内にのみ定義されていたため、
+ * モバイルでは grid のデフォルト (span 1) に縮んでデッドスペースが発生していた。
+ */
+.fullWidthCard {
+    grid-column: span 12;
+}
+
 @media (min-width: 1024px) {
     .statusCard {
         grid-column: span 4;
@@ -300,7 +308,10 @@
         grid-column: span 4;
     }
 
-    .fullWidthCard {
+    /* 「今すぐ取り組む」カードは使用頻度が高いため、デスクトップでも
+     * 全幅表示を維持する (.statusCard の span 4 を上書き)。
+     */
+    .todayMissionPriority {
         grid-column: span 12;
     }
 }

@@ -1,0 +1,17 @@
+{
+	"version": 1,
+	"hooks": {
+		"sessionStart": [
+			{
+				"type": "command",
+				"powershell": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/self-inspect.ps1\" -Mode start"
+			}
+		],
+		"sessionEnd": [
+			{
+				"type": "command",
+				"powershell": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/self-inspect.ps1\" -Mode end"
+			}
+		]
+	}
+}

@@ -2,13 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@/lib/cosmos', () => ({
     getContainer: vi.fn(),
+    ensureContainer: vi.fn(),
 }));
 
-import { getContainer } from '@/lib/cosmos';
+import { ensureContainer } from '@/lib/cosmos';
 import { studyPlanRepository } from '@/lib/repositories/studyPlanRepository';
 import type { StudyPlan } from '@/lib/types/studyPlan';
 
-const mockGetContainer = vi.mocked(getContainer);
+const mockEnsureContainer = vi.mocked(ensureContainer);
 
 const samplePlan: StudyPlan = {
     id: 'plan-1',
@@ -39,7 +40,7 @@ describe('studyPlanRepository', () => {
             resources: [{ ...samplePlan, userId: 'u1' }],
         });
         const queryMock = vi.fn(() => ({ fetchAll: fetchAllMock }));
-        mockGetContainer.mockResolvedValue({ items: { query: queryMock } } as any);
+        mockEnsureContainer.mockResolvedValue({ items: { query: queryMock } } as any);
 
         const result = await studyPlanRepository.listByUser('u1');
 
@@ -57,7 +58,7 @@ describe('studyPlanRepository', () => {
         const upsertMock = vi.fn().mockResolvedValue({
             resource: { ...samplePlan, userId: 'u1' },
         });
-        mockGetContainer.mockResolvedValue({ items: { upsert: upsertMock } } as any);
+        mockEnsureContainer.mockResolvedValue({ items: { upsert: upsertMock } } as any);
 
         const saved = await studyPlanRepository.upsert('u1', samplePlan);
 
@@ -68,7 +69,7 @@ describe('studyPlanRepository', () => {
 
     it('upsertMany: 複数件を順次 upsert し件数を返す', async () => {
         const upsertMock = vi.fn().mockResolvedValue({ resource: { ...samplePlan, userId: 'u1' } });
-        mockGetContainer.mockResolvedValue({ items: { upsert: upsertMock } } as any);
+        mockEnsureContainer.mockResolvedValue({ items: { upsert: upsertMock } } as any);
 
         const n = await studyPlanRepository.upsertMany('u1', [samplePlan, { ...samplePlan, id: 'plan-2' }]);
 
@@ -79,7 +80,7 @@ describe('studyPlanRepository', () => {
     it('findById: 404 時は null を返す', async () => {
         const readMock = vi.fn().mockRejectedValue({ code: 404 });
         const itemMock = vi.fn(() => ({ read: readMock }));
-        mockGetContainer.mockResolvedValue({ item: itemMock } as any);
+        mockEnsureContainer.mockResolvedValue({ item: itemMock } as any);
 
         const result = await studyPlanRepository.findById('u1', 'missing');
 
@@ -89,11 +90,11 @@ describe('studyPlanRepository', () => {
 
     it('remove: 404 時は false、成功時は true', async () => {
         const deleteOk = vi.fn().mockResolvedValue({});
-        mockGetContainer.mockResolvedValue({ item: () => ({ delete: deleteOk }) } as any);
+        mockEnsureContainer.mockResolvedValue({ item: () => ({ delete: deleteOk }) } as any);
         await expect(studyPlanRepository.remove('u1', 'plan-1')).resolves.toBe(true);
 
         const deleteNotFound = vi.fn().mockRejectedValue({ statusCode: 404 });
-        mockGetContainer.mockResolvedValue({ item: () => ({ delete: deleteNotFound }) } as any);
+        mockEnsureContainer.mockResolvedValue({ item: () => ({ delete: deleteNotFound }) } as any);
         await expect(studyPlanRepository.remove('u1', 'missing')).resolves.toBe(false);
     });
 

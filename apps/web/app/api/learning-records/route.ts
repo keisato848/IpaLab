@@ -75,6 +75,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(records);
 
     } catch (error: any) {
+        console.error("Failed to fetch learning records:", error);
         return NextResponse.json(
             { error: "Internal Server Error", details: error.message },
             { status: 500 }
@@ -162,6 +163,7 @@ export async function POST(request: NextRequest) {
         }
 
     } catch (error: any) {
+        console.error("Failed to save learning record(s):", error);
         return NextResponse.json(
             { error: "Internal Server Error", details: error.message },
             { status: 500 }

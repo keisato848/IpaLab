@@ -1,4 +1,4 @@
-import { getContainer } from '@/lib/cosmos';
+import { ensureContainer } from '@/lib/cosmos';
 import { DailyProgress, DailyProgressSchema } from '@ipa-lab/shared';
 import { SqlQuerySpec } from '@azure/cosmos';
 
@@ -15,7 +15,7 @@ export const dailyProgressRepository = {
 
     async upsert(item: DailyProgress): Promise<DailyProgress> {
         const validated = DailyProgressSchema.parse(item);
-        const container = await getContainer(this.containerName);
+        const container = await ensureContainer(this.containerName);
         if (!container) throw new Error('Database not initialized');
         const { resource } = await container.items.upsert(validated);
         if (!resource) throw new Error('Failed to upsert daily progress');
@@ -33,7 +33,7 @@ export const dailyProgressRepository = {
     },
 
     async findByUserAndDateRange(userId: string, from: string, to: string): Promise<DailyProgress[]> {
-        const container = await getContainer(this.containerName);
+        const container = await ensureContainer(this.containerName);
         if (!container) throw new Error('Database not initialized');
         const querySpec: SqlQuerySpec = {
             query:
