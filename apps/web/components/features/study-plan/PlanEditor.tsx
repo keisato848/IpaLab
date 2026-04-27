@@ -320,9 +320,6 @@ export default function PlanEditor({ plan, onApply, onCancel }: Props) {
                 <span className={styles.legendItem}>
                     <span className={styles.legendSwatch} style={{ background: '#fef2f2', borderColor: '#fca5a5' }} /> 休
                 </span>
-                <span className={styles.legendItem}>
-                    <span className={styles.legendSwatch} style={{ background: '#fef3c7', borderColor: '#fbbf24' }} /> 集中
-                </span>
                 <span style={{ marginLeft: 'auto', color: '#9ca3af' }}>
                     クリックで切替 / ドラッグで別日へ移動
                 </span>
@@ -344,15 +341,13 @@ export default function PlanEditor({ plan, onApply, onCancel }: Props) {
                     }
                     const dayNum = Number(date.slice(-2));
                     const baseline = task.questionCount;
-                    const adjusted =
-                        mode === 'rest' ? 0 : mode === 'focus' ? Math.round(baseline * 1.5) : baseline;
+                    const adjusted = mode === 'rest' ? 0 : baseline;
                     const movedTo = editor.moves[date];
                     const isDragging = draggingDate === date;
                     const isDragOver = dragOverDate === date;
                     const cellClass = [
                         styles.cell,
                         mode === 'rest' ? styles.cellRest : '',
-                        mode === 'focus' ? styles.cellFocus : '',
                         isDragOver ? styles.cellDragOver : '',
                         isDragging ? styles.cellDragging : '',
                     ]
@@ -360,7 +355,7 @@ export default function PlanEditor({ plan, onApply, onCancel }: Props) {
                         .join(' ');
                     const wd = WEEKDAYS[weekdayIndex(date)];
                     const ariaLabel = `${date} ${wd}曜日、現在 ${adjusted} 問${
-                        mode === 'rest' ? '（休日）' : mode === 'focus' ? '（集中日）' : ''
+                        mode === 'rest' ? '（休日）' : ''
                     }${movedTo ? `、${movedTo} へ移動予定` : ''}、クリックで切替、移動ボタンで別日へ移動`;
                     return (
                         <div
@@ -406,9 +401,6 @@ export default function PlanEditor({ plan, onApply, onCancel }: Props) {
                                 <span className={styles.cellCount}>{adjusted} 問</span>
                                 {mode === 'rest' && (
                                     <span className={`${styles.cellMode} ${styles.cellModeRest}`}>休日</span>
-                                )}
-                                {mode === 'focus' && (
-                                    <span className={`${styles.cellMode} ${styles.cellModeFocus}`}>集中</span>
                                 )}
                                 {movedTo && (
                                     <span className={styles.cellMode} style={{ color: '#1d4ed8' }}>
