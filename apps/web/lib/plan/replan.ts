@@ -1,18 +1,22 @@
 /**
- * 動的再計画エンジン v1.0 (Phase 1 MVP).
+ * 動的再計画エンジン v1.0 (Phase 1 MVP) / v1.5 (manualMoves) / v2.0 (profile-weighted).
  *
- * - 入力: 既存の `StudyPlan` (apps/web/lib/api.ts) + 直近 `DailyProgress` 配列
- * - 振る舞い: 過去日の未消化問題数 (debt) を、`today` 以降の未来日にグリーディに振り分ける
- * - 制約: 1 日あたりの上限 = `max(originalQuestionCount, baseCap) * boost`
- *   （元計画のサイズを大きく超えない範囲で吸収）
+ * - v1.0: 過去日 debt を未来日にグリーディ (日付昇順) 振り分け
+ * - v1.5: ユーザの D&D による manualMoves を先に適用
+ * - v2.0: PerformanceProfile を入力すると、未来日を「曜日ペース重み × 弱点重み」で
+ *         並べ替えてから debt を充填。ユーザが実績を出している曜日 / 弱いカテゴリを
+ *         優先的に詰める。
+ *
  * - 試験日 (`plan.examDate`) を超える日には絶対に積まない（overflowed として返す）
- * - 純粋関数。I/O ゼロ。ゴールデンテスト容易。
+ * - 純粋関数。I/O ゼロ。
  *
- * 設計書: docs/02_design/20_DynamicReplanningEngine.md §13 (Phase 1 MVP)
- * 関連 Issue: #188 (P2-A-2)
+ * 設計書: docs/02_design/20_DynamicReplanningEngine.md §13 は v1.0 / v1.5 のベース挙動の参照。
+ * v2.0（曜日ペース重み × 弱点重み付け）の仕様根拠: 関連 Issue #222
+ * 関連 Issue: #188 (P2-A-2), #222 (v2.0)
  */
 
 import type { StudyPlan } from '@/lib/api';
+import type { PerformanceProfile } from '@/lib/types/performanceProfile';
 import type { DailyProgress } from '@ipa-lab/shared';
 
 export interface ReplanOptions {
@@ -53,7 +57,7 @@ export interface ReplanResult {
     diff: ReplanDiff;
     warnings: string[];
     generatedAt: string;
-    algorithmVersion: '1.0' | '1.5';
+    algorithmVersion: '1.0' | '1.5' | '2.0';
 }
 
 /**
@@ -74,6 +78,8 @@ export interface ReplanInput {
     today: string;
     /** v1.5: タスク単位の手動移動指示。空配列または未指定なら v1.0 と同等の挙動 */
     manualMoves?: ManualMove[];
+    /** v2.0: PerformanceProfile を渡すと曜日ペース × 弱点重み付きで再配分する */
+    profile?: PerformanceProfile;
     options?: ReplanOptions;
 }
 
@@ -100,7 +106,14 @@ export function replan(input: ReplanInput): ReplanResult {
     const moved: ReplanMove[] = [];
     const overflowed: ReplanOverflow[] = [];
 
-    type DayRef = { weekIdx: number; taskIdx: number; date: string; planned: number; cap: number };
+    type DayRef = {
+        weekIdx: number;
+        taskIdx: number;
+        date: string;
+        planned: number;
+        cap: number;
+        category?: string;
+    };
     const futureDays: DayRef[] = [];
     const pastDebts: { date: string; debt: number }[] = [];
 
@@ -117,12 +130,24 @@ export function replan(input: ReplanInput): ReplanResult {
             } else if (task.date <= plan.examDate) {
                 const planned = task.questionCount;
                 const cap = Math.max(opts.baseCapacity, Math.ceil(planned * opts.capacityBoost));
-                futureDays.push({ weekIdx: wi, taskIdx: ti, date: task.date, planned, cap });
+                futureDays.push({
+                    weekIdx: wi,
+                    taskIdx: ti,
+                    date: task.date,
+                    planned,
+                    cap,
+                    category: task.targetCategory,
+                });
             }
         });
     });
 
     futureDays.sort((a, b) => a.date.localeCompare(b.date));
+
+    // v2.0: profile があれば日付順 → 重み降順に並べ替えて充填する
+    const fillOrder = input.profile
+        ? rankDaysByProfileWeight([...futureDays], input.profile)
+        : futureDays;
 
     // 各 future day の現在割当量
     const assigned = new Map<string, number>();
@@ -158,11 +183,11 @@ export function replan(input: ReplanInput): ReplanResult {
         manualMovesApplied += 1;
     }
 
-    // --- 2. debt をグリーディに未来日へ詰め込む ---------------------------------------
+    // --- 2. debt をグリーディに未来日へ詰め込む (v2.0 では重み順) ---------------------
     let remaining = totalDebt;
     for (const debt of pastDebts) {
         let toRedistribute = debt.debt;
-        for (const day of futureDays) {
+        for (const day of fillOrder) {
             if (toRedistribute === 0) break;
             const cur = assigned.get(day.date)!;
             const room = day.cap - cur;
@@ -225,6 +250,50 @@ export function replan(input: ReplanInput): ReplanResult {
         },
         warnings,
         generatedAt: now,
-        algorithmVersion: manualMoves.length > 0 ? '1.5' : '1.0',
+        algorithmVersion: input.profile ? '2.0' : manualMoves.length > 0 ? '1.5' : '1.0',
     };
+}
+
+/**
+ * v2.0: futureDays を「曜日ペース重み × 弱点重み」の降順で並べ替えて返す。
+ *
+ * - paceWeight = paceByWeekday[dow] / mean(paceByWeekday)  (mean=0 の場合 1.0)
+ * - weaknessWeight = カテゴリ正答率が WEAKNESS_THRESHOLD 未満で WEAKNESS_BOOST、それ以外 1.0
+ * - weight = paceWeight * weaknessWeight
+ * - 重みが同じなら日付昇順 (元の順序保持)
+ *
+ * 弱点しきい値はとりあえず 60% (0.6)。実装着手時のメモ通り。
+ */
+const WEAKNESS_THRESHOLD = 0.6;
+const WEAKNESS_BOOST = 1.5;
+
+function rankDaysByProfileWeight<T extends { date: string; category?: string }>(
+    days: T[],
+    profile: PerformanceProfile,
+): T[] {
+    const paceMean = mean(profile.paceByWeekday);
+    const accuracyMap = profile.accuracyByCategory; // Record<string, CategoryAccuracy>
+
+    const weighted = days.map((day, idx) => {
+        const dow = new Date(`${day.date}T00:00:00.000Z`).getUTCDay();
+        // 曜日ペースが 0 の日 (= その曜日に学習実績なし) は中立扱い (1.0)。
+        // そうしないと 0 重みでその曜日に一切詰まらず、平日空白などで詰まらない計画になる。
+        const dayPace = profile.paceByWeekday[dow];
+        const paceWeight = paceMean > 0 && dayPace > 0 ? dayPace / paceMean : 1;
+        const acc = day.category ? accuracyMap[day.category]?.rate : undefined;
+        const weaknessWeight =
+            acc !== undefined && acc < WEAKNESS_THRESHOLD ? WEAKNESS_BOOST : 1;
+        return { day, idx, weight: paceWeight * weaknessWeight };
+    });
+
+    weighted.sort((a, b) => {
+        if (b.weight !== a.weight) return b.weight - a.weight;
+        return a.idx - b.idx;
+    });
+    return weighted.map((w) => w.day);
+}
+
+function mean(arr: number[]): number {
+    if (arr.length === 0) return 0;
+    return arr.reduce((s, v) => s + v, 0) / arr.length;
 }
