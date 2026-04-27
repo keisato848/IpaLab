@@ -331,12 +331,6 @@
         grid-column: span 4;
     }
 
-    /* 「今すぐ取り組む」カードは使用頻度が高いため、デスクトップでも
-     * 全幅表示を維持する (.statusCard の span 4 を上書き)。
-     */
-    .todayMissionPriority {
-        grid-column: span 12;
-    }
 }
 
 /* Header Actions (Date + Theme) */
