@@ -19,14 +19,17 @@ export default async function ExamEntrancePage({ params }: { params: Promise<{ y
 
     // Fetch Data
     let questions: Question[] = [];
+    let cosmosFailed = false;
     try {
         const data = await questionRepository.listByExamId(examId);
         questions = data as unknown as Question[];
     } catch (e) {
-        // CosmosDB 失敗時は無視
+        cosmosFailed = true;
+        console.error(`[Page] Cosmos query failed for examId=${examId}:`, e instanceof Error ? e.message : e);
     }
 
-    // ファイルシステムフォールバック (ローカル開発・DB未接続時)
+    // Filesystem フォールバック: 全環境で有効。Cosmos 同期漏れ・接続障害時の最終防衛線。
+    // observability: fallback が発動した場合は warn を出して根本原因の追跡可能性を確保する。
     if (questions.length === 0) {
         try {
             const fsData = await getExamData(examId);
@@ -42,8 +45,14 @@ export default async function ExamEntrancePage({ params }: { params: Promise<{ y
                 // Form A: 配列
                 questions = fsData as unknown as Question[];
             }
+            if (questions.length > 0) {
+                console.warn(
+                    `[Page] Filesystem fallback engaged for examId=${examId} (loaded ${questions.length} questions). ` +
+                    `cosmosFailed=${cosmosFailed}. Investigate sync gap or DB outage.`
+                );
+            }
         } catch (e) {
-            console.warn(`[Page] FS Data load failed for ${examId}.`);
+            console.warn(`[Page] FS Data load failed for ${examId}:`, e instanceof Error ? e.message : e);
         }
     }
 

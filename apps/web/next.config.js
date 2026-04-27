@@ -8,6 +8,13 @@ const nextConfig = {
     outputFileTracingRoot: path.join(__dirname, '../../'),
     transpilePackages: ["@ipa-lab/shared"],
     reactStrictMode: true,
+    // standalone build に packages/data の問題JSONを同梱する。
+    // ssg-helper.ts は cwd 相対の動的パスで読むため Next.js のトレース対象外となる。
+    // Cosmos 同期漏れ時のフォールバック (apps/web/app/(main)/exam/...) で必須。
+    outputFileTracingIncludes: {
+        '/exam/**': ['../../packages/data/data/questions/**/*.json'],
+        '/api/**': ['../../packages/data/data/questions/**/*.json'],
+    },
     // Next.js 15: serverComponentsExternalPackages renamed to serverExternalPackages
     serverExternalPackages: [
         '@azure/cosmos',
