@@ -36,6 +36,7 @@ export async function GET(
 
         return NextResponse.json(safeQuestions);
     } catch (error) {
+        console.error('[exam-questions] Failed to fetch questions:', error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

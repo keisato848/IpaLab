@@ -81,6 +81,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ items, summary });
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Internal Error';
+    console.error('[user-progress/daily] Error:', message);
     return NextResponse.json({ error: 'INTERNAL_ERROR', message }, { status: 500 });
   }
 }
