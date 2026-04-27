@@ -60,6 +60,7 @@ export async function GET() {
 
         return NextResponse.json(normalizedExams);
     } catch (error: any) {
+        console.error("Failed to fetch exams:", error);
         return NextResponse.json(
             { error: "Internal Server Error", details: error.message },
             { status: 500 }

@@ -1,4 +1,4 @@
-import { getContainer } from '@/lib/cosmos';
+import { ensureContainer } from '@/lib/cosmos';
 // import { Exam } from '@ipa-lab/shared'; // Not available in shared yet
 
 export interface Exam {
@@ -17,7 +17,7 @@ export interface Exam {
 
 export const examRepository = {
     async findAll(): Promise<Exam[]> {
-        const container = await getContainer("Exams");
+        const container = await ensureContainer("Exams");
         if (!container) throw new Error("Database not initialized");
         const { resources } = await container.items
             .query("SELECT * FROM c ORDER BY c.id DESC")
@@ -26,7 +26,7 @@ export const examRepository = {
     },
 
     async findById(id: string): Promise<Exam | null> {
-        const container = await getContainer("Exams");
+        const container = await ensureContainer("Exams");
         if (!container) return null;
         try {
             const { resource } = await container.item(id, id).read();
