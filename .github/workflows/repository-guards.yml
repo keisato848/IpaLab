@@ -1,0 +1,58 @@
+name: Repository Guards
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  exam-data-fallback-guard:
+    name: Exam Data Fallback Guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run guard
+        run: node scripts/guard-exam-data-fallback.mjs
+
+  standalone-bundle-data-check:
+    # standalone build に packages/data の問題JSONが実際に同梱されているかを検証
+    name: Standalone Bundle Data Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Build web (standalone)
+        run: npm run build:standalone
+      - name: Verify problem JSON is bundled
+        shell: bash
+        run: |
+          set -e
+          BUNDLE_DIR="apps/web/.next/standalone/packages/data/data/questions"
+          if [ ! -d "$BUNDLE_DIR" ]; then
+            echo "::error::standalone bundle に packages/data/data/questions ディレクトリが含まれていません。"
+            echo "::error::next.config.js の outputFileTracingIncludes を確認してください (PR #230 参照)。"
+            exit 1
+          fi
+          COUNT=$(find "$BUNDLE_DIR" -mindepth 1 -maxdepth 1 -type d | wc -l)
+          echo "Bundled exam directories: $COUNT"
+          if [ "$COUNT" -lt 50 ]; then
+            echo "::error::同梱された試験ディレクトリ数が想定より少ない (got=$COUNT, expected>=50)。"
+            echo "::error::outputFileTracingIncludes の glob を確認してください。"
+            exit 1
+          fi
+          # 代表的な examId が同梱されているかスポットチェック
+          for SAMPLE in "SA-2024-Spring-PM1" "AP-2024-Spring-AM" "SC-2024-Spring-PM1"; do
+            if [ ! -f "$BUNDLE_DIR/$SAMPLE/questions_transformed.json" ] && \
+               [ ! -f "$BUNDLE_DIR/$SAMPLE/questions_raw.json" ]; then
+              echo "::warning::$SAMPLE の問題JSONが同梱されていません。"
+            fi
+          done
+          echo "✅ standalone bundle に問題JSONが同梱されています。"
