@@ -25,17 +25,24 @@ interface UsePlanHealthCheckOptions {
     userId: string;
     /** disabled なら fetch しない (default true) */
     enabled?: boolean;
+    /**
+     * 外部で取得済みの profile を注入できる。指定された場合は API fetch をスキップし、
+     * 渡された profile に対してのみ評価する。これによりダッシュボード上で
+     * `usePerformanceProfile` (#219) と本フックが API を二重呼び出しする問題を回避する。
+     */
+    profile?: PerformanceProfile | null;
 }
 
 /**
  * ダッシュボードマウント時に PerformanceProfile を取得し、
  * クライアント側で健康判定 + スロットリングを適用してトースト表示状態を返す。
  *
- * 健康判定はクライアント純粋関数で行うため API 往復は 1 回のみ (profile 取得)。
+ * 健康判定はクライアント純粋関数で行うため、API 往復は profile が外部注入されない場合のみ 1 回。
  */
 export function usePlanHealthCheck({
     userId,
     enabled = true,
+    profile: externalProfile,
 }: UsePlanHealthCheckOptions): UsePlanHealthCheckResult {
     const [health, setHealth] = useState<PlanHealthResult | null>(null);
     const [visible, setVisible] = useState(false);
@@ -43,8 +50,21 @@ export function usePlanHealthCheck({
 
     useEffect(() => {
         if (!enabled || !userId) return;
-        let aborted = false;
 
+        // 外部から profile を渡された場合: API fetch せずそのまま評価
+        if (externalProfile !== undefined) {
+            if (externalProfile === null) return; // 取得待ち or 失敗
+            const result = evaluatePlanHealth(externalProfile);
+            setHealth(result);
+            if (!result.shouldNotify) return;
+            const suppression = loadSuppression(userId);
+            if (shouldShowToast(result.status, suppression, new Date())) {
+                setVisible(true);
+            }
+            return;
+        }
+
+        let aborted = false;
         async function run() {
             setLoading(true);
             try {
@@ -71,7 +91,7 @@ export function usePlanHealthCheck({
         return () => {
             aborted = true;
         };
-    }, [enabled, userId]);
+    }, [enabled, userId, externalProfile]);
 
     const dismiss = useCallback(
         (reason: DismissReason) => {
