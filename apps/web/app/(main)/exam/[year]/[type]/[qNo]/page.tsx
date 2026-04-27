@@ -71,10 +71,11 @@ export default async function ExamQuestionPage({ params }: { params: Promise<{ y
         console.error(`[Page] Cosmos query failed for examId=${examId}:`, e instanceof Error ? e.message : e);
     }
 
-    // Filesystem フォールバック: ローカル/開発時のみ有効。
-    // 本番(standalone build)では packages/data が同梱されないため事実上動作しない。
-    // 同期漏れを本番で隠蔽しないよう、明示的に開発環境のみ実行する。
-    if (questions.length === 0 && process.env.NODE_ENV !== 'production') {
+    // Filesystem フォールバック: 全環境で有効。
+    // packages/data の JSON は next.config.js の outputFileTracingIncludes で
+    // standalone build に同梱される。Cosmos 同期漏れ・接続障害時の最終防衛線。
+    // observability: fallback が発動した場合は warn を出して根本原因 (Cosmos 欠損 / 同期漏れ) の追跡可能性を確保する。
+    if (questions.length === 0) {
         try {
             const fsData = await getExamData(examId);
             if (fsData && !Array.isArray(fsData)) {
@@ -87,7 +88,10 @@ export default async function ExamQuestionPage({ params }: { params: Promise<{ y
                 questions = fsData as unknown as Question[];
             }
             if (questions.length > 0) {
-                console.info(`[Page] Loaded ${questions.length} questions from filesystem fallback for ${examId} (dev only).`);
+                console.warn(
+                    `[Page] Filesystem fallback engaged for examId=${examId} (loaded ${questions.length} questions). ` +
+                    `Cosmos status=${loadStatus}. Investigate sync gap or DB outage.`
+                );
             }
         } catch (e) {
             console.warn(`[Page] FS Data load failed for ${examId}:`, e instanceof Error ? e.message : e);
