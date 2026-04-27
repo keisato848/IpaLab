@@ -22,6 +22,12 @@ interface PerformanceInsightsProps {
     loading: boolean;
     error: string | null;
     onRetry?: () => void;
+    /**
+     * 親 (DashboardClient) のグリッドレイアウト用クラス (例: fullWidthCard) を
+     * このコンポーネントの `<section>` に付与するためのフック。
+     * これがないと CSS Grid 内で `grid-column: auto` (span 1) になりレイアウトが崩れる。
+     */
+    className?: string;
 }
 
 interface PaceMood {
@@ -61,6 +67,7 @@ export default function PerformanceInsights({
     loading,
     error,
     onRetry,
+    className,
 }: PerformanceInsightsProps) {
     const [collapsed, setCollapsed] = useState(false);
 
@@ -78,16 +85,17 @@ export default function PerformanceInsights({
     }, [profile]);
 
     if (!enabled) return null;
+    const rootClass = className ? `${styles.card} ${className}` : styles.card;
     if (loading && !profile) {
         return (
-            <section className={styles.card} aria-busy="true">
+            <section className={rootClass} aria-busy="true">
                 <div className={styles.empty}>📊 学習ペースを集計中...</div>
             </section>
         );
     }
     if (error && !profile) {
         return (
-            <section className={styles.card} role="alert">
+            <section className={rootClass} role="alert">
                 <div className={styles.empty}>
                     ⚠️ 学習ペースの取得に失敗しました ({error})
                     {onRetry && (
@@ -104,7 +112,7 @@ export default function PerformanceInsights({
     }
     if (!profile) {
         return (
-            <section className={styles.card}>
+            <section className={rootClass}>
                 <div className={styles.empty}>
                     📊 まだ学習データが少ないため、ペースを表示できません。
                     <br />
@@ -120,7 +128,7 @@ export default function PerformanceInsights({
     const hasAnyCategory = sortedCategories.length > 0;
 
     return (
-        <section className={styles.card} aria-label="あなたの学習ペース">
+        <section className={rootClass} aria-label="あなたの学習ペース">
             <div className={styles.header}>
                 <div>
                     <h2 className={styles.title}>📊 あなたの学習ペース</h2>
