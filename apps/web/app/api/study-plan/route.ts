@@ -21,6 +21,7 @@ export async function GET() {
         const plans = await studyPlanRepository.listByUser(session.user.id);
         return NextResponse.json(plans);
     } catch (error) {
+        console.error('[study-plan GET] failed', error);
         const message = error instanceof Error ? error.message : 'Unknown error';
         return NextResponse.json(
             { error: 'Internal Server Error', details: message },
@@ -67,6 +68,7 @@ export async function POST(request: NextRequest) {
         const saved = await studyPlanRepository.upsert(session.user.id, parsed.data);
         return NextResponse.json(saved, { status: 200 });
     } catch (error) {
+        console.error('[study-plan POST] failed', error);
         const message = error instanceof Error ? error.message : 'Unknown error';
         return NextResponse.json(
             { error: 'Internal Server Error', details: message },

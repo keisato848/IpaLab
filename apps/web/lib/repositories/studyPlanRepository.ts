@@ -1,4 +1,4 @@
-import { getContainer } from '@/lib/cosmos';
+import { ensureContainer } from '@/lib/cosmos';
 import type { SqlQuerySpec } from '@azure/cosmos';
 import { StoredStudyPlanSchema, type StoredStudyPlan } from '@/lib/types/studyPlanSchema';
 import type { StudyPlan } from '@/lib/types/studyPlan';
@@ -17,7 +17,7 @@ export const studyPlanRepository = {
     containerName: 'StudyPlan',
 
     async listByUser(userId: string): Promise<StudyPlan[]> {
-        const container = await getContainer(this.containerName);
+        const container = await ensureContainer(this.containerName);
         if (!container) throw new Error('Database not initialized');
         const querySpec: SqlQuerySpec = {
             query: 'SELECT * FROM c WHERE c.userId = @userId ORDER BY c.examDate ASC',
@@ -28,7 +28,7 @@ export const studyPlanRepository = {
     },
 
     async findById(userId: string, id: string): Promise<StudyPlan | null> {
-        const container = await getContainer(this.containerName);
+        const container = await ensureContainer(this.containerName);
         if (!container) throw new Error('Database not initialized');
         try {
             const { resource } = await container.item(id, userId).read<StoredStudyPlan>();
@@ -42,7 +42,7 @@ export const studyPlanRepository = {
 
     async upsert(userId: string, plan: StudyPlan): Promise<StudyPlan> {
         const stored = StoredStudyPlanSchema.parse({ ...plan, userId });
-        const container = await getContainer(this.containerName);
+        const container = await ensureContainer(this.containerName);
         if (!container) throw new Error('Database not initialized');
         const { resource } = await container.items.upsert(stored);
         if (!resource) throw new Error('Failed to upsert study plan');
@@ -60,7 +60,7 @@ export const studyPlanRepository = {
     },
 
     async remove(userId: string, id: string): Promise<boolean> {
-        const container = await getContainer(this.containerName);
+        const container = await ensureContainer(this.containerName);
         if (!container) throw new Error('Database not initialized');
         try {
             await container.item(id, userId).delete();

@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
         }
 
     } catch (error: any) {
+        console.error("Failed to fetch exam progress:", error);
         return NextResponse.json(
             { error: "Internal Server Error", details: error.message },
             { status: 500 }
@@ -125,6 +126,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(resource);
 
     } catch (error: any) {
+        console.error("Failed to update exam progress:", error);
         return NextResponse.json(
             { error: "Internal Server Error", details: error.message },
             { status: 500 }

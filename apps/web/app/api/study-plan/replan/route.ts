@@ -116,6 +116,7 @@ export async function POST(request: NextRequest) {
         const result = replan({ plan, dailyProgress, today, manualMoves: parsed.data.manualMoves });
         return NextResponse.json(result);
     } catch (e) {
+        console.error('[study-plan/replan] failed', e);
         const message = e instanceof Error ? e.message : 'Internal Error';
         return NextResponse.json({ error: 'INTERNAL_ERROR', message }, { status: 500 });
     }
