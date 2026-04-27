@@ -13,8 +13,10 @@ import { useMonthlyProgress, createDefaultMonthlyGoals } from '@/hooks/useMonthl
 import { useMonthlyStats } from '@/hooks/useMonthlyStats';
 import GoalSettingWizard, { StudyPlan, MonthlyGoal } from './GoalSettingWizard';
 import MonthlyGoalEditor from './MonthlyGoalEditor';
+import PerformanceInsights from './PerformanceInsights';
 import PlanHealthToast from './PlanHealthToast';
 import PlanReadyNotification from './PlanReadyNotification';
+import { usePerformanceProfile } from '@/hooks/usePerformanceProfile';
 import { usePlanHealthCheck } from '@/hooks/usePlanHealthCheck';
 import styles from './DashboardClient.module.css';
 
@@ -33,11 +35,20 @@ export default function DashboardClient() {
     const [records, setRecords] = useState<LearningRecord[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // #221 計画ヘルスチェック (認証済みユーザのみ)
+    // #228: profile を 1 回だけ取得して PerformanceInsights / usePlanHealthCheck で共有
+    const isAuthed = status === 'authenticated';
+    const {
+        profile: performanceProfile,
+        loading: performanceProfileLoading,
+        error: performanceProfileError,
+    } = usePerformanceProfile(isAuthed);
+
+    // #221 計画ヘルスチェック (認証済みユーザのみ。profile を共有して二重 fetch を回避)
     const { health: planHealth, visible: planHealthVisible, dismiss: dismissPlanHealth } =
         usePlanHealthCheck({
             userId: session?.user?.id ?? '',
-            enabled: status === 'authenticated',
+            enabled: isAuthed,
+            profile: performanceProfile,
         });
 
     // Goal Setting State
@@ -720,6 +731,12 @@ export default function DashboardClient() {
             </header>
 
             <div className={styles.grid}>
+                <PerformanceInsights
+                    enabled={isAuthed}
+                    profile={performanceProfile}
+                    loading={performanceProfileLoading}
+                    error={performanceProfileError}
+                />
                 <section className={`${styles.card} ${styles.levelCard} ${styles.fullWidthCard} ${styles.collapsibleSection}`}>
                     {renderCollapseToggle('level', 'レベル情報', 'light')}
                     <div className={styles.levelHeader}>
