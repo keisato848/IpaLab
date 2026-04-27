@@ -13,7 +13,9 @@ import { useMonthlyProgress, createDefaultMonthlyGoals } from '@/hooks/useMonthl
 import { useMonthlyStats } from '@/hooks/useMonthlyStats';
 import GoalSettingWizard, { StudyPlan, MonthlyGoal } from './GoalSettingWizard';
 import MonthlyGoalEditor from './MonthlyGoalEditor';
+import PlanHealthToast from './PlanHealthToast';
 import PlanReadyNotification from './PlanReadyNotification';
+import { usePlanHealthCheck } from '@/hooks/usePlanHealthCheck';
 import styles from './DashboardClient.module.css';
 
 // PR-E: 重い可視化コンポーネントは dynamic import で遅延ロード（First Load JS 削減）
@@ -30,6 +32,13 @@ export default function DashboardClient() {
     const { data: session, status } = useSession();
     const [records, setRecords] = useState<LearningRecord[]>([]);
     const [loading, setLoading] = useState(true);
+
+    // #221 計画ヘルスチェック (認証済みユーザのみ)
+    const { health: planHealth, visible: planHealthVisible, dismiss: dismissPlanHealth } =
+        usePlanHealthCheck({
+            userId: session?.user?.id ?? '',
+            enabled: status === 'authenticated',
+        });
 
     // Goal Setting State
     const [studyPlan, setStudyPlan] = useState<StudyPlan | null>(null);
@@ -1425,6 +1434,25 @@ export default function DashboardClient() {
                     job={pendingJob}
                     onApply={handleApplyPlanFromNotification}
                     onDismiss={handleDismissNotification}
+                />
+            )}
+
+            {planHealthVisible && planHealth && (
+                <PlanHealthToast
+                    health={planHealth}
+                    onAction={() => {
+                        dismissPlanHealth('apply');
+                        const action = planHealth.suggestion.action;
+                        if (action === 'open_replan') {
+                            // 既存の計画編集ページへ
+                            window.location.href = '/plan';
+                        } else if (action === 'increase_pace') {
+                            // 絶好調: 計画ブースト導線として /plan へ
+                            window.location.href = '/plan?action=boost';
+                        }
+                    }}
+                    onLater={() => dismissPlanHealth('later')}
+                    onClose={() => dismissPlanHealth('close')}
                 />
             )}
 
