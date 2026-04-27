@@ -1,4 +1,4 @@
-import { ensureContainer } from '@/lib/cosmos';
+import { getContainer } from '@/lib/cosmos';
 import { LearningRecord, LearningRecordSchema } from '@ipa-lab/shared';
 import { SqlQuerySpec } from '@azure/cosmos';
 
@@ -10,7 +10,7 @@ export const learningRecordRepository = {
         // Note: In API we used LearningRecordSchema.parse(record), here we ensure types match
         // We cast to any to satisfy parser if strict types differ slightly or verify strictness
         const validated = LearningRecordSchema.parse(record);
-        const container = await ensureContainer(this.containerName);
+        const container = await getContainer(this.containerName);
         if (!container) throw new Error('Database not initialized');
         const { resource } = await container.items.upsert(validated);
         if (!resource) throw new Error('Failed to save learning record');
@@ -18,7 +18,7 @@ export const learningRecordRepository = {
     },
 
     async findByUserId(userId: string): Promise<LearningRecord[]> {
-        const container = await ensureContainer(this.containerName);
+        const container = await getContainer(this.containerName);
         if (!container) throw new Error('Database not initialized');
         const querySpec: SqlQuerySpec = {
             query: "SELECT * FROM c WHERE c.userId = @userId",
@@ -40,7 +40,7 @@ export const learningRecordRepository = {
         fromIso: string,
         toIso: string,
     ): Promise<LearningRecord[]> {
-        const container = await ensureContainer(this.containerName);
+        const container = await getContainer(this.containerName);
         if (!container) throw new Error('Database not initialized');
         const querySpec: SqlQuerySpec = {
             query:
@@ -60,7 +60,7 @@ export const learningRecordRepository = {
     },
 
     async listByUserAndExamId(userId: string, examId: string): Promise<LearningRecord[]> {
-        const container = await ensureContainer(this.containerName);
+        const container = await getContainer(this.containerName);
         if (!container) throw new Error('Database not initialized');
         const querySpec: SqlQuerySpec = {
             query: "SELECT * FROM c WHERE c.userId = @userId AND c.examId = @examId",
