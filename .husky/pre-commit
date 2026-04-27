@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+
+# =============================================================
+# pre-commit hook
+# 軽量ガード (静的チェックのみ・テストは pre-push で実行)
+# =============================================================
+
+# 過去インシデント (PR #230) の再発防止: 午後試験データ防壁の静的チェック
+echo "🛡️  Exam-data fallback guard を実行中..."
+node scripts/guard-exam-data-fallback.mjs
+GUARD_EXIT=$?
+
+if [ $GUARD_EXIT -ne 0 ]; then
+  echo "❌ ガードチェックに失敗しました。コミットを中止します。"
+  exit 1
+fi

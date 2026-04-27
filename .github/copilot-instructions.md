@@ -360,3 +360,43 @@ AI アシスタントの障害報告機能から自動起票された Issue は�
 - **Gemini API の地域制限**: US リージョンからのみ呼び出し可能（East Asia からは `User location is not supported` エラー）
 - フロントエンドから AI 機能を使う場合は必ず `/api/ai/plan` を経由（直接 Gemini API を呼ばない）
 - api-ai のデプロイ後は Function App の再起動が必要な場合あり
+
+## 午後試験データ防壁 (Exam Data Fallback Guard)
+
+**過去インシデント (PR #230 / SA-2024-Spring-PM1)** に基づく **絶対ルール**。
+違反は `pre-commit` フック (`scripts/guard-exam-data-fallback.mjs`) と CI ワークフロー
+(`.github/workflows/repository-guards.yml`) で機械的に検知される。
+
+### ❌ 禁止事項 (Copilot は絶対に行わないこと)
+
+1. **`apps/web/app/(main)/exam/[year]/[type]/[qNo]/page.tsx` および同 `[type]/page.tsx` の
+   filesystem fallback ブロックに `process.env.NODE_ENV !== 'production'` ガードを再導入しない**
+   - 理由: Cosmos 同期漏れ/接続障害時に本番で「データが見つかりません」エラーが出る
+   - 「dev only」「ローカルのみ」といった理由で再導入を提案しない
+
+2. **`apps/web/next.config.js` の `outputFileTracingIncludes` から
+   `packages/data/data/questions/**/*.json` の glob を削除しない**
+   - 理由: standalone build に問題JSONが同梱されず fallback が動かなくなる
+   - `ssg-helper.ts` は cwd 相対の動的パスで読むため Next.js の自動トレース対象外
+
+3. **`apps/web/lib/ssg-helper.ts` の `getExamData()` エクスポートを削除/リネームしない**
+   - 理由: fallback の入口が消える
+
+### ✅ 必須事項
+
+- 試験ページ (両方) で fallback が発動した際は `console.warn`
+  with `"Filesystem fallback engaged for examId=..."` を出力すること
+  → Application Insights から Cosmos 同期漏れを検知するため
+- fallback ロジックを変更する場合、必ず `node scripts/guard-exam-data-fallback.mjs` を
+  ローカルで実行してパスすることを確認
+
+### 関連ファイル
+
+| ファイル | 役割 |
+|---|---|
+| `apps/web/app/(main)/exam/[year]/[type]/[qNo]/page.tsx` | 質問ページ (fallback 一次防壁) |
+| `apps/web/app/(main)/exam/[year]/[type]/page.tsx` | エントランスページ (fallback 二次防壁) |
+| `apps/web/lib/ssg-helper.ts` | `getExamData()` 実装 |
+| `apps/web/next.config.js` | `outputFileTracingIncludes` 設定 |
+| `scripts/guard-exam-data-fallback.mjs` | 静的チェッカ (pre-commit / CI) |
+| `.github/workflows/repository-guards.yml` | CI で standalone bundle 同梱検証 |
