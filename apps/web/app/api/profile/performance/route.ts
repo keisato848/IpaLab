@@ -99,6 +99,7 @@ export async function GET(_request: NextRequest) {
         return NextResponse.json({ profile });
     } catch (e) {
         const message = e instanceof Error ? e.message : 'Internal Error';
+        console.error('[profile/performance] Error:', message);
         return NextResponse.json({ error: 'INTERNAL_ERROR', message }, { status: 500 });
     }
 }

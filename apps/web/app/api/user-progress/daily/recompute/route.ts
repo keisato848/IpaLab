@@ -78,6 +78,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ upsertedCount, range: { from, to } });
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Internal Error';
+    console.error('[user-progress/daily/recompute] Error:', message);
     return NextResponse.json({ error: 'INTERNAL_ERROR', message }, { status: 500 });
   }
 }

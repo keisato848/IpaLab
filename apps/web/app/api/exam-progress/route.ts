@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
             }
             return NextResponse.json(resource);
         } catch (e: any) {
-            // 404 is fine, return empty
+            if (e.code !== 404) console.error('[exam-progress] Unexpected read error:', e);
             if (e.code === 404) {
                 return NextResponse.json({
                     id,
@@ -97,6 +97,7 @@ export async function POST(request: NextRequest) {
                 };
             }
         } catch (e) {
+            console.error('[exam-progress] Failed to read existing progress, using default:', e);
             progress = {
                 id,
                 userId,

@@ -323,11 +323,15 @@
 }
 
 @media (min-width: 1024px) {
-    .statusCard {
+    /* fullWidthCard を持つ statusCard (例: 学習目標カード) は span 12 を保持する。
+     * バグ修正: 以前は .statusCard { span 4 } が .fullWidthCard を上書きし、
+     * 学習目標カードが幅 4 に縮んで右側にデッドスペースが発生していた。
+     */
+    .statusCard:not(.fullWidthCard) {
         grid-column: span 4;
     }
 
-    .heatmapCard {
+    .heatmapCard:not(.fullWidthCard) {
         grid-column: span 4;
     }
 

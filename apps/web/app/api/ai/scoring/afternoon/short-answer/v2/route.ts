@@ -42,6 +42,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     const json = await req.json();
     body = RequestSchema.parse(json);
   } catch (err) {
+    console.error('[short-answer-v2] Invalid request body:', err instanceof Error ? err.message : String(err));
     return NextResponse.json(
       {
         error: 'EMPTY_ANSWER',
@@ -75,6 +76,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       return NextResponse.json({ ...((completeEvt.data as object) ?? {}), partialErrors: errors });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
+      console.error('[short-answer-v2] LLM batch error:', message);
       return NextResponse.json({ error: 'LLM_TIMEOUT', message }, { status: 504 });
     }
   }
