@@ -49,6 +49,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   try {
     body = RequestSchema.parse(await req.json());
   } catch (err) {
+    console.error('[essay-v2] Invalid request body:', err instanceof Error ? err.message : String(err));
     return NextResponse.json(
       { error: 'EMPTY_ANSWER', details: err instanceof z.ZodError ? err.errors : String(err) },
       { status: 422 },
@@ -113,6 +114,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       return NextResponse.json({ ...((completeEvt.data as object) ?? {}), partialErrors: errors });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
+      console.error('[essay-v2] LLM batch error:', message);
       return NextResponse.json({ error: 'LLM_TIMEOUT', message }, { status: 504 });
     }
   }

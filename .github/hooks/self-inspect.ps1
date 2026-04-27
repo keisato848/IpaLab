@@ -12,6 +12,8 @@
 #       → Application Insights に流れず障害調査が困難になる (#229)
 #   R3. .fullWidthCard 等の重要 CSS クラスがメディアクエリ内にしか
 #       定義されていない (モバイル幅でデッドスペース発生)
+#   R4. .todayMissionPriority 等のレイアウト特殊クラスが @media 内で
+#       grid-column: span 12 に上書きされている (PR 混入によるデグレ再発防止)
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -124,8 +126,60 @@ Get-ChildItem -Path $WebRoot -Filter '*.module.css' -Recurse | ForEach-Object {
 }
 
 # ---------------------------------------------------------------------------
-# レポート出力
+# R4: レイアウト特殊クラスが @media 内で grid-column: span 12 に上書きされていないか
+#     (デグレパターン: .todayMissionPriority は .statusCard の span 4 を継承すべき)
+# R5: @media 内の単一クラスセレクタ (例: .statusCard) が、トップレベルで定義された
+#     組合せクラス (.statusCard.fullWidthCard) の grid-column を意図せず打ち消すパターン
+#     → @media 内では .X:not(.fullWidthCard) のように除外する必要がある
 # ---------------------------------------------------------------------------
+$r4Targets = @(
+    @{ File = 'DashboardClient.module.css'; Class = 'todayMissionPriority' }
+)
+Get-ChildItem -Path $WebRoot -Filter '*.module.css' -Recurse | ForEach-Object {
+    $cssFile = $_
+    foreach ($t in $r4Targets) {
+        if ($cssFile.Name -ne $t.File) { continue }
+        $raw = Get-Content -LiteralPath $cssFile.FullName -Raw
+        # @media ブロック内に .todayMissionPriority { ... grid-column ... } があるか
+        $mediaBlocks = [regex]::Matches($raw, '(?s)@media[^{]+\{(?:[^{}]|\{[^{}]*\})*\}')
+        foreach ($mb in $mediaBlocks) {
+            $innerClass = [regex]::Matches($mb.Value, "(?s)\.$($t.Class)\s*\{([^}]*)\}")
+            foreach ($ic in $innerClass) {
+                if ($ic.Groups[1].Value -match 'grid-column') {
+                    Add-Finding -Rule 'R4-css-media-grid-override' -Severity 'High' `
+                        -File $cssFile.FullName `
+                        -Detail ".$($t.Class) が @media 内で grid-column を上書きしています (デグレの原因になります)"
+                }
+            }
+        }
+    }
+}
+
+# R5: @media 内の statusCard / heatmapCard 等が fullWidthCard を打ち消すパターン
+$r5SusClasses = @('statusCard', 'heatmapCard', 'historyCard', 'levelCard')
+Get-ChildItem -Path $WebRoot -Filter 'DashboardClient.module.css' -Recurse | ForEach-Object {
+    $cssFile = $_
+    $raw = Get-Content -LiteralPath $cssFile.FullName -Raw
+    $mediaBlocks = [regex]::Matches($raw, '(?s)@media[^{]+\{(?:[^{}]|\{[^{}]*\})*\}')
+    foreach ($mb in $mediaBlocks) {
+        foreach ($cls in $r5SusClasses) {
+            # @media 内に `.X { ... grid-column ... }` が裸で書かれているかをチェック
+            # (`.X:not(...)` 形式は OK)
+            $bareSelector = [regex]::Matches($mb.Value, "(?s)(^|[\s,\}])\.$cls\s*\{([^}]*)\}")
+            foreach ($bs in $bareSelector) {
+                if ($bs.Groups[2].Value -match 'grid-column' -and
+                    $raw -match "\.$cls\.fullWidthCard|\.fullWidthCard\.$cls") {
+                    # トップレベルで .X.fullWidthCard が登場しているのに、@mediaで .X 単独で grid-column を定義
+                    Add-Finding -Rule 'R5-css-media-fullwidth-shadow' -Severity 'High' `
+                        -File $cssFile.FullName `
+                        -Detail ".$cls が @media 内で grid-column を裸定義し .fullWidthCard を打ち消す可能性 (推奨: .${cls}:not(.fullWidthCard))"
+                }
+            }
+        }
+    }
+}
+
+
 $tag = if ($Mode -eq 'start') { 'SESSION-START' } else { 'SESSION-END' }
 Write-Host ""
 Write-Host "## [self-inspect $tag] 自己点検レポート"
@@ -138,15 +192,15 @@ if ($findings.Count -eq 0) {
 
 Write-Host "⚠ 検出件数: $($findings.Count) 件"
 Write-Host ""
-Write-Host "| Severity | Rule | File | Detail |"
-Write-Host "|---|---|---|---|"
+Write-Host '| Severity | Rule | File | Detail |'
+Write-Host '|----------|------|------|--------|'
 foreach ($f in $findings) {
     $rel = $f.File.Replace($RepoRoot.Path, '').TrimStart('\', '/')
     Write-Host "| $($f.Severity) | $($f.Rule) | $rel | $($f.Detail) |"
 }
 
 Write-Host ""
-Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動"
+Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除"
 
 if ($FailOnFinding) { exit 1 }
 exit 0
