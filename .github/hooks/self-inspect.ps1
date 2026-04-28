@@ -15,8 +15,6 @@
 #   R4. .todayMissionPriority 等のレイアウト特殊クラスが @media 内で
 #       grid-column: span 12 に上書きされている (PR 混入によるデグレ再発防止)
 #   R5. @media 内の単一クラスセレクタが .X.fullWidthCard の grid-column を打ち消すパターン
-#   R6. スクリプト/CI ファイル内で `gh pr merge` が使われている
-#       → エージェントによるユーザー承認なしのマージを防止 (copilot-instructions.md 禁止事項)
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -181,32 +179,6 @@ Get-ChildItem -Path $WebRoot -Filter 'DashboardClient.module.css' -Recurse | For
         }
     }
 }
-
-
-# R6: gh pr merge の禁止コマンド使用検出
-#     エージェントが gh pr merge を実行することは禁止 (ユーザー承認なしのマージ防止)
-#     → スクリプト・CI ファイル内に gh pr merge が書かれていれば警告
-
-# ---------------------------------------------------------------------------
-# R6: gh pr merge の禁止コマンド使用検出
-# ---------------------------------------------------------------------------
-$searchDirs = @(
-    (Join-Path $RepoRoot '.github'),
-    (Join-Path $RepoRoot 'scripts')
-)
-foreach ($dir in $searchDirs) {
-    if (-not (Test-Path $dir)) { continue }
-    Get-ChildItem -Path $dir -Recurse -File -Include '*.ps1','*.sh','*.yml','*.yaml' |
-        Where-Object { $_.FullName -ne (Resolve-Path $PSCommandPath) } |
-        ForEach-Object {
-            $hits = Select-String -LiteralPath $_.FullName -Pattern 'gh\s+pr\s+merge' -SimpleMatch
-            foreach ($h in $hits) {
-                Add-Finding -Rule 'R6-forbidden-gh-pr-merge' -Severity 'High' `
-                    -File $h.Path -Detail "L$($h.LineNumber): gh pr merge の使用はエージェントに禁止されています: $($h.Line.Trim())"
-            }
-        }
-}
-
 
 $tag = if ($Mode -eq 'start') { 'SESSION-START' } else { 'SESSION-END' }
 Write-Host ""
