@@ -211,11 +211,49 @@
 .subSection {
   margin-top: 24px;
 }
+.subSectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
 .subSection h3 {
   font-family: 'Shippori Mincho B1', serif;
   font-weight: 700;
   font-size: 15px;
   border-left: 4px solid var(--seal);
   padding-left: 10px;
-  margin: 0 0 12px;
+  margin: 0;
+}
+.subSectionScore {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.subScoreLabel {
+  font-size: 11px;
+  color: var(--ink-mute);
+  letter-spacing: 0.05em;
+}
+.subScoreValue {
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 800;
+  font-size: 18px;
+  color: #2f4a3a;
+  font-variant-numeric: tabular-nums;
+}
+.subScoreValue.weak {
+  color: var(--seal);
+}
+.subWeakBadge {
+  display: inline-block;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--seal);
+  color: #ffffff;
+  letter-spacing: 0.05em;
 }

@@ -172,9 +172,27 @@ export function EssayScoringClient({ samples }: EssayScoringClientProps): JSX.El
               const subPersps = perspectives.filter((p) => p.subQuestion === sub);
               const subErrs = errors.filter((e) => e.subQuestion === sub);
               if (subPersps.length === 0 && subErrs.length === 0) return null;
+
+              // Calculate average score for this sub-question
+              const avgScore = subPersps.length > 0
+                ? Math.round(subPersps.reduce((sum, p) => sum + p.score, 0) / subPersps.length)
+                : 0;
+              const isWeakSection = avgScore < 60;
+
               return (
                 <div key={sub} className={styles.subSection}>
-                  <h3>設問{sub}</h3>
+                  <div className={styles.subSectionHeader}>
+                    <h3>設問{sub}</h3>
+                    {subPersps.length > 0 && (
+                      <div className={styles.subSectionScore}>
+                        <span className={styles.subScoreLabel}>平均スコア</span>
+                        <span className={`${styles.subScoreValue} ${isWeakSection ? styles.weak : ''}`}>
+                          {avgScore}
+                        </span>
+                        {isWeakSection && <span className={styles.subWeakBadge}>要改善</span>}
+                      </div>
+                    )}
+                  </div>
                   {subPersps.map((p) => (
                     <PerspectiveCard key={`p-${sub}-${p.id}`} data={p} variant="essay" />
                   ))}
