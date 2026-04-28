@@ -14,6 +14,7 @@
 #       定義されていない (モバイル幅でデッドスペース発生)
 #   R4. .todayMissionPriority 等のレイアウト特殊クラスが @media 内で
 #       grid-column: span 12 に上書きされている (PR 混入によるデグレ再発防止)
+#   R5. @media 内の単一クラスセレクタが .X.fullWidthCard の grid-column を打ち消すパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -178,7 +179,6 @@ Get-ChildItem -Path $WebRoot -Filter 'DashboardClient.module.css' -Recurse | For
         }
     }
 }
-
 
 $tag = if ($Mode -eq 'start') { 'SESSION-START' } else { 'SESSION-END' }
 Write-Host ""

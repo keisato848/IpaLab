@@ -1,0 +1,12 @@
+{
+	"hooks": {
+		"PreToolUse": [
+			{
+				"type": "command",
+				"command": "pwsh -NoProfile -ExecutionPolicy Bypass -File .github/hooks/ban-gh-pr-merge.ps1",
+				"windows": "pwsh -NoProfile -ExecutionPolicy Bypass -File .github/hooks/ban-gh-pr-merge.ps1",
+				"timeout": 10
+			}
+		]
+	}
+}
