@@ -11,6 +11,10 @@
 			{
 				"type": "command",
 				"powershell": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/self-inspect.ps1\" -Mode end"
+			},
+			{
+				"type": "command",
+				"powershell": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/conduct-check.ps1\""
 			}
 		],
 	}
