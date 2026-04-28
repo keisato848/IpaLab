@@ -181,9 +181,6 @@ apps/web/test-results/
 apps/web/e2e/test-results/
 # apps/web/e2e/evidence/ — エビデンス報告書のためコミット対象とする
 
-# Playwright
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-/playwright/.auth/
+# Anthropic 公式スキル (VS Code Copilot CLI が自動生成するため追跡対象外)
+.github/skills/
+
