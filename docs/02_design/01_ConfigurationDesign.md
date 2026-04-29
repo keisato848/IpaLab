@@ -5,6 +5,7 @@
 ## 1. Monorepo 構成 (Turborepo)
 
 ### 1.1 ルート `package.json`
+
 - **Workspaces**:
   - `apps/*`: アプリケーション (web, api, api-ai)
   - `packages/*`: 共通ライブラリ
@@ -22,6 +23,7 @@
   - `prepare`: `husky`
 
 ### 1.2 `turbo.json` パイプライン
+
 - **build**:
   - DependsOn: `^build`
   - Outputs: `.next/**`, `dist/**`, `build/**`
@@ -34,6 +36,7 @@
 ## 2. 共通パッケージ (`packages/`)
 
 ### 2.1 `packages/config`
+
 設定ファイルを一元管理し、各アプリから `extends` して利用します。
 
 - **`tsconfig.base.json`**:
@@ -49,13 +52,17 @@
   - ルール: `console.log` 警告, `unused-vars` エラー等。
 
 ### 2.2 `packages/shared`
+
 型定義と純粋関数ロジック。UIには依存しない。
+
 - **Entry**: `src/index.ts`
 - **Build**: TypeScript コンパイルで `dist/` に出力
 - **Dependencies**: `zod` (型安全性), `date-fns` (日付操作)
 
 ### 2.3 `packages/data`
+
 データスクレイピング、CosmosDB 同期、問題データ管理。
+
 - **Entry**: `src/index.ts`
 - **メインスクリプト**:
   - `scrape`: IPA サイトからのデータ収集
@@ -65,18 +72,21 @@
 - **Dependencies**: `@azure/cosmos`, `@google/genai`, `axios`, `dotenv`
 
 ### 2.4 `packages/ui`
+
 将来の共有UIコンポーネント用。
+
 - **現状**: 空フォルダ（未実装）
 - **将来構想**: React コンポーネントライブラリとしての活用を検討
 
 ## 3. アプリケーション設定
 
 ### 3.1 Web (`apps/web`)
+
 - **Framework**: Next.js 16.2.1 (App Router)
 - **Node.js**: v20 (LTS)
 - **Build**: Standalone モード無効（Azure SWA 最適化）
 - **Styling**: CSS Modules (`*.module.css`)
-- **Testing**: 
+- **Testing**:
   - Unit: Vitest + @testing-library/react
   - E2E: Playwright
 - **Lint**: `packages/config/eslint-preset` を使用
@@ -84,6 +94,7 @@
 - **内部パッケージ依存**: `@ipa-lab/config`, `@ipa-lab/data`, `@ipa-lab/shared`
 
 ### 3.2 API (`apps/api`)
+
 - **Runtime**: Node.js v20
 - **Structure**: Azure Functions Node.js Model v4
 - **Port**: 7074（ローカル開発時）
@@ -92,6 +103,7 @@
 - **Dependencies**: `@azure/cosmos`, `@azure/functions`, `front-matter`
 
 ### 3.3 AI API (`apps/api-ai`)
+
 - **Runtime**: Node.js v20
 - **Structure**: Azure Functions Node.js Model v4
 - **Port**: 7075（ローカル開発時）
@@ -106,7 +118,9 @@
 ## 4. 開発環境設定
 
 ### 4.1 必要な環境変数
+
 #### Web アプリケーション
+
 ```env
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=<secret>
@@ -116,6 +130,7 @@ AZURE_COSMOS_CONNECTION_STRING=<cosmos_connection>
 ```
 
 #### API Functions
+
 ```env
 AzureWebJobsStorage=UseDevelopmentStorage=true
 FUNCTIONS_WORKER_RUNTIME=node
@@ -123,6 +138,7 @@ COSMOS_DB_CONNECTION=<cosmos_connection>
 ```
 
 #### AI Functions
+
 ```env
 AzureWebJobsStorage=UseDevelopmentStorage=true
 FUNCTIONS_WORKER_RUNTIME=node
@@ -131,10 +147,26 @@ COSMOS_DB_CONNECTION=<cosmos_connection>
 ```
 
 ### 4.2 ビルド設定
+
 - **Turborepo**: パラレルビルド、キャッシュ最適化
 - **TypeScript**: Strict モード有効
 - **ESLint**: Next.js ルール + Prettier 統合
-- **Husky**: pre-commit フック（lint + test 自動実行）
+- **Husky**:
+  - `pre-commit`: 静的ガードを実行し、午後試験データ fallback 防壁と `self-inspect` を確認する
+  - `pre-push`: `npm run test:unit` によりユニットテストを実行する
+
+### 4.3 ローカルガードとドキュメント同期
+
+`pre-commit` は軽量な静的チェックに限定し、以下の順序で実行します。
+
+1. `node scripts/guard-exam-data-fallback.mjs`
+   - 午後試験データ fallback の本番防壁を検証します。
+2. `pwsh .github/hooks/self-inspect.ps1 -Mode end -FailOnFinding`
+   - 過去インシデントに基づく再発防止ルール R1〜R8 を検証します。
+
+`self-inspect` の R8 は、`apps/`、`packages/`、`.github/hooks/`、`.github/workflows/`、`.husky/`、主要なルート設定ファイルに実装変更があるにもかかわらず `docs/` 配下の更新がない場合に検出します。検出時はコミットを中止し、該当する設計書・手順書の更新を `document-agent` の担当作業として促します。
+
+テスト実行は `pre-push` に集約し、コミット時の待ち時間を抑えつつ、push 前にユニットテストを必ず通す構成とします。
 
 ## 5. Copilot Agent カスタマイズ設定
 
@@ -165,6 +197,9 @@ read / edit / search / execute / agent / web / todo
 - **2026-04-29**: Copilot Agent カスタマイズ設定セクションを追加
   - `.github/agents/`, `.github/hooks/`, `.github/prompts/`, `.github/skills/`, `.vscode/mcp.json` の設計方針を追加
   - 詳細設計は `docs/02_design/23_CopilotAgentCustomizationDesign.md` を参照
+- **2026-04-29**: Husky / self-inspect の設計を更新
+  - `pre-commit` の静的ガード構成を実態に合わせて更新
+  - 実装変更時に `docs/` 更新を要求する R8 と `document-agent` の責務を追記
 - **2026-04-07**: リバースエンジニアリングによる大幅更新
   - アプリケーション構成を実装に合わせて更新（apps/api-ai 追加）
   - packages/data の詳細追加

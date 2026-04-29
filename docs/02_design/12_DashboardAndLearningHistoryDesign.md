@@ -134,6 +134,8 @@ sequenceDiagram
 | Page | `apps/web/app/(main)/history/page.tsx` | 履歴画面のエントリポイント |
 | Component | `apps/web/components/features/dashboard/DashboardClient.tsx` | 学習記録読込、計画読込、通知、集計結果の統括 |
 | Component | `apps/web/components/features/history/HistoryList.tsx` | セッション一覧・履歴一覧の表示と完了処理 |
+| Component | `apps/web/components/features/exam/QuestionClient.tsx` | 問題画面の解答保存、今回集計、セッション進捗更新 |
+| Utility | `apps/web/components/features/exam/sessionStats.ts` | 問題画面の当日集計と現在セッション集計の分離 |
 | Component | `apps/web/components/features/dashboard/HeatmapWidget.tsx` | 日別学習量の可視化 |
 | Component | `apps/web/components/features/dashboard/MonthlyProgressCard.tsx` | 月次目標の進捗表示 |
 | Component | `apps/web/components/features/dashboard/GoalSettingWizard.tsx` | 学習計画の作成 UI |
@@ -242,7 +244,16 @@ sequenceDiagram
 2. セッションが存在しない場合のみ `getLearningRecords()` にフォールバックする
 3. ゲストは `guestManager.getHistory()` をそのまま表示対象とする
 
-### 10.3 学習計画の保存
+### 10.3 問題画面の今回集計とセッション進捗
+
+`QuestionClient` は同じ `LearningRecord[]` から以下の 2 種類の統計を分けて算出する。
+
+- 表示用の「今回」集計: ユーザーのローカル日付で当日回答された同一試験の記録を対象とする。`sessionId` が異なる「続きから」遷移でも、その日の演習状況をまとめて表示する。
+- 保存用のセッション進捗: `sessionId` がある場合は現在の `sessionId` に一致する記録のみを対象とする。`LearningSession.answeredCount` / `correctCount` / `lastQuestionNo` の更新にはこちらを使用し、別セッションの当日回答を混入させない。
+
+当日判定は UTC 文字列 prefix ではなく、`answeredAt` を `Date` として解釈したローカル日付境界で比較する。これにより、日本時間などユーザーの利用日付と `toISOString()` の UTC 日付がずれる時間帯でも、画面表示の「当日」集計が安定する。
+
+### 10.4 学習計画の保存
 
 1. `studyPlans` があればそれを配列として読込む
 2. なければ旧形式 `studyPlan` を移行する
@@ -325,6 +336,7 @@ sequenceDiagram
 | Unit | `useMonthlyStats` が今月 / 前月比較を正しく返すこと |
 | Unit | `useUserProgress` が XP・実績・連続日数を正しく更新すること |
 | Unit | 学習計画の旧形式 `studyPlan` が `studyPlans` に移行されること |
+| Unit | 問題画面の表示用当日集計と保存用セッション集計が混在しないこと |
 | Integration | 認証済みとゲストで履歴データソースが切り替わること |
 | Integration | セッションが 0 件のとき履歴画面が `LearningRecord` にフォールバックすること |
 
@@ -351,6 +363,11 @@ sequenceDiagram
 
 - `useUserProgress` は認証済みユーザーでも localStorage にしか保存しない
 - ゲストと認証済みで保存戦略が揃っていない
+
+### 16.5 問題画面の集計ラベル
+
+- `QuestionClient` の「今回」は当日ベースの表示値であり、`LearningSession` の 1 試行分とは保存境界が異なる
+- 将来的に UI 文言を変更する場合も、表示用当日集計と保存用セッション進捗は同じ state に戻さない
 
 ---
 

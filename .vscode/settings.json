@@ -22,5 +22,12 @@
         "npm run fill-explanations": true,
         "npm run extract": true,
         "Get-Process": true
-    }
+    },
+    "azureFunctions.deploySubpath": "deploy_temp",
+    "azureFunctions.postDeployTask": "npm install (functions)",
+    "azureFunctions.projectLanguage": "TypeScript",
+    "azureFunctions.projectRuntime": "~4",
+    "debug.internalConsoleOptions": "neverOpen",
+    "azureFunctions.projectLanguageModel": 4,
+    "azureFunctions.preDeployTask": "npm prune (functions)"
 }

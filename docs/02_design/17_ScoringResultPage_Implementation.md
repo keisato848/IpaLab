@@ -42,52 +42,75 @@ API側は **POST + SSE形式のレスポンス** （→ #176 §2.0）であり�
 
 ```typescript
 // lib/scoring/sseClient.ts （共通ユーティリティ）
-export async function* postSseStream(url: string, body: unknown, signal?: AbortSignal) {
+export async function* postSseStream(
+  url: string,
+  body: unknown,
+  signal?: AbortSignal,
+) {
   const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' },
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "text/event-stream",
+    },
     body: JSON.stringify(body),
     signal,
   });
   if (!res.ok || !res.body) throw new Error(`SSE failed: ${res.status}`);
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
-  let buffer = '';
+  let buffer = "";
   while (true) {
     const { value, done } = await reader.read();
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
-    const events = buffer.split('\n\n');
-    buffer = events.pop() ?? '';
+    const events = buffer.split("\n\n");
+    buffer = events.pop() ?? "";
     for (const ev of events) {
-      const lines = ev.split('\n');
-      const event = lines.find(l => l.startsWith('event:'))?.slice(6).trim();
-      const data = lines.find(l => l.startsWith('data:'))?.slice(5).trim();
+      const lines = ev.split("\n");
+      const event = lines
+        .find((l) => l.startsWith("event:"))
+        ?.slice(6)
+        .trim();
+      const data = lines
+        .find((l) => l.startsWith("data:"))
+        ?.slice(5)
+        .trim();
       if (event && data) yield { event, data: JSON.parse(data) };
     }
   }
 }
 
 // useShortAnswerScoringStream.ts (系統A)
-export function useShortAnswerScoringStream(questionId: string, userAnswer: string) {
+export function useShortAnswerScoringStream(
+  questionId: string,
+  userAnswer: string,
+) {
   const [perspectives, setPerspectives] = useState<PerspectiveScore[]>([]);
   const [total, setTotal] = useState<TotalScore | null>(null);
-  const [status, setStatus] = useState<'idle'|'streaming'|'done'|'error'>('idle');
+  const [status, setStatus] = useState<"idle" | "streaming" | "done" | "error">(
+    "idle",
+  );
 
   useEffect(() => {
     const ctrl = new AbortController();
     (async () => {
-      setStatus('streaming');
+      setStatus("streaming");
       try {
         for await (const { event, data } of postSseStream(
-          '/api/ai/scoring/afternoon/short-answer/v2',
-          { questionId, userAnswer, mode: 'stream' },
+          "/api/ai/scoring/afternoon/short-answer/v2",
+          { questionId, userAnswer, mode: "stream" },
           ctrl.signal,
         )) {
-          if (event === 'perspective') setPerspectives(p => [...p, data]);
-          if (event === 'complete')   { setTotal(data); setStatus('done'); }
+          if (event === "perspective") setPerspectives((p) => [...p, data]);
+          if (event === "complete") {
+            setTotal(data);
+            setStatus("done");
+          }
         }
-      } catch { setStatus('error'); }
+      } catch {
+        setStatus("error");
+      }
     })();
     return () => ctrl.abort();
   }, [questionId, userAnswer]);
@@ -105,9 +128,11 @@ export function useEssayScoringStream(input: EssayInput) {
 採点結果ページ Top コンポーネントで `result.format` により分岐：
 
 ```tsx
-return result.format === 'essay'
-  ? <EssayResultLayout result={result} />
-  : <ShortAnswerResultLayout result={result} />;
+return result.format === "essay" ? (
+  <EssayResultLayout result={result} />
+) : (
+  <ShortAnswerResultLayout result={result} />
+);
 ```
 
 ## 4. レンダリング戦略
@@ -115,6 +140,8 @@ return result.format === 'essay'
 - ページ自体は **Server Component**（既存パターン踏襲）
 - 採点結果部分のみ Client Component で SSE 受信
 - SEO 不要のためクライアント側で十分
+- 論述式の観点別カードは、改善点を即座に確認できるよう既定で詳細を展開する
+- 論述式の小問スコア表示は `sub_question_complete` / `complete.subQuestionScores` の公式集計値を優先し、ストリーミング途中のみ重み付き暫定値を表示する
 
 ## 5. 状態管理
 
@@ -149,3 +176,9 @@ return result.format === 'essay'
 ## 10. 関連
 
 - #176 API v2 / #177 情報設計 / #179 差分ハイライト / #180 フィードバックUI
+
+## 11. 改訂履歴
+
+| 日付       | 内容                                                                       |
+| ---------- | -------------------------------------------------------------------------- |
+| 2026-04-29 | 論述式の観点別カード既定展開、小問スコア行、弱点ハイライトの表示方針を追記 |
