@@ -21,6 +21,7 @@ export default defineConfig({
   reporter: [
     ['html', { open: 'never' }],
     ['list'],
+    ['./e2e/reporters/custom-report.ts'],
   ],
   /* テスト結果・エビデンスの出力先 */
   outputDir: path.join(__dirname, 'e2e', 'test-results'),

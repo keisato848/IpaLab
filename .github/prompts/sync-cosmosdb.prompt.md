@@ -1,5 +1,10 @@
 ---
-description: 'CosmosDBへ問題データを同期する。ファイアウォールIP一時許可→sync-db実行→IP削除を自動化。'
+description: 'CosmosDBへ問題データを同期する。ファイアウォールIP一時許可、sync-db実行、IP削除を自動化する。'
+tools:
+	- read
+	- search
+	- execute
+	- web
 ---
 
 # CosmosDB データ同期
@@ -9,7 +14,7 @@ description: 'CosmosDBへ問題データを同期する。ファイアウォー�
 
 ## 引数
 
-- `${{ input:target }}` — 同期対象。試験IDを指定（例: `AP-2024-Fall-AM`）。複数指定はカンマ区切り（例: `AP-2016-Spring-AM,AP-2019-Fall-AM`）。`all` で全件同期
+- `${input:target}` — 同期対象。試験IDを指定（例: `AP-2024-Fall-AM`）。複数指定はカンマ区切り（例: `AP-2016-Spring-AM,AP-2019-Fall-AM`）。`all` で全件同期
 
 ## CosmosDB 情報
 

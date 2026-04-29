@@ -2,9 +2,10 @@
 name: document-agent
 description: 'リバースエンジニアリングと Docs-as-Code によるドキュメント生成・レビューを行うエージェントです。コードベースを解析し、設計書・構成図・レビュー結果を自動生成します。例: <example>コンテキスト: ユーザーがコードベースからアーキテクチャドキュメントを生成したい、または既存の実装に対して技術レビューを行いたい場合。<scope><!-- 対象範囲（例: "apps/api-ai", "apps/web/app/api" ）--></scope> <output-type><!-- 出力種別（例: "設計書", "レビュー結果", "構成図" ）--></output-type></example>'
 tools:
+  - read
   - search
-  - editFiles
-  - runCommands
+  - edit
+  - execute
 ---
 
 # ドキュメントエージェント — リバースエンジニアリング & Docs-as-Code スペシャリスト

@@ -1,3 +1,12 @@
+---
+description: 'GitHub Actions YAML 構文エラーの修正計画を確認し、ワークフロー構文を安全に復旧する。'
+tools:
+  - read
+  - search
+  - edit
+  - execute
+---
+
 # Plan: azure-functions-ai.yml の YAML 構文エラー修正
 
 PR #118 のマージにより、`.github/workflows/azure-functions-ai.yml` の「Check outbound IPs for CosmosDB firewall」ステップに **YAML 構文エラー**が導入された。GitHub Actions ランナーがワークフローファイルをパースする際に 125行目で失敗している。
