@@ -18,6 +18,7 @@
 #   R6. 採点エラーカードが低スコア観点として「要改善」表示されるパターン
 #   R7. 論述式の小問スコア表示が公式集計ではなく単純平均へ戻るパターン
 #   R8. 実装変更に docs/ 配下の設計書・手順書更新が伴っていないパターン
+#   R9. QuestionClient のセッション進捗保存が表示用 sessionStats に依存するパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -286,13 +287,31 @@ if ($implementationChanges.Count -gt 0 -and $docsChanges.Count -eq 0) {
         -Detail "実装変更に対応する docs/ 配下の更新がありません。document-agent が該当する設計書・手順書を更新してください。対象例: $sample"
 }
 
+# ---------------------------------------------------------------------------
+# R9: セッション進捗保存が表示用の当日集計に依存していないか
+#     (`sessionStats` は画面上の「今回」表示用。LearningSession の保存は
+#      現在の sessionId に閉じた `currentSessionStats` を使う)
+# ---------------------------------------------------------------------------
+$questionClient = Join-Path $WebRoot 'components\features\exam\QuestionClient.tsx'
+if (Test-Path $questionClient) {
+    $raw = Get-Content -LiteralPath $questionClient -Raw
+    if ($raw -match 'answeredCount:\s*sessionStats\.total' -or
+        $raw -match 'correctCount:\s*sessionStats\.correct' -or
+        $raw -match 'const\s+newTotal\s*=\s*sessionStats\.total\s*\+\s*1' -or
+        $raw -match 'const\s+newCorrect\s*=\s*sessionStats\.correct\s*\+') {
+        Add-Finding -Rule 'R9-session-progress-display-stats' -Severity 'High' `
+            -File $questionClient `
+            -Detail 'LearningSession の answeredCount/correctCount 保存が表示用 sessionStats に依存しています (推奨: currentSessionStats を使用)'
+    }
+}
+
 $tag = if ($Mode -eq 'start') { 'SESSION-START' } else { 'SESSION-END' }
 Write-Host ""
 Write-Host "## [self-inspect $tag] 自己点検レポート"
 Write-Host ""
 
 if ($findings.Count -eq 0) {
-    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8)"
+    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9)"
     exit 0
 }
 
@@ -306,7 +325,7 @@ foreach ($f in $findings) {
 }
 
 Write-Host ""
-Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新"
+Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用"
 
 if ($FailOnFinding) { exit 1 }
 exit 0
