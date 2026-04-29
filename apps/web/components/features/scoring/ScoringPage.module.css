@@ -17,7 +17,7 @@
   );
   min-height: 100vh;
   padding: 20px 16px 120px;
-  font-family: 'Noto Serif JP', 'Shippori Mincho B1', serif;
+  font-family: "Noto Serif JP", "Shippori Mincho B1", serif;
   color: var(--ink);
 }
 
@@ -39,14 +39,14 @@
   border: 2px solid var(--seal);
   color: var(--seal);
   padding: 2px 10px;
-  font-family: 'Shippori Mincho B1', serif;
+  font-family: "Shippori Mincho B1", serif;
   font-weight: 700;
   font-size: 11px;
   letter-spacing: 0.3em;
   margin-bottom: 10px;
 }
 .title {
-  font-family: 'Shippori Mincho B1', serif;
+  font-family: "Shippori Mincho B1", serif;
   font-weight: 800;
   font-size: 19px;
   margin: 0 0 6px;
@@ -65,7 +65,7 @@
   position: relative;
 }
 .card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -1px;
   left: -1px;
@@ -89,13 +89,13 @@
   flex-wrap: wrap;
 }
 .cardLabel {
-  font-family: 'Shippori Mincho B1', serif;
+  font-family: "Shippori Mincho B1", serif;
   font-weight: 800;
   font-size: 17px;
   letter-spacing: 0.08em;
 }
 .limit {
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: "Noto Sans JP", sans-serif;
   font-size: 11px;
   color: var(--paper-inner);
   background: #2f4a3a;
@@ -107,7 +107,7 @@
   display: grid;
   gap: 10px;
   margin-bottom: 16px;
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: "Noto Sans JP", sans-serif;
   font-size: 13px;
 }
 .fields label {
@@ -138,7 +138,7 @@
   color: #fff;
   border: 1px solid var(--seal);
   padding: 12px;
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: "Noto Sans JP", sans-serif;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.15em;
@@ -159,7 +159,7 @@
   margin-top: 20px;
 }
 .resultsTitle {
-  font-family: 'Shippori Mincho B1', serif;
+  font-family: "Shippori Mincho B1", serif;
   font-weight: 800;
   font-size: 16px;
   border-bottom: 1px solid var(--line);
@@ -174,10 +174,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: "Noto Sans JP", sans-serif;
 }
 .totalScore {
-  font-family: 'Shippori Mincho B1', serif;
+  font-family: "Shippori Mincho B1", serif;
   font-weight: 800;
   font-size: 36px;
   color: var(--seal-dark);
@@ -188,16 +188,24 @@
   padding: 6px 18px;
   background: var(--ink);
   color: var(--paper);
-  font-family: 'Shippori Mincho B1', serif;
+  font-family: "Shippori Mincho B1", serif;
   font-weight: 800;
   font-size: 28px;
   letter-spacing: 0.2em;
   border-radius: 2px;
 }
-.rank.A { background: #2f4a3a; }
-.rank.B { background: #3a5a8a; }
-.rank.C { background: #b23a2f; }
-.rank.D { background: #8b1e1e; }
+.rank.A {
+  background: #2f4a3a;
+}
+.rank.B {
+  background: #3a5a8a;
+}
+.rank.C {
+  background: #b23a2f;
+}
+.rank.D {
+  background: #8b1e1e;
+}
 
 .errorBox {
   background: rgba(178, 58, 47, 0.08);
@@ -219,7 +227,7 @@
   margin-bottom: 12px;
 }
 .subSection h3 {
-  font-family: 'Shippori Mincho B1', serif;
+  font-family: "Shippori Mincho B1", serif;
   font-weight: 700;
   font-size: 15px;
   border-left: 4px solid var(--seal);
@@ -229,6 +237,7 @@
 .subSectionScore {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
 }
 .subScoreLabel {
@@ -237,7 +246,7 @@
   letter-spacing: 0.05em;
 }
 .subScoreValue {
-  font-family: 'Shippori Mincho B1', serif;
+  font-family: "Shippori Mincho B1", serif;
   font-weight: 800;
   font-size: 18px;
   color: #2f4a3a;
@@ -248,7 +257,7 @@
 }
 .subWeakBadge {
   display: inline-block;
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: "Noto Sans JP", sans-serif;
   font-size: 10px;
   font-weight: 700;
   padding: 2px 6px;
@@ -256,4 +265,11 @@
   background: var(--seal);
   color: #ffffff;
   letter-spacing: 0.05em;
+}
+
+@media (max-width: 520px) {
+  .subSectionHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
