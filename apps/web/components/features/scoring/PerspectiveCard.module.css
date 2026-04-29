@@ -2,15 +2,19 @@
   background: #fdfaf2;
   border: 1px solid #d4c9b3;
   border-left: 4px solid #2f4a3a;
-  padding: 14px 16px;
+  padding: 0;
   margin-bottom: 12px;
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: "Noto Sans JP", sans-serif;
   font-size: 13px;
   color: #1c1814;
   animation: cardIn 0.25s ease-out;
 }
 .card.error {
   border-left-color: #b23a2f;
+}
+.card.weakness {
+  border-left-color: #b23a2f;
+  border-left-width: 5px;
 }
 .card.streaming {
   opacity: 0.6;
@@ -29,18 +33,84 @@
 .head {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: flex-start;
   gap: 12px;
-  margin-bottom: 8px;
+  padding: 14px 16px;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.head:hover {
+  background: rgba(47, 74, 58, 0.03);
+}
+.head:focus-visible {
+  outline: 2px solid #2f4a3a;
+  outline-offset: -2px;
+}
+
+.headMain {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.headRight {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.expandIcon {
+  font-size: 10px;
+  color: #857a68;
+  transition: transform 0.2s ease;
+  user-select: none;
+}
+
+.details {
+  padding: 0 16px 14px 16px;
+  animation: detailsIn 0.2s ease-out;
+}
+@keyframes detailsIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .name {
-  font-family: 'Shippori Mincho B1', serif;
+  font-family: "Shippori Mincho B1", serif;
   font-weight: 700;
   font-size: 15px;
   color: #1c1814;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.weaknessBadge {
+  display: inline-block;
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: #b23a2f;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
 }
 .score {
-  font-family: 'Shippori Mincho B1', serif;
+  font-family: "Shippori Mincho B1", serif;
   font-weight: 800;
   font-size: 22px;
   color: #2f4a3a;
