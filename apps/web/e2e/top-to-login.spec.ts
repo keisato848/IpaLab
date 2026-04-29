@@ -211,11 +211,15 @@ test.describe('トップページ → ログイン フロー', () => {
       await page.goto('/');
 
       // Step 2: 「登録なしで、実力を試す」をクリック
-      await page.getByRole('link', { name: /登録なしで/ }).click();
+      const guestCta = page.getByRole('link', { name: /登録なしで/ });
+      await expect(guestCta).toBeVisible();
+      await Promise.all([
+        page.waitForURL(/\/dashboard/, { timeout: 15000 }),
+        guestCta.click(),
+      ]);
 
       // Step 3: ダッシュボードに遷移
-      // 開発サーバーの初回コンパイルに時間がかかるため、タイムアウトを延長
-      await expect(page).toHaveURL(/\/dashboard/, { timeout: 15000 });
+      await expect(page).toHaveURL(/\/dashboard/);
     });
   });
 

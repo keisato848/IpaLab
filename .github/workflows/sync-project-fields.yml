@@ -1,0 +1,277 @@
+name: Sync Project Fields (日本語フィールド同期)
+
+on:
+  issues:
+    types: [opened, edited, assigned, unassigned, labeled, unlabeled, milestoned, demilestoned, closed, reopened]
+  pull_request:
+    types: [opened, edited, assigned, unassigned, labeled, unlabeled, review_requested, review_request_removed, closed, reopened]
+
+env:
+  PROJECT_NUMBER: 1
+  PROJECT_OWNER: keisato848
+  # カスタムフィールド ID
+  FIELD_STATUS: PVTSSF_lAHOBFEGqs4BTrxCzhA7rk0
+  FIELD_ASSIGNEES: PVTF_lAHOBFEGqs4BTrxCzhA7sb4
+  FIELD_LABELS: PVTF_lAHOBFEGqs4BTrxCzhA7sb8
+  FIELD_MILESTONE: PVTF_lAHOBFEGqs4BTrxCzhA7scA
+  FIELD_REPOSITORY: PVTF_lAHOBFEGqs4BTrxCzhA7scE
+  FIELD_REVIEWERS: PVTF_lAHOBFEGqs4BTrxCzhA7scI
+  FIELD_LINKED_PR: PVTF_lAHOBFEGqs4BTrxCzhA7scM
+  # ステータス選択肢 ID
+  STATUS_NOT_STARTED: e390f9e0
+  STATUS_IN_PROGRESS: fbad8887
+  STATUS_DONE: 9f47d395
+
+jobs:
+  sync-fields:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: read
+      pull-requests: read
+    steps:
+      - name: Sync issue fields to project
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PROJECT_PAT }}
+          script: |
+            const issue = context.payload.issue;
+
+            // --- 1. プロジェクトアイテム ID を取得 ---
+            const findItemQuery = `query($owner: String!, $number: Int!, $cursor: String) {
+              user(login: $owner) {
+                projectV2(number: $number) {
+                  items(first: 100, after: $cursor) {
+                    nodes {
+                      id
+                      content {
+                        ... on Issue { id number repository { nameWithOwner } }
+                      }
+                    }
+                    pageInfo { hasNextPage endCursor }
+                  }
+                }
+              }
+            }`;
+
+            let itemId = null;
+            let cursor = null;
+            const repoFullName = `${context.repo.owner}/${context.repo.repo}`;
+
+            while (!itemId) {
+              const result = await github.graphql(findItemQuery, {
+                owner: process.env.PROJECT_OWNER,
+                number: parseInt(process.env.PROJECT_NUMBER),
+                cursor: cursor
+              });
+              const items = result.user.projectV2.items;
+              for (const item of items.nodes) {
+                if (item.content &&
+                    item.content.number === issue.number &&
+                    item.content.repository?.nameWithOwner === repoFullName) {
+                  itemId = item.id;
+                  break;
+                }
+              }
+              if (!items.pageInfo.hasNextPage) break;
+              cursor = items.pageInfo.endCursor;
+            }
+
+            if (!itemId) {
+              console.log(`Issue #${issue.number} はプロジェクトに未登録。スキップ。`);
+              return;
+            }
+
+            const projectId = (await github.graphql(`query($owner: String!, $number: Int!) {
+              user(login: $owner) { projectV2(number: $number) { id } }
+            }`, {
+              owner: process.env.PROJECT_OWNER,
+              number: parseInt(process.env.PROJECT_NUMBER)
+            })).user.projectV2.id;
+
+            // --- 2. フィールド値を構築 ---
+            const assignees = (issue.assignees || []).map(a => a.login).join(', ') || '(未割り当て)';
+            const labels = (issue.labels || []).map(l => l.name).join(', ') || '(なし)';
+            const milestone = issue.milestone?.title || '(なし)';
+            const repository = repoFullName;
+
+            // ステータス: closed → 完了, open → 未着手 (進行中は手動)
+            let statusOptionId;
+            if (issue.state === 'closed') {
+              statusOptionId = process.env.STATUS_DONE;
+            } else {
+              // open 状態は既存値を保持したいが、新規 Issue なら未着手
+              statusOptionId = context.payload.action === 'opened'
+                ? process.env.STATUS_NOT_STARTED
+                : null; // null = 更新しない
+            }
+
+            // --- 3. テキストフィールド一括更新 ---
+            const textFields = [
+              { fieldId: process.env.FIELD_ASSIGNEES, value: assignees },
+              { fieldId: process.env.FIELD_LABELS, value: labels },
+              { fieldId: process.env.FIELD_MILESTONE, value: milestone },
+              { fieldId: process.env.FIELD_REPOSITORY, value: repository },
+            ];
+
+            for (const field of textFields) {
+              await github.graphql(`mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: String!) {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $projectId
+                  itemId: $itemId
+                  fieldId: $fieldId
+                  value: { text: $value }
+                }) { projectV2Item { id } }
+              }`, {
+                projectId,
+                itemId,
+                fieldId: field.fieldId,
+                value: field.value
+              });
+              console.log(`✅ ${field.fieldId} → ${field.value}`);
+            }
+
+            // --- 4. ステータス更新 (条件付き) ---
+            if (statusOptionId) {
+              await github.graphql(`mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $projectId
+                  itemId: $itemId
+                  fieldId: $fieldId
+                  value: { singleSelectOptionId: $optionId }
+                }) { projectV2Item { id } }
+              }`, {
+                projectId,
+                itemId,
+                fieldId: process.env.FIELD_STATUS,
+                optionId: statusOptionId
+              });
+              console.log(`✅ ステータス → ${statusOptionId}`);
+            }
+
+            console.log(`🎉 Issue #${issue.number} の日本語フィールド同期完了`);
+
+      - name: Sync PR fields to project
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PROJECT_PAT }}
+          script: |
+            const pr = context.payload.pull_request;
+
+            // --- 1. プロジェクトアイテム ID を取得 ---
+            const findItemQuery = `query($owner: String!, $number: Int!, $cursor: String) {
+              user(login: $owner) {
+                projectV2(number: $number) {
+                  items(first: 100, after: $cursor) {
+                    nodes {
+                      id
+                      content {
+                        ... on PullRequest { id number repository { nameWithOwner } }
+                      }
+                    }
+                    pageInfo { hasNextPage endCursor }
+                  }
+                }
+              }
+            }`;
+
+            let itemId = null;
+            let cursor = null;
+            const repoFullName = `${context.repo.owner}/${context.repo.repo}`;
+
+            while (!itemId) {
+              const result = await github.graphql(findItemQuery, {
+                owner: process.env.PROJECT_OWNER,
+                number: parseInt(process.env.PROJECT_NUMBER),
+                cursor: cursor
+              });
+              const items = result.user.projectV2.items;
+              for (const item of items.nodes) {
+                if (item.content &&
+                    item.content.number === pr.number &&
+                    item.content.repository?.nameWithOwner === repoFullName) {
+                  itemId = item.id;
+                  break;
+                }
+              }
+              if (!items.pageInfo.hasNextPage) break;
+              cursor = items.pageInfo.endCursor;
+            }
+
+            if (!itemId) {
+              console.log(`PR #${pr.number} はプロジェクトに未登録。スキップ。`);
+              return;
+            }
+
+            const projectId = (await github.graphql(`query($owner: String!, $number: Int!) {
+              user(login: $owner) { projectV2(number: $number) { id } }
+            }`, {
+              owner: process.env.PROJECT_OWNER,
+              number: parseInt(process.env.PROJECT_NUMBER)
+            })).user.projectV2.id;
+
+            // --- 2. フィールド値を構築 ---
+            const assignees = (pr.assignees || []).map(a => a.login).join(', ') || '(未割り当て)';
+            const labels = (pr.labels || []).map(l => l.name).join(', ') || '(なし)';
+            const milestone = pr.milestone?.title || '(なし)';
+            const repository = repoFullName;
+            const reviewers = (pr.requested_reviewers || []).map(r => r.login).join(', ') || '(なし)';
+
+            // ステータス
+            let statusOptionId;
+            if (pr.merged) {
+              statusOptionId = process.env.STATUS_DONE;
+            } else if (pr.state === 'closed') {
+              statusOptionId = process.env.STATUS_DONE;
+            } else if (context.payload.action === 'opened') {
+              statusOptionId = process.env.STATUS_IN_PROGRESS;
+            } else {
+              statusOptionId = null;
+            }
+
+            // --- 3. テキストフィールド更新 ---
+            const textFields = [
+              { fieldId: process.env.FIELD_ASSIGNEES, value: assignees },
+              { fieldId: process.env.FIELD_LABELS, value: labels },
+              { fieldId: process.env.FIELD_MILESTONE, value: milestone },
+              { fieldId: process.env.FIELD_REPOSITORY, value: repository },
+              { fieldId: process.env.FIELD_REVIEWERS, value: reviewers },
+            ];
+
+            for (const field of textFields) {
+              await github.graphql(`mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: String!) {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $projectId
+                  itemId: $itemId
+                  fieldId: $fieldId
+                  value: { text: $value }
+                }) { projectV2Item { id } }
+              }`, {
+                projectId,
+                itemId,
+                fieldId: field.fieldId,
+                value: field.value
+              });
+              console.log(`✅ ${field.fieldId} → ${field.value}`);
+            }
+
+            // --- 4. ステータス更新 ---
+            if (statusOptionId) {
+              await github.graphql(`mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $projectId
+                  itemId: $itemId
+                  fieldId: $fieldId
+                  value: { singleSelectOptionId: $optionId }
+                }) { projectV2Item { id } }
+              }`, {
+                projectId,
+                itemId,
+                fieldId: process.env.FIELD_STATUS,
+                optionId: statusOptionId
+              });
+              console.log(`✅ ステータス → ${statusOptionId}`);
+            }
+
+            console.log(`🎉 PR #${pr.number} の日本語フィールド同期完了`);

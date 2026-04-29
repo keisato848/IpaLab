@@ -1,21 +1,24 @@
 {
 	"version": 1,
 	"hooks": {
-		"sessionStart": [
+		"SessionStart": [
 			{
 				"type": "command",
-				"powershell": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/self-inspect.ps1\" -Mode start"
+				"command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/self-inspect.ps1\" -Mode start",
+				"windows": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/self-inspect.ps1\" -Mode start"
 			}
 		],
-		"sessionEnd": [
+		"Stop": [
 			{
 				"type": "command",
-				"powershell": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/self-inspect.ps1\" -Mode end"
+				"command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/self-inspect.ps1\" -Mode end",
+				"windows": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/self-inspect.ps1\" -Mode end"
 			},
 			{
 				"type": "command",
-				"powershell": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/conduct-check.ps1\""
+				"command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/conduct-check.ps1\"",
+				"windows": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/conduct-check.ps1\""
 			}
-		],
+		]
 	}
 }

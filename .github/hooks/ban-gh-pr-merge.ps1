@@ -23,7 +23,8 @@ try {
 }
 
 # シェル実行系ツール名のリスト (VS Code Copilot エージェントが使用するもの)
-$shellTools = @('runCommands', 'executePowerShell', 'executeCommand', 'powershell', 'bash', 'sh', 'terminal')
+# 公式エイリアス 'execute' と旧名称両方を包拵する
+$shellTools = @('execute', 'runCommands', 'executePowerShell', 'executeCommand', 'powershell', 'bash', 'sh', 'terminal')
 
 $toolName = $payload.tool_name
 if ($toolName -notin $shellTools) {

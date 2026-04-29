@@ -57,6 +57,17 @@ Closes #
 - [ ] `npm run test:e2e` (Playwright) パス
 - [ ] a11y チェック（axe-core）パス
 
+### 4.1 E2E テストエビデンス報告書（UI 変更 PR は必須）
+
+E2E テスト実行時、`apps/web/e2e/reporters/custom-report.ts` が自動生成します。
+
+- [ ] `docs/04_reports/E2E_Test_Evidence_Report_{YYYYMMDD}.md` が生成されている
+- [ ] 以下にリンクを記載している
+
+| 実行日 | 報告書 |
+|--------|--------|
+| <!-- YYYY-MM-DD --> | <!-- [E2E_Test_Evidence_Report_YYYYMMDD.md](docs/04_reports/E2E_Test_Evidence_Report_YYYYMMDD.md) --> |
+
 ### 5. 本番影響モニタリング（マージ後 24h）
 
 - [ ] Application Insights のエラー率に異常なし

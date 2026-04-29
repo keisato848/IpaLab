@@ -1,11 +1,28 @@
 {
+	"version": 1,
 	"hooks": {
+		"SessionStart": [
+			{
+				"type": "command",
+				"command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/skills/github-customization-check/scripts/validate-github-customizations.ps1\" -Mode hook -FailOnFinding",
+				"windows": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/skills/github-customization-check/scripts/validate-github-customizations.ps1\" -Mode hook -FailOnFinding",
+				"timeout": 30
+			}
+		],
 		"PreToolUse": [
 			{
 				"type": "command",
 				"command": "pwsh -NoProfile -ExecutionPolicy Bypass -File .github/hooks/ban-gh-pr-merge.ps1",
 				"windows": "pwsh -NoProfile -ExecutionPolicy Bypass -File .github/hooks/ban-gh-pr-merge.ps1",
 				"timeout": 10
+			}
+		],
+		"Stop": [
+			{
+				"type": "command",
+				"command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/skills/github-customization-check/scripts/validate-github-customizations.ps1\" -Mode hook -FailOnFinding",
+				"windows": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/skills/github-customization-check/scripts/validate-github-customizations.ps1\" -Mode hook -FailOnFinding",
+				"timeout": 30
 			}
 		]
 	}

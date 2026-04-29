@@ -168,12 +168,38 @@ COSMOS_DB_CONNECTION=<cosmos_connection>
 
 テスト実行は `pre-push` に集約し、コミット時の待ち時間を抑えつつ、push 前にユニットテストを必ず通す構成とします。
 
+## 5. Copilot Agent カスタマイズ設定
+
+GitHub Copilot エージェントのカスタマイズ設定は以下のパスに配置する。詳細は [23_CopilotAgentCustomizationDesign.md](23_CopilotAgentCustomizationDesign.md) を参照。
+
+| 種別 | 配置パス | 用途 |
+|------|---------|------|
+| Custom Agent | `.github/agents/*.agent.md` | エージェント定義（VS Code + GitHub.com cloud） |
+| Prompt File | `.github/prompts/*.prompt.md` | 再利用可能プロンプト（VS Code） |
+| Agent Skill | `.github/skills/<name>/SKILL.md` | スキルパッケージ（VS Code） |
+| Hook 設定 | `.github/hooks/*.json` | セッションフック（SessionStart / Stop 等） |
+| MCP（VS Code） | `.vscode/mcp.json` | VS Code ワークスペース MCP サーバー |
+| オーケストレーター | `AGENTS.md` | タスク分類・ルーティング定義 |
+| E2E レポーター | `apps/web/e2e/reporters/custom-report.ts` | エビデンス報告書自動生成 |
+
+### 5.1 tool aliases 制約
+
+`.agent.md` の `tools` フィールドには **公式 GitHub エイリアスのみ** 記載すること。
+
+```
+read / edit / search / execute / agent / web / todo
+```
+
+非公式名称（`editFiles`, `runCommands`, `codebase` 等）は動作しないため禁止。
+
 ## 変更履歴
 
+- **2026-04-29**: Copilot Agent カスタマイズ設定セクションを追加
+  - `.github/agents/`, `.github/hooks/`, `.github/prompts/`, `.github/skills/`, `.vscode/mcp.json` の設計方針を追加
+  - 詳細設計は `docs/02_design/23_CopilotAgentCustomizationDesign.md` を参照
 - **2026-04-29**: Husky / self-inspect の設計を更新
   - `pre-commit` の静的ガード構成を実態に合わせて更新
   - 実装変更時に `docs/` 更新を要求する R8 と `document-agent` の責務を追記
-
 - **2026-04-07**: リバースエンジニアリングによる大幅更新
   - アプリケーション構成を実装に合わせて更新（apps/api-ai 追加）
   - packages/data の詳細追加
