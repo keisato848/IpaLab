@@ -12,14 +12,8 @@ import path from 'path';
 // エビデンス格納ディレクトリ（apps/web/e2e/evidence に保存）
 const EVIDENCE_DIR = path.resolve(process.cwd(), 'e2e', 'evidence');
 
-// エビデンス保存の有効/無効フラグ
-// SKIP_EVIDENCE=1 または true でファイル保存をスキップ（pre-push フック等で有用）
-const SKIP_EVIDENCE = ['1', 'true'].includes(
-  (process.env.SKIP_EVIDENCE ?? '').toLowerCase()
-);
-
-// テスト開始前にエビデンスディレクトリを作成（スキップ時は不要）
-if (!SKIP_EVIDENCE && !fs.existsSync(EVIDENCE_DIR)) {
+// テスト開始前にエビデンスディレクトリを作成
+if (!fs.existsSync(EVIDENCE_DIR)) {
   fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
 }
 
@@ -37,11 +31,6 @@ export async function captureEvidence(
   name: string,
   options: { fullPage?: boolean } = {}
 ): Promise<Buffer> {
-  // スキップ時はスクリーンショットを撮らず空バッファを返す
-  if (SKIP_EVIDENCE) {
-    return Buffer.alloc(0);
-  }
-
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   // Windows互換: ファイル名はASCII安全な文字のみ使用
   const sanitizedName = name

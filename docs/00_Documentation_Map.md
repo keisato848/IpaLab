@@ -33,7 +33,7 @@ docs/
 │   ├── 16_TelemetryAndMonitoringDesign.md # Application Insights / PageViews / 監視設計
 │   ├── 17_DataLoadingAndSyncBoundaryDesign.md # packages/data と apps/web のデータ境界設計
 │   ├── 18_AiAssistantDesign.md   # AIアシスタントウィジェット（チャット・障害報告）の詳細設計
-│   └── (必要に応じて追加)
+│   └── 23_CopilotAgentCustomizationDesign.md # Copilot Agent カスタマイズ設計（Custom Agents/Hooks/MCP/E2E報告書）
 ├── 03_plans/                    # [Execution Plan Level] 整備計画・作業分割・再開用メモ
 │   ├── detailed-design-systematization-plan.md # 機能詳細設計を体系化するための実行計画
 │   ├── ai-assistant-implementation-plan.md # AIアシスタント機能の実装計画（8フェーズ）

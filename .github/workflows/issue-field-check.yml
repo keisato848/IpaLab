@@ -1,0 +1,91 @@
+name: Issue Field Check
+
+on:
+  issues:
+    types: [opened, edited, assigned, unassigned, labeled, unlabeled, milestoned, demilestoned]
+
+jobs:
+  check-required-fields:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - name: Check required fields
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const errors = [];
+
+            // アサイン確認
+            if (!issue.assignees || issue.assignees.length === 0) {
+              errors.push('❌ **Assignee** が未設定です。担当者を1名以上設定してください。');
+            }
+
+            // ラベル確認
+            if (!issue.labels || issue.labels.length === 0) {
+              errors.push('❌ **Label** が未設定です。1つ以上のラベルを設定してください。');
+            }
+
+            // マイルストーン確認
+            if (!issue.milestone) {
+              errors.push('❌ **Milestone** が未設定です。対応するマイルストーンを設定してください。');
+            }
+
+            if (errors.length > 0) {
+              // 既存の bot コメントを検索して更新 or 新規作成
+              const comments = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+              });
+              const botComment = comments.data.find(c =>
+                c.user.type === 'Bot' && c.body.includes('<!-- issue-field-check -->')
+              );
+
+              const body = [
+                '<!-- issue-field-check -->',
+                '## ⚠️ Issue 必須フィールドが未入力です',
+                '',
+                errors.join('\n'),
+                '',
+                '> すべての項目を設定するとこの警告は自動的に解消されます。',
+              ].join('\n');
+
+              if (botComment) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: botComment.id,
+                  body,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body,
+                });
+              }
+
+              core.setFailed(`Required fields missing: ${errors.length} item(s)`);
+            } else {
+              // 解消済みなら既存の警告コメントを削除
+              const comments = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+              });
+              const botComment = comments.data.find(c =>
+                c.user.type === 'Bot' && c.body.includes('<!-- issue-field-check -->')
+              );
+              if (botComment) {
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: botComment.id,
+                });
+              }
+              console.log('✅ All required fields are set.');
+            }

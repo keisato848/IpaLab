@@ -1,7 +1,9 @@
 # CLAUDE.md - Claude Code エージェント指示書
 
 このファイルは Claude Code エージェントがこのリポジトリで作業する際のルールを定義します。
-`.github/copilot-instructions.md` と併せて遵守すること。
+`.github/copilot-instructions.md` と [AGENTS.md](AGENTS.md) を併せて遵守すること。
+
+> **エージェントルーティング**: タスク種別ごとの担当エージェントは [AGENTS.md](AGENTS.md) のルーティングルールを参照すること。
 
 ## 言語
 
@@ -26,14 +28,24 @@
 
 **E2E テストを実行した場合、マークダウン形式のエビデンス報告書の作成は必須である。省略は認めない。**
 
-#### 報告書の保存先・テンプレート
+#### 報告書の自動生成（推奨）
+
+`apps/web/e2e/reporters/custom-report.ts`（Playwright Reporter）が E2E テスト実行時に自動生成する。
 
 ```
-報告書: docs/04_reports/E2E_Test_Evidence_Report_{YYYYMMDD}.md
+報告書出力先: docs/04_reports/E2E_Test_Evidence_Report_{YYYYMMDD}.md
+```
+
+**`SKIP_EVIDENCE` 環境変数は廃止済み。** CI・ローカルを問わず報告書は常に生成される。
+
+#### 手動補完が必要な場合
+
+自動生成された報告書の「変更概要」セクションには `> 本報告書は E2E テスト実行時に自動生成されます。` と記載される。
+PR での文脈説明を追記する場合はテンプレートを参照して補完すること。
+
+```
 テンプレート: docs/04_reports/E2E_Test_Evidence_Report_TEMPLATE.md
 ```
-
-テンプレートをコピーして `{YYYYMMDD}` 部分を実行日に置換し、各プレースホルダ `{...}` を埋めること。
 
 #### 報告書に含める必須セクション
 

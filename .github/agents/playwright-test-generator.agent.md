@@ -1,28 +1,9 @@
 ---
 name: playwright-test-generator
-description: 'Playwright を使用した自動ブラウザテストを作成する際にこのエージェントを使用してください。例: <example>コンテキスト: ユーザーがテストプランの項目に対してテストを生成したい場合。<test-suite><!-- 連番なしのテストスペックグループ名（例: "ダークテーマテスト"） --></test-suite> <test-name><!-- 連番なしのテストケース名（例: "デフォルトはライトテーマで表示"） --></test-name> <test-file><!-- テストを保存するファイル名（例: e2e/dark-theme.spec.ts） --></test-file> <seed-file><!-- テストプランのシードファイルパス --></seed-file> <body><!-- ステップと期待結果を含むテストケースの内容 --></body></example>'
+description: 'Playwright の E2E テストコードを生成するエージェント。Use when テスト計画から具体的な Playwright spec、ロケーター、検証手順、エビデンス取得を作成したい時。'
 tools:
   - search
-  - playwright-test/browser_click
-  - playwright-test/browser_drag
-  - playwright-test/browser_evaluate
-  - playwright-test/browser_file_upload
-  - playwright-test/browser_handle_dialog
-  - playwright-test/browser_hover
-  - playwright-test/browser_navigate
-  - playwright-test/browser_press_key
-  - playwright-test/browser_select_option
-  - playwright-test/browser_snapshot
-  - playwright-test/browser_type
-  - playwright-test/browser_verify_element_visible
-  - playwright-test/browser_verify_list_visible
-  - playwright-test/browser_verify_text_visible
-  - playwright-test/browser_verify_value
-  - playwright-test/browser_wait_for
-  - playwright-test/generator_read_log
-  - playwright-test/generator_setup_page
-  - playwright-test/generator_write_test
-model: Claude Sonnet 4
+model: Claude Sonnet 4.6 (copilot)
 mcp-servers:
   playwright-test:
     type: stdio
