@@ -20,6 +20,7 @@ import { getExamLabel } from '@/lib/exam-utils';
 import styles from './QuestionClient.module.css';
 import { Question, saveLearningRecord, LearningRecord, getLearningRecords, saveExamProgress, getExamProgress, updateSessionProgress } from '@/lib/api';
 import { FaRegBookmark, FaBookmark } from 'react-icons/fa';
+import { buildQuestionSessionStats, incrementStats } from './sessionStats';
 
 // Helper: Check if answer is correct (supports ALL_CORRECT for questions with no valid answer)
 const checkIsCorrect = (selectedOption: string | null, correctOption: string): boolean => {
@@ -59,6 +60,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
     // Stats State
     const [sessionStats, setSessionStats] = useState({ total: 0, correct: 0 });
+    const [currentSessionStats, setCurrentSessionStats] = useState({ total: 0, correct: 0 });
     const [pastStats, setPastStats] = useState<{ total: number; correct: number } | null>(null);
     const [examStats, setExamStats] = useState<{ total: number; correct: number } | null>(null);
     const [allExamRecords, setAllExamRecords] = useState<LearningRecord[]>([]);
@@ -252,17 +254,16 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
                 if (eRecords.length > 0) {
                     setAllExamRecords(eRecords);
-                    // Session Stats: 当日ベース（「続きから」遷移でも全体進捗を崩さない）
-                    const today = new Date().toISOString().split('T')[0];
-                    const sessionRecords = eRecords.filter(r => r && r.answeredAt && r.answeredAt.startsWith(today));
-                    if (sessionRecords.length > 0) {
-                        const sCorrect = sessionRecords.filter(r => r.isCorrect).length;
-                        setSessionStats({ total: sessionRecords.length, correct: sCorrect });
-                    }
+                    const { displayStats, currentSessionStats: nextCurrentSessionStats } = buildQuestionSessionStats(eRecords, sessionId);
+                    setSessionStats(displayStats);
+                    setCurrentSessionStats(nextCurrentSessionStats);
 
                     const eCorrect = eRecords.filter(r => r.isCorrect).length;
                     setExamStats({ total: eRecords.length, correct: eCorrect });
                 } else {
+                    setAllExamRecords([]);
+                    setSessionStats({ total: 0, correct: 0 });
+                    setCurrentSessionStats({ total: 0, correct: 0 });
                     setExamStats(null);
                 }
             } catch (e) {
@@ -327,16 +328,19 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             aiFeedback: data.result.feedback,
             aiRadarData: data.result.radarChartData,
             isCorrect,
+            sessionId: sessionId || undefined,
             answeredAt: new Date().toISOString(),
             timeTakenSeconds: 0,
         };
 
+        const nextCurrentSessionStats = sessionId ? incrementStats(currentSessionStats, isCorrect) : currentSessionStats;
+
         // Optimistic UI update (before API calls to ensure immediate feedback)
         statsVersionRef.current += 1;
-        setSessionStats(prev => ({
-            total: prev.total + 1,
-            correct: prev.correct + (isCorrect ? 1 : 0)
-        }));
+        setSessionStats(prev => incrementStats(prev, isCorrect));
+        if (sessionId) {
+            setCurrentSessionStats(prev => incrementStats(prev, isCorrect));
+        }
         setExamStats(prev => {
             const currentTotal = prev?.total || 0;
             const currentCorrect = prev?.correct || 0;
@@ -358,12 +362,10 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
                 // Update session progress if sessionId exists
                 if (sessionId) {
-                    const newTotal = sessionStats.total + 1;
-                    const newCorrect = sessionStats.correct + (isCorrect ? 1 : 0);
                     savePromises.push(
                         updateSessionProgress(sessionId, {
-                            answeredCount: newTotal,
-                            correctCount: newCorrect,
+                            answeredCount: nextCurrentSessionStats.total,
+                            correctCount: nextCurrentSessionStats.correct,
                             lastQuestionNo: parseInt(qNo),
                         })
                     );
@@ -455,12 +457,14 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             timeTakenSeconds: timeTaken,
         };
 
+        const nextCurrentSessionStats = sessionId ? incrementStats(currentSessionStats, isCorrect) : currentSessionStats;
+
         // Optimistic UI update (before API calls to ensure immediate feedback)
         statsVersionRef.current += 1;
-        setSessionStats(prev => ({
-            total: prev.total + 1,
-            correct: prev.correct + (isCorrect ? 1 : 0)
-        }));
+        setSessionStats(prev => incrementStats(prev, isCorrect));
+        if (sessionId) {
+            setCurrentSessionStats(prev => incrementStats(prev, isCorrect));
+        }
         setExamStats(prev => {
             const currentTotal = prev?.total || 0;
             const currentCorrect = prev?.correct || 0;
@@ -482,12 +486,10 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
                 // Update session progress if sessionId exists
                 if (sessionId) {
-                    const newTotal = sessionStats.total + 1;
-                    const newCorrect = sessionStats.correct + (isCorrect ? 1 : 0);
                     savePromises.push(
                         updateSessionProgress(sessionId, {
-                            answeredCount: newTotal,
-                            correctCount: newCorrect,
+                            answeredCount: nextCurrentSessionStats.total,
+                            correctCount: nextCurrentSessionStats.correct,
                             lastQuestionNo: parseInt(qNo),
                         })
                     );
@@ -535,8 +537,8 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         try {
             await updateSessionProgress(sessionId, {
                 status: 'completed',
-                answeredCount: sessionStats.total,
-                correctCount: sessionStats.correct,
+                answeredCount: currentSessionStats.total,
+                correctCount: currentSessionStats.correct,
                 lastQuestionNo: parseInt(qNo)
             });
             router.push(`/exam/${year}/${type}/result?mode=${mode}&sessionId=${sessionId}`);
@@ -674,16 +676,16 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
                 {/* Guest Warning - show only on first answer */}
                 {showGuestWarning && !session?.user && (
-                    <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', color: '#92400e', padding: '0.5rem 1rem', fontSize: '0.85rem', textAlign: 'center', position: 'relative' }}>
-                        ⚠️ ゲストモード：履歴はブラウザに保存され、キャッシュクリア等で消失します。<Link href="/login" style={{ textDecoration: 'underline', fontWeight: 'bold' }}>ログイン</Link>してデータを守りましょう。
-                        <button onClick={() => setShowGuestWarning(false)} style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: '#92400e' }}>✕</button>
+                    <div className={`${styles.guestWarning} ${styles.guestWarningFramed}`}>
+                        ⚠️ ゲストモード：履歴はブラウザに保存され、キャッシュクリア等で消失します。<Link href="/login" className={styles.guestWarningLink}>ログイン</Link>してデータを守りましょう。
+                        <button onClick={() => setShowGuestWarning(false)} className={styles.guestWarningClose} aria-label="ゲストモード警告を閉じる">✕</button>
                     </div>
                 )}
 
                 <div className={styles.pmGrid}>
                     {/* Left Panel: Question Text */}
                     <div className={styles.pmPanel}>
-                        <h2 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '1rem', borderBottom: '2px solid #eee', paddingBottom: '0.5rem' }}>
+                        <h2 className={styles.pmQuestionTitle}>
                             {question.subCategory || '問題文'}
                         </h2>
                         <div className={styles.markdownBody}>
@@ -701,7 +703,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     <div className={styles.pmPanel}>
                         {currentSubQ ? (
                             <div>
-                                <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+                                <h3 className={styles.pmSubQuestionTitle}>
                                     {currentSubQ.subQNo || `設問 ${currentSubQIndex + 1}`}
                                 </h3>
                                 <div className={styles.markdownBody}>
@@ -727,7 +729,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     </div>
                 </div>
 
-                <footer className={styles.footer} style={{ marginTop: '2rem' }}>
+                <footer className={`${styles.footer} ${styles.pmFooter}`}>
                     <button
                         className={styles.navBtn}
                         onClick={handleSubPrev}
@@ -735,7 +737,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     >
                         前の設問
                     </button>
-                    <span style={{ margin: '0 1rem', fontWeight: 'bold' }}>
+                    <span className={styles.subQuestionCounter}>
                         {currentSubQIndex + 1} / {subQs.length}
                     </span>
                     <button
@@ -745,7 +747,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     >
                         次の設問
                     </button>
-                    <Link href={`/exam/${year}/${type}`} className={styles.navBtn} style={{ marginLeft: 'auto' }}>
+                    <Link href={`/exam/${year}/${type}`} className={`${styles.navBtn} ${styles.pmBackLink}`}>
                         一覧へ戻る
                     </Link>
                 </footer>
@@ -799,17 +801,17 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                             className={styles.progressContainer}
                             onClick={() => setShowProgressDropdown(!showProgressDropdown)}
                         >
-                            <div className={styles.progressBar}>
-                                <div 
-                                    className={styles.progressFill}
-                                    style={{ width: `${(parseInt(qNo) / totalQuestions) * 100}%` }}
-                                />
-                            </div>
+                            <progress
+                                className={styles.progressBar}
+                                value={Number.parseInt(qNo, 10)}
+                                max={totalQuestions}
+                                aria-label="問題進捗"
+                            />
                             <span className={styles.progressText}>
                                 {qNo}/{totalQuestions}
                             </span>
                             {/* Mobile dropdown indicator */}
-                            <span className={styles.mobileOnly} style={{ marginLeft: '0.25rem' }}>
+                            <span className={`${styles.mobileOnly} ${styles.mobileProgressToggleIcon}`}>
                                 {showProgressDropdown ? '▲' : '▼'}
                             </span>
                         </div>
@@ -909,9 +911,9 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
             {/* Guest Warning - show only on first answer */}
             {showGuestWarning && !session?.user && (
-                <div style={{ background: '#fffbeb', borderBottom: '1px solid #fcd34d', color: '#92400e', padding: '0.5rem 1rem', fontSize: '0.85rem', textAlign: 'center', position: 'relative' }}>
-                    ⚠️ ゲストモード：履歴はブラウザに保存され、キャッシュクリア等で消失します。<Link href="/login" style={{ textDecoration: 'underline', fontWeight: 'bold', marginLeft: '0.5rem' }}>ログイン</Link>してデータを守りましょう。
-                    <button onClick={() => setShowGuestWarning(false)} style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: '#92400e' }}>✕</button>
+                <div className={styles.guestWarning}>
+                    ⚠️ ゲストモード：履歴はブラウザに保存され、キャッシュクリア等で消失します。<Link href="/login" className={styles.guestWarningLink}>ログイン</Link>してデータを守りましょう。
+                    <button onClick={() => setShowGuestWarning(false)} className={styles.guestWarningClose} aria-label="ゲストモード警告を閉じる">✕</button>
                 </div>
             )}
 
@@ -940,7 +942,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                         出典：{examLabel} 問{qNo}
 
                         {pastStats && (
-                            <span style={{ marginLeft: '1rem', color: '#666', fontSize: '0.9em' }}>
+                            <span className={styles.pastStats}>
                                 (過去の正答率: {Math.round((pastStats.correct / pastStats.total) * 100)}% - {pastStats.correct}/{pastStats.total}回)
                             </span>
                         )}

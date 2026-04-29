@@ -15,6 +15,7 @@
 #   R4. .todayMissionPriority 等のレイアウト特殊クラスが @media 内で
 #       grid-column: span 12 に上書きされている (PR 混入によるデグレ再発防止)
 #   R5. @media 内の単一クラスセレクタが .X.fullWidthCard の grid-column を打ち消すパターン
+#   R6. QuestionClient のセッション進捗保存が表示用 sessionStats に依存するパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -180,13 +181,31 @@ Get-ChildItem -Path $WebRoot -Filter 'DashboardClient.module.css' -Recurse | For
     }
 }
 
+# ---------------------------------------------------------------------------
+# R6: セッション進捗保存が表示用の当日集計に依存していないか
+#     (`sessionStats` は画面上の「今回」表示用。LearningSession の保存は
+#      現在の sessionId に閉じた `currentSessionStats` を使う)
+# ---------------------------------------------------------------------------
+$questionClient = Join-Path $WebRoot 'components\features\exam\QuestionClient.tsx'
+if (Test-Path $questionClient) {
+    $raw = Get-Content -LiteralPath $questionClient -Raw
+    if ($raw -match 'answeredCount:\s*sessionStats\.total' -or
+        $raw -match 'correctCount:\s*sessionStats\.correct' -or
+        $raw -match 'const\s+newTotal\s*=\s*sessionStats\.total\s*\+\s*1' -or
+        $raw -match 'const\s+newCorrect\s*=\s*sessionStats\.correct\s*\+') {
+        Add-Finding -Rule 'R6-session-progress-display-stats' -Severity 'High' `
+            -File $questionClient `
+            -Detail 'LearningSession の answeredCount/correctCount 保存が表示用 sessionStats に依存しています (推奨: currentSessionStats を使用)'
+    }
+}
+
 $tag = if ($Mode -eq 'start') { 'SESSION-START' } else { 'SESSION-END' }
 Write-Host ""
 Write-Host "## [self-inspect $tag] 自己点検レポート"
 Write-Host ""
 
 if ($findings.Count -eq 0) {
-    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3)"
+    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6)"
     exit 0
 }
 
@@ -200,7 +219,7 @@ foreach ($f in $findings) {
 }
 
 Write-Host ""
-Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除"
+Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → セッション進捗保存は currentSessionStats を使用"
 
 if ($FailOnFinding) { exit 1 }
 exit 0
