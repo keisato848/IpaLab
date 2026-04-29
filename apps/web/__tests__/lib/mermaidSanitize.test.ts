@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sanitizeMermaid } from '@/lib/mermaid/sanitize';
+import { isLikelyMermaid, normalizeMermaidCodeBlocks, sanitizeMermaid } from '@/lib/mermaid/sanitize';
 
 describe('sanitizeMermaid', () => {
     it('returns empty for empty input', () => {
@@ -91,5 +91,29 @@ describe('sanitizeMermaid', () => {
         expect(out).toContain('D["x <- (x x n)"]');
         expect(out).toContain('E[演算]');
         expect(out).toContain('A --> B --> C');
+    });
+});
+
+describe('normalizeMermaidCodeBlocks', () => {
+    it('adds mermaid language tag to unlabeled Mermaid code block', () => {
+        const input = ['説明文', '```', 'graph TD', 'A --> B', '```'].join('\n');
+        expect(normalizeMermaidCodeBlocks(input)).toBe(['説明文', '```mermaid', 'graph TD', 'A --> B', '```'].join('\n'));
+    });
+
+    it('preserves non-Mermaid unlabeled code block', () => {
+        const input = ['```', 'const a = 1;', '```'].join('\n');
+        expect(normalizeMermaidCodeBlocks(input)).toBe(input);
+    });
+
+    it('preserves already labeled Mermaid code block', () => {
+        const input = ['```mermaid', 'sequenceDiagram', 'A->>B: hello', '```'].join('\n');
+        expect(normalizeMermaidCodeBlocks(input)).toBe(input);
+    });
+});
+
+describe('isLikelyMermaid', () => {
+    it('detects common Mermaid diagram declarations', () => {
+        expect(isLikelyMermaid('flowchart LR\nA --> B')).toBe(true);
+        expect(isLikelyMermaid('sequenceDiagram\nA->>B: hello')).toBe(true);
     });
 });

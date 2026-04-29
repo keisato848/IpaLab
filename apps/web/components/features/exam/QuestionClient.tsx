@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { guestManager } from '@/lib/guest-manager';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { getExamLabel } from '@/lib/exam-utils';
+import { normalizeMermaidCodeBlocks } from '@/lib/mermaid/sanitize';
 import styles from './QuestionClient.module.css';
 import { Question, saveLearningRecord, LearningRecord, getLearningRecords, saveExamProgress, getExamProgress, updateSessionProgress } from '@/lib/api';
 import { FaRegBookmark, FaBookmark } from 'react-icons/fa';
@@ -694,7 +695,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                 rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                 components={components}
                             >
-                                {question.text}
+                                {normalizeMermaidCodeBlocks(question.text)}
                             </ReactMarkdown>
                         </div>
                     </div>
@@ -712,7 +713,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                         rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                         components={components}
                                     >
-                                        {currentSubQ.text}
+                                        {normalizeMermaidCodeBlocks(currentSubQ.text)}
                                     </ReactMarkdown>
                                 </div>
                                 <AIAnswerBox
@@ -926,7 +927,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                             rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                             components={components}
                         >
-                            {question.text}
+                            {normalizeMermaidCodeBlocks(question.text)}
                         </ReactMarkdown>
                     </div>
                     {/* Mermaid Diagram Injection for Issue #22 */}
@@ -989,7 +990,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                             rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                             components={components}
                                         >
-                                            {opt.text}
+                                            {normalizeMermaidCodeBlocks(opt.text)}
                                         </ReactMarkdown>
                                     </div>
                                     {showExplanation && isPractice && isSelected && (
@@ -1060,7 +1061,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                                 rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                                 components={components}
                                             >
-                                                {raw}
+                                                {normalizeMermaidCodeBlocks(raw)}
                                             </ReactMarkdown>
                                         );
                                     }
@@ -1077,7 +1078,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                                     rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                                     components={components}
                                                 >
-                                                    {s.body}
+                                                    {normalizeMermaidCodeBlocks(s.body)}
                                                 </ReactMarkdown>
                                             );
                                         }
@@ -1095,7 +1096,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                                         rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                                         components={components}
                                                     >
-                                                        {s.body || ''}
+                                                        {normalizeMermaidCodeBlocks(s.body || '')}
                                                     </ReactMarkdown>
                                                 </div>
                                             </details>
@@ -1117,5 +1118,3 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         </div>
     );
 }
-
-

@@ -10,6 +10,20 @@
  */
 
 const NEEDS_QUOTING = /[<>():,]|x\s+x/;
+const MERMAID_START = /^\s*(?:graph|flowchart|sequenceDiagram|classDiagram|stateDiagram(?:-v2)?|erDiagram|journey|gantt|pie|gitGraph|mindmap|timeline|quadrantChart|requirementDiagram|C4Context|C4Container|C4Component|C4Dynamic|sankey-beta|xychart-beta|block-beta|packet-beta)\b/i;
+
+export function isLikelyMermaid(chart: string): boolean {
+    return MERMAID_START.test(chart);
+}
+
+export function normalizeMermaidCodeBlocks(markdown: string): string {
+    if (!markdown) return markdown;
+
+    return markdown.replace(/```[ \t]*\r?\n([\s\S]*?)```/g, (match, body: string) => {
+        if (!isLikelyMermaid(body)) return match;
+        return match.replace(/^```[ \t]*(\r?\n)/, '```mermaid$1');
+    });
+}
 
 /**
  * Mermaid のノードラベル `Id[label]` / `Id(label)` / `Id{label}` のうち、
