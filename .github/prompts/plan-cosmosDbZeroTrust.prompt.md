@@ -1,3 +1,11 @@
+---
+description: 'CosmosDB ゼロトラスト保護の計画を確認し、Azure 構成変更の手順とリスクを整理する。'
+tools:
+  - read
+  - search
+  - web
+---
+
 ## Plan: CosmosDB ゼロトラスト保護（Service Endpoint + IPフィルタ方式）
 
 ### TL;DR
