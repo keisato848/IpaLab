@@ -13,6 +13,7 @@ import 'katex/dist/katex.min.css';
 import he from 'he';
 import dynamic from 'next/dynamic';
 import { Question } from '@/lib/api';
+import { normalizeMermaidCodeBlocks } from '@/lib/mermaid/sanitize';
 import styles from './SCPMExamView.module.css';
 import AIAnswerBox from './AIAnswerBox';
 import { ScoreResult } from './AIAnswerBox';
@@ -158,7 +159,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                                         rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                         components={markdownComponents}
                                     >
-                                        {diagram.content}
+                                        {normalizeMermaidCodeBlocks(diagram.content)}
                                     </ReactMarkdown>
                                 </div>
                             ) : (
@@ -180,7 +181,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                         rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                         components={markdownComponents}
                     >
-                        {part}
+                        {normalizeMermaidCodeBlocks(part)}
                     </ReactMarkdown>
                 </div>
             );
@@ -375,7 +376,7 @@ function SubQuestionBlock({ question, index, parentContext, onGrade, initialData
                         remarkPlugins={[remarkGfm, remarkMath] as any}
                         rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                         components={markdownComponents}
-                    >{question.text}</ReactMarkdown>
+                    >{normalizeMermaidCodeBlocks(question.text)}</ReactMarkdown>
                 </div>
             </div>
 
@@ -411,7 +412,7 @@ function SubQuestionItem({ sq, sIdx, onGrade, initialData }: { sq: any, sIdx: nu
                         remarkPlugins={[remarkGfm, remarkMath] as any}
                         rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                         components={markdownComponents}
-                    >{sq.text}</ReactMarkdown>
+                    >{normalizeMermaidCodeBlocks(sq.text)}</ReactMarkdown>
                 </div>
             </div>
 

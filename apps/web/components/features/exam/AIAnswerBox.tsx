@@ -10,6 +10,9 @@ import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import rehypeRaw from 'rehype-raw';
 import dynamic from 'next/dynamic';
+// @ts-ignore
+import he from 'he';
+import { normalizeMermaidCodeBlocks } from '@/lib/mermaid/sanitize';
 import styles from './AIAnswerBox.module.css';
 
 // Dynamic import for Recharts to reduce initial bundle size
@@ -40,6 +43,17 @@ const RechartsScoreRadar = dynamic(
 
 // Dynamically import Mermaid to avoid SSR issues
 const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false });
+
+const markdownComponents = {
+    code({ inline, className, children, ...props }: any) {
+        const match = /language-(\w+)/.exec(className || '');
+        if (!inline && match && match[1] === 'mermaid') {
+            const chartContent = he.decode(String(children)).replace(/\n$/, '');
+            return <Mermaid chart={chartContent} />;
+        }
+        return <code className={className} {...props}>{children}</code>;
+    }
+};
 
 interface AIAnswerBoxProps {
     questionText: string;
@@ -184,8 +198,9 @@ export default function AIAnswerBox({
                             <ReactMarkdown
                                 remarkPlugins={[remarkGfm, remarkMath] as any}
                                 rehypePlugins={[rehypeRaw, rehypeKatex] as any}
+                                components={markdownComponents}
                             >
-                                {result.feedback}
+                                {normalizeMermaidCodeBlocks(result.feedback)}
                             </ReactMarkdown>
                         </div>
                     </div>
@@ -204,8 +219,9 @@ export default function AIAnswerBox({
                                 <ReactMarkdown
                                     remarkPlugins={[remarkGfm, remarkMath] as any}
                                     rehypePlugins={[rehypeRaw, rehypeKatex] as any}
+                                    components={markdownComponents}
                                 >
-                                    {result.improvedAnswer}
+                                    {normalizeMermaidCodeBlocks(result.improvedAnswer)}
                                 </ReactMarkdown>
                             </div>
                         </div>

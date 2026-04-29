@@ -146,6 +146,7 @@ flowchart TD
 - 構成図: `graph TD` または `graph LR`
 - ユーザーフロー / データフロー: `sequenceDiagram`
 - 状態遷移: 必要に応じて `stateDiagram-v2`
+- アプリ内 Markdown 表示では、言語タグなしコードフェンスでも本文が Mermaid 宣言で始まる場合は `mermaid` 言語タグ付きとして正規化して描画する
 
 図を作る際は、略称よりも責務が分かるラベルを優先する。
 
