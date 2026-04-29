@@ -14,3 +14,17 @@ if [ $GUARD_EXIT -ne 0 ]; then
   echo "❌ ガードチェックに失敗しました。コミットを中止します。"
   exit 1
 fi
+
+echo "🔎 self-inspect を実行中..."
+if ! command -v pwsh >/dev/null 2>&1; then
+  echo "❌ pwsh が見つからないため self-inspect を実行できません。"
+  exit 1
+fi
+
+pwsh .github/hooks/self-inspect.ps1 -Mode end -FailOnFinding
+INSPECT_EXIT=$?
+
+if [ $INSPECT_EXIT -ne 0 ]; then
+  echo "❌ self-inspect に失敗しました。実装変更に対応する docs/ 更新は document-agent が担当します。"
+  exit 1
+fi
