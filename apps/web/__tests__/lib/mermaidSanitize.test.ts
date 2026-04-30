@@ -105,6 +105,11 @@ describe('normalizeMermaidCodeBlocks', () => {
         expect(normalizeMermaidCodeBlocks(input)).toBe(input);
     });
 
+    it('does not treat graph variable assignment as Mermaid', () => {
+        const input = ['```', 'graph = { nodes: [] };', '```'].join('\n');
+        expect(normalizeMermaidCodeBlocks(input)).toBe(input);
+    });
+
     it('preserves already labeled Mermaid code block', () => {
         const input = ['```mermaid', 'sequenceDiagram', 'A->>B: hello', '```'].join('\n');
         expect(normalizeMermaidCodeBlocks(input)).toBe(input);
@@ -113,7 +118,13 @@ describe('normalizeMermaidCodeBlocks', () => {
 
 describe('isLikelyMermaid', () => {
     it('detects common Mermaid diagram declarations', () => {
+        expect(isLikelyMermaid('graph TD\nA --> B')).toBe(true);
         expect(isLikelyMermaid('flowchart LR\nA --> B')).toBe(true);
         expect(isLikelyMermaid('sequenceDiagram\nA->>B: hello')).toBe(true);
+    });
+
+    it('rejects graph without Mermaid direction', () => {
+        expect(isLikelyMermaid('graph = { nodes: [] };')).toBe(false);
+        expect(isLikelyMermaid('graph.forEach(node => visit(node));')).toBe(false);
     });
 });

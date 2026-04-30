@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import remarkGfm from 'remark-gfm';
@@ -87,6 +87,14 @@ export default function AIAnswerBox({
     const [result, setResult] = useState<ScoreResult | null>(initialResult || null);
     const [error, setError] = useState<string | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const normalizedFeedback = useMemo(
+        () => normalizeMermaidCodeBlocks(result?.feedback || ''),
+        [result?.feedback]
+    );
+    const normalizedImprovedAnswer = useMemo(
+        () => normalizeMermaidCodeBlocks(result?.improvedAnswer || ''),
+        [result?.improvedAnswer]
+    );
 
     // Auto-resize textarea
     useEffect(() => {
@@ -200,7 +208,7 @@ export default function AIAnswerBox({
                                 rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                 components={markdownComponents}
                             >
-                                {normalizeMermaidCodeBlocks(result.feedback)}
+                                {normalizedFeedback}
                             </ReactMarkdown>
                         </div>
                     </div>
@@ -221,7 +229,7 @@ export default function AIAnswerBox({
                                     rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                     components={markdownComponents}
                                 >
-                                    {normalizeMermaidCodeBlocks(result.improvedAnswer)}
+                                    {normalizedImprovedAnswer}
                                 </ReactMarkdown>
                             </div>
                         </div>

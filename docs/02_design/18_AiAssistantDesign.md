@@ -358,7 +358,8 @@ interface ExamContext {
 ### 6.2.1 Markdown / Mermaid 表示
 
 - `ChatMessage.tsx` はアシスタント応答を Markdown として表示する。
-- 応答内のコードフェンスが言語タグなしでも、本文が `graph TD`、`flowchart`、`sequenceDiagram` などの Mermaid 宣言で始まる場合は `mermaid` 言語タグ付きコードブロックとして正規化し、共通 Mermaid コンポーネントで描画する。
+- 応答内のコードフェンスが言語タグなしでも、本文が `graph TD`、`flowchart LR`、`sequenceDiagram` などの Mermaid 宣言で始まる場合は `mermaid` 言語タグ付きコードブロックとして正規化し、共通 Mermaid コンポーネントで描画する。
+- `graph` / `flowchart` は `graph = {...}` のような一般コードとの誤検知を避けるため、方向指定（`TD` / `LR` 等）を必須とする。
 - Mermaid の構文サニタイズは `lib/mermaid/sanitize.ts` に集約し、AI Assistant と試験画面で同じ判定を利用する。
 
 ### 6.3 Root Layout 統合
