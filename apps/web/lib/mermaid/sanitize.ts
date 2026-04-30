@@ -25,6 +25,22 @@ export function normalizeMermaidCodeBlocks(markdown: string): string {
     });
 }
 
+function unwrapMermaidChart(chart: string): string {
+    let out = chart.trim();
+
+    out = out
+        .replace(/^\[CODE_BLOCK:mermaid\]\s*/i, '')
+        .replace(/\s*\[\/CODE_BLOCK\]$/i, '')
+        .trim();
+
+    const fenced = out.match(/^```(?:mermaid)?[ \t]*\r?\n([\s\S]*?)\r?\n?```$/i);
+    if (fenced && isLikelyMermaid(fenced[1])) {
+        return fenced[1].trim();
+    }
+
+    return out;
+}
+
 /**
  * Mermaid のノードラベル `Id[label]` / `Id(label)` / `Id{label}` のうち、
  * 未クォートかつ Mermaid パーサが嫌う特殊文字を含むものを `Id["label"]` 等にラップする。
@@ -35,6 +51,8 @@ export function normalizeMermaidCodeBlocks(markdown: string): string {
  */
 export function sanitizeMermaid(chart: string): string {
     if (!chart) return chart;
+
+    chart = unwrapMermaidChart(chart);
 
     // 1. Comment out invalid "note:" lines that are not valid Mermaid formatting
     let out = chart.replace(/(\n\s*)note:/gi, '$1%% note:');

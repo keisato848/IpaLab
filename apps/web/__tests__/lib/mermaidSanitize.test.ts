@@ -11,6 +11,16 @@ describe('sanitizeMermaid', () => {
         expect(sanitizeMermaid(input)).toBe('graph TD\n  %% note: this is invalid');
     });
 
+    it('unwraps static data CODE_BLOCK mermaid markers', () => {
+        const input = '[CODE_BLOCK:mermaid]\ngraph TD\nA --> B\n[/CODE_BLOCK]';
+        expect(sanitizeMermaid(input)).toBe('graph TD\nA --> B');
+    });
+
+    it('unwraps full mermaid code fences before rendering', () => {
+        const input = '```mermaid\ngraph TD\nA --> B\n```';
+        expect(sanitizeMermaid(input)).toBe('graph TD\nA --> B');
+    });
+
     it('quotes node label containing <- (assignment arrow)', () => {
         const input = 'graph TD\nB[x <- 1]';
         expect(sanitizeMermaid(input)).toContain('B["x <- 1"]');
