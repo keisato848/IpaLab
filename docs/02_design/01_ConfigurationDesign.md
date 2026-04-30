@@ -89,7 +89,7 @@
 - **Testing**:
   - Unit: Vitest + @testing-library/react
   - E2E: Playwright
-- **Lint**: `packages/config/eslint-preset` を使用
+- **Lint**: `eslint app components hooks lib --ext .js,.jsx,.ts,.tsx` で `packages/config/eslint-preset` を使用
 - **TSConfig**: `packages/config/tsconfig.base.json` を extends
 - **内部パッケージ依存**: `@ipa-lab/config`, `@ipa-lab/data`, `@ipa-lab/shared`
 
@@ -109,6 +109,7 @@
 - **Port**: 7075（ローカル開発時）
 - **Region**: US East 2（Gemini API 地域制限対応）
 - **Build**: tsup による TypeScript コンパイル
+- **Lint**: `packages/config/eslint-server` を extends し、生成物 `dist/` は対象外
 - **Dependencies**: `@azure/cosmos`, `@google/generative-ai`, `applicationinsights`
 - **主要機能**:
   - Gemini API プロキシ処理
@@ -168,6 +169,14 @@ COSMOS_DB_CONNECTION=<cosmos_connection>
 
 テスト実行は `pre-push` に集約し、コミット時の待ち時間を抑えつつ、push 前にユニットテストを必ず通す構成とします。
 
+### 4.4 GitHub Actions: 日本語フィールド同期
+
+`.github/workflows/sync-project-fields.yml` は、Issue / Pull Request の担当者、ラベル、マイルストーン、リポジトリ、レビュー担当者を GitHub Projects v2 の日本語フィールドへ同期します。
+
+- `PROJECT_PAT` Secret が利用できる場合のみ `actions/github-script` で Projects v2 API を呼び出します。
+- Copilot / fork 相当の PR など Secret が提供されない実行コンテキストでは、同期処理をスキップして workflow 自体は成功させます。
+- プロジェクト同期は運用補助であり、アプリケーション品質ゲートを不要にブロックしない設計とします。
+
 ## 5. Copilot Agent カスタマイズ設定
 
 GitHub Copilot エージェントのカスタマイズ設定は以下のパスに配置する。詳細は [23_CopilotAgentCustomizationDesign.md](23_CopilotAgentCustomizationDesign.md) を参照。
@@ -194,6 +203,8 @@ read / edit / search / execute / agent / web / todo
 
 ## 変更履歴
 
+- **2026-04-30**: GitHub Actions の日本語フィールド同期 workflow 設計を追記
+  - `PROJECT_PAT` 未提供時は同期をスキップし、PR の品質ゲートをブロックしない方針を明記
 - **2026-04-29**: Copilot Agent カスタマイズ設定セクションを追加
   - `.github/agents/`, `.github/hooks/`, `.github/prompts/`, `.github/skills/`, `.vscode/mcp.json` の設計方針を追加
   - 詳細設計は `docs/02_design/23_CopilotAgentCustomizationDesign.md` を参照

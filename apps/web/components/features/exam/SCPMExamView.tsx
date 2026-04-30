@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -13,6 +13,7 @@ import 'katex/dist/katex.min.css';
 import he from 'he';
 import dynamic from 'next/dynamic';
 import { Question } from '@/lib/api';
+import { normalizeMermaidCodeBlocks } from '@/lib/mermaid/sanitize';
 import styles from './SCPMExamView.module.css';
 import AIAnswerBox from './AIAnswerBox';
 import { ScoreResult } from './AIAnswerBox';
@@ -77,6 +78,32 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
     const [mobileLayout, setMobileLayout] = useState<'tab' | 'stacked'>('stacked');
     // Layout Mode: default (3-col/split), focus (2-col/split no nav), paper (answer only)
     const [layoutMode, setLayoutMode] = useState<'default' | 'focus' | 'paper'>('default');
+    const normalizedContextParts = useMemo(() => {
+        if (!context) return [];
+
+        return context.background.split(/({{diagram:[^}]+}})/g).map((part, index) => {
+            const match = part.match(/{{diagram:([^}]+)}}/);
+            if (!match) {
+                return {
+                    type: 'markdown',
+                    key: `text-${index}`,
+                    content: normalizeMermaidCodeBlocks(part),
+                };
+            }
+
+            const diagramId = match[1];
+            const diagram = context.diagrams?.find(d => d.id === diagramId);
+            return {
+                type: 'diagram',
+                key: `diagram-${index}`,
+                diagramId,
+                diagram,
+                markdownContent: diagram?.type === 'markdown'
+                    ? normalizeMermaidCodeBlocks(diagram.content)
+                    : undefined,
+            };
+        });
+    }, [context]);
 
     // Split View Resizing
     const [contextWidth, setContextWidth] = useState(60); // percent
@@ -133,20 +160,14 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
     // Let's use a regex to replace {{diagram:id}} with a custom directive for ReactMarkdown if possible,
     // or just render the diagram IN PLACE if it's a block.
 
-    const renderContextWithDiagrams = (text: string) => {
-        // We will split the text by the diagram placeholder pattern
-        const parts = text.split(/({{diagram:[^}]+}})/g);
-
-        return parts.map((part, index) => {
-            const match = part.match(/{{diagram:([^}]+)}}/);
-            if (match) {
-                const diagramId = match[1];
-                const diagram = context.diagrams?.find(d => d.id === diagramId);
-
-                if (!diagram) return <div key={index} className={styles.errorMessage}>[Missing Diagram: {diagramId}]</div>;
+    const renderContextWithDiagrams = () => {
+        return normalizedContextParts.map((part) => {
+            if (part.type === 'diagram') {
+                const { diagram, diagramId } = part;
+                if (!diagram) return <div key={part.key} className={styles.errorMessage}>[Missing Diagram: {diagramId}]</div>;
 
                 return (
-                    <div key={index} className={styles.diagramContainer}>
+                    <div key={part.key} className={styles.diagramContainer}>
                         <div className={styles.diagramLabel}>{diagram.label}</div>
                         <div className={styles.diagramContent}>
                             {diagram.type === 'mermaid' ? (
@@ -158,7 +179,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                                         rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                         components={markdownComponents}
                                     >
-                                        {diagram.content}
+                                        {part.markdownContent}
                                     </ReactMarkdown>
                                 </div>
                             ) : (
@@ -174,13 +195,13 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
 
             // Standard Text
             return (
-                <div key={index} className={styles.markdownContent}>
+                <div key={part.key} className={styles.markdownContent}>
                     <ReactMarkdown
                         remarkPlugins={[remarkGfm, remarkMath] as any}
                         rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                         components={markdownComponents}
                     >
-                        {part}
+                        {part.content}
                     </ReactMarkdown>
                 </div>
             );
@@ -304,7 +325,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                     </div>
 
                     <div className={styles.contextContent}>
-                        {renderContextWithDiagrams(context.background)}
+                        {renderContextWithDiagrams()}
                     </div>
                 </div>
 
@@ -366,6 +387,11 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
 }
 
 function SubQuestionBlock({ question, index, parentContext, onGrade, initialData }: { question: any, index: number, parentContext: any, onGrade?: (data: any) => void, initialData?: any }) {
+    const normalizedQuestionText = useMemo(
+        () => normalizeMermaidCodeBlocks(question.text),
+        [question.text]
+    );
+
     return (
         <div className={styles.subQuestionBlock}>
             <div className={styles.subQuestionHeader}>
@@ -375,7 +401,7 @@ function SubQuestionBlock({ question, index, parentContext, onGrade, initialData
                         remarkPlugins={[remarkGfm, remarkMath] as any}
                         rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                         components={markdownComponents}
-                    >{question.text}</ReactMarkdown>
+                    >{normalizedQuestionText}</ReactMarkdown>
                 </div>
             </div>
 
@@ -399,6 +425,10 @@ function SubQuestionBlock({ question, index, parentContext, onGrade, initialData
 
 function SubQuestionItem({ sq, sIdx, onGrade, initialData }: { sq: any, sIdx: number, onGrade?: (data: any) => void, initialData?: any }) {
     const [showExplanation, setShowExplanation] = useState(false);
+    const normalizedText = useMemo(
+        () => normalizeMermaidCodeBlocks(sq.text),
+        [sq.text]
+    );
 
     return (
         <div className={styles.subQuestionItem}>
@@ -411,7 +441,7 @@ function SubQuestionItem({ sq, sIdx, onGrade, initialData }: { sq: any, sIdx: nu
                         remarkPlugins={[remarkGfm, remarkMath] as any}
                         rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                         components={markdownComponents}
-                    >{sq.text}</ReactMarkdown>
+                    >{normalizedText}</ReactMarkdown>
                 </div>
             </div>
 
