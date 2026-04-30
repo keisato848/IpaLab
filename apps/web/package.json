@@ -8,7 +8,7 @@
         "build:standalone": "next build --webpack && node scripts/copy-standalone-assets.js",
         "start": "next start",
         "start:standalone": "node server.js",
-        "lint": "next lint",
+        "lint": "eslint app components hooks lib --ext .js,.jsx,.ts,.tsx",
         "test": "vitest",
         "test:run": "vitest run",
         "test:coverage": "vitest run --coverage",

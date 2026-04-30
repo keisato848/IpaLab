@@ -89,7 +89,7 @@
 - **Testing**:
   - Unit: Vitest + @testing-library/react
   - E2E: Playwright
-- **Lint**: `packages/config/eslint-preset` を使用
+- **Lint**: `eslint app components hooks lib --ext .js,.jsx,.ts,.tsx` で `packages/config/eslint-preset` を使用
 - **TSConfig**: `packages/config/tsconfig.base.json` を extends
 - **内部パッケージ依存**: `@ipa-lab/config`, `@ipa-lab/data`, `@ipa-lab/shared`
 
@@ -109,6 +109,7 @@
 - **Port**: 7075（ローカル開発時）
 - **Region**: US East 2（Gemini API 地域制限対応）
 - **Build**: tsup による TypeScript コンパイル
+- **Lint**: `packages/config/eslint-server` を extends し、生成物 `dist/` は対象外
 - **Dependencies**: `@azure/cosmos`, `@google/generative-ai`, `applicationinsights`
 - **主要機能**:
   - Gemini API プロキシ処理
