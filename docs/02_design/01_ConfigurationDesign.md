@@ -169,6 +169,14 @@ COSMOS_DB_CONNECTION=<cosmos_connection>
 
 テスト実行は `pre-push` に集約し、コミット時の待ち時間を抑えつつ、push 前にユニットテストを必ず通す構成とします。
 
+### 4.4 GitHub Actions: 日本語フィールド同期
+
+`.github/workflows/sync-project-fields.yml` は、Issue / Pull Request の担当者、ラベル、マイルストーン、リポジトリ、レビュー担当者を GitHub Projects v2 の日本語フィールドへ同期します。
+
+- `PROJECT_PAT` Secret が利用できる場合のみ `actions/github-script` で Projects v2 API を呼び出します。
+- Copilot / fork 相当の PR など Secret が提供されない実行コンテキストでは、同期処理をスキップして workflow 自体は成功させます。
+- プロジェクト同期は運用補助であり、アプリケーション品質ゲートを不要にブロックしない設計とします。
+
 ## 5. Copilot Agent カスタマイズ設定
 
 GitHub Copilot エージェントのカスタマイズ設定は以下のパスに配置する。詳細は [23_CopilotAgentCustomizationDesign.md](23_CopilotAgentCustomizationDesign.md) を参照。
@@ -195,6 +203,8 @@ read / edit / search / execute / agent / web / todo
 
 ## 変更履歴
 
+- **2026-04-30**: GitHub Actions の日本語フィールド同期 workflow 設計を追記
+  - `PROJECT_PAT` 未提供時は同期をスキップし、PR の品質ゲートをブロックしない方針を明記
 - **2026-04-29**: Copilot Agent カスタマイズ設定セクションを追加
   - `.github/agents/`, `.github/hooks/`, `.github/prompts/`, `.github/skills/`, `.vscode/mcp.json` の設計方針を追加
   - 詳細設計は `docs/02_design/23_CopilotAgentCustomizationDesign.md` を参照
