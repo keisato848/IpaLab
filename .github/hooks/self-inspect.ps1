@@ -19,6 +19,7 @@
 #   R7. 論述式の小問スコア表示が公式集計ではなく単純平均へ戻るパターン
 #   R8. 実装変更に docs/ 配下の設計書・手順書更新が伴っていないパターン
 #   R9. QuestionClient のセッション進捗保存が表示用 sessionStats に依存するパターン
+#   R10. 静的問題データ由来の Mermaid CODE_BLOCK マーカーを除去しないパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -305,13 +306,27 @@ if (Test-Path $questionClient) {
     }
 }
 
+# ---------------------------------------------------------------------------
+# R10: 静的問題データ由来の Mermaid CODE_BLOCK マーカーを除去しているか
+#      (`[CODE_BLOCK:mermaid]` が Mermaid コンポーネントへ渡ると描画に失敗する)
+# ---------------------------------------------------------------------------
+$mermaidSanitize = Join-Path $WebRoot 'lib\mermaid\sanitize.ts'
+if (Test-Path $mermaidSanitize) {
+    $raw = Get-Content -LiteralPath $mermaidSanitize -Raw
+    if ($raw -notmatch 'CODE_BLOCK:mermaid' -or $raw -notmatch '/CODE_BLOCK') {
+        Add-Finding -Rule 'R10-mermaid-codeblock-marker' -Severity 'High' `
+            -File $mermaidSanitize `
+            -Detail '静的問題データの [CODE_BLOCK:mermaid] / [/CODE_BLOCK] を除去できず、Mermaid 描画失敗が再発する可能性があります'
+    }
+}
+
 $tag = if ($Mode -eq 'start') { 'SESSION-START' } else { 'SESSION-END' }
 Write-Host ""
 Write-Host "## [self-inspect $tag] 自己点検レポート"
 Write-Host ""
 
 if ($findings.Count -eq 0) {
-    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9)"
+    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10)"
     exit 0
 }
 
@@ -325,7 +340,7 @@ foreach ($f in $findings) {
 }
 
 Write-Host ""
-Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用"
+Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去"
 
 if ($FailOnFinding) { exit 1 }
 exit 0
