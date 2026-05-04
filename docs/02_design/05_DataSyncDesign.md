@@ -4,6 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-04 | Ollama による AM/AM2 問題PDF pilot、Gemma 推奨条件、Qwen3.x の response 空問題を追加 |
 | 2026-05-04 | Ollama Vision による解答PDFローカル抽出 pilot と PDF レンダラ前提を追加 |
 | 2026-05-03 | PDF ダウンロード時の実体検証、`DOWNLOAD_CATEGORIES` による対象カテゴリ指定、`audit:raw-pdfs` による Stage A 完了ゲートを追加 |
 | 2026-05-02 | Cosmos `Questions` 再同期前のローカル監査、qNo 単位 dry-run、`qNo=99` 旧プレースホルダー削除計画、Agent Skill / Specialist / Security review の運用を追加 |
@@ -147,6 +148,28 @@ npm run -w packages/data extract:answers:ollama -- --exam-id=AP-2024-Spring-AM
 前提条件は、Ollama で Vision 対応モデル（既定値 `gemma4:26b`）が利用できること、および PDF を画像化するローカルレンダラが PATH から実行できることである。
 対応レンダラは Poppler (`pdftoppm` / `pdftocairo`)、MuPDF (`mutool`)、ImageMagick + Ghostscript (`magick`)、Ghostscript (`gswin64c` / `gs`) とする。
 `--dry-run` や `--limit` が npm 側の設定として扱われる環境があるため、script は `npm_config_*` も読み取る。
+
+#### 7.2.2 Ollama AM/AM2 問題PDF抽出 pilot
+
+AM/AM2 の択一問題PDFをローカルで試験抽出する場合は、`extract:questions:ollama` を使用できる。
+対象は午前系の `*-AM` / `*-AM2` に限定し、午後問題の正式抽出は Gemini 系の Stage B を継続する。
+スキャンPDFでは埋め込みテキストが空になるため、ページ画像を Ollama Vision モデルへ渡す。
+2段組みPDFでは `--split-columns` で左右カラムを分割し、長時間処理では `--allow-partial` と `--debug-dir` で成功チャンクと生応答を残す。
+
+```powershell
+npm run -w packages/data extract:questions:ollama -- --check --model=gemma4:e4b
+npm run -w packages/data extract:questions:ollama -- --model=gemma4:e4b --exam-id=DB-2016-Spring-AM2 --split-columns --allow-partial --debug-dir=../../temp-logs/ollama-debug --render-dpi=85 --num-predict=1024 --timeout-ms=420000
+```
+
+2026-05-04 時点の検証では、`DB-2016-Spring-AM2` はスキャンPDFであり、`--text-only` は利用できない。
+`gemma4:e4b` + `--split-columns` はページ単位の抽出に成功したが、選択肢欠落や本文誤読が残るため、出力後は qNo、選択肢4件、正答、図表表現を必ずレビューする。
+`--with-explanations` は同時生成の負荷が高いため、一次抽出では無効のままとし、解説は後工程で補完する。
+
+Qwen3.x 系モデルは当面使用しない。
+`qwen3.5:9b` では `/api/generate`、`/api/chat`、`format: json` の有無、`options.think=false` のいずれでも `response` / `message.content` が空になる事象を確認した。
+この問題はプロンプトや JSON 強制だけでは回避できず、`qwen3.6:27b` も同系統のリスクが高い。
+また 27B は `gemma4:26b` と同程度のサイズになり、処理時間・メモリ面でも `gemma4:e4b` より不利である。
+Ollama またはモデル側で response 空問題が解消されるまで、AM/AM2 問題PDF抽出の推奨モデルは `gemma4:e4b` とする。
 
 ### 7.3 qNo=99 の扱い
 
