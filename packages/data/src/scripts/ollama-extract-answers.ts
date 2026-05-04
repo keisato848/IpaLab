@@ -137,8 +137,11 @@ async function renderPdfPages(pdfPath: string, dpi: number, maxPages: number): P
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const pdfjsLib = (await import('pdfjs-dist/legacy/build/pdf.mjs')) as typeof import('pdfjs-dist');
-    // Node.js ではワーカースレッドを使わずメインスレッドで処理する
-    pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+    // Node.js 環境では fake worker を使用するためワーカーパスを動的解決して指定する
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const pdfjsDistDir = path.dirname(require.resolve('pdfjs-dist/package.json'));
+    const workerPath = path.join(pdfjsDistDir, 'legacy', 'build', 'pdf.worker.mjs');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `file:///${workerPath.replace(/\\/g, '/')}`;
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { createCanvas } = require('@napi-rs/canvas') as typeof import('@napi-rs/canvas');
@@ -281,13 +284,13 @@ function formatAnswerJson(examId: string, responseText: string): string {
 }
 
 async function buildPrompt(examId: string): Promise<string> {
-    const promptPath = path.resolve(__dirname, '../../../../docs/prompts/gemini_answer_ocr_prompt.md');
+    const promptPath = path.resolve(__dirname, '../../../../docs/prompts/ollama_answer_ocr_prompt.md');
     const prompt = await fs.readFile(promptPath, 'utf8');
     return `${prompt}
 
 Target exam ID: ${examId}
 
-If the answer key contains descriptive afternoon answers rather than simple multiple-choice options, return a JSON object that preserves the answer labels and answer text. For multiple-choice tables, return the documented {"1":"a"} mapping. Output only valid JSON.`;
+For this target, extract every answer row visible in the PDF. Output only valid JSON.`;
 }
 
 async function extractTarget(target: AnswerTarget, options: CliOptions) {
