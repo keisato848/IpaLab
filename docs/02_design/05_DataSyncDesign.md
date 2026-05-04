@@ -4,7 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
-| 2026-05-05 | `DB-2016-Spring-AM2` の Ollama/Gemma AM2 問題PDF抽出実績と Q4 再抽出メモを追加 |
+| 2026-05-05 | `DB-2016-Spring-AM2` の Ollama/Gemma AM2 問題PDF抽出実績、Q4 再抽出メモ、`NW-2025-Spring-AM2` の解答抽出実績を追加 |
 | 2026-05-04 | Ollama による AM/AM2 問題PDF pilot、Gemma 推奨条件、Qwen3.x の response 空問題を追加 |
 | 2026-05-04 | Ollama Vision による解答PDFローカル抽出 pilot と PDF レンダラ前提を追加 |
 | 2026-05-03 | PDF ダウンロード時の実体検証、`DOWNLOAD_CATEGORIES` による対象カテゴリ指定、`audit:raw-pdfs` による Stage A 完了ゲートを追加 |
@@ -149,6 +149,9 @@ npm run -w packages/data extract:answers:ollama -- --exam-id=AP-2024-Spring-AM
 前提条件は、Ollama で Vision 対応モデル（既定値 `gemma4:26b`）が利用できること、および PDF を画像化するローカルレンダラが PATH から実行できることである。
 対応レンダラは Poppler (`pdftoppm` / `pdftocairo`)、MuPDF (`mutool`)、ImageMagick + Ghostscript (`magick`)、Ghostscript (`gswin64c` / `gs`) とする。
 `--dry-run` や `--limit` が npm 側の設定として扱われる環境があるため、script は `npm_config_*` も読み取る。
+
+2026-05-05 に `NW-2025-Spring-AM2` の解答PDFを `gemma4:e4b` で抽出し、`answers_raw.json` 20問分を生成した。
+AM2 問題本文抽出を行う場合は、この正答マップと照合して `correctOption` 欠落や qNo 欠番を検出する。
 
 #### 7.2.2 Ollama AM/AM2 問題PDF抽出 pilot
 
