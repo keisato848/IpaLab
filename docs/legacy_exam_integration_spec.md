@@ -62,15 +62,17 @@
 - **入力**: `exam-list.ts` の定義リスト
 - **処理**: 定義されたURLからPDFをダウンロード。
 - **出力**: `packages/data/data/raw_pdfs/` 配下のPDFファイル。
-- **制約**: 既存ファイルはスキップすること（冪等性の担保）。
+- **制約**: 既存の正常PDFのみをスキップすること（冪等性の担保）。HTML/XML エラーページや `%PDF-` ヘッダー欠落ファイルは破損扱いとして再取得する。
 
 ### 4.2 データ抽出機能 (ETL)
 - **入力**: PDFファイル
-- **処理**: Google Gemini API (Flash/Proモデル) を使用したOCRと構造化。
+- **処理**: Google Gemini API (Flash/Proモデル) を使用したOCRと構造化。解答PDFに限り、検証用のローカルOllama Vision pilotで抽出できる。
 - **出力**: `questions_raw.json`, `answers_raw.json`
 - **要件**:
     - 図表を含む複雑なレイアウトの認識。
     - APIレート制限への対応（リトライ、キーローテーション）。
+  - Ollama pilot は `answers_raw.json` 専用であり、PDFを画像化するローカルレンダラ（Poppler、MuPDF、ImageMagick + Ghostscript、Ghostscriptのいずれか）を前提とする。
+  - Ollama pilot は `questions_raw.json` の抽出完了条件を代替しない。問題本文と図表の抽出は引き続き Stage B の正式抽出処理で完了判定する。
 
 ### 4.3 クレンジング機能
 - **入力**: Raw JSONファイル

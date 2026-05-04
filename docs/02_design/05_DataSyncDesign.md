@@ -1,5 +1,14 @@
 # Data Sync & Scraping Tool Design
 
+## 変更履歴
+
+| 日付 | 内容 |
+|------|------|
+| 2026-05-04 | Ollama Vision による解答PDFローカル抽出 pilot と PDF レンダラ前提を追加 |
+| 2026-05-03 | PDF ダウンロード時の実体検証、`DOWNLOAD_CATEGORIES` による対象カテゴリ指定、`audit:raw-pdfs` による Stage A 完了ゲートを追加 |
+| 2026-05-02 | Cosmos `Questions` 再同期前のローカル監査、qNo 単位 dry-run、`qNo=99` 旧プレースホルダー削除計画、Agent Skill / Specialist / Security review の運用を追加 |
+| 2026-05-02 | IPA 公式年度別 HTML から対象カテゴリの問題/解答 PDF を抽出し、`exam-list.ts` とローカルデータの To-Be / As-Is 差分を確認する公式ソース監査を追加 |
+
 ## 1. Overview
 This document outlines the design for the **Data Sync Tool** (`packages/data`), which is responsible for populating the Cosmos DB with exam master data.
 The tool combines **Question Data** stored locally (GitOps) with **Answer Data** scraped from the official IPA website, validated by a human administrator.
@@ -87,3 +96,66 @@ packages/data/
 - `npm run scrape <url> --out <filename>`
 - `npm run sync --dry-run`
 - `npm run sync --force`
+
+## 7. Cosmos Questions 再同期ガード
+
+本番 `Questions` コンテナを再同期する場合は、直接 apply せず、以下の順序で確認する。
+
+1. `.github/skills/exam-data-management/scripts/official-source-coverage-audit.mjs --json` で IPA 公式年度別 HTML から対象カテゴリの問題/解答 PDF を抽出し、To-Be を確定する。
+2. `.github/skills/exam-data-management/scripts/local-exam-data-audit.mjs --json` でローカル JSON 形式、qNo 欠損、重複、空データ、IPA 公開一覧との差分を確認する。
+3. Cosmos DB firewall は現在 IP を一時追加し、完了後に元の `ipRules` へ復元する。接続文字列は標準出力へ出さない。
+4. `.github/skills/exam-data-management/scripts/cosmos-questions-sync-plan.mjs --dry-run --json` で削除予定と upsert 予定を確認する。
+5. ユーザー承認後のみ `--apply --confirm-production-write` を付けて実行する。
+6. apply 後に同じ dry-run を再実行し、旧プレースホルダーと未投入 qNo が残っていないことを確認する。
+
+### 7.1 公式ソース To-Be 監査
+
+対象カテゴリは AP / PM / SC / FE / NW / DB / SA / ES / ST、年度範囲は 2016 年以降を標準とする。
+`official-source-coverage-audit.mjs` は IPA の年度別 HTML から `_qs.pdf` と `_ans.pdf` を抽出し、問題 PDF が存在する単位を To-Be として扱う。
+公式解答 PDF が存在する場合は `exam-list.ts` の `answerUrl` と `packages/data/data/questions/{examId}/answers_raw.json` も検証対象に含める。
+差分は `representativeGaps` として As-Is / To-Be の形で出力し、本番同期 dry-run 前に説明する。
+
+### 7.2 Raw PDF Stage A ゲート
+
+PDF ダウンロード後、Gemini OCR へ進む前に `packages/data/data/raw_pdfs/` の実体監査を必ず実行する。
+`download.ts` は既存ファイルがあっても `%PDF-` ヘッダーがない、または HTML/XML と判定できるファイルを破損扱いにし、再取得対象にする。
+大規模整備では対象カテゴリを `DOWNLOAD_CATEGORIES` で明示し、監査も同じカテゴリで実行する。
+
+```powershell
+$env:DOWNLOAD_CATEGORIES = "AP,PM,SC,FE,NW,DB,SA,ES,ST"
+npm run download -w packages/data
+Remove-Item Env:DOWNLOAD_CATEGORIES
+
+npm run -w packages/data audit:raw-pdfs -- --categories=AP,PM,SC,FE,NW,DB,SA,ES,ST
+```
+
+Stage A の完了条件は `status=RAW_PDF_AUDIT_OK`、`missingQuestionCount=0`、`missingAnswerCount=0`、`invalidPdfCount=0` とする。
+この条件を満たすまで `npm run extract -w packages/data` へ進まない。
+Windows 環境では `npx` を子プロセスから直接 spawn すると `spawnSync npx ENOENT` になる場合があるため、Gemini OCR は `npm run extract -w packages/data` から起動し、内部では `process.execPath` と `ts-node/register` で `gemini-extract.ts` を実行する。
+
+#### 7.2.1 Ollama 解答PDF抽出 pilot
+
+Gemini のレート制限回避やローカル検証のため、解答PDFだけを `extract:answers:ollama` で抽出できる。
+この pilot は `answers_raw.json` の補完用であり、問題本文・図表・Mermaid 変換を含む `questions_raw.json` の正式抽出を代替しない。
+
+```powershell
+npm run -w packages/data extract:answers:ollama -- --check
+npm run -w packages/data extract:answers:ollama -- --dry-run --limit=3
+npm run -w packages/data extract:answers:ollama -- --exam-id=AP-2024-Spring-AM
+```
+
+前提条件は、Ollama で Vision 対応モデル（既定値 `gemma4:26b`）が利用できること、および PDF を画像化するローカルレンダラが PATH から実行できることである。
+対応レンダラは Poppler (`pdftoppm` / `pdftocairo`)、MuPDF (`mutool`)、ImageMagick + Ghostscript (`magick`)、Ghostscript (`gswin64c` / `gs`) とする。
+`--dry-run` や `--limit` が npm 側の設定として扱われる環境があるため、script は `npm_config_*` も読み取る。
+
+### 7.3 qNo=99 の扱い
+
+`qNo=99` は IP/AM では正規問題になり得るため、全件削除は禁止する。
+削除対象は「ローカル静的データに同じ examId が存在し、かつローカル側に Q99 が存在しない Cosmos 側 Q99」に限定する。
+これにより、過去の同期不具合で生成された午後問題の旧プレースホルダーを削除しつつ、正規の Q99 を保持する。
+
+### 7.4 Agent 運用
+
+データ抽出、登録、同期は `.github/skills/exam-data-management/` と `data-management-specialist` が担当する。
+本番 DB 操作、GitHub security alerts、secret scanning、Dependabot、CodeQL の確認は `security-agent` がレビューする。
+レビューで権限不足や未確認項目がある場合は、同期 apply 前の未解決リスクとして扱う。

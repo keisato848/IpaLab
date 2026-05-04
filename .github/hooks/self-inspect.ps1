@@ -19,6 +19,12 @@
 #   R7. 論述式の小問スコア表示が公式集計ではなく単純平均へ戻るパターン
 #   R8. 実装変更に docs/ 配下の設計書・手順書更新が伴っていないパターン
 #   R9. QuestionClient のセッション進捗保存が表示用 sessionStats に依存するパターン
+#   R10. 静的問題データ由来の Mermaid CODE_BLOCK マーカーを除去しないパターン
+#   R11. 問題データ同期で qNo 欠損を 99 に丸めるパターン
+#   R12. tracked 設定テンプレートに実接続文字列や API キーを置くパターン
+#   R13. PDF ダウンロードで HTML/XML エラーページを .pdf として保存するパターン
+#   R14. Windows で npx を直接 spawn して ENOENT になるパターン
+#   R15. npm run 経由の CLI 引数が npm_config_* に吸収されるパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -305,13 +311,139 @@ if (Test-Path $questionClient) {
     }
 }
 
+# ---------------------------------------------------------------------------
+# R10: 静的問題データ由来の Mermaid CODE_BLOCK マーカーを除去しているか
+#      (`[CODE_BLOCK:mermaid]` が Mermaid コンポーネントへ渡ると描画に失敗する)
+# ---------------------------------------------------------------------------
+$mermaidSanitize = Join-Path $WebRoot 'lib\mermaid\sanitize.ts'
+if (Test-Path $mermaidSanitize) {
+    $raw = Get-Content -LiteralPath $mermaidSanitize -Raw
+    if ($raw -notmatch 'CODE_BLOCK:mermaid' -or $raw -notmatch '/CODE_BLOCK') {
+        Add-Finding -Rule 'R10-mermaid-codeblock-marker' -Severity 'High' `
+            -File $mermaidSanitize `
+            -Detail '静的問題データの [CODE_BLOCK:mermaid] / [/CODE_BLOCK] を除去できず、Mermaid 描画失敗が再発する可能性があります'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R11: sync-db.ts が qNo 欠損を 99 に丸めていないか
+#      (Cosmos に qNo=99 の午後問題が残ると、対象 qNo が見つからず FS fallback も発動しない)
+# ---------------------------------------------------------------------------
+$syncDbScript = Join-Path $RepoRoot 'packages\data\src\scripts\sync-db.ts'
+if (Test-Path $syncDbScript) {
+    $raw = Get-Content -LiteralPath $syncDbScript -Raw
+    $badPatterns = @(
+        'qNo\s*\|\|\s*99',
+        'parentQNo\s*=\s*99',
+        'resolvedQNo\s*=\s*[^;]*\|\|\s*99'
+    )
+
+    foreach ($pattern in $badPatterns) {
+        if ($raw -match $pattern) {
+            Add-Finding -Rule 'R11-sync-db-qno-99-fallback' -Severity 'High' `
+                -File $syncDbScript `
+                -Detail 'sync-db.ts が qNo 欠損を 99 に丸める可能性があります (推奨: qNo を正規化し、欠損時は同期を失敗させる)'
+            break
+        }
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R12: tracked local settings / env templates に実値が入っていないか
+#      (値はレポートに出さず、ファイルと種類だけを示す)
+# ---------------------------------------------------------------------------
+$trackedConfigPatterns = @(
+    'apps/*/local.settings.json',
+    'apps/*/.env.template',
+    'packages/*/.env.template'
+)
+
+$trackedConfigFiles = @()
+foreach ($pattern in $trackedConfigPatterns) {
+    $trackedConfigFiles += Invoke-GitLines @('ls-files', $pattern)
+}
+
+foreach ($relativePath in ($trackedConfigFiles | Sort-Object -Unique)) {
+    $fullPath = Join-Path $RepoRoot $relativePath
+    if (-not (Test-Path $fullPath)) { continue }
+
+    $content = Get-Content -LiteralPath $fullPath -Raw
+    if ($content -match 'AccountKey=(?!<|\$\{|abc123==|"|''|;|\s|$)[^;"''\s]+') {
+        Add-Finding -Rule 'R12-tracked-secret-material' -Severity 'High' `
+            -File $fullPath `
+            -Detail 'tracked 設定ファイルに Cosmos/Storage 接続文字列の AccountKey 実値が含まれている可能性があります (値は表示しません)'
+    }
+    if ($content -match 'AIza[0-9A-Za-z_-]{20,}') {
+        Add-Finding -Rule 'R12-tracked-secret-material' -Severity 'High' `
+            -File $fullPath `
+            -Detail 'tracked 設定ファイルに Google API キー形式の実値が含まれている可能性があります (値は表示しません)'
+    }
+    if ($content -match 'BEGIN (RSA|OPENSSH|PRIVATE) KEY') {
+        Add-Finding -Rule 'R12-tracked-secret-material' -Severity 'High' `
+            -File $fullPath `
+            -Detail 'tracked 設定ファイルに秘密鍵ヘッダーが含まれている可能性があります (値は表示しません)'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R13: download.ts が非 PDF レスポンスを検証せず保存していないか
+#      (HTML/XML エラーページが raw_pdfs/*.pdf として残ると OCR が no pages で失敗する)
+# ---------------------------------------------------------------------------
+$downloadScript = Join-Path $RepoRoot 'packages\data\src\scraper\download.ts'
+if (Test-Path $downloadScript) {
+    $raw = Get-Content -LiteralPath $downloadScript -Raw
+    $hasPdfValidation = ($raw -match 'validatePdfProbe' -and $raw -match 'content-type' -and $raw -match '%PDF-')
+    $writesResponseDirectly = ($raw -match 'writeFile\(\s*filePath\s*,\s*response\.data\s*\)' -or $raw -match 'writeFile\(\s*answerFilePath\s*,\s*response\.data\s*\)')
+
+    if (-not $hasPdfValidation -or $writesResponseDirectly) {
+        Add-Finding -Rule 'R13-download-non-pdf-save' -Severity 'High' `
+            -File $downloadScript `
+            -Detail 'download.ts が HTML/XML や PDF ヘッダー欠落を検証せず raw_pdfs に保存する可能性があります (推奨: content-type と %PDF- ヘッダーを確認し、壊れた既存ファイルは再取得する)'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R14: Node child_process で npx を直接 spawn/execFile していないか
+#      (Windows では npx.cmd 解決に失敗して spawnSync npx ENOENT になる)
+# ---------------------------------------------------------------------------
+$runExtractScript = Join-Path $RepoRoot 'packages\data\src\scripts\run-extract.ts'
+if (Test-Path $runExtractScript) {
+    $raw = Get-Content -LiteralPath $runExtractScript -Raw
+    $spawnsNpxWithSingleQuote = $raw -match "(execFileSync|spawnSync)\(\s*'npx'"
+    $spawnsNpxWithDoubleQuote = $raw -match '(execFileSync|spawnSync)\(\s*"npx"'
+    if ($spawnsNpxWithSingleQuote -or $spawnsNpxWithDoubleQuote) {
+        Add-Finding -Rule 'R14-node-npx-spawn-windows' -Severity 'High' `
+            -File $runExtractScript `
+            -Detail 'run-extract.ts が npx を直接 spawn しており、Windows で ENOENT になる可能性があります (推奨: process.execPath + --require ts-node/register)'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R15: npm run 経由で dry-run 等の CLI 引数が npm_config_* に吸収されても動くか
+#      (Windows/npm では --dry-run などが argv に届かず設定として扱われる場合がある)
+# ---------------------------------------------------------------------------
+$ollamaAnswerScript = Join-Path $RepoRoot 'packages\data\src\scripts\ollama-extract-answers.ts'
+$dataPackageJson = Join-Path $RepoRoot 'packages\data\package.json'
+if ((Test-Path $ollamaAnswerScript) -and (Test-Path $dataPackageJson)) {
+    $scriptRaw = Get-Content -LiteralPath $ollamaAnswerScript -Raw
+    $packageRaw = Get-Content -LiteralPath $dataPackageJson -Raw
+    $readsNpmConfigArgs = ($scriptRaw -match 'npm_config_dry_run' -and $scriptRaw -match 'npm_config_limit' -and $scriptRaw -match 'npm_config_categories')
+    $usesNodeRegister = $packageRaw -match '"extract:answers:ollama"\s*:\s*"node --require ts-node/register src/scripts/ollama-extract-answers.ts"'
+
+    if (-not $readsNpmConfigArgs -or -not $usesNodeRegister) {
+        Add-Finding -Rule 'R15-npm-script-args-windows' -Severity 'Medium' `
+            -File $ollamaAnswerScript `
+            -Detail 'Ollama 抽出 script が npm run 経由の --dry-run/--limit/--categories を npm_config_* から読めない、または ts-node CLI 直起動に戻っている可能性があります'
+    }
+}
+
 $tag = if ($Mode -eq 'start') { 'SESSION-START' } else { 'SESSION-END' }
 Write-Host ""
 Write-Host "## [self-inspect $tag] 自己点検レポート"
 Write-Host ""
 
 if ($findings.Count -eq 0) {
-    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9)"
+    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15)"
     exit 0
 }
 
@@ -325,7 +457,7 @@ foreach ($f in $findings) {
 }
 
 Write-Host ""
-Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用"
+Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から接続文字列・API キー実値を除去 / R13 → download.ts で content-type と %PDF- ヘッダーを検証し、壊れた既存 PDF は再取得する / R14 → npx 直接 spawn ではなく process.execPath + ts-node/register を使う / R15 → npm_config_* と node --require ts-node/register で npm run 引数を安定化する"
 
 if ($FailOnFinding) { exit 1 }
 exit 0
