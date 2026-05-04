@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { guestManager } from '@/lib/guest-manager';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { getExamLabel } from '@/lib/exam-utils';
+import { normalizeMermaidCodeBlocks } from '@/lib/mermaid/sanitize';
 import styles from './QuestionClient.module.css';
 import { Question, saveLearningRecord, LearningRecord, getLearningRecords, saveExamProgress, getExamProgress, updateSessionProgress } from '@/lib/api';
 import { FaRegBookmark, FaBookmark } from 'react-icons/fa';
@@ -606,6 +607,68 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     // Flatten subQuestions if nested, or use direct list.
     const subQs = question.subQuestions || [];
     const currentSubQ = subQs[currentSubQIndex];
+    const normalizedQuestionText = useMemo(
+        () => normalizeMermaidCodeBlocks(question.text),
+        [question.text]
+    );
+    const normalizedCurrentSubQText = useMemo(
+        () => normalizeMermaidCodeBlocks(currentSubQ?.text || ''),
+        [currentSubQ?.text]
+    );
+    const normalizedOptionTextById = useMemo(
+        () => new Map((question.options || []).map(opt => [opt.id, normalizeMermaidCodeBlocks(opt.text)])),
+        [question.options]
+    );
+    const explanationMarkdown = useMemo(() => {
+        const raw = question.explanation || '(解説がありません)';
+        const lines = raw.split(/\r?\n/);
+        type Section = { heading: string | null; body: string };
+        const sections: Section[] = [];
+        let cur: Section = { heading: null, body: '' };
+        let inFence = false;
+        let fenceChar: '`' | '~' | null = null;
+        let fenceLength = 0;
+
+        for (const line of lines) {
+            const fenceMatch = line.match(/^[ ]{0,3}([`~]{3,})/);
+            if (fenceMatch) {
+                const marker = fenceMatch[1];
+                const markerChar = marker[0] as '`' | '~';
+                if (!inFence) {
+                    inFence = true;
+                    fenceChar = markerChar;
+                    fenceLength = marker.length;
+                } else if (fenceChar === markerChar && marker.length >= fenceLength) {
+                    inFence = false;
+                    fenceChar = null;
+                    fenceLength = 0;
+                }
+                cur.body += (cur.body ? '\n' : '') + line;
+                continue;
+            }
+
+            if (!inFence) {
+                const m = line.match(/^(#{2,3})\s+(.+?)\s*$/);
+                if (m) {
+                    if (cur.heading !== null || cur.body.trim() !== '') sections.push(cur);
+                    cur = { heading: m[2], body: '' };
+                    continue;
+                }
+            }
+
+            cur.body += (cur.body ? '\n' : '') + line;
+        }
+        if (cur.heading !== null || cur.body.trim() !== '') sections.push(cur);
+
+        return {
+            raw: normalizeMermaidCodeBlocks(raw),
+            sections: sections.map(section => ({
+                ...section,
+                body: normalizeMermaidCodeBlocks(section.body),
+            })),
+            hasHeadings: sections.some(section => section.heading !== null),
+        };
+    }, [question.explanation]);
 
     const handleSubNext = () => {
         if (currentSubQIndex < subQs.length - 1) {
@@ -694,7 +757,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                 rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                 components={components}
                             >
-                                {question.text}
+                                {normalizedQuestionText}
                             </ReactMarkdown>
                         </div>
                     </div>
@@ -712,7 +775,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                         rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                         components={components}
                                     >
-                                        {currentSubQ.text}
+                                        {normalizedCurrentSubQText}
                                     </ReactMarkdown>
                                 </div>
                                 <AIAnswerBox
@@ -926,7 +989,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                             rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                             components={components}
                         >
-                            {question.text}
+                            {normalizedQuestionText}
                         </ReactMarkdown>
                     </div>
                     {/* Mermaid Diagram Injection for Issue #22 */}
@@ -989,7 +1052,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                             rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                             components={components}
                                         >
-                                            {opt.text}
+                                            {normalizedOptionTextById.get(opt.id) || opt.text}
                                         </ReactMarkdown>
                                     </div>
                                     {showExplanation && isPractice && isSelected && (
@@ -1008,65 +1071,22 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                             </div>
                             <div className={styles.explanationBody}>
                                 {(() => {
-                                    // EXP08: 解説 Markdown を見出し（##, ###）単位で分割し details/summary でラップ
-                                    // フェンスコードブロック ( ``` / ~~~ ) 内の `##` や `###` は誤分割しないよう
-                                    // フェンス開閉をトラッキングし、フェンス内では heading 判定をスキップする。
-                                    const raw = question.explanation || '(解説がありません)';
-                                    const lines = raw.split(/\r?\n/);
-                                    type Section = { heading: string | null; body: string };
-                                    const sections: Section[] = [];
-                                    let cur: Section = { heading: null, body: '' };
-                                    let inFence = false;
-                                    let fenceChar: '`' | '~' | null = null;
-                                    let fenceLength = 0;
-
-                                    for (const line of lines) {
-                                        const fenceMatch = line.match(/^[ ]{0,3}([`~]{3,})/);
-                                        if (fenceMatch) {
-                                            const marker = fenceMatch[1];
-                                            const markerChar = marker[0] as '`' | '~';
-                                            if (!inFence) {
-                                                inFence = true;
-                                                fenceChar = markerChar;
-                                                fenceLength = marker.length;
-                                            } else if (fenceChar === markerChar && marker.length >= fenceLength) {
-                                                inFence = false;
-                                                fenceChar = null;
-                                                fenceLength = 0;
-                                            }
-                                            cur.body += (cur.body ? '\n' : '') + line;
-                                            continue;
-                                        }
-
-                                        if (!inFence) {
-                                            const m = line.match(/^(#{2,3})\s+(.+?)\s*$/);
-                                            if (m) {
-                                                if (cur.heading !== null || cur.body.trim() !== '') sections.push(cur);
-                                                cur = { heading: m[2], body: '' };
-                                                continue;
-                                            }
-                                        }
-
-                                        cur.body += (cur.body ? '\n' : '') + line;
-                                    }
-                                    if (cur.heading !== null || cur.body.trim() !== '') sections.push(cur);
-
+                                    // EXP08: useMemo で分割・正規化済みの解説 Markdown を details/summary でラップする。
                                     // 見出しが1個もない場合は従来通り一括描画
-                                    const hasHeadings = sections.some(s => s.heading !== null);
-                                    if (!hasHeadings) {
+                                    if (!explanationMarkdown.hasHeadings) {
                                         return (
                                             <ReactMarkdown
                                                 remarkPlugins={[remarkGfm, remarkMath] as any}
                                                 rehypePlugins={[rehypeRaw, rehypeKatex] as any}
                                                 components={components}
                                             >
-                                                {raw}
+                                                {explanationMarkdown.raw}
                                             </ReactMarkdown>
                                         );
                                     }
 
                                     const PRIMARY_RE = /(正解の理由|正解|解答|答え|ポイント)/;
-                                    return sections.map((s, i) => {
+                                    return explanationMarkdown.sections.map((s, i) => {
                                         if (s.heading === null) {
                                             // 先頭の見出し前テキスト
                                             if (s.body.trim() === '') return null;
@@ -1117,5 +1137,3 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         </div>
     );
 }
-
-
