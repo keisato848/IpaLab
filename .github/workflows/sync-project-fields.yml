@@ -9,6 +9,7 @@ on:
 env:
   PROJECT_NUMBER: 1
   PROJECT_OWNER: keisato848
+  PROJECT_PAT: ${{ secrets.PROJECT_PAT }}
   # カスタムフィールド ID
   FIELD_STATUS: PVTSSF_lAHOBFEGqs4BTrxCzhA7rk0
   FIELD_ASSIGNEES: PVTF_lAHOBFEGqs4BTrxCzhA7sb4
@@ -29,11 +30,15 @@ jobs:
       issues: read
       pull-requests: read
     steps:
+      - name: Skip project sync when PAT is unavailable
+        if: env.PROJECT_PAT == ''
+        run: echo "::notice::PROJECT_PAT is unavailable; skipping project field sync."
+
       - name: Sync issue fields to project
-        if: github.event_name == 'issues'
+        if: github.event_name == 'issues' && env.PROJECT_PAT != ''
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.PROJECT_PAT }}
+          github-token: ${{ env.PROJECT_PAT }}
           script: |
             const issue = context.payload.issue;
 
@@ -152,10 +157,10 @@ jobs:
             console.log(`🎉 Issue #${issue.number} の日本語フィールド同期完了`);
 
       - name: Sync PR fields to project
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && env.PROJECT_PAT != ''
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.PROJECT_PAT }}
+          github-token: ${{ env.PROJECT_PAT }}
           script: |
             const pr = context.payload.pull_request;
 
