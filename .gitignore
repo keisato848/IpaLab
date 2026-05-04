@@ -156,6 +156,7 @@ appsettings-backup*.json
 nul
 
 # デバッグ・調査用スクリプト・ログ
+agent_logs/
 debug_*.js
 debug-*.js
 test-models.js
@@ -165,6 +166,9 @@ amps.json
 logs_*.json
 logs_*.txt
 logs.txt
+*_log.txt
+extract_log.txt
+install_log.txt
 
 # Claude Code
 .claude/

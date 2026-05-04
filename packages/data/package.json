@@ -11,7 +11,9 @@
         "fill-explanations": "ts-node src/scripts/fill-missing-explanations.ts",
         "scrape": "ts-node src/scraper/index.ts",
         "download": "ts-node src/scraper/download.ts",
+        "audit:raw-pdfs": "ts-node src/scripts/audit-raw-pdfs.ts",
         "parse": "ts-node src/scraper/parse.ts",
+        "extract:answers:ollama": "node --require ts-node/register src/scripts/ollama-extract-answers.ts",
         "generate-samples": "ts-node src/scripts/generate-samples.ts",
         "sync": "npx ts-node src/syncer/index.ts",
         "sync-db": "npx ts-node src/scripts/sync-db.ts",
@@ -36,9 +38,11 @@
         "@azure/cosmos": "^4.9.0",
         "@google/genai": "^1.38.0",
         "@ipa-lab/shared": "*",
+        "@napi-rs/canvas": "^0.1.100",
         "axios": "^1.6.0",
         "dotenv": "^16.4.5",
-        "json5": "^2.2.3"
+        "json5": "^2.2.3",
+        "pdfjs-dist": "^5.7.284"
     },
     "devDependencies": {
         "@types/glob": "^8.1.0",
