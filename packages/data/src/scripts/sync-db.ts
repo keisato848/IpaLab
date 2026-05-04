@@ -53,6 +53,23 @@ interface RawPMQuestion {
     questions: any[];
 }
 
+const resolveQNo = (value: unknown): number | null => {
+    if (typeof value === 'number' && Number.isInteger(value) && value > 0) {
+        return value;
+    }
+
+    if (typeof value === 'string' && /^\d+$/.test(value.trim())) {
+        const parsed = Number.parseInt(value.trim(), 10);
+        return parsed > 0 ? parsed : null;
+    }
+
+    return null;
+};
+
+const hasOwnQNo = (value: unknown): boolean => {
+    return typeof value === 'object' && value !== null && Object.prototype.hasOwnProperty.call(value, 'qNo');
+};
+
 // Clean invalid LearningRecords (missing required fields like answeredAt)
 async function cleanLearningRecords() {
     if (!CONNECTION_STRING) {
@@ -230,6 +247,8 @@ async function main() {
 
         console.log(`Found ${questionFiles.length} question files (filtering for ${targetExam || 'ALL'}).`);
 
+        const failedFolders: { folderName: string; message: string }[] = [];
+
         for (const file of questionFiles) {
             const dir = path.dirname(file);
             const folderName = dir.split(path.sep).pop()!;
@@ -292,7 +311,8 @@ async function main() {
                         const clsData = JSON.parse(fs.readFileSync(classifiedPath, 'utf-8'));
                         if (Array.isArray(clsData)) {
                             clsData.forEach((c: any) => {
-                                if (c.qNo) classificationMap.set(c.qNo, { category: c.category, subCategory: c.subCategory });
+                                const qNo = resolveQNo(c.qNo);
+                                if (qNo) classificationMap.set(qNo, { category: c.category, subCategory: c.subCategory });
                             });
                             console.log(`Loaded classification data for ${folderName} (${classificationMap.size} items)`);
                         }
@@ -365,15 +385,24 @@ async function main() {
                     if (isHierarchical) {
                         // --- Case A: Hierarchical PM Question ---
 
-                        // data が配列の場合（複数大問がある場合）は各要素を個別にドキュメント化
-                        const hierarchicalItems = Array.isArray(data) ? data : [data];
+                        // data が配列の場合（複数大問がある場合）は各要素を個別にドキュメント化。
+                        // Form C の { questions: [...] } ラッパーは内側の questions を同期対象にする。
+                        const hierarchicalItems = Array.isArray(data)
+                            ? data
+                            : hasOwnQNo(data)
+                                ? [data]
+                                : Array.isArray(data.questions)
+                                    ? data.questions
+                                    : [data];
 
                         for (const item of hierarchicalItems) {
                             // Determine Parent QNo
-                            let parentQNo = item.qNo || null;
+                            let parentQNo = resolveQNo(item.qNo);
                             if (!parentQNo && item.theme) parentQNo = extractQNo(item.theme);
                             if (!parentQNo && item.description) parentQNo = extractQNo(item.description);
-                            if (!parentQNo) parentQNo = 99; // Fallback
+                            if (!parentQNo) {
+                                throw new Error(`Missing qNo for hierarchical PM item in ${folderName}. Refusing to sync placeholder qNo=99.`);
+                            }
 
                             // Determine Description/Context
                             const contextObj = item.context || null;
@@ -398,25 +427,27 @@ async function main() {
                     } else { // --- Case B: Flat List (AM Exams, SC AM2, or PM Independent Questions) ---
                         // This preserves the original logic for AM exams.
 
-                        for (const q of questions) {
-                            // For AM/Flat, we expect q.qNo to exist.
-                            const resolvedQNo = q.qNo || 99;
+                        for (const [questionIndex, questionItem] of questions.entries()) {
+                            const resolvedQNo = resolveQNo(questionItem.qNo);
+                            if (!resolvedQNo) {
+                                throw new Error(`Missing qNo for flat question index=${questionIndex} in ${folderName}. Refusing to sync placeholder qNo=99.`);
+                            }
 
                             // PM/Afternoon logic (often nested)
                             if (type.startsWith('PM') || type === 'AM2' || examPrefix === 'PM' || examPrefix === 'SC') {
                                 // PM AM2 is Multiple Choice
-                                if (q.options && q.options.length > 0) {
+                                if (questionItem.options && questionItem.options.length > 0) {
                                     itemsToUpsert.push({
                                         id: `${examId}-${resolvedQNo}`,
                                         examId: examId,
                                         type: type,
                                         qNo: resolvedQNo,
-                                        text: q.text,
+                                        text: questionItem.text,
                                         category: classificationMap.get(resolvedQNo)?.category || examPrefix, // Fallback to examPrefix if missing
                                         subCategory: classificationMap.get(resolvedQNo)?.subCategory || undefined,
-                                        options: q.options,
-                                        correctOption: q.correctOption,
-                                        explanation: q.explanation
+                                        options: questionItem.options,
+                                        correctOption: questionItem.correctOption,
+                                        explanation: questionItem.explanation
                                     });
                                 } else {
                                     // Descriptive Question but NOT a subquestion (Legacy/Fallback)
@@ -426,11 +457,11 @@ async function main() {
                                         examId: examId,
                                         type: type,
                                         qNo: resolvedQNo,
-                                        subQNo: q.subQNo,
-                                        text: q.text || q.theme || "（記述式問題）",
-                                        theme: q.theme,
-                                        description: q.description || data.description,
-                                        questions: q.questions || q.subQuestions
+                                        subQNo: questionItem.subQNo,
+                                        text: questionItem.text || questionItem.theme || "（記述式問題）",
+                                        theme: questionItem.theme,
+                                        description: questionItem.description || data.description,
+                                        questions: questionItem.questions || questionItem.subQuestions
                                     });
                                 }
                             } else {
@@ -440,13 +471,13 @@ async function main() {
                                     examId: examId,
                                     type: type,
                                     qNo: resolvedQNo,
-                                    text: q.text,
+                                    text: questionItem.text,
                                     category: classificationMap.get(resolvedQNo)?.category || examPrefix,
                                     subCategory: classificationMap.get(resolvedQNo)?.subCategory || undefined,
-                                    diagram: q.diagram, // Fix for Issue #22
-                                    options: q.options,
-                                    correctOption: q.correctOption,
-                                    explanation: q.explanation
+                                    diagram: questionItem.diagram, // Fix for Issue #22
+                                    options: questionItem.options,
+                                    correctOption: questionItem.correctOption,
+                                    explanation: questionItem.explanation
                                 });
                             }
                         }
@@ -486,13 +517,22 @@ async function main() {
 
             } catch (err: any) {
                 console.error(`Failed to process ${folderName}:`, err.message);
+                failedFolders.push({ folderName, message: err.message });
                 continue;
             }
+        }
+
+        if (failedFolders.length > 0) {
+            failedFolders.forEach(({ folderName, message }) => {
+                console.error(`[FAILED] ${folderName}: ${message}`);
+            });
+            throw new Error(`Failed to sync ${failedFolders.length} exam folder(s).`);
         }
 
         console.log("Done.");
     } catch (e: any) {
         console.error("Error during sync:", e?.message || e);
+        process.exitCode = 1;
     }
 
 }

@@ -41,7 +41,7 @@ for (const rel of examPages) {
     if (!src) continue;
 
     const forbiddenPattern =
-        /if\s*\([^)]*process\.env\.NODE_ENV\s*!==?\s*['"]production['"][^)]*\)\s*\{[^}]*getExamData/s;
+        /process\.env\.NODE_ENV\s*!==?\s*['"]production['"][\s\S]{0,800}(getExamData|loadFilesystemQuestions)/;
     if (forbiddenPattern.test(src)) {
         errors.push(
             `[RULE-1] ${rel}: filesystem fallback を NODE_ENV ガードで本番無効化しています。\n` +
@@ -50,7 +50,7 @@ for (const rel of examPages) {
         );
     }
 
-    if (src.includes('getExamData') && !/Filesystem fallback engaged/i.test(src)) {
+    if ((src.includes('getExamData') || src.includes('loadFilesystemQuestions')) && !/Filesystem fallback engaged/i.test(src)) {
         warnings.push(
             `[RULE-1b] ${rel}: fallback 発動時の warn ログ ("Filesystem fallback engaged") が見当たりません。\n` +
             '         Cosmos 同期漏れの観測性が低下します。'

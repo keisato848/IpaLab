@@ -166,6 +166,10 @@ async function extractQuestions(examId: string, rawDir: string, outDir: string, 
                 console.log(`[Key #${client.keyIndex}] Quota exceeded or Overloaded. Switching to next key...`);
                 // Continue loop -> gets new client -> new key
                 await new Promise(r => setTimeout(r, 2000)); // Small pause
+            } else if (e.status === 400 || e.message?.includes('400 Bad Request') || e.message?.includes('no pages')) {
+                // Non-retryable: broken/empty PDF. Skip immediately.
+                console.warn(`[Key #${client.keyIndex}] Non-retryable 400 error (bad/empty PDF). Skipping QUESTIONS for ${examId}.`);
+                break;
             } else {
                 // Non-recoverable or unknown error? 
                 // For now, let's treat most errors as "try another key" unless it's file IO
@@ -226,6 +230,10 @@ async function extractAnswers(examId: string, rawDir: string, outDir: string, st
             if (e.status === 429 || e.message?.includes('429') || e.status === 503) {
                 console.log(`[Key #${client.keyIndex}] Quota exceeded. Switching to next key...`);
                 await new Promise(r => setTimeout(r, 2000));
+            } else if (e.status === 400 || e.message?.includes('400 Bad Request') || e.message?.includes('no pages')) {
+                // Non-retryable: broken/empty PDF. Skip immediately.
+                console.warn(`[Key #${client.keyIndex}] Non-retryable 400 error (bad/empty PDF). Skipping ANSWERS for ${examId}.`);
+                break;
             } else {
                 await new Promise(r => setTimeout(r, 2000));
             }
@@ -261,6 +269,9 @@ async function main() {
             (f.startsWith('PM-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('SC-') && (f.includes('-AM2') || f.includes('-PM') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('IP-') && f.includes('-AM')) ||
+            (f.startsWith('NW-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
+            (f.startsWith('DB-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
+            (f.startsWith('ES-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('SA-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('ST-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2')))
         )

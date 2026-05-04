@@ -42,8 +42,8 @@ expect(
     withMutation(
         'apps/web/app/(main)/exam/[year]/[type]/[qNo]/page.tsx',
         (s) => s.replace(
-            /if \(questions\.length === 0\) \{\s*\n\s*try \{\s*\n\s*const fsData = await getExamData/,
-            "if (questions.length === 0 && process.env.NODE_ENV !== 'production') {\n        try {\n            const fsData = await getExamData"
+            /if \(questions\.length === 0 \|\| questionMissingFromCosmos \|\| suspiciousPlaceholderQuestions\) \{/,
+            "if ((questions.length === 0 || questionMissingFromCosmos || suspiciousPlaceholderQuestions) && process.env.NODE_ENV !== 'production') {"
         ),
         'NODE_ENV guard re-add'
     ),
