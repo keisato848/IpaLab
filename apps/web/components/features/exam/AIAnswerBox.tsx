@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import remarkGfm from 'remark-gfm';
@@ -10,6 +10,9 @@ import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import rehypeRaw from 'rehype-raw';
 import dynamic from 'next/dynamic';
+// @ts-ignore
+import he from 'he';
+import { normalizeMermaidCodeBlocks } from '@/lib/mermaid/sanitize';
 import styles from './AIAnswerBox.module.css';
 
 // Dynamic import for Recharts to reduce initial bundle size
@@ -40,6 +43,17 @@ const RechartsScoreRadar = dynamic(
 
 // Dynamically import Mermaid to avoid SSR issues
 const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false });
+
+const markdownComponents = {
+    code({ inline, className, children, ...props }: any) {
+        const match = /language-(\w+)/.exec(className || '');
+        if (!inline && match && match[1] === 'mermaid') {
+            const chartContent = he.decode(String(children)).replace(/\n$/, '');
+            return <Mermaid chart={chartContent} />;
+        }
+        return <code className={className} {...props}>{children}</code>;
+    }
+};
 
 interface AIAnswerBoxProps {
     questionText: string;
@@ -73,6 +87,14 @@ export default function AIAnswerBox({
     const [result, setResult] = useState<ScoreResult | null>(initialResult || null);
     const [error, setError] = useState<string | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const normalizedFeedback = useMemo(
+        () => normalizeMermaidCodeBlocks(result?.feedback || ''),
+        [result?.feedback]
+    );
+    const normalizedImprovedAnswer = useMemo(
+        () => normalizeMermaidCodeBlocks(result?.improvedAnswer || ''),
+        [result?.improvedAnswer]
+    );
 
     // Auto-resize textarea
     useEffect(() => {
@@ -184,8 +206,9 @@ export default function AIAnswerBox({
                             <ReactMarkdown
                                 remarkPlugins={[remarkGfm, remarkMath] as any}
                                 rehypePlugins={[rehypeRaw, rehypeKatex] as any}
+                                components={markdownComponents}
                             >
-                                {result.feedback}
+                                {normalizedFeedback}
                             </ReactMarkdown>
                         </div>
                     </div>
@@ -204,8 +227,9 @@ export default function AIAnswerBox({
                                 <ReactMarkdown
                                     remarkPlugins={[remarkGfm, remarkMath] as any}
                                     rehypePlugins={[rehypeRaw, rehypeKatex] as any}
+                                    components={markdownComponents}
                                 >
-                                    {result.improvedAnswer}
+                                    {normalizedImprovedAnswer}
                                 </ReactMarkdown>
                             </div>
                         </div>

@@ -17,8 +17,9 @@
         "@azure/cosmos": "^4.9.1",
         "@azure/functions": "^4.11.0",
         "@google/generative-ai": "^0.21.0",
-        "applicationinsights": "^2.9.6",
-        "uuid": "^9.0.1"
+        "applicationinsights": "^3.14.0",
+        "ipa-lab": "file:../..",
+        "uuid": "^14.0.0"
     },
     "devDependencies": {
         "@types/node": "^20.0.0",

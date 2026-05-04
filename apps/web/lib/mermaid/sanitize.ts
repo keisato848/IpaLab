@@ -10,6 +10,36 @@
  */
 
 const NEEDS_QUOTING = /[<>():,]|x\s+x/;
+const MERMAID_START = /^\s*(?:(?:graph|flowchart)\s+(?:TD|TB|BT|RL|LR)\b|sequenceDiagram|classDiagram|stateDiagram(?:-v2)?|erDiagram|journey|gantt|pie|gitGraph|mindmap|timeline|quadrantChart|requirementDiagram|C4Context|C4Container|C4Component|C4Dynamic|sankey-beta|xychart-beta|block-beta|packet-beta)\b/i;
+
+export function isLikelyMermaid(chart: string): boolean {
+    return MERMAID_START.test(chart);
+}
+
+export function normalizeMermaidCodeBlocks(markdown: string): string {
+    if (!markdown) return markdown;
+
+    return markdown.replace(/```[ \t]*\r?\n([\s\S]*?)```/g, (match, body: string) => {
+        if (!isLikelyMermaid(body)) return match;
+        return match.replace(/^```[ \t]*(\r?\n)/, '```mermaid$1');
+    });
+}
+
+function unwrapMermaidChart(chart: string): string {
+    let out = chart.trim();
+
+    out = out
+        .replace(/^\[CODE_BLOCK:mermaid\]\s*/i, '')
+        .replace(/\s*\[\/CODE_BLOCK\]$/i, '')
+        .trim();
+
+    const fenced = out.match(/^```(?:mermaid)?[ \t]*\r?\n([\s\S]*?)\r?\n?```$/i);
+    if (fenced && isLikelyMermaid(fenced[1])) {
+        return fenced[1].trim();
+    }
+
+    return out;
+}
 
 /**
  * Mermaid のノードラベル `Id[label]` / `Id(label)` / `Id{label}` のうち、
@@ -21,6 +51,8 @@ const NEEDS_QUOTING = /[<>():,]|x\s+x/;
  */
 export function sanitizeMermaid(chart: string): string {
     if (!chart) return chart;
+
+    chart = unwrapMermaidChart(chart);
 
     // 1. Comment out invalid "note:" lines that are not valid Mermaid formatting
     let out = chart.replace(/(\n\s*)note:/gi, '$1%% note:');
