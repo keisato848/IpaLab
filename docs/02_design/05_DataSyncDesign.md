@@ -4,6 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-05 | `DB-2016-Spring-AM2` の Ollama/Gemma AM2 問題PDF抽出実績と Q4 再抽出メモを追加 |
 | 2026-05-04 | Ollama による AM/AM2 問題PDF pilot、Gemma 推奨条件、Qwen3.x の response 空問題を追加 |
 | 2026-05-04 | Ollama Vision による解答PDFローカル抽出 pilot と PDF レンダラ前提を追加 |
 | 2026-05-03 | PDF ダウンロード時の実体検証、`DOWNLOAD_CATEGORIES` による対象カテゴリ指定、`audit:raw-pdfs` による Stage A 完了ゲートを追加 |
@@ -164,6 +165,11 @@ npm run -w packages/data extract:questions:ollama -- --model=gemma4:e4b --exam-i
 2026-05-04 時点の検証では、`DB-2016-Spring-AM2` はスキャンPDFであり、`--text-only` は利用できない。
 `gemma4:e4b` + `--split-columns` はページ単位の抽出に成功したが、選択肢欠落や本文誤読が残るため、出力後は qNo、選択肢4件、正答、図表表現を必ずレビューする。
 `--with-explanations` は同時生成の負荷が高いため、一次抽出では無効のままとし、解説は後工程で補完する。
+
+2026-05-05 の `DB-2016-Spring-AM2` 抽出では、`gemma4:e4b` + `--split-columns` + `--allow-partial` で `questions_raw.json` 24問を生成した。
+初回通し抽出では Q4 が欠番になったため、ページ4のみを `--page-range=4`、`--render-dpi=100`、`--num-predict=1536` で再抽出し、Q4 だけをマージした。
+構造検証では qNo 1-24、選択肢 a-d の4件、`answers_raw.json` との `correctOption` 一致を確認した。
+ただし OCR 由来の本文・図表の誤読は残り得るため、Cosmos 同期前に人手レビューまたは Gemini 版との比較を行う。
 
 Qwen3.x 系モデルは当面使用しない。
 `qwen3.5:9b` では `/api/generate`、`/api/chat`、`format: json` の有無、`options.think=false` のいずれでも `response` / `message.content` が空になる事象を確認した。
