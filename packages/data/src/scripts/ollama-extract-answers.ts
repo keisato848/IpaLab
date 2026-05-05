@@ -46,6 +46,21 @@ const OPTION_MAP: Record<string, string> = {
     D: 'd',
 };
 
+async function loadPdfJs() {
+    // pdfjs-dist v5 のメインビルドは DOM API (DOMMatrix 等) を要求するため
+    // Node.js ポリフィル込みの legacy build を使用する
+    // ts-ignore: .mjs サブパスの型解決は TypeScript が未対応
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const pdfjsLib = (await import('pdfjs-dist/legacy/build/pdf.mjs')) as typeof import('pdfjs-dist');
+    // Node.js 環境では fake worker を使用するためワーカーパスを動的解決して指定する
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const pdfjsDistDir = path.dirname(require.resolve('pdfjs-dist/package.json'));
+    const workerPath = path.join(pdfjsDistDir, 'legacy', 'build', 'pdf.worker.mjs');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `file:///${workerPath.replace(/\\/g, '/')}`;
+    return pdfjsLib;
+}
+
 function splitList(value?: string): string[] {
     if (!value) return [];
     return value
@@ -131,17 +146,7 @@ OLLAMA_RENDER_DPI, OLLAMA_MAX_PAGES, OLLAMA_TIMEOUT_MS.`);
 }
 
 async function renderPdfPages(pdfPath: string, dpi: number, maxPages: number): Promise<Buffer[]> {
-    // pdfjs-dist v5 のメインビルドは DOM API (DOMMatrix 等) を要求するため
-    // Node.js ポリフィル込みの legacy build を使用する
-    // ts-ignore: .mjs サブパスの型解決は TypeScript が未対応
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const pdfjsLib = (await import('pdfjs-dist/legacy/build/pdf.mjs')) as typeof import('pdfjs-dist');
-    // Node.js 環境では fake worker を使用するためワーカーパスを動的解決して指定する
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfjsDistDir = path.dirname(require.resolve('pdfjs-dist/package.json'));
-    const workerPath = path.join(pdfjsDistDir, 'legacy', 'build', 'pdf.worker.mjs');
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `file:///${workerPath.replace(/\\/g, '/')}`;
+    const pdfjsLib = await loadPdfJs();
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { createCanvas } = require('@napi-rs/canvas') as typeof import('@napi-rs/canvas');
@@ -168,6 +173,26 @@ async function renderPdfPages(pdfPath: string, dpi: number, maxPages: number): P
     }
 
     return buffers;
+}
+
+async function extractPdfText(pdfPath: string, maxPages: number): Promise<string> {
+    const pdfjsLib = await loadPdfJs();
+    const data = await fs.readFile(pdfPath);
+    const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(data) }).promise;
+    const numPages = Math.min(pdf.numPages, maxPages);
+    const pages: string[] = [];
+
+    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        const text = textContent.items
+            .map((item: any) => String(item.str ?? '').trim())
+            .filter(Boolean)
+            .join(' ');
+        pages.push(text);
+    }
+
+    return pages.join(' ');
 }
 
 async function ensureOllamaModel(baseUrl: string, model: string) {
@@ -265,6 +290,20 @@ function normalizeMorningAnswers(parsed: Record<string, unknown>): Record<string
     return ordered;
 }
 
+function parseMorningAnswersFromText(text: string): Record<string, string> {
+    const normalized: Record<string, string> = {};
+    const compactText = text.replace(/\s+/g, ' ').trim();
+    const answerPattern = /問\s*(\d{1,3})\s*([アイウエa-dA-D])/g;
+
+    for (const match of compactText.matchAll(answerPattern)) {
+        const qNo = match[1];
+        const option = optionToLetter(match[2]);
+        if (qNo && option) normalized[qNo] = option;
+    }
+
+    return Object.fromEntries(Object.entries(normalized).sort((a, b) => Number(a[0]) - Number(b[0])));
+}
+
 function formatAnswerJson(examId: string, responseText: string): string {
     const parsed = JSON.parse(extractJsonText(responseText));
 
@@ -299,6 +338,16 @@ async function extractTarget(target: AnswerTarget, options: CliOptions) {
     const timeoutMs = parseNumber(process.env.OLLAMA_TIMEOUT_MS, DEFAULT_TIMEOUT_MS)!;
 
     console.log(`--- Processing ${target.examId} answers with ${options.model} ---`);
+    if (/-AM2?$/.test(target.examId)) {
+        const textAnswers = parseMorningAnswersFromText(await extractPdfText(target.pdfPath, maxPages));
+        if (Object.keys(textAnswers).length > 0) {
+            await fs.mkdir(path.dirname(target.outputPath), { recursive: true });
+            await fs.writeFile(target.outputPath, JSON.stringify(textAnswers, null, 2));
+            console.log(`Saved ${target.outputPath} (${Object.keys(textAnswers).length} answers from embedded PDF text)`);
+            return;
+        }
+    }
+
     const imageBuffers = await renderPdfPages(target.pdfPath, dpi, maxPages);
     const prompt = await buildPrompt(target.examId);
     const responseText = await generateWithOllama(options.baseUrl, options.model, prompt, imageBuffers, timeoutMs);

@@ -146,12 +146,14 @@ npm run -w packages/data extract:answers:ollama -- --dry-run --limit=3
 npm run -w packages/data extract:answers:ollama -- --exam-id=AP-2024-Spring-AM
 ```
 
-前提条件は、Ollama で Vision 対応モデル（既定値 `gemma4:26b`）が利用できること、および PDF を画像化するローカルレンダラが PATH から実行できることである。
-対応レンダラは Poppler (`pdftoppm` / `pdftocairo`)、MuPDF (`mutool`)、ImageMagick + Ghostscript (`magick`)、Ghostscript (`gswin64c` / `gs`) とする。
+前提条件は、Ollama で Vision 対応モデル（既定値 `gemma4:26b`）が利用できること、および `pdfjs-dist` legacy build と `@napi-rs/canvas` による PDF 画像化がローカルで動作することである。
 `--dry-run` や `--limit` が npm 側の設定として扱われる環境があるため、script は `npm_config_*` も読み取る。
 
-2026-05-05 に `NW-2025-Spring-AM2` の解答PDFを `gemma4:e4b` で抽出し、`answers_raw.json` 20問分を生成した。
-AM2 問題本文抽出を行う場合は、この正答マップと照合して `correctOption` 欠落や qNo 欠番を検出する。
+2026-05-05 に AM/AM2 解答PDFの前処理として、埋め込みテキストが存在する場合は `問 1 ウ` のような表記を直接パースし、`answers_raw.json` の key-value map に変換する経路を追加した。
+テキストから正答を検出できた場合は Ollama Vision OCR を呼ばず、テキストが空のスキャンPDFだけ従来の画像OCRにフォールバックする。
+この修正により `NW-2024-Spring-AM2` と `NW-2025-Spring-AM2` はいずれも25問分の正答を生成できる。
+`NW-2025-Spring-AM2` は初回の Gemma OCR で20問分に過少抽出されていたため、25問版の正答マップで `questions_raw.json` の `correctOption` を再同期した。
+AM2 問題本文抽出を行う場合は、生成済みの正答マップと照合して `correctOption` 欠落や qNo 欠番を検出する。
 
 #### 7.2.2 Ollama AM/AM2 問題PDF抽出 pilot
 
@@ -176,8 +178,10 @@ npm run -w packages/data extract:questions:ollama -- --model=gemma4:e4b --exam-i
 
 2026-05-05 の `NW-2025-Spring-AM2` 問題PDF抽出では、ページ単位で `--chunk-pages=1 --chunk-overlap=0` を指定して重複チャンクを避けた。
 Q1-Q12、Q16-Q20 はページ別 probe の成功分を正答マップで検証して採用し、Q13-Q15 はページ7左右カラム画像を確認して選択肢本文を補正した。
-構造検証では qNo 1-20、選択肢 a-d の4件、空文字選択肢なし、`answers_raw.json` との `correctOption` 一致、Q21 除外を確認した。
-ページ7のように左右カラムの切れ目に選択肢がまたがる場合、Ollama の JSON が途中で切れたり qNo を 1 から再採番したりするため、カラム画像と生応答を併用して補正する。
+その後、埋め込みテキスト版の解答抽出で正答が25問あることを確認したため、Q21-Q25 をページ10〜12の左右カラム画像から補完した。
+Q22-Q24 はページ11左右カラムの分断により Gemma の JSON が途中切れしたため、ページ画像と生応答を併用して手動補正した。
+構造検証では qNo 1-25、選択肢 a-d の4件、空文字選択肢なし、`answers_raw.json` との `correctOption` 一致を確認した。
+ページ7やページ11のように左右カラムの切れ目に選択肢がまたがる場合、Ollama の JSON が途中で切れたり qNo を 1 から再採番したりするため、カラム画像と生応答を併用して補正する。
 
 Qwen3.x 系モデルは当面使用しない。
 `qwen3.5:9b` では `/api/generate`、`/api/chat`、`format: json` の有無、`options.think=false` のいずれでも `response` / `message.content` が空になる事象を確認した。
