@@ -4,7 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
-| 2026-05-05 | `DB-2016-Spring-AM2` の Ollama/Gemma AM2 問題PDF抽出実績、Q4 再抽出メモ、`NW-2025-Spring-AM2` の解答抽出実績を追加 |
+| 2026-05-05 | `DB-2016-Spring-AM2` の Ollama/Gemma AM2 問題PDF抽出実績、Q4 再抽出メモ、`NW-2025-Spring-AM2` の解答・問題抽出実績を追加 |
 | 2026-05-04 | Ollama による AM/AM2 問題PDF pilot、Gemma 推奨条件、Qwen3.x の response 空問題を追加 |
 | 2026-05-04 | Ollama Vision による解答PDFローカル抽出 pilot と PDF レンダラ前提を追加 |
 | 2026-05-03 | PDF ダウンロード時の実体検証、`DOWNLOAD_CATEGORIES` による対象カテゴリ指定、`audit:raw-pdfs` による Stage A 完了ゲートを追加 |
@@ -173,6 +173,11 @@ npm run -w packages/data extract:questions:ollama -- --model=gemma4:e4b --exam-i
 初回通し抽出では Q4 が欠番になったため、ページ4のみを `--page-range=4`、`--render-dpi=100`、`--num-predict=1536` で再抽出し、Q4 だけをマージした。
 構造検証では qNo 1-24、選択肢 a-d の4件、`answers_raw.json` との `correctOption` 一致を確認した。
 ただし OCR 由来の本文・図表の誤読は残り得るため、Cosmos 同期前に人手レビューまたは Gemini 版との比較を行う。
+
+2026-05-05 の `NW-2025-Spring-AM2` 問題PDF抽出では、ページ単位で `--chunk-pages=1 --chunk-overlap=0` を指定して重複チャンクを避けた。
+Q1-Q12、Q16-Q20 はページ別 probe の成功分を正答マップで検証して採用し、Q13-Q15 はページ7左右カラム画像を確認して選択肢本文を補正した。
+構造検証では qNo 1-20、選択肢 a-d の4件、空文字選択肢なし、`answers_raw.json` との `correctOption` 一致、Q21 除外を確認した。
+ページ7のように左右カラムの切れ目に選択肢がまたがる場合、Ollama の JSON が途中で切れたり qNo を 1 から再採番したりするため、カラム画像と生応答を併用して補正する。
 
 Qwen3.x 系モデルは当面使用しない。
 `qwen3.5:9b` では `/api/generate`、`/api/chat`、`format: json` の有無、`options.think=false` のいずれでも `response` / `message.content` が空になる事象を確認した。
