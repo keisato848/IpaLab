@@ -25,6 +25,7 @@
 #   R13. PDF ダウンロードで HTML/XML エラーページを .pdf として保存するパターン
 #   R14. Windows で npx を直接 spawn して ENOENT になるパターン
 #   R15. npm run 経由の CLI 引数が npm_config_* に吸収されるパターン
+#   R16. AM/AM2 問題データ差分で answers/questions の qNo・正答・選択肢が不整合なパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -437,13 +438,94 @@ if ((Test-Path $ollamaAnswerScript) -and (Test-Path $dataPackageJson)) {
     }
 }
 
+# ---------------------------------------------------------------------------
+# R16: 変更対象の AM/AM2 questions_raw.json が answers_raw.json と整合しているか
+#      (Ollama OCR の過少抽出や正答マップ更新漏れで qNo 欠番・correctOption 不一致が残る)
+# ---------------------------------------------------------------------------
+$changedMorningExamIds = @(
+    $changedFiles |
+        ForEach-Object {
+            $p = $_ -replace '\\', '/'
+            if ($p -match '^packages/data/data/questions/([^/]+-AM2?)/(answers_raw|questions_raw)\.json$') {
+                $Matches[1]
+            }
+        } |
+        Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+        Sort-Object -Unique
+)
+
+foreach ($examId in $changedMorningExamIds) {
+    $answersPath = Join-Path $RepoRoot "packages\data\data\questions\$examId\answers_raw.json"
+    $questionsPath = Join-Path $RepoRoot "packages\data\data\questions\$examId\questions_raw.json"
+    if (-not ((Test-Path $answersPath) -and (Test-Path $questionsPath))) { continue }
+
+    try {
+        $answers = Get-Content -LiteralPath $answersPath -Raw | ConvertFrom-Json
+        $questionsRaw = Get-Content -LiteralPath $questionsPath -Raw | ConvertFrom-Json
+        $questions = @($questionsRaw)
+
+        $answerMap = @{}
+        foreach ($prop in $answers.PSObject.Properties) {
+            if ($prop.Name -match '^\d+$') {
+                $answerMap[$prop.Name] = [string]$prop.Value
+            }
+        }
+
+        $questionMap = @{}
+        $badOptions = @()
+        $mismatches = @()
+        foreach ($q in $questions) {
+            $qNo = [string]$q.qNo
+            if ([string]::IsNullOrWhiteSpace($qNo)) { continue }
+            $questionMap[$qNo] = $true
+
+            $options = @($q.options)
+            $expectedIds = @('a', 'b', 'c', 'd')
+            $hasBadOptions = $options.Count -ne 4
+            if (-not $hasBadOptions) {
+                for ($i = 0; $i -lt 4; $i++) {
+                    if ([string]$options[$i].id -ne $expectedIds[$i] -or [string]::IsNullOrWhiteSpace([string]$options[$i].text)) {
+                        $hasBadOptions = $true
+                        break
+                    }
+                }
+            }
+            if ($hasBadOptions) { $badOptions += $qNo }
+
+            if ($answerMap.ContainsKey($qNo) -and [string]$q.correctOption -ne $answerMap[$qNo]) {
+                $mismatches += "${qNo}:$($q.correctOption)->$($answerMap[$qNo])"
+            }
+        }
+
+        $missingQuestions = @(
+            $answerMap.Keys |
+                Where-Object { -not $questionMap.ContainsKey([string]$_) } |
+                Sort-Object { [int]$_ }
+        )
+
+        if ($missingQuestions.Count -gt 0 -or $badOptions.Count -gt 0 -or $mismatches.Count -gt 0) {
+            $details = @()
+            if ($missingQuestions.Count -gt 0) { $details += "missing qNo: $(($missingQuestions | Select-Object -First 10) -join ', ')" }
+            if ($badOptions.Count -gt 0) { $details += "bad options: $(($badOptions | Select-Object -First 10) -join ', ')" }
+            if ($mismatches.Count -gt 0) { $details += "correctOption mismatch: $(($mismatches | Select-Object -First 10) -join ', ')" }
+            Add-Finding -Rule 'R16-morning-data-answer-sync' -Severity 'High' `
+                -File $questionsPath `
+                -Detail ($details -join ' / ')
+        }
+    } catch {
+        Add-Finding -Rule 'R16-morning-data-answer-sync' -Severity 'High' `
+            -File $questionsPath `
+            -Detail "AM/AM2 問題データの JSON 解析または正答照合に失敗しました: $($_.Exception.Message)"
+    }
+}
+
 $tag = if ($Mode -eq 'start') { 'SESSION-START' } else { 'SESSION-END' }
 Write-Host ""
 Write-Host "## [self-inspect $tag] 自己点検レポート"
 Write-Host ""
 
 if ($findings.Count -eq 0) {
-    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15)"
+    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16)"
     exit 0
 }
 
@@ -457,7 +539,8 @@ foreach ($f in $findings) {
 }
 
 Write-Host ""
-Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から接続文字列・API キー実値を除去 / R13 → download.ts で content-type と %PDF- ヘッダーを検証し、壊れた既存 PDF は再取得する / R14 → npx 直接 spawn ではなく process.execPath + ts-node/register を使う / R15 → npm_config_* と node --require ts-node/register で npm run 引数を安定化する"
+Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から接続文字列・API キー実値を除去 / R13 → download.ts で content-type と %PDF- ヘッダーを検証し、壊れた既存 PDF は再取得する / R14 → npx 直接 spawn ではなく process.execPath + ts-node/register を使う / R15 → npm_config_* と node --require ts-node/register で npm run 引数を安定化する / R16 → AM/AM2 の answers_raw.json と questions_raw.json の qNo・correctOption・選択肢を同期する"
 
 if ($FailOnFinding) { exit 1 }
 exit 0
+
