@@ -152,6 +152,7 @@ npm run -w packages/data extract:answers:ollama -- --exam-id=AP-2024-Spring-AM
 2026-05-05 に AM/AM2 解答PDFの前処理として、埋め込みテキストが存在する場合は `問 1 ウ` のような表記を直接パースし、`answers_raw.json` の key-value map に変換する経路を追加した。
 テキストから正答を検出できた場合は Ollama Vision OCR を呼ばず、テキストが空のスキャンPDFだけ従来の画像OCRにフォールバックする。
 この修正により `NW-2024-Spring-AM2` と `NW-2025-Spring-AM2` はいずれも25問分の正答を生成できる。
+同じ経路で `NW-2023-Spring-AM2` も25問分の正答を生成できる。
 `NW-2025-Spring-AM2` は初回の Gemma OCR で20問分に過少抽出されていたため、25問版の正答マップで `questions_raw.json` の `correctOption` を再同期した。
 AM2 問題本文抽出を行う場合は、生成済みの正答マップと照合して `correctOption` 欠落や qNo 欠番を検出する。
 
