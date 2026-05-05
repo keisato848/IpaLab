@@ -4,6 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-05 | `NW-2023-Spring-AM2` の Ollama/Gemma AM2 問題PDF抽出実績と画像補正結果を追加 |
 | 2026-05-05 | `DB-2016-Spring-AM2` の Ollama/Gemma AM2 問題PDF抽出実績、Q4 再抽出メモ、`NW-2025-Spring-AM2` の解答・問題抽出実績を追加 |
 | 2026-05-04 | Ollama による AM/AM2 問題PDF pilot、Gemma 推奨条件、Qwen3.x の response 空問題を追加 |
 | 2026-05-04 | Ollama Vision による解答PDFローカル抽出 pilot と PDF レンダラ前提を追加 |
@@ -189,6 +190,11 @@ Q22-Q24 はページ11左右カラムの分断により Gemma の JSON が途中
 Q1-Q19 はページ別 probe の成功分を正答マップとページ画像で検証し、Q20-Q25 はページ10〜12のページ画像から補完した。
 構造検証では qNo 1-25、選択肢 a-d の4件、空文字選択肢なし、`answers_raw.json` との `correctOption` 一致を確認した。
 ページ全体画像でも長時間タイムアウトするページは、Gemma 再試行を続けずにページ画像と既知の正答マップで本文・選択肢を補正する。
+
+2026-05-05 の `NW-2023-Spring-AM2` 問題PDF抽出でも、スキャンPDFかつ紙面は1カラムだったため、`--split-columns` は使わずページ全体画像で処理した。
+Q1-Q13 はページ3〜6の probe 成功分を採用前にページ画像で補正し、Q14-Q25 はページ7〜12のページ画像から本文・選択肢を補完した。
+ページ7は `gemma4:e4b` のページ単位抽出が 600000ms でタイムアウトしたため、再試行を続けずに画像確認へ切り替えた。
+構造検証では qNo 1-25、選択肢 a-d の4件、空文字選択肢なし、`answers_raw.json` との `correctOption` 一致を確認した。
 
 Qwen3.x 系モデルは当面使用しない。
 `qwen3.5:9b` では `/api/generate`、`/api/chat`、`format: json` の有無、`options.think=false` のいずれでも `response` / `message.content` が空になる事象を確認した。
