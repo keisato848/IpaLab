@@ -4,6 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-05 | `NW-2022-Spring-AM2` の埋め込みテキストによる AM2 解答PDF抽出実績を追加 |
 | 2026-05-05 | `NW-2023-Spring-AM2` の Ollama/Gemma AM2 問題PDF抽出実績と画像補正結果を追加 |
 | 2026-05-05 | `DB-2016-Spring-AM2` の Ollama/Gemma AM2 問題PDF抽出実績、Q4 再抽出メモ、`NW-2025-Spring-AM2` の解答・問題抽出実績を追加 |
 | 2026-05-04 | Ollama による AM/AM2 問題PDF pilot、Gemma 推奨条件、Qwen3.x の response 空問題を追加 |
@@ -154,6 +155,7 @@ npm run -w packages/data extract:answers:ollama -- --exam-id=AP-2024-Spring-AM
 テキストから正答を検出できた場合は Ollama Vision OCR を呼ばず、テキストが空のスキャンPDFだけ従来の画像OCRにフォールバックする。
 この修正により `NW-2024-Spring-AM2` と `NW-2025-Spring-AM2` はいずれも25問分の正答を生成できる。
 同じ経路で `NW-2023-Spring-AM2` も25問分の正答を生成できる。
+同じ経路で `NW-2022-Spring-AM2` も25問分の正答を生成できる。
 `NW-2025-Spring-AM2` は初回の Gemma OCR で20問分に過少抽出されていたため、25問版の正答マップで `questions_raw.json` の `correctOption` を再同期した。
 AM2 問題本文抽出を行う場合は、生成済みの正答マップと照合して `correctOption` 欠落や qNo 欠番を検出する。
 
