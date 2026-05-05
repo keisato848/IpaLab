@@ -4,6 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-06 | `NW-2021-Spring-AM2` 解答PDFの CMap 不足による抽出不可事象を追加 |
 | 2026-05-06 | `NW-2022-Spring-AM2` の Ollama/Gemma AM2 問題PDFタイムアウトと画像補正結果を追加 |
 | 2026-05-05 | `NW-2022-Spring-AM2` の埋め込みテキストによる AM2 解答PDF抽出実績を追加 |
 | 2026-05-05 | `NW-2023-Spring-AM2` の Ollama/Gemma AM2 問題PDF抽出実績と画像補正結果を追加 |
@@ -159,6 +160,10 @@ npm run -w packages/data extract:answers:ollama -- --exam-id=AP-2024-Spring-AM
 同じ経路で `NW-2022-Spring-AM2` も25問分の正答を生成できる。
 `NW-2025-Spring-AM2` は初回の Gemma OCR で20問分に過少抽出されていたため、25問版の正答マップで `questions_raw.json` の `correctOption` を再同期した。
 AM2 問題本文抽出を行う場合は、生成済みの正答マップと照合して `correctOption` 欠落や qNo 欠番を検出する。
+
+`NW-2021-Spring-AM2` の解答PDFは `90msp-RKSJ-H` CMap を要求するが、現在の `pdfjs-dist` 同梱 CMap では読み込めず、テキスト抽出では `©2021` 以外を取得できない。
+この状態で `extract:answers:ollama` を実行すると、PDF内の表罫線や選択肢記号列を誤認し、1〜16問の `a,b,c,d` 繰返しのような不完全な `answers_raw.json` が生成される。
+25問分の公式正答を復元できるまでは、`NW-2021-Spring-AM2/answers_raw.json` をコミットしない。
 
 #### 7.2.2 Ollama AM/AM2 問題PDF抽出 pilot
 
