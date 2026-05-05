@@ -4,6 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-06 | `NW-2019-Fall-AM2` の AM2 問題PDF画像補正結果を追加 |
 | 2026-05-06 | `NW-2019-Fall-AM2` の AM2 解答PDF抽出実績を追加 |
 | 2026-05-06 | `NW-2021-Spring-AM2` 解答PDFの CMap 不足による抽出不可事象を追加 |
 | 2026-05-06 | `NW-2022-Spring-AM2` の Ollama/Gemma AM2 問題PDFタイムアウトと画像補正結果を追加 |
@@ -210,6 +211,10 @@ Q1-Q13 はページ3〜6の probe 成功分を採用前にページ画像で補�
 ページ3を `gemma4:e4b` で `--page-range=3 --chunk-pages=1 --chunk-overlap=0 --allow-partial --render-dpi=60 --num-predict=1536 --timeout-ms=600000` として抽出したがタイムアウトしたため、ページ3〜10のページ画像から Q1-Q25 の本文・選択肢を補完した。
 構造検証では qNo 1-25、選択肢 a-d の4件、空文字選択肢なし、`answers_raw.json` との `correctOption` 一致を確認した。
 1カラムのスキャンPDFでページ単位抽出が初回ページからタイムアウトする場合は、Gemma 再試行を続けずにページ画像転記へ切り替える。
+
+2026-05-06 の `NW-2019-Fall-AM2` 問題PDF抽出でも、12ページすべての埋め込みテキストが空のスキャンPDFであり、実問題はページ3からページ11までだった。
+ページ3〜11のページ画像から Q1-Q25 の本文・選択肢を補完し、図表を含む Q2 と Q22 は既存 raw JSON の慣例に合わせて `[図: ...]` 形式で簡略表現した。
+構造検証では qNo 1-25、選択肢 a-d の4件、空文字選択肢なし、`answers_raw.json` との `correctOption` 一致を確認した。
 
 Qwen3.x 系モデルは当面使用しない。
 `qwen3.5:9b` では `/api/generate`、`/api/chat`、`format: json` の有無、`options.think=false` のいずれでも `response` / `message.content` が空になる事象を確認した。
