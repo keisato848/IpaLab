@@ -20,7 +20,7 @@
         "text": "源泉と吸収, データフロー, プロセス"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 2,
@@ -43,7 +43,7 @@
         "text": "モジュールは, 機能の追加や変更が可能であって, その影響を他のモジュールに及ぼしてはならない。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 3,
@@ -66,7 +66,7 @@
         "text": "OpenSSL"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 4,
@@ -89,7 +89,7 @@
         "text": "マルチスレッド"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 5,
@@ -112,7 +112,7 @@
         "text": "配列や集合のような実装の異なるコンテナに対し, 同一のインタフェースでアクセスする。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 6,
@@ -135,7 +135,7 @@
         "text": "メトリクス計測ツール"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 7,
@@ -158,7 +158,7 @@
         "text": "ユースケーステスト"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 8,
@@ -181,7 +181,7 @@
         "text": "7"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 9,
@@ -204,7 +204,7 @@
         "text": "名前呼出し"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 10,
@@ -227,7 +227,7 @@
         "text": "d"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 11,
@@ -250,7 +250,7 @@
         "text": "ひとまとまりの要件を 1 単位として設計からテストまで実施するので, 要件ごとに開発状況が把握できる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 12,
@@ -273,7 +273,7 @@
         "text": "複数の回答者からの結果を比較しやすいが, インタビューの際に特定の回答者の回答から深い洞察を引き出すことが困難である。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 13,
@@ -296,7 +296,7 @@
         "text": "ユースケース図"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 14,
@@ -319,7 +319,7 @@
         "text": "ベンダー企業は, 契約で定めた最低発注工数を下回って作業を完了した場合, 実稼働工数に基づく金額の支払を依頼元に請求しなければならない。"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   },
   {
     "qNo": 15,
@@ -342,7 +342,7 @@
         "text": "野球のバットを購入した人に野球のボールを勧めるなど, 商品間の関連に着目して関連商品を提示する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "a"
   },
   {
     "qNo": 16,
@@ -365,7 +365,7 @@
         "text": "誰でも電子メールの送信ができるメールサーバを踏み台にして, 電子メールの送信元アドレスを詐称したなりすましメールを大量に送信する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 17,
@@ -388,7 +388,7 @@
         "text": "d_B = 75% の IPS を導入する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 18,
@@ -411,7 +411,7 @@
         "text": "SSH"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 19,
@@ -434,7 +434,7 @@
         "text": "SMTP-AUTH を使用して, メール送信者を認証する。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 20,
@@ -457,7 +457,7 @@
         "text": "プログラムが仮想アドレスにアクセスすると, 対応する物理アドレスのメモリがアクセスされる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 21,
@@ -480,7 +480,7 @@
         "text": "処理の順序を制御するプログラムからのリクエストによってサービスを実行し, 実行結果をレスポンスとして, 制御するプログラムに返して処理を継続させる。"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 22,
@@ -503,7 +503,7 @@
         "text": "1.9"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 23,
@@ -526,7 +526,7 @@
         "text": "ブロックコード"
       }
     ],
-    "correctOption": null
+    "correctOption": "c"
   },
   {
     "qNo": 24,
@@ -549,7 +549,7 @@
         "text": "エ"
       }
     ],
-    "correctOption": null
+    "correctOption": "d"
   },
   {
     "qNo": 25,
@@ -572,6 +572,6 @@
         "text": "ルータ"
       }
     ],
-    "correctOption": null
+    "correctOption": "b"
   }
 ]

@@ -134,6 +134,18 @@ P0/P1の修正では、報告後に明示的なGo判定を得てから実装へ�
 4. 修正後に AM/AM2 の qNo、選択肢a-d、正答一致、解説有無を再検証する。
 5. 再発防止として `.github/hooks/self-inspect.ps1` のR16相当で検出できるか確認する。
 
+進捗:
+
+| examId | 状態 | 根拠・検証 |
+|------|------|------|
+| `PM-2020-Fall-AM2` | `answers_raw.json` 問2を `d` に補正 | 公式解答PDFの問2はエ。問題側 `correctOption` と一致 |
+| `PM-2016-Spring-AM2` | `answers_raw.json` 問2に `ALL_CORRECT` を追加 | 公式解答PDFの問2は注記「誤りにより問題として成立しない」。問題側 `ALL_CORRECT` と一致 |
+| `SA-2025-Spring-AM2` | 全25問の `correctOption` を `answers_raw.json` から反映 | AM2正答mapと問題側の qNo・選択肢を同期 |
+| `ST-2025-Spring-AM2` | 全25問の `correctOption` を `answers_raw.json` から反映 | AM2正答mapと問題側の qNo・選択肢を同期 |
+
+再発防止として R16 を更新し、`questions_raw.json` の配列形式と `{ questions: [...] }` 形式、`answers_raw.json` の key-value map・配列・`answers` ラッパーを正規化して照合する。
+加えて、問題側 qNo に対応する正答キーがない場合も `missing answers` として検出する。
+
 ### 4.4 P0: 午後問題の解答欄未生成リスク
 
 対象:
