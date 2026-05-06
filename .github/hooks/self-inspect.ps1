@@ -26,6 +26,8 @@
 #   R14. Windows で npx を直接 spawn して ENOENT になるパターン
 #   R15. npm run 経由の CLI 引数が npm_config_* に吸収されるパターン
 #   R16. AM/AM2 問題データ差分で answers/questions の qNo・正答・選択肢が不整合なパターン
+#   R17. PM/PM1/PM2 問題データ差分で questions_transformed.json が欠落し、解答欄が生成されないパターン
+#   R18. Mermaid 図表データ差分でブラウザ描画に失敗しやすいリンクラベル・節点表記を含むパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -519,13 +521,108 @@ foreach ($examId in $changedMorningExamIds) {
     }
 }
 
+# ---------------------------------------------------------------------------
+# R17: 変更対象の PM/PM1/PM2 データが transformed と解答欄を持つか
+#      (raw 配列の questions[] だけでは QuestionClient/SCPMExamView の入力欄が生成されない)
+# ---------------------------------------------------------------------------
+$changedAfternoonExamIds = @(
+    $changedFiles |
+        ForEach-Object {
+            $p = $_ -replace '\\', '/'
+            if ($p -match '^packages/data/data/questions/([^/]+-PM\d?)/(answers_raw|questions_raw|questions_transformed)\.json$') {
+                $Matches[1]
+            }
+        } |
+        Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+        Sort-Object -Unique
+)
+
+foreach ($examId in $changedAfternoonExamIds) {
+    $examDir = Join-Path $RepoRoot "packages\data\data\questions\$examId"
+    $transformedPath = Join-Path $examDir 'questions_transformed.json'
+
+    if (-not (Test-Path $transformedPath)) {
+        Add-Finding -Rule 'R17-afternoon-transformed-answer-fields' -Severity 'High' `
+            -File $examDir `
+            -Detail 'PM/PM1/PM2 データに questions_transformed.json がなく、午後解答欄が生成されない可能性があります'
+        continue
+    }
+
+    try {
+        $data = Get-Content -LiteralPath $transformedPath -Raw | ConvertFrom-Json
+        $items = @($data)
+        $mainCount = $items.Count
+        $sectionCount = 0
+        $answerFieldCount = 0
+        $emptySections = @()
+
+        foreach ($item in $items) {
+            $sections = @($item.questions)
+            $sectionCount += $sections.Count
+            foreach ($section in $sections) {
+                $fields = @($section.subQuestions)
+                $answerFieldCount += $fields.Count
+                if ($fields.Count -eq 0) {
+                    $emptySections += "$($item.qNo):$($section.subQNo)"
+                }
+            }
+        }
+
+        if ($mainCount -eq 0 -or $sectionCount -eq 0 -or $answerFieldCount -eq 0 -or $emptySections.Count -gt 0) {
+            $details = @("main=$mainCount", "sections=$sectionCount", "answerFields=$answerFieldCount")
+            if ($emptySections.Count -gt 0) { $details += "empty sections: $(($emptySections | Select-Object -First 10) -join ', ')" }
+            Add-Finding -Rule 'R17-afternoon-transformed-answer-fields' -Severity 'High' `
+                -File $transformedPath `
+                -Detail ($details -join ' / ')
+        }
+    } catch {
+        Add-Finding -Rule 'R17-afternoon-transformed-answer-fields' -Severity 'High' `
+            -File $transformedPath `
+            -Detail "PM/PM1/PM2 transformed データの JSON 解析または解答欄照合に失敗しました: $($_.Exception.Message)"
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R18: 変更対象の問題データに Mermaid の既知描画失敗パターンが残っていないか
+#      (ハイフン入りリンクラベルやエッジ上の節点定義はブラウザ描画で構文エラーになりやすい)
+# ---------------------------------------------------------------------------
+$changedQuestionDataFiles = @(
+    $changedFiles |
+        ForEach-Object { $_ -replace '\\', '/' } |
+        Where-Object { $_ -match '^packages/data/data/questions/.+\.json$' } |
+        Sort-Object -Unique
+)
+
+foreach ($relPath in $changedQuestionDataFiles) {
+    $fullPath = Join-Path $RepoRoot ($relPath -replace '/', '\')
+    if (-not (Test-Path $fullPath)) { continue }
+
+    $raw = Get-Content -LiteralPath $fullPath -Raw
+    $badPatterns = @()
+    if ($raw -match '(?<!-)--(?![-|>])\s+[A-Za-z0-9]+-[A-Za-z0-9]+\s+(?<!-)--(?![-|>])') {
+        $badPatterns += 'hyphenated edge label should use -->|label| or ---|label|'
+    }
+    if ($raw -match '(?<!-)--(?![-|>])\s+[A-Za-z0-9_]+\(\(') {
+        $badPatterns += 'node definition appears inside an edge label'
+    }
+    if ($raw -match '[A-Za-z0-9_]+\(\([^"\\\)]*[^\x00-\x7F][^"\\\)]*\)\)') {
+        $badPatterns += 'non-ASCII circle node label should be quoted'
+    }
+
+    if ($badPatterns.Count -gt 0) {
+        Add-Finding -Rule 'R18-mermaid-data-render-syntax' -Severity 'Medium' `
+            -File $fullPath `
+            -Detail (($badPatterns | Sort-Object -Unique) -join ' / ')
+    }
+}
+
 $tag = if ($Mode -eq 'start') { 'SESSION-START' } else { 'SESSION-END' }
 Write-Host ""
 Write-Host "## [self-inspect $tag] 自己点検レポート"
 Write-Host ""
 
 if ($findings.Count -eq 0) {
-    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16)"
+    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16 / R17 / R18)"
     exit 0
 }
 
@@ -539,7 +636,7 @@ foreach ($f in $findings) {
 }
 
 Write-Host ""
-Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から接続文字列・API キー実値を除去 / R13 → download.ts で content-type と %PDF- ヘッダーを検証し、壊れた既存 PDF は再取得する / R14 → npx 直接 spawn ではなく process.execPath + ts-node/register を使う / R15 → npm_config_* と node --require ts-node/register で npm run 引数を安定化する / R16 → AM/AM2 の answers_raw.json と questions_raw.json の qNo・correctOption・選択肢を同期する"
+Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から接続文字列・API キー実値を除去 / R13 → download.ts で content-type と %PDF- ヘッダーを検証し、壊れた既存 PDF は再取得する / R14 → npx 直接 spawn ではなく process.execPath + ts-node/register を使う / R15 → npm_config_* と node --require ts-node/register で npm run 引数を安定化する / R16 → AM/AM2 の answers_raw.json と questions_raw.json の qNo・correctOption・選択肢を同期する / R17 → PM/PM1/PM2 は questions_transformed.json と subQuestions 解答欄を同期する / R18 → Mermaid のリンクラベルは -->|label| または ---|label| に正規化し、非ASCIIの円形節点ラベルは引用する"
 
 if ($FailOnFinding) { exit 1 }
 exit 0

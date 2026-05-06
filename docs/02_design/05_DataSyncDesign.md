@@ -162,6 +162,13 @@ node --require ts-node/register src/scraper/gemini-extract.ts --exam-id=NW-2025-
 `answers_raw.json` は63項目、全値が非空文字列であることを確認した。
 ただし午後問題の正答キーは `1-1-a`、`1-2-4-GUA` のように Gemini 抽出由来のキー体系になり得るため、Cosmos 同期や採点機能に投入する前に、既存PM系の `問1-設問...` 形式との対応付けを確認する。
 
+同日に `NW-2025-Spring-PM2/questions_transformed.json` を追加し、アプリ表示で優先読込される午後問題構造へ変換した。
+変換後は2大問、8設問グループ、63解答欄で、`answers_raw.json` の63項目と対応する。
+raw抽出では問1設問1、問2設問1、問2設問2の `subQuestions` が空であり、問2設問3では解答キーに存在する(2)(3)相当の設問文が不足していたため、PDFページ画像による原典確認を行い、解答欄単位へ分解した。
+再発防止として `.github/hooks/self-inspect.ps1` に R17 を追加し、変更対象の `PM` / `PM1` / `PM2` データで `questions_transformed.json` が欠落している、または transformed 内の解答欄が0件・空設問を含む場合に検出する。
+E2E確認時に `NW-2025-Spring-PM2` のMermaid図表で、ハイフン入りリンクラベル `-- LTE-M --` とエッジ上の節点定義 `-- Internet((...)) ---` がブラウザ描画エラーになることを検出したため、`-->|LTE-M|`、`---|専用線|`、独立した `Internet(("インターネット"))` 節点へ正規化した。
+同じ再発防止として `.github/hooks/self-inspect.ps1` に R18 を追加し、変更対象の問題JSONに既知のMermaid描画失敗パターンが残る場合に検出する。
+
 #### 7.2.1 Ollama 解答PDF抽出 pilot
 
 Gemini のレート制限回避やローカル検証のため、解答PDFだけを `extract:answers:ollama` で抽出できる。
