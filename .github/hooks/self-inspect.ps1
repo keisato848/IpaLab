@@ -464,17 +464,49 @@ foreach ($examId in $changedMorningExamIds) {
     try {
         $answers = Get-Content -LiteralPath $answersPath -Raw | ConvertFrom-Json
         $questionsRaw = Get-Content -LiteralPath $questionsPath -Raw | ConvertFrom-Json
-        $questions = @($questionsRaw)
+        $questions = @()
+        if ($questionsRaw -is [array]) {
+            $questions = @($questionsRaw)
+        } elseif ($null -ne $questionsRaw.PSObject.Properties['questions']) {
+            $questions = @($questionsRaw.questions)
+        } elseif ($null -ne $questionsRaw) {
+            $questions = @($questionsRaw)
+        }
 
         $answerMap = @{}
-        foreach ($prop in $answers.PSObject.Properties) {
-            if ($prop.Name -match '^\d+$') {
-                $answerMap[$prop.Name] = [string]$prop.Value
+        $answerItems = $null
+        if ($answers -is [array]) {
+            $answerItems = @($answers)
+        } elseif ($null -ne $answers.PSObject.Properties['answers']) {
+            $answerItems = @($answers.answers)
+        }
+
+        if ($null -ne $answerItems) {
+            foreach ($answer in $answerItems) {
+                $answerQNo = $null
+                if ($null -ne $answer.PSObject.Properties['qNo']) { $answerQNo = [string]$answer.qNo }
+                elseif ($null -ne $answer.PSObject.Properties['questionNo']) { $answerQNo = [string]$answer.questionNo }
+
+                $answerValue = $null
+                if ($null -ne $answer.PSObject.Properties['correctOption']) { $answerValue = [string]$answer.correctOption }
+                elseif ($null -ne $answer.PSObject.Properties['correct']) { $answerValue = [string]$answer.correct }
+                elseif ($null -ne $answer.PSObject.Properties['answer']) { $answerValue = [string]$answer.answer }
+
+                if ($answerQNo -match '^\d+$' -and -not [string]::IsNullOrWhiteSpace($answerValue)) {
+                    $answerMap[$answerQNo] = $answerValue
+                }
+            }
+        } else {
+            foreach ($prop in $answers.PSObject.Properties) {
+                if ($prop.Name -match '^\d+$') {
+                    $answerMap[$prop.Name] = [string]$prop.Value
+                }
             }
         }
 
         $questionMap = @{}
         $badOptions = @()
+        $missingAnswers = @()
         $mismatches = @()
         foreach ($q in $questions) {
             $qNo = [string]$q.qNo
@@ -494,7 +526,9 @@ foreach ($examId in $changedMorningExamIds) {
             }
             if ($hasBadOptions) { $badOptions += $qNo }
 
-            if ($answerMap.ContainsKey($qNo) -and [string]$q.correctOption -ne $answerMap[$qNo]) {
+            if (-not $answerMap.ContainsKey($qNo)) {
+                $missingAnswers += $qNo
+            } elseif ([string]$q.correctOption -ne $answerMap[$qNo]) {
                 $mismatches += "${qNo}:$($q.correctOption)->$($answerMap[$qNo])"
             }
         }
@@ -505,9 +539,10 @@ foreach ($examId in $changedMorningExamIds) {
                 Sort-Object { [int]$_ }
         )
 
-        if ($missingQuestions.Count -gt 0 -or $badOptions.Count -gt 0 -or $mismatches.Count -gt 0) {
+        if ($missingQuestions.Count -gt 0 -or $missingAnswers.Count -gt 0 -or $badOptions.Count -gt 0 -or $mismatches.Count -gt 0) {
             $details = @()
             if ($missingQuestions.Count -gt 0) { $details += "missing qNo: $(($missingQuestions | Select-Object -First 10) -join ', ')" }
+            if ($missingAnswers.Count -gt 0) { $details += "missing answers: $(($missingAnswers | Select-Object -First 10) -join ', ')" }
             if ($badOptions.Count -gt 0) { $details += "bad options: $(($badOptions | Select-Object -First 10) -join ', ')" }
             if ($mismatches.Count -gt 0) { $details += "correctOption mismatch: $(($mismatches | Select-Object -First 10) -join ', ')" }
             Add-Finding -Rule 'R16-morning-data-answer-sync' -Severity 'High' `

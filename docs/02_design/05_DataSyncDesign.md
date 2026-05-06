@@ -4,6 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-06 | `PM-2020-Fall-AM2` / `PM-2016-Spring-AM2` / `SA-2025-Spring-AM2` / `ST-2025-Spring-AM2` の AM2 正答不整合補正と self-inspect R16 強化を追加 |
 | 2026-05-06 | `SA-2025-Spring-PM1` / `SA-2025-Spring-PM2` / `ST-2025-Spring-PM1` / `ST-2025-Spring-PM2` の午後問題 transformed 追加実績を追加 |
 | 2026-05-06 | `NW-2025-Spring-PM2` の Gemini API による解説込み問題・解答PDF抽出実績を追加 |
 | 2026-05-06 | `NW-2019-Fall-AM2` の AM2 問題PDF画像補正結果を追加 |
@@ -175,6 +176,13 @@ PM1は `answers_raw.json` の公式解答キーを設問内のリーフ解答欄
 変換後の集計は、`SA-2025-Spring-PM1` が3大問・11設問グループ・26解答欄、`SA-2025-Spring-PM2` が2大問・6設問グループ・6解答欄、`ST-2025-Spring-PM1` が3大問・10設問グループ・23解答欄、`ST-2025-Spring-PM2` が2大問・6設問グループ・6解答欄である。
 PM2論述の公式解答例欠落はP1残課題として扱い、データ補完時は公式講評・解答例などの根拠を確認してから更新する。
 E2Eでは各大問ページの解答欄数、空設問なし、Mermaid描画失敗なしを確認し、証跡は `docs/04_reports/E2E_Test_Evidence_Report_20260506.md` に保存する。
+
+同日に AM2 正答不整合の P0 対応として、`PM-2020-Fall-AM2`、`PM-2016-Spring-AM2`、`SA-2025-Spring-AM2`、`ST-2025-Spring-AM2` を補正した。
+`PM-2020-Fall-AM2` は公式解答PDFで問2がエであることを確認し、`answers_raw.json` の問2を `d` に修正した。
+`PM-2016-Spring-AM2` は公式解答PDFで問2が注記扱いであることを確認し、問題側の `ALL_CORRECT` と一致するよう `answers_raw.json` に問2 `ALL_CORRECT` を追加した。
+`SA-2025-Spring-AM2` と `ST-2025-Spring-AM2` は、既存 `answers_raw.json` の25問分の正答を `questions_raw.json` の `correctOption` に反映した。
+再発防止として `.github/hooks/self-inspect.ps1` の R16 を強化し、`questions_raw.json` が配列形式または `{ questions: [...] }` 形式のどちらでも正規化し、`answers_raw.json` も key-value map、配列、`answers` ラッパーを照合対象にする。
+また、問題側に qNo が存在するのに解答mapへ対応する正答がない場合も R16 で検出する。
 
 #### 7.2.1 Ollama 解答PDF抽出 pilot
 
