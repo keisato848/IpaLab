@@ -1,62 +1,65 @@
-# E2E テスト エビデンス報告書
-
-**実行日時**: 2026-05-06 11:45 JST (UTC: 2026-05-06T02:45)
-
----
+# E2E テストエビデンス報告書
 
 ## 1. エグゼクティブサマリー
 
-| 項目 | 内容 |
-|------|------|
-| テストフレームワーク | Playwright (Chromium) |
-| テストファイル数 | 1 |
-| 総テスト数 | 2 |
-| 成功数 | 2 |
-| 失敗数 | 0 |
-| 成功率 | **100%** |
-| 実行時間 | 14.2 秒 |
-| 対象ブランチ | `feature/pm-gated-agent-workflow` |
-| PR番号 | なし |
-
----
+| 項目 | 値 |
+|------|-----|
+| テストフレームワーク | Playwright |
+| 対象 | NW/SA/ST 2025春 PM1/PM2 transformed データ表示 |
+| 総テスト数 | 12 |
+| 成功 | 12 |
+| 失敗 | 0 |
+| スキップ | 0 |
+| 成功率 | 100.0% |
+| 実行時間 | NW PM2: 2 passed、P0残件: 34.3秒 |
+| ブランチ | feature/pm-gated-agent-workflow |
+| PR 番号 | なし |
 
 ## 2. 変更概要
 
-`NW-2025-Spring-PM2` に `questions_transformed.json` を追加し、午後IIの問1・問2で `SCPMExamView` が解答欄を生成できる構造へ変換した。
-あわせて、ブラウザ描画で構文エラーになっていた Mermaid のリンクラベルと節点表記を正規化し、再発防止として `self-inspect` の R17/R18 を追加した。
-
-本 E2E テストは、上記の変更により午後IIページで解答欄と図表が適切に表示されることを確認する目的で実施した。
-
----
+- NW-2025-Spring-PM2 の `questions_transformed.json` で、2大問・8設問グループ・63解答欄と Mermaid 図表描画を検証した。
+- SA/ST 2025春 PM1/PM2 の残P0対象4試験で、`questions_transformed.json` 追加後の午後問題入力欄表示を検証した。
+- PM2論述問題は公式解答例が未抽出のため、解答例は空文字のまま保持し、設問ア〜ウの入力欄生成だけを確認した。
 
 ## 3. テストシナリオ一覧
 
-### 3.1 nw-2025-pm2.spec.ts — NW-2025-Spring-PM2 午後IIデータ表示
-
-| テストID | シナリオ名 | 結果 |
-|----------|-----------|------|
-| N-01 | 問1で32個の解答欄と4個のMermaid図表が表示される | Pass |
-| N-02 | 問2で欠落していた設問(2)(3)を含む31個の解答欄と4個のMermaid図表が表示される | Pass |
-
----
+| テスト ID | シナリオ名 | 結果 |
+|-----------|-----------|------|
+| N-01 | NW-2025-Spring-PM2 問1の32解答欄とMermaid描画を確認 | Pass |
+| N-02 | NW-2025-Spring-PM2 問2の31解答欄とMermaid描画を確認 | Pass |
+| P0-01 | SA-2025-Spring-PM1 問1の10解答欄を確認 | Pass |
+| P0-02 | SA-2025-Spring-PM1 問2の8解答欄を確認 | Pass |
+| P0-03 | SA-2025-Spring-PM1 問3の8解答欄を確認 | Pass |
+| P0-04 | SA-2025-Spring-PM2 問1の3解答欄を確認 | Pass |
+| P0-05 | SA-2025-Spring-PM2 問2の3解答欄を確認 | Pass |
+| P0-06 | ST-2025-Spring-PM1 問1の8解答欄とMermaid描画を確認 | Pass |
+| P0-07 | ST-2025-Spring-PM1 問2の8解答欄を確認 | Pass |
+| P0-08 | ST-2025-Spring-PM1 問3の7解答欄を確認 | Pass |
+| P0-09 | ST-2025-Spring-PM2 問1の3解答欄を確認 | Pass |
+| P0-10 | ST-2025-Spring-PM2 問2の3解答欄を確認 | Pass |
 
 ## 4. スクリーンショットエビデンス
 
-エビデンスファイルの保存先: `apps/web/e2e/evidence/`
+| NW PM2 問1 | NW PM2 問2 |
+|:---:|:---:|
+| ![N-01](../../apps/web/e2e/evidence/2026-05-06T02-45-44-245Z_N-01_NW2025PM2_Q1_answer_fields.png) | ![N-02](../../apps/web/e2e/evidence/2026-05-06T02-45-48-481Z_N-02_NW2025PM2_Q2_answer_fields.png) |
 
-### N-01: NW-2025-Spring-PM2 問1
+| SA PM1 問1 | SA PM1 問2 | SA PM1 問3 |
+|:---:|:---:|:---:|
+| ![P0-01](../../apps/web/e2e/evidence/2026-05-06T04-04-50-092Z_P0-01_SA-2025-Spring-PM1_q1_answer_fields.png) | ![P0-02](../../apps/web/e2e/evidence/2026-05-06T04-04-53-024Z_P0-02_SA-2025-Spring-PM1_q2_answer_fields.png) | ![P0-03](../../apps/web/e2e/evidence/2026-05-06T04-04-55-872Z_P0-03_SA-2025-Spring-PM1_q3_answer_fields.png) |
 
-![N-01](../../apps/web/e2e/evidence/2026-05-06T02-45-44-245Z_N-01_NW2025PM2_Q1_answer_fields.png)
+| SA PM2 問1 | SA PM2 問2 |
+|:---:|:---:|
+| ![P0-04](../../apps/web/e2e/evidence/2026-05-06T04-04-58-356Z_P0-04_SA-2025-Spring-PM2_q1_answer_fields.png) | ![P0-05](../../apps/web/e2e/evidence/2026-05-06T04-05-00-846Z_P0-05_SA-2025-Spring-PM2_q2_answer_fields.png) |
 
-### N-02: NW-2025-Spring-PM2 問2
+| ST PM1 問1 | ST PM1 問2 | ST PM1 問3 |
+|:---:|:---:|:---:|
+| ![P0-06](../../apps/web/e2e/evidence/2026-05-06T04-05-04-725Z_P0-06_ST-2025-Spring-PM1_q1_answer_fields.png) | ![P0-07](../../apps/web/e2e/evidence/2026-05-06T04-05-07-253Z_P0-07_ST-2025-Spring-PM1_q2_answer_fields.png) | ![P0-08](../../apps/web/e2e/evidence/2026-05-06T04-05-10-010Z_P0-08_ST-2025-Spring-PM1_q3_answer_fields.png) |
 
-![N-02](../../apps/web/e2e/evidence/2026-05-06T02-45-48-481Z_N-02_NW2025PM2_Q2_answer_fields.png)
-
----
+| ST PM2 問1 | ST PM2 問2 |
+|:---:|:---:|
+| ![P0-09](../../apps/web/e2e/evidence/2026-05-06T04-05-12-367Z_P0-09_ST-2025-Spring-PM2_q1_answer_fields.png) | ![P0-10](../../apps/web/e2e/evidence/2026-05-06T04-05-15-011Z_P0-10_ST-2025-Spring-PM2_q2_answer_fields.png) |
 
 ## 5. 結論
 
-- 全2テストが成功し、成功率は100%。
-- 問1は32個、問2は31個の解答欄が表示されることを確認した。
-- 問1・問2ともに、問題文中のMermaid図表4個がSVGとして描画され、描画失敗メッセージは発生しなかった。
-- Cosmos DB未初期化のローカル環境では、filesystem fallbackで対象データを読み込めることも確認した。
+対象12シナリオは全て成功した。午後問題ページで `questions_transformed.json` が優先読込され、解答欄が欠落せず、Mermaid図表の描画失敗も発生しないことを確認した。

@@ -4,6 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-06 | `SA-2025-Spring-PM1` / `SA-2025-Spring-PM2` / `ST-2025-Spring-PM1` / `ST-2025-Spring-PM2` の午後問題 transformed 追加実績を追加 |
 | 2026-05-06 | `NW-2025-Spring-PM2` の Gemini API による解説込み問題・解答PDF抽出実績を追加 |
 | 2026-05-06 | `NW-2019-Fall-AM2` の AM2 問題PDF画像補正結果を追加 |
 | 2026-05-06 | `NW-2019-Fall-AM2` の AM2 解答PDF抽出実績を追加 |
@@ -168,6 +169,12 @@ raw抽出では問1設問1、問2設問1、問2設問2の `subQuestions` が空�
 再発防止として `.github/hooks/self-inspect.ps1` に R17 を追加し、変更対象の `PM` / `PM1` / `PM2` データで `questions_transformed.json` が欠落している、または transformed 内の解答欄が0件・空設問を含む場合に検出する。
 E2E確認時に `NW-2025-Spring-PM2` のMermaid図表で、ハイフン入りリンクラベル `-- LTE-M --` とエッジ上の節点定義 `-- Internet((...)) ---` がブラウザ描画エラーになることを検出したため、`-->|LTE-M|`、`---|専用線|`、独立した `Internet(("インターネット"))` 節点へ正規化した。
 同じ再発防止として `.github/hooks/self-inspect.ps1` に R18 を追加し、変更対象の問題JSONに既知のMermaid描画失敗パターンが残る場合に検出する。
+
+同日に残P0対象の `SA-2025-Spring-PM1`、`SA-2025-Spring-PM2`、`ST-2025-Spring-PM1`、`ST-2025-Spring-PM2` に `questions_transformed.json` を追加した。
+PM1は `answers_raw.json` の公式解答キーを設問内のリーフ解答欄へ展開し、PM2は `answers_raw.json` が空のため解答例を捏造せず、設問ア〜ウの論述入力欄だけを構造化する。
+変換後の集計は、`SA-2025-Spring-PM1` が3大問・11設問グループ・26解答欄、`SA-2025-Spring-PM2` が2大問・6設問グループ・6解答欄、`ST-2025-Spring-PM1` が3大問・10設問グループ・23解答欄、`ST-2025-Spring-PM2` が2大問・6設問グループ・6解答欄である。
+PM2論述の公式解答例欠落はP1残課題として扱い、データ補完時は公式講評・解答例などの根拠を確認してから更新する。
+E2Eでは各大問ページの解答欄数、空設問なし、Mermaid描画失敗なしを確認し、証跡は `docs/04_reports/E2E_Test_Evidence_Report_20260506.md` に保存する。
 
 #### 7.2.1 Ollama 解答PDF抽出 pilot
 
