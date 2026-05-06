@@ -4,6 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-06 | `NW-2025-Spring-PM2` の Gemini API による解説込み問題・解答PDF抽出実績を追加 |
 | 2026-05-06 | `NW-2019-Fall-AM2` の AM2 問題PDF画像補正結果を追加 |
 | 2026-05-06 | `NW-2019-Fall-AM2` の AM2 解答PDF抽出実績を追加 |
 | 2026-05-06 | `NW-2021-Spring-AM2` 解答PDFの CMap 不足による抽出不可事象を追加 |
@@ -140,6 +141,26 @@ npm run -w packages/data audit:raw-pdfs -- --categories=AP,PM,SC,FE,NW,DB,SA,ES,
 Stage A の完了条件は `status=RAW_PDF_AUDIT_OK`、`missingQuestionCount=0`、`missingAnswerCount=0`、`invalidPdfCount=0` とする。
 この条件を満たすまで `npm run extract -w packages/data` へ進まない。
 Windows 環境では `npx` を子プロセスから直接 spawn すると `spawnSync npx ENOENT` になる場合があるため、Gemini OCR は `npm run extract -w packages/data` から起動し、内部では `process.execPath` と `ts-node/register` で `gemini-extract.ts` を実行する。
+
+#### 7.2.0 Gemini OCR Stage B 対象限定実行
+
+午後問題を Gemini API で抽出する場合、`gemini_pm_ocr_prompt.md` に従い、`questions_raw.json` には問題本文、図表の Mermaid 表現、設問、設問ごとの `explanation` を含める。
+全PDFを一括処理すると不要な再抽出やレート消費が発生するため、`gemini-extract.ts` は対象試験を限定できる。
+
+```powershell
+Set-Location packages/data
+node --require ts-node/register src/scraper/gemini-extract.ts --exam-id=NW-2025-Spring-PM2 --force --questions-only
+node --require ts-node/register src/scraper/gemini-extract.ts --exam-id=NW-2025-Spring-PM2 --force --answers-only
+```
+
+`--exam-id=<examId>` は対象PDFを1試験に限定する。
+`--questions-only` は問題PDFだけ、`--answers-only` は解答PDFだけを処理する。
+`--force` は既存の `questions_raw.json` / `answers_raw.json` を上書きするため、対象ファイルを確認してから使用する。
+午後問題では出力が単一オブジェクトまたはオブジェクト配列になるため、午前問題のような `JSON array` 固定のプロンプト追記は行わず、午後問題では `JSON object` を要求する。
+
+2026-05-06 に `NW-2025-Spring-PM2` を Gemini API で抽出し、`questions_raw.json` は2問、各問4設問、全設問で20文字超の `explanation` あり、Mermaidブロックありの構造を確認した。
+`answers_raw.json` は63項目、全値が非空文字列であることを確認した。
+ただし午後問題の正答キーは `1-1-a`、`1-2-4-GUA` のように Gemini 抽出由来のキー体系になり得るため、Cosmos 同期や採点機能に投入する前に、既存PM系の `問1-設問...` 形式との対応付けを確認する。
 
 #### 7.2.1 Ollama 解答PDF抽出 pilot
 
