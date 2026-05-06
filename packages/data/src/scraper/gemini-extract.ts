@@ -128,7 +128,8 @@ async function extractQuestions(examId: string, rawDir: string, outDir: string, 
     }
 
     let promptText = await fs.readFile(promptPath, 'utf-8');
-    promptText += "\n\nIMPORTANT: Output ONLY the JSON array. Do not wrap in markdown code blocks.";
+    const outputKind = isAfternoon ? 'JSON object' : 'JSON array';
+    promptText += `\n\nIMPORTANT: Output ONLY the ${outputKind}. Do not wrap in markdown code blocks.`;
 
     // Retry loop for KEY ROTATION
     const MAX_KEY_RETRIES = 5;
@@ -255,6 +256,16 @@ function formatJson(text: string): string {
 }
 
 async function main() {
+    const args = process.argv.slice(2);
+    const examIdArg = args.find(arg => arg.startsWith('--exam-id='))?.split('=')[1];
+    const force = args.includes('--force');
+    const questionsOnly = args.includes('--questions-only');
+    const answersOnly = args.includes('--answers-only');
+
+    if (questionsOnly && answersOnly) {
+        throw new Error('--questions-only and --answers-only cannot be used together.');
+    }
+
     const rawDir = path.resolve(__dirname, '../../data/raw_pdfs');
     const outDir = path.resolve(__dirname, '../../data/questions');
 
@@ -276,6 +287,13 @@ async function main() {
             (f.startsWith('ST-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2')))
         )
     );
+
+    if (examIdArg) {
+        examFiles = examFiles.filter(f => path.basename(f, '.pdf') === examIdArg);
+        if (examFiles.length === 0) {
+            throw new Error(`Question PDF not found for --exam-id=${examIdArg}`);
+        }
+    }
 
     // Sort Newest First
     examFiles.sort((a, b) => {
@@ -302,11 +320,13 @@ async function main() {
                 let skipQ = false;
                 try {
                     await fs.access(qOut);
-                    console.log(`[SKIP] Questions for ${examId} already exist.`);
-                    skipQ = true;
+                    if (!force) {
+                        console.log(`[SKIP] Questions for ${examId} already exist.`);
+                        skipQ = true;
+                    }
                 } catch { }
 
-                if (!skipQ) {
+                if (!skipQ && !answersOnly) {
                     await extractQuestions(examId, rawDir, outDir, 0);
                 }
             })(),
@@ -315,11 +335,13 @@ async function main() {
                 let skipA = false;
                 try {
                     await fs.access(aOut);
-                    console.log(`[SKIP] Answers for ${examId} already exist.`);
-                    skipA = true;
+                    if (!force) {
+                        console.log(`[SKIP] Answers for ${examId} already exist.`);
+                        skipA = true;
+                    }
                 } catch { }
 
-                if (!skipA) {
+                if (!skipA && !questionsOnly) {
                     await extractAnswers(examId, rawDir, outDir, 0);
                 }
             })()
