@@ -93,6 +93,8 @@ GitHub Actions ワークフロー: `.github/workflows/azure-app-service.yml`
 | `deploy` | `main` push / 手動のみ | **本番**へデプロイ |
 | `deploy-staging` | PR のみ | **Staging**へデプロイ + PR にURLをコメント |
 
+Artifact の取得は `actions/download-artifact@v6` を使用する。`gh run download` は checkout していない deploy ジョブで `fatal: not a git repository` となるため使用しない。
+
 ### 4.2 必要な GitHub Secrets
 
 | Secret名 | 説明 | 対象 |
@@ -208,6 +210,7 @@ export async function GET(req: NextRequest) {
 | `COSMOS_DB_CONNECTION_STAGING` Secret未登録 | 同上 |
 | Staging App Service がまだ作成されていない | Azure Portal で `app-pm-exam-dx-staging` の存在を確認 |
 | `AZURE_CREDENTIALS` の Service Principal に Staging App Service へのアクセス権がない | Staging リソースグループへの Contributor 権限を付与 |
+| Artifact 取得で `fatal: not a git repository` が出る | `.github/workflows/azure-app-service.yml` の deploy / deploy-staging が `actions/download-artifact@v6` を使用していることを確認 |
 
 ### 6.4 OAuth コールバックエラー（Staging）
 
@@ -229,6 +232,9 @@ export async function GET(req: NextRequest) {
 
 | 日付 | 変更内容 | 担当 |
 |------|---------|------|
+| 2026/05/07 | **GitHub Actions artifact 取得方式の修正** | エージェント |
+| | - `gh run download` を `actions/download-artifact@v6` に置換 | |
+| | - checkout 不在ジョブでの `fatal: not a git repository` 再発防止を明記 | |
 | 2026/04/09 | **Staging 環境構築対応** | エージェント |
 | | - Azure App Service Staging (`app-pm-exam-dx-staging`) 追加 | |
 | | - CI/CD に `deploy-staging` ジョブ追加（PRトリガー、PR URLコメント投稿） | |

@@ -82,9 +82,10 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh run download ${{ github.run_id }} --name node-app --dir ./deploy
+        uses: actions/download-artifact@v6
+        with:
+          name: node-app
+          path: ./deploy
 
       - name: Deploy to Azure Web App
         run: |

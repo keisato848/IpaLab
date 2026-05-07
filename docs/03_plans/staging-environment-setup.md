@@ -21,7 +21,7 @@ az webapp create \
   --name app-pm-exam-dx-staging \
   --plan asp-pm-exam-dx-prod \
   --resource-group rg-pm-exam-dx-prod \
-  --runtime "NODE:20-lts"
+   --runtime "NODE:24-lts"
 ```
 
 作成後、起動コマンドを設定:
