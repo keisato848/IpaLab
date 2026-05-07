@@ -29,6 +29,10 @@ on:
     types: [opened, synchronize, reopened]
     branches:
       - main
+    paths:
+      - 'apps/web/**'
+      - 'packages/**'
+      - '.github/workflows/azure-app-service.yml'
 
 env:
   AZURE_WEBAPP_NAME: app-pm-exam-dx-prod

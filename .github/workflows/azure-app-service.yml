@@ -26,6 +26,7 @@ on:
     paths:
       - 'apps/web/**'
       - 'packages/**'
+      - '.github/workflows/azure-app-service.yml'
   workflow_dispatch:
 
 permissions:
