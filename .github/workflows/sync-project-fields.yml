@@ -36,7 +36,7 @@ jobs:
 
       - name: Sync issue fields to project
         if: github.event_name == 'issues' && env.PROJECT_PAT != ''
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ env.PROJECT_PAT }}
           script: |
@@ -158,7 +158,7 @@ jobs:
 
       - name: Sync PR fields to project
         if: github.event_name == 'pull_request' && env.PROJECT_PAT != ''
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ env.PROJECT_PAT }}
           script: |
