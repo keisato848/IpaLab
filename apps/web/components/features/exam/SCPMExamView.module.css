@@ -52,6 +52,10 @@
     color: white;
 }
 
+.contextPaneHidden {
+    --pm-answer-pane-width: 100%;
+}
+
 /* Focus Mode: Full Screen Overlay */
 .layoutMode_focus {
     position: fixed;
@@ -230,6 +234,57 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+.answerHeaderActions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    flex: none;
+    min-width: 0;
+}
+
+.contextToggleButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    min-height: 36px;
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.contextToggleButton:hover,
+.contextToggleButton:focus-visible {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: var(--bg-primary);
+}
+
+.contextToggleButton:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+.contextToggleIcon {
+    flex: none;
+    width: 1rem;
+    text-align: center;
+}
+
+.contextToggleText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .answerSummary {
     display: flex;
     align-items: center;
@@ -336,6 +391,10 @@
     .answerPane {
         width: 40%;
         display: block;
+    }
+
+    .contextPaneHidden .answerPane {
+        width: 100% !important;
     }
 
     .pane {
@@ -455,6 +514,19 @@
 
     .answerSummary {
         gap: 0.375rem;
+    }
+
+    .answerHeaderActions {
+        gap: 0.375rem;
+    }
+
+    .contextToggleButton {
+        min-height: 32px;
+        padding: 0.375rem 0.5rem;
+    }
+
+    .contextToggleText {
+        max-width: 5.5rem;
     }
 
     .answerPaneTitle {
