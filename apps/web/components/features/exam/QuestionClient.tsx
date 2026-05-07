@@ -689,9 +689,6 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             <div className={styles.pmExamShell}>
                 <header className={styles.pmExamHeader}>
                     <div className={styles.pmHeaderInfo}>
-                        <Link href="/" className={styles.pmBrandLink}>
-                            IpaLab
-                        </Link>
                         <span className={styles.pmExamMeta}>
                             {examLabel} {isMock ? '(模試モード)' : ''}
                         </span>
@@ -785,6 +782,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                     initialAnswer={descriptiveHistory[getSubQId(question.id, currentSubQIndex)]?.answer}
                                     initialResult={descriptiveHistory[getSubQId(question.id, currentSubQIndex)]?.result}
                                     draftKey={buildPMDraftKey(getSubQId(question.id, currentSubQIndex))}
+                                    inputVariant="genkoyoshi"
                                     onSave={(data) => handleSaveAIScore(data, currentSubQIndex)}
                                 />
                             </div>

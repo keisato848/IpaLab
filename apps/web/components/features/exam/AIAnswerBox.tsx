@@ -12,6 +12,7 @@ import rehypeRaw from 'rehype-raw';
 import dynamic from 'next/dynamic';
 // @ts-ignore
 import he from 'he';
+import { GenkoyoshiInput } from '@/components/features/scoring/GenkoyoshiInput';
 import { normalizeMermaidCodeBlocks } from '@/lib/mermaid/sanitize';
 import styles from './AIAnswerBox.module.css';
 
@@ -63,6 +64,7 @@ interface AIAnswerBoxProps {
     initialResult?: ScoreResult;
     onSave?: (data: { answer: string; result: ScoreResult }) => void;
     draftKey?: string;
+    inputVariant?: 'textarea' | 'genkoyoshi';
 }
 
 export interface ScoreResult {
@@ -81,6 +83,7 @@ export default function AIAnswerBox({
     initialResult,
     onSave,
     draftKey,
+    inputVariant = 'textarea',
     hideChart = false
 }: AIAnswerBoxProps & { hideChart?: boolean }) {
     const [answer, setAnswer] = useState(initialAnswer);
@@ -92,6 +95,8 @@ export default function AIAnswerBox({
     const [draftError, setDraftError] = useState<string | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const isOverLimit = typeof limit === 'number' && answer.length > limit;
+    const useGenkoyoshiInput = inputVariant === 'genkoyoshi';
+    const genkoyoshiMaxChars = limit ?? 800;
     const normalizedFeedback = useMemo(
         () => normalizeMermaidCodeBlocks(result?.feedback || ''),
         [result?.feedback]
@@ -205,25 +210,45 @@ export default function AIAnswerBox({
                 {isExpanded ? "⤢ 縮小" : "⤢ 拡大"}
             </button>
             <div className={styles.inputWrapper}>
-                <textarea
-                    ref={textareaRef}
-                    className={styles.textarea}
-                    value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
-                    placeholder="ここに回答を入力してください..."
-                    rows={5}
-                    disabled={isLoading}
-                    aria-invalid={isOverLimit}
-                />
-                <div className={styles.charCounter}>
-                    {limit ? (
-                        <span className={answer.length > limit ? styles.charOver : ''}>
-                            {answer.length} / {limit} 文字
-                        </span>
-                    ) : (
+                {useGenkoyoshiInput ? (
+                    <div className={styles.genkoyoshiWrapper} aria-invalid={isOverLimit}>
+                        <GenkoyoshiInput
+                            value={answer}
+                            onChange={setAnswer}
+                            maxChars={genkoyoshiMaxChars}
+                            placeholder="ここに回答を入力してください"
+                            ariaLabel="原稿用紙形式の解答入力欄"
+                            disabled={isLoading}
+                        />
+                    </div>
+                ) : (
+                    <>
+                        <textarea
+                            ref={textareaRef}
+                            className={styles.textarea}
+                            value={answer}
+                            onChange={(e) => setAnswer(e.target.value)}
+                            placeholder="ここに回答を入力してください..."
+                            rows={5}
+                            disabled={isLoading}
+                            aria-invalid={isOverLimit}
+                        />
+                        <div className={styles.charCounter}>
+                            {limit ? (
+                                <span className={answer.length > limit ? styles.charOver : ''}>
+                                    {answer.length} / {limit} 文字
+                                </span>
+                            ) : (
+                                <span>{answer.length} 文字</span>
+                            )}
+                        </div>
+                    </>
+                )}
+                {useGenkoyoshiInput && !limit && (
+                    <div className={styles.charCounter}>
                         <span>{answer.length} 文字</span>
-                    )}
-                </div>
+                    </div>
+                )}
                 {isOverLimit && (
                     <div className={styles.limitWarning}>文字数制限を超えています。制限内に収めてから採点してください。</div>
                 )}

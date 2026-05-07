@@ -4,6 +4,7 @@
 
 | 日付 | 変更内容 |
 |------|------|
+| 2026-05-07 | 午後試験ヘッダーの不要な `IpaLab` リンクを削除し、午後記述欄を原稿用紙形式入力に変更 |
 | 2026-05-07 | アプリ全体の左サイドナビをデスクトップで常時開閉でき、状態を localStorage に保存する UI を追加 |
 | 2026-05-07 | 新形式午後画面で解答中に問題文左ペインをトグル表示できる UI を追加 |
 | 2026-05-06 | 変換済み午後データの `subQuestions` 空配列、`section.answer`、`section.questions`、PM2 論述設問を解答欄として扱うフォールバック、疎な `qNo` の位置番号フォールバック、日本語 Mermaid 図表のサニタイズ強化を追加 |
@@ -17,6 +18,7 @@
 
 - 午後問題の表示形式判定
 - ケース本文、図表、設問、記述入力 UI
+- 午後記述欄の原稿用紙形式入力 UI
 - `/api/score` による CLKS ベース採点
 - 採点結果の `LearningRecord` への保存
 - 採点前の回答下書きの localStorage 保存
@@ -34,6 +36,7 @@
 - `LearningRecord` の記述式拡張項目
 - `/api/score` と `lib/scoring.ts`
 - 文字数制限の表示と超過時の採点抑止
+- 午後記述欄の原稿用紙形式表示と文字数制限の可視化
 - 午後問題の新旧データ形式への対応
 - 新形式午後画面の問題文ペイン開閉 UI
 - アプリ全体で常時利用できるデスクトップサイドナビ開閉 UI
@@ -134,6 +137,7 @@ sequenceDiagram
 | Component | `apps/web/components/features/exam/QuestionClient.tsx` | 午後形式判定、採点結果保存、統計更新 |
 | Component | `apps/web/components/features/exam/AIAnswerBox.tsx` | 回答入力、採点 API 呼び出し、スコア表示 |
 | Component | `apps/web/components/features/exam/SCPMExamView.tsx` | 新形式ケース問題の分割表示と図表参照 |
+| Component | `apps/web/components/features/scoring/GenkoyoshiInput.tsx` | 原稿用紙形式の答案入力と字数カウンタ表示 |
 | Component | `apps/web/app/(main)/layout.tsx` | メインサイドナビ表示とデスクトップ開閉状態の保持 |
 | Utility | `apps/web/components/features/exam/pmAnswerUtils.ts` | 午後答案の文字数制限抽出、設問ID、下書き保存キー生成 |
 | Component | `apps/web/components/features/exam/ExamSummary.tsx` | 総合スコアとレーダー集計表示 |

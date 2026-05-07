@@ -544,6 +544,7 @@ function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, initialData }: { sq
                     initialAnswer={initialData?.answer}
                     initialResult={initialData?.result}
                     draftKey={buildPMDraftKey(answerFieldId)}
+                    inputVariant="genkoyoshi"
                     hideChart={true}
                 />
             </div>

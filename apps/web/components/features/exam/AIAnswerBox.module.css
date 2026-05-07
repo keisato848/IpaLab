@@ -27,6 +27,11 @@
     min-height: 50vh;
 }
 
+.container.expanded .genkoyoshiWrapper {
+    min-height: 50vh;
+    overflow-y: auto;
+}
+
 .expandBtn {
     background: transparent;
     border: 1px solid #ccc;
@@ -95,6 +100,15 @@
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.genkoyoshiWrapper {
+    border-radius: 8px;
+}
+
+.genkoyoshiWrapper[aria-invalid="true"] {
+    border: 1px solid #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
 }
 
 .actions {

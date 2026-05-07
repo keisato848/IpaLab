@@ -82,6 +82,15 @@
   box-shadow: 0 0 0 3px rgba(196, 85, 74, 0.25);
 }
 
+.wrap.disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.wrap.disabled .overlay {
+  cursor: not-allowed;
+}
+
 .tapHint {
   position: absolute;
   inset: 0;
