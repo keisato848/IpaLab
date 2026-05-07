@@ -43,4 +43,14 @@ describe('AIAnswerBox', () => {
         expect(screen.getByText('文字数制限を超えています。制限内に収めてから採点してください。')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'AIで採点する' })).toBeDisabled();
     });
+
+    it('原稿用紙形式で回答を入力できる', () => {
+        render(<AIAnswerBox questionText="設問" limit={20} inputVariant="genkoyoshi" />);
+
+        const textarea = screen.getByLabelText('原稿用紙形式の解答入力欄');
+        fireEvent.change(textarea, { target: { value: '原稿用紙答案' } });
+
+        expect(screen.getByTestId('genko-counter').textContent).toContain('6');
+        expect(screen.queryByPlaceholderText('ここに回答を入力してください...')).not.toBeInTheDocument();
+    });
 });
