@@ -687,10 +687,11 @@
     align-items: center;
     padding: 0.125rem 0.5rem;
     font-size: var(--fs-xs);
-    font-weight: 600;
+    font-weight: 700;
     border-radius: 9999px;
-    background: rgba(251, 191, 36, 0.2);
-    color: #92400e;
+    border: 1px solid rgba(17, 24, 39, 0.14);
+    background: #fbbf24;
+    color: #111827;
 }
 
 .explanationText {
