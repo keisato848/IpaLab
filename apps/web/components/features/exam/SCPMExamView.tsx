@@ -125,6 +125,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
     const [mobileLayout, setMobileLayout] = useState<'tab' | 'stacked'>('stacked');
     // Layout Mode: default (3-col/split), focus (2-col/split no nav), paper (answer only)
     const [layoutMode, setLayoutMode] = useState<'default' | 'focus' | 'paper'>('default');
+    const [isContextPaneCollapsed, setIsContextPaneCollapsed] = useState(false);
     const normalizedContextParts = useMemo(() => {
         if (!context) return [];
 
@@ -308,6 +309,19 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
 
     const overallScore = answeredScoreCount > 0 ? Math.round(totalScore / answeredScoreCount) : 0;
     const answerFieldCount = countAnswerFields(questions);
+    const isContextPaneHidden = layoutMode === 'paper' || isContextPaneCollapsed;
+
+    const toggleContextPane = () => {
+        if (isContextPaneHidden) {
+            setLayoutMode('default');
+            setIsContextPaneCollapsed(false);
+            setActiveTab('context');
+            return;
+        }
+
+        setIsContextPaneCollapsed(true);
+        setActiveTab('answer');
+    };
 
 
 
@@ -317,7 +331,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
             <div className={styles.layoutControls}>
                 <div className={styles.layoutToggleGroup}>
                     <button
-                        onClick={() => setLayoutMode('default')}
+                        onClick={() => { setLayoutMode('default'); setIsContextPaneCollapsed(false); }}
                         className={`${styles.layoutToggleBtn} ${layoutMode === 'default' ? styles.active : ''}`}
                         title="標準 (3カラム)"
                     >
@@ -331,7 +345,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                         集中
                     </button>
                     <button
-                        onClick={() => setLayoutMode('paper')}
+                        onClick={() => { setLayoutMode('paper'); setIsContextPaneCollapsed(true); }}
                         className={`${styles.layoutToggleBtn} ${layoutMode === 'paper' ? styles.active : ''}`}
                         title="解答のみ (1カラム)"
                     >
@@ -361,29 +375,32 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                 </button>
             </div>
 
-            <div className={`${styles.splitContainer} ${mobileLayout === 'stacked' ? styles.stacked : ''}`}>
+            <div className={`${styles.splitContainer} ${mobileLayout === 'stacked' ? styles.stacked : ''} ${isContextPaneHidden ? styles.contextPaneHidden : ''}`}>
                 {/* Left Pane: Context (Scrollable) */}
-                <div
-                    className={`${styles.pane} ${styles.contextPane} ${mobileLayout === 'stacked' || activeTab === 'context' ? styles.active : ''}`}
-                    style={layoutMode !== 'paper' && activeTab === 'context' ? { width: `${contextWidth}%` } : undefined}
-                >
-                    <div className={styles.contextHeader}>
-                        <h1 className={styles.contextTitle}>{context.title}</h1>
-                        <span className={styles.contextBadge}>
-                            PM / SC Exam Context
-                        </span>
-                    </div>
+                {!isContextPaneHidden && (
+                    <div
+                        id="pm-context-pane"
+                        className={`${styles.pane} ${styles.contextPane} ${mobileLayout === 'stacked' || activeTab === 'context' ? styles.active : ''}`}
+                        style={activeTab === 'context' ? { width: `${contextWidth}%` } : undefined}
+                    >
+                        <div className={styles.contextHeader}>
+                            <h1 className={styles.contextTitle}>{context.title}</h1>
+                            <span className={styles.contextBadge}>
+                                PM / SC Exam Context
+                            </span>
+                        </div>
 
-                    <div className={styles.contextContent}>
-                        {renderContextWithDiagrams()}
+                        <div className={styles.contextContent}>
+                            {renderContextWithDiagrams()}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Resizer Handle (Desktop only, visible if not paper/mobile) */}
                 <div
                     className={styles.resizer}
                     onMouseDown={startResizing}
-                    style={{ display: layoutMode === 'paper' || activeTab !== 'context' ? 'none' : 'block' }} // Hide in paper mode or mobile tab view logic if applicable, though activeTab is mobile only.
+                    style={{ display: isContextPaneHidden || activeTab !== 'context' ? 'none' : 'block' }} // Hide in paper/collapsed mode or mobile tab view logic if applicable, though activeTab is mobile only.
                 >
                     <div className={styles.resizerHandle} />
                 </div>
@@ -391,18 +408,30 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                 {/* Right Pane: Questions (Scrollable) */}
                 <div
                     className={`${styles.pane} ${styles.answerPane} ${mobileLayout === 'stacked' || activeTab === 'answer' ? styles.active : ''}`}
-                    style={layoutMode !== 'paper' && activeTab === 'context' ? { width: `${100 - contextWidth}%` } : undefined}
+                    style={!isContextPaneHidden && activeTab === 'context' ? { width: `${100 - contextWidth}%` } : undefined}
                 >
                     <div className={styles.answerPaneHeader} data-testid="pm-answer-pane-header">
                         <div className={styles.answerSummary}>
                             <h2 className={styles.answerPaneTitle}>設問一覧</h2>
                             <span className={styles.answerPaneSubtitle}>解答欄 {answerFieldCount}</span>
                         </div>
-                        {/* Total Score Display */}
-                        <div className={styles.scoreDisplay} aria-label="総合スコア 100点満点">
-                            <div className={styles.scoreLabel}>スコア</div>
-                            <div className={styles.scoreValue}>
-                                {overallScore}<span className={styles.scoreMax}>/100</span>
+                        <div className={styles.answerHeaderActions}>
+                            <button
+                                type="button"
+                                className={styles.contextToggleButton}
+                                onClick={toggleContextPane}
+                                aria-expanded={!isContextPaneHidden}
+                                aria-controls="pm-context-pane"
+                            >
+                                <span className={styles.contextToggleIcon} aria-hidden="true">{isContextPaneHidden ? '←' : '→'}</span>
+                                <span className={styles.contextToggleText}>{isContextPaneHidden ? '問題文を表示' : '問題文を隠す'}</span>
+                            </button>
+                            {/* Total Score Display */}
+                            <div className={styles.scoreDisplay} aria-label="総合スコア 100点満点">
+                                <div className={styles.scoreLabel}>スコア</div>
+                                <div className={styles.scoreValue}>
+                                    {overallScore}<span className={styles.scoreMax}>/100</span>
+                                </div>
                             </div>
                         </div>
                     </div>
