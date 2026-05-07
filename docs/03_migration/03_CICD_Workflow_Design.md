@@ -33,7 +33,7 @@ on:
 env:
   AZURE_WEBAPP_NAME: app-pm-exam-dx-prod
   AZURE_WEBAPP_PACKAGE_PATH: './apps/web/.next/standalone'
-  NODE_VERSION: '20.x'
+  NODE_VERSION: '24.x'
 
 jobs:
   build:
@@ -41,10 +41,10 @@ jobs:
     name: Build
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -64,7 +64,7 @@ jobs:
           cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: node-app
           path: apps/web/.next/standalone
@@ -81,7 +81,7 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: node-app
           path: ./deploy
@@ -101,10 +101,10 @@ jobs:
     name: PR Build Check
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -148,7 +148,7 @@ permissions:
 
 steps:
   - name: Azure Login
-    uses: azure/login@v2
+    uses: azure/login@v3
     with:
       client-id: ${{ secrets.AZURE_CLIENT_ID }}
       tenant-id: ${{ secrets.AZURE_TENANT_ID }}

@@ -10,7 +10,7 @@
   - `apps/*`: アプリケーション (web, api, api-ai)
   - `packages/*`: 共通ライブラリ
 - **PackageManager**: `npm@10.9.2`
-- **Node.js バージョン**: `20` (LTS)
+- **Node.js バージョン**: `>=20 <25` (CI は Node.js 24 LTS)
 - **Scripts**:
   - `dev`: `turbo run dev`
   - `build`: `turbo run build`

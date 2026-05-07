@@ -14,10 +14,10 @@ jobs:
     name: Exam Data Fallback Guard
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
       - name: Run guard
         run: node scripts/guard-exam-data-fallback.mjs
 
@@ -26,10 +26,10 @@ jobs:
     name: Standalone Bundle Data Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
       - run: npm ci
       - name: Build web (standalone)
