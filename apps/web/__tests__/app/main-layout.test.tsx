@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import DashboardLayout from '@/app/(main)/layout';
 
 vi.mock('next-auth/react', () => ({
@@ -40,5 +40,19 @@ describe('DashboardLayout', () => {
 
     expect(screen.getByRole('button', { name: 'サイドナビを隠す' })).toHaveAttribute('aria-expanded', 'true');
     expect(window.localStorage.getItem('ipalab_main_sidebar_collapsed_v1')).toBe('false');
+  });
+
+  it('保存済みの縮小状態を復元する', async () => {
+    window.localStorage.setItem('ipalab_main_sidebar_collapsed_v1', 'true');
+
+    render(
+      <DashboardLayout>
+        <div>本文</div>
+      </DashboardLayout>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'サイドナビを表示' })).toBeInTheDocument();
+    });
   });
 });
