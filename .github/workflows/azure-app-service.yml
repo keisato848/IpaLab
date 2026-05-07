@@ -31,6 +31,7 @@ on:
 
 permissions:
   contents: read
+  actions: read     # gh run download でビルド成果物を取得するために必要
   pull-requests: write  # Staging デプロイ完了後のPRコメント投稿に必要
 
 env:
@@ -154,10 +155,9 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v8
-        with:
-          name: webapp-artifact
-          path: ./deploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download ${{ github.run_id }} --name webapp-artifact --dir ./deploy
 
       - name: Display structure of downloaded files
         run: |
@@ -278,10 +278,9 @@ jobs:
 
       - name: Download artifact from build job
         if: steps.config-check.outputs.configured == 'true'
-        uses: actions/download-artifact@v8
-        with:
-          name: webapp-artifact
-          path: ./deploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download ${{ github.run_id }} --name webapp-artifact --dir ./deploy
 
       - name: Display deploy structure
         if: steps.config-check.outputs.configured == 'true'
