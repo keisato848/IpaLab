@@ -9,9 +9,9 @@ Azure Static Web Apps から Azure App Service への移行に伴い、CI/CD パ
 | 項目 | 現行 (SWA) | 新構成 (App Service) |
 |------|-----------|---------------------|
 | GitHub Actions ファイル | `azure-static-web-apps.yml` | `azure-app-service.yml` |
-| デプロイアクション | `Azure/static-web-apps-deploy@v1` | `Azure/webapps-deploy@v3` |
+| デプロイ方式 | `Azure/static-web-apps-deploy@v1` | Azure CLI `az webapp deploy` |
 | ビルド場所 | Azure Oryx (SWA 側) | GitHub Actions (self-build) |
-| 認証方式 | `AZURE_STATIC_WEB_APPS_API_TOKEN` | Publish Profile or OIDC |
+| 認証方式 | `AZURE_STATIC_WEB_APPS_API_TOKEN` | Service Principal (`AZURE_CREDENTIALS`) or OIDC |
 | ステージング | PR ごとの一時環境 | デプロイスロット (S1以上) |
 
 ## 3. 新しい GitHub Actions ワークフロー
@@ -75,9 +75,6 @@ jobs:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     name: Deploy
-    environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
       - name: Download artifact from build job
@@ -87,12 +84,14 @@ jobs:
           path: ./deploy
 
       - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ./deploy
+        run: |
+          rm -f deploy.zip
+          (cd deploy && zip -qr ../deploy.zip .)
+          az webapp deploy \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group rg-pm-exam-dx-prod \
+            --src-path deploy.zip \
+            --type zip
 
   # PR 時のビルド検証（デプロイはしない）
   pr-check:
@@ -123,21 +122,26 @@ jobs:
 
 ### 3.2 認証方式
 
-#### オプション A: Publish Profile（推奨・シンプル）
+#### オプション A: Service Principal + Azure CLI（推奨）
 
 ```yaml
-- name: Deploy to Azure Web App
-  uses: azure/webapps-deploy@v3
+- name: Azure Login
+  uses: azure/login@v3
   with:
-    app-name: ${{ env.AZURE_WEBAPP_NAME }}
-    publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-    package: ./deploy
+    creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+- name: Deploy to Azure Web App
+  run: |
+    rm -f deploy.zip
+    (cd deploy && zip -qr ../deploy.zip .)
+    az webapp deploy \
+      --name ${{ env.AZURE_WEBAPP_NAME }} \
+      --resource-group rg-pm-exam-dx-prod \
+      --src-path deploy.zip \
+      --type zip
 ```
 
-**Publish Profile の取得方法:**
-1. Azure Portal > App Service > `app-pm-exam-dx-prod`
-2. 「概要」>「発行プロファイルの取得」
-3. ダウンロードした XML を GitHub Secrets に `AZURE_WEBAPP_PUBLISH_PROFILE` として登録
+従来の Azure 公式デプロイ Action は後継メジャータグが未提供のため、Node.js ランタイム警告を避ける目的で Azure CLI の Zip Deploy を使用する。
 
 #### オプション B: OIDC (OpenID Connect)（より安全）
 
@@ -155,10 +159,14 @@ steps:
       subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   - name: Deploy to Azure Web App
-    uses: azure/webapps-deploy@v3
-    with:
-      app-name: ${{ env.AZURE_WEBAPP_NAME }}
-      package: ./deploy
+    run: |
+      rm -f deploy.zip
+      (cd deploy && zip -qr ../deploy.zip .)
+      az webapp deploy \
+        --name ${{ env.AZURE_WEBAPP_NAME }} \
+        --resource-group rg-pm-exam-dx-prod \
+        --src-path deploy.zip \
+        --type zip
 ```
 
 ## 4. GitHub Secrets 設定
@@ -167,7 +175,7 @@ steps:
 
 | シークレット名 | 説明 | 取得方法 |
 |---------------|------|---------|
-| `AZURE_WEBAPP_PUBLISH_PROFILE` | App Service 発行プロファイル | Azure Portal からダウンロード |
+| `AZURE_CREDENTIALS` | App Service デプロイ用 Service Principal JSON | Azure CLI で作成 |
 | `APPLICATIONINSIGHTS_CONNECTION_STRING` | Application Insights 接続文字列 | Azure Portal > Application Insights |
 
 ### 4.2 OIDC 方式の場合（追加）
@@ -299,7 +307,7 @@ az webapp deployment source sync --name app-pm-exam-dx-prod --resource-group rg-
 ```yaml
 - name: Notify on failure
   if: failure()
-  uses: actions/github-script@v7
+  uses: actions/github-script@v8
   with:
     script: |
       github.rest.issues.createComment({
@@ -323,7 +331,7 @@ az webapp deployment source sync --name app-pm-exam-dx-prod --resource-group rg-
 
 ### 設定作業
 - [ ] `.github/workflows/azure-app-service.yml` を作成
-- [ ] GitHub Secrets に `AZURE_WEBAPP_PUBLISH_PROFILE` を設定
+- [ ] GitHub Secrets に `AZURE_CREDENTIALS` を設定
 - [ ] GitHub Secrets に `APPLICATIONINSIGHTS_CONNECTION_STRING` を設定
 - [ ] App Service のスタートアップコマンドを設定
 
@@ -340,5 +348,5 @@ az webapp deployment source sync --name app-pm-exam-dx-prod --resource-group rg-
 ---
 
 **作成日**: 2026-02-04
-**更新日**: 2026-02-04
+**更新日**: 2026-05-07
 **ステータス**: 設計完了

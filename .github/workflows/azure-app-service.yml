@@ -222,11 +222,15 @@ jobs:
               TELEMETRY_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}"
 
       - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          package: ./deploy
+        run: |
+          rm -f deploy.zip
+          (cd deploy && zip -qr ../deploy.zip .)
+          ls -lh deploy.zip
+          az webapp deploy \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group rg-pm-exam-dx-prod \
+            --src-path deploy.zip \
+            --type zip
 
       # VNet 統合の維持確認 (CosmosDB ゼロトラスト保護)
       # コードデプロイでは VNet 統合設定は影響を受けないが、念のため確認
@@ -347,11 +351,15 @@ jobs:
 
       - name: Deploy to Staging Web App
         if: steps.config-check.outputs.configured == 'true'
-        id: deploy-to-staging
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.STAGING_APP_NAME }}
-          package: ./deploy
+        run: |
+          rm -f deploy.zip
+          (cd deploy && zip -qr ../deploy.zip .)
+          ls -lh deploy.zip
+          az webapp deploy \
+            --name "$STAGING_APP_NAME" \
+            --resource-group "$STAGING_RG" \
+            --src-path deploy.zip \
+            --type zip
 
       - name: Azure Logout
         if: steps.config-check.outputs.configured == 'true'
@@ -361,7 +369,7 @@ jobs:
       # secrets は github-script 内で直接展開できないため、env 経由で渡す
       - name: Comment PR with Staging URL
         if: steps.config-check.outputs.configured == 'true'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           STAGING_APP_NAME: ${{ env.STAGING_APP_NAME }}
         with:
