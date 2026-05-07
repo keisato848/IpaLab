@@ -1,7 +1,7 @@
 // Rebuild Trigger (Fixed)
 import Link from 'next/link';
 import { Question } from '@/lib/api';
-import { findQuestionByNo, hasSuspiciousPlaceholderQuestions, loadFilesystemQuestions } from '@/lib/exam-data';
+import { findQuestionByNo, findQuestionByNoOrPosition, hasSuspiciousPlaceholderQuestions, loadFilesystemQuestions } from '@/lib/exam-data';
 import QuestionClient from '@/components/features/exam/QuestionClient';
 import styles from './page.module.css';
 import { Suspense } from 'react';
@@ -23,10 +23,11 @@ export async function generateMetadata({ params }: { params: Promise<{ year: str
 
     try {
         const questions = await questionRepository.listByExamId(examId);
-        let question = findQuestionByNo(questions as unknown as Question[], Number.parseInt(qNo, 10));
+        const qNoInt = Number.parseInt(qNo, 10);
+        let question = findQuestionByNoOrPosition(questions as unknown as Question[], qNoInt);
         if (!question) {
             const fsQuestions = await loadFilesystemQuestions(examId);
-            question = findQuestionByNo(fsQuestions, Number.parseInt(qNo, 10));
+            question = findQuestionByNoOrPosition(fsQuestions, qNoInt);
         }
 
         if (!question) return { title: `Not Found` };
@@ -107,7 +108,7 @@ export default async function ExamQuestionPage({ params }: { params: Promise<{ y
     }
 
     // Find current question by qNo
-    const question = findQuestionByNo(questions, qNoInt);
+    const question = findQuestionByNoOrPosition(questions, qNoInt);
 
     if (!question) {
         // examId 配下のデータが0件 or DBエラー → "見つからない"ではなく"準備中/障害"として案内

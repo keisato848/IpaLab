@@ -8,6 +8,116 @@
     color: var(--text-primary);
 }
 
+.pmExamShell {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.pmExamHeader {
+    min-height: 64px;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+}
+
+.pmHeaderInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.pmBrandLink {
+    flex: none;
+    color: var(--accent-color);
+    font-size: var(--fs-xl);
+    font-weight: 800;
+    text-decoration: none;
+    letter-spacing: 0;
+}
+
+.pmExamMeta {
+    min-width: 0;
+    padding-left: 1rem;
+    border-left: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pmHeaderActions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: none;
+}
+
+.pmExitButton {
+    min-height: 40px;
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--card-shadow, 0 1px 3px rgba(0, 0, 0, 0.08));
+    transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.pmExitButton:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: var(--bg-secondary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.pmExamContent {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .pmExamHeader {
+        min-height: 56px;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .pmHeaderInfo {
+        gap: 0.75rem;
+    }
+
+    .pmBrandLink {
+        font-size: var(--fs-lg);
+    }
+
+    .pmExamMeta {
+        padding-left: 0.75rem;
+        font-size: var(--fs-xs);
+    }
+
+    .pmExitButton {
+        min-height: 36px;
+        padding: 0.45rem 0.75rem;
+        font-size: var(--fs-xs);
+    }
+}
+
 /* Two-row header structure */
 .header {
     background: var(--bg-secondary);

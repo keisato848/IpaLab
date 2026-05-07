@@ -17,12 +17,59 @@ import { normalizeMermaidCodeBlocks } from '@/lib/mermaid/sanitize';
 import styles from './SCPMExamView.module.css';
 import AIAnswerBox from './AIAnswerBox';
 import { ScoreResult } from './AIAnswerBox';
+import { buildPMAnswerFieldId, buildPMDraftKey, extractAnswerLimit } from './pmAnswerUtils';
 // Replaced missing UI components with native elements
 // import { Badge } from '@/components/ui/badge';
 // import { Button } from '@/components/ui/button';
 
 // Dynamic import for Mermaid to avoid SSR issues
 const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false });
+
+const hasText = (value: unknown) => typeof value === 'string' && value.trim().length > 0;
+
+const hasDirectAnswerContent = (item: any) => {
+    return hasText(item?.answer) || hasText(item?.explanation) || hasText(item?.modelAnswer);
+};
+
+const buildSectionAnswerItem = (section: any) => ({
+    label: section.subQNo || section.label || '解答',
+    text: '',
+    promptText: section.text || '',
+    references: section.references || [],
+    answer: section.answer || section.modelAnswer || '',
+    explanation: section.explanation || '',
+    point: section.point,
+});
+
+const getAnswerItems = (section: any) => {
+    const childItems = Array.isArray(section?.subQuestions) && section.subQuestions.length > 0
+        ? section.subQuestions
+        : Array.isArray(section?.questions) && section.questions.length > 0
+            ? section.questions
+            : [];
+
+    const items: any[] = [];
+    if (hasDirectAnswerContent(section)) {
+        items.push(buildSectionAnswerItem(section));
+    }
+
+    if (childItems.length > 0) {
+        return [...items, ...childItems];
+    }
+
+    if (items.length > 0) {
+        return items;
+    }
+
+    return hasText(section?.text) ? [buildSectionAnswerItem(section)] : [];
+};
+
+const countAnswerFields = (questions: any[] | undefined) => {
+    if (!questions) return 0;
+    return questions.reduce((total, item) => {
+        return total + getAnswerItems(item).length;
+    }, 0);
+};
 
 // Custom renderer for ReactMarkdown to handle Mermaid diagrams
 const markdownComponents = {
@@ -66,7 +113,7 @@ const RechartsPMRadar = dynamic(
 interface SCPMExamViewProps {
     question: Question;
     onAnswerSubmit?: (subQNo: string | number, answer: string) => void;
-    onGrade?: (data: { answer: string; result: ScoreResult }, subQIndex: number) => void;
+    onGrade?: (data: { answer: string; result: ScoreResult }, subQIndex: number, subSubIndex?: number) => void;
     descriptiveHistory?: Record<string, { answer: string; result: any }>; // Pass history
 }
 
@@ -224,7 +271,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
 
     let aggregatedData = [...defaultRadar];
     let totalScore = 0;
-    let maxScore = 0;
+    let answeredScoreCount = 0;
 
     if (descriptiveHistory) {
         // Sum up
@@ -232,8 +279,8 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
         Object.values(descriptiveHistory).forEach(entry => {
             if (entry.result && entry.result.radarChartData) {
                 count++;
+                answeredScoreCount++;
                 totalScore += entry.result.score || 0;
-                maxScore += 100; // Assume 100 per question
 
                 entry.result.radarChartData.forEach((d: any) => {
                     const target = aggregatedData.find(ad => ad.subject === d.subject);
@@ -258,6 +305,9 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
             }));
         }
     }
+
+    const overallScore = answeredScoreCount > 0 ? Math.round(totalScore / answeredScoreCount) : 0;
+    const answerFieldCount = countAnswerFields(questions);
 
 
 
@@ -343,22 +393,22 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                     className={`${styles.pane} ${styles.answerPane} ${mobileLayout === 'stacked' || activeTab === 'answer' ? styles.active : ''}`}
                     style={layoutMode !== 'paper' && activeTab === 'context' ? { width: `${100 - contextWidth}%` } : undefined}
                 >
-                    <div className={styles.answerPaneHeader}>
-                        <div>
+                    <div className={styles.answerPaneHeader} data-testid="pm-answer-pane-header">
+                        <div className={styles.answerSummary}>
                             <h2 className={styles.answerPaneTitle}>設問一覧</h2>
-                            <p className={styles.answerPaneSubtitle}>全{questions?.length || 0}問</p>
+                            <span className={styles.answerPaneSubtitle}>解答欄 {answerFieldCount}</span>
                         </div>
                         {/* Total Score Display */}
-                        <div className={styles.scoreDisplay}>
-                            <div className={styles.scoreLabel}>総合スコア (目安)</div>
+                        <div className={styles.scoreDisplay} aria-label="総合スコア 100点満点">
+                            <div className={styles.scoreLabel}>スコア</div>
                             <div className={styles.scoreValue}>
-                                {totalScore} <span className={styles.scoreMax}>/ {questions ? questions.length * 100 : 0}</span>
+                                {overallScore}<span className={styles.scoreMax}>/100</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Global Radar Chart Area */}
-                    {totalScore > 0 && (
+                    {answeredScoreCount > 0 && (
                         <div className={styles.radarContainer}>
                             <h3 className={styles.radarTitle}>回答傾向分析 (全設問平均)</h3>
                             <div className={styles.radarChart}>
@@ -373,9 +423,14 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                                 key={q.id || idx}
                                 question={q}
                                 index={idx}
+                                parentQuestionId={question.id}
                                 parentContext={context}
-                                onGrade={onGrade ? (data) => onGrade(data, idx) : undefined}
-                                initialData={descriptiveHistory ? descriptiveHistory[q.id || `sq-${idx}`] : undefined}
+                                onGrade={onGrade ? (data, subSubIndex) => onGrade(data, idx, subSubIndex) : undefined}
+                                getInitialData={(subSubIndex) => {
+                                    if (!descriptiveHistory) return undefined;
+                                    return descriptiveHistory[buildPMAnswerFieldId(question.id, idx, subSubIndex)]
+                                        || descriptiveHistory[q.id || `sq-${idx}`];
+                                }}
                             />
                         ))}
                     </div>
@@ -386,11 +441,12 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
 
 }
 
-function SubQuestionBlock({ question, index, parentContext, onGrade, initialData }: { question: any, index: number, parentContext: any, onGrade?: (data: any) => void, initialData?: any }) {
+function SubQuestionBlock({ question, index, parentQuestionId, parentContext, onGrade, getInitialData }: { question: any, index: number, parentQuestionId: string, parentContext: any, onGrade?: (data: any, subSubIndex?: number) => void, getInitialData?: (subSubIndex?: number) => any }) {
     const normalizedQuestionText = useMemo(
         () => normalizeMermaidCodeBlocks(question.text),
         [question.text]
     );
+    const answerItems = useMemo(() => getAnswerItems(question), [question]);
 
     return (
         <div className={styles.subQuestionBlock}>
@@ -405,16 +461,16 @@ function SubQuestionBlock({ question, index, parentContext, onGrade, initialData
                 </div>
             </div>
 
-            {/* Sub-sub questions if any */}
-            {question.subQuestions && question.subQuestions.length > 0 && (
+            {answerItems.length > 0 && (
                 <div className={styles.subQuestionsList}>
-                    {question.subQuestions.map((sq: any, sIdx: number) => (
+                    {answerItems.map((sq: any, sIdx: number) => (
                         <SubQuestionItem
                             key={sIdx}
                             sq={sq}
                             sIdx={sIdx}
-                            onGrade={onGrade}
-                            initialData={initialData}
+                            answerFieldId={buildPMAnswerFieldId(parentQuestionId, index, sIdx)}
+                            onGrade={onGrade ? (data) => onGrade(data, sIdx) : undefined}
+                            initialData={getInitialData?.(sIdx)}
                         />
                     ))}
                 </div>
@@ -423,36 +479,42 @@ function SubQuestionBlock({ question, index, parentContext, onGrade, initialData
     );
 }
 
-function SubQuestionItem({ sq, sIdx, onGrade, initialData }: { sq: any, sIdx: number, onGrade?: (data: any) => void, initialData?: any }) {
+function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, initialData }: { sq: any, sIdx: number, answerFieldId: string, onGrade?: (data: any) => void, initialData?: any }) {
     const [showExplanation, setShowExplanation] = useState(false);
     const normalizedText = useMemo(
         () => normalizeMermaidCodeBlocks(sq.text),
         [sq.text]
     );
+    const promptText = sq.promptText || sq.text || '';
+    const answerLimit = useMemo(() => extractAnswerLimit(promptText), [promptText]);
 
     return (
         <div className={styles.subQuestionItem}>
-            <div className={styles.subQuestionItemHeader}>
-                <span className={styles.subQuestionLabel}>
-                    {sq.label}
-                </span>
-                <div className={`${styles.markdownContent} ${styles.subQuestionItemText}`}>
-                    <ReactMarkdown
-                        remarkPlugins={[remarkGfm, remarkMath] as any}
-                        rehypePlugins={[rehypeRaw, rehypeKatex] as any}
-                        components={markdownComponents}
-                    >{normalizedText}</ReactMarkdown>
+            {hasText(sq.text) && (
+                <div className={styles.subQuestionItemHeader}>
+                    <span className={styles.subQuestionLabel}>
+                        {sq.label}
+                    </span>
+                    <div className={`${styles.markdownContent} ${styles.subQuestionItemText}`}>
+                        <ReactMarkdown
+                            remarkPlugins={[remarkGfm, remarkMath] as any}
+                            rehypePlugins={[rehypeRaw, rehypeKatex] as any}
+                            components={markdownComponents}
+                        >{normalizedText}</ReactMarkdown>
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* AI Grading Box */}
             <div style={{ marginTop: '1rem' }}>
                 <AIAnswerBox
-                    questionText={`[${sq.label}] ${sq.text}`}
+                    questionText={`[${sq.label}] ${promptText}`}
                     modelAnswer={sq.answer}
+                    limit={answerLimit}
                     onSave={onGrade}
                     initialAnswer={initialData?.answer}
                     initialResult={initialData?.result}
+                    draftKey={buildPMDraftKey(answerFieldId)}
                     hideChart={true}
                 />
             </div>

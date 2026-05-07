@@ -21,7 +21,7 @@ test.describe('P0午後問題 transformed データ表示', () => {
 
       await expect(page.getByText(item.title).first()).toBeVisible({ timeout: 30_000 });
       await expect(page.getByRole('heading', { name: '設問一覧' })).toBeVisible();
-      await expect(page.getByText(`全${item.sections}問`)).toBeVisible();
+      await expect(page.getByText(`解答欄 ${item.fields}`)).toBeVisible();
       await expect(page.locator('textarea')).toHaveCount(item.fields);
       await expect(page.getByText('設問データがありません')).toHaveCount(0);
       await expect(page.getByText('図の描画に失敗しました')).toHaveCount(0);
@@ -35,4 +35,48 @@ test.describe('P0午後問題 transformed データ表示', () => {
       await captureEvidence(page, testInfo, `${item.id}_${item.examId}_q${item.qNo}_answer_fields`, { fullPage: false });
     });
   }
+
+  test('P0-11: 新形式午後画面の下書き保存・文字数制限・ヘッダー表示が機能する', async ({ page }, testInfo) => {
+    await page.goto('/exam/SA-2025-Spring-PM1/PM1/1?mode=practice');
+    await page.waitForLoadState('domcontentloaded');
+
+    await expect(page.locator('[aria-label="総合スコア 100点満点"]')).toBeVisible();
+    await expect(page.getByText('0/100')).toBeVisible();
+    await expect(page.getByText(/0 \/ \d+ 文字/).first()).toBeVisible();
+
+    const firstTextarea = page.locator('textarea').first();
+    await firstTextarea.fill('途中保存の確認');
+    await page.getByRole('button', { name: '下書き保存' }).first().click();
+    await expect(page.getByText(/保存済み/).first()).toBeVisible();
+
+    await page.reload();
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('textarea').first()).toHaveValue('途中保存の確認');
+
+    const exitButton = page.getByRole('button', { name: '終了して一覧へ' });
+    await expect(exitButton).toBeVisible();
+    const backgroundColor = await exitButton.evaluate((element) => getComputedStyle(element).backgroundColor);
+    expect(backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+
+    await captureEvidence(page, testInfo, 'P0-11_pm_draft_limit_header', { fullPage: false });
+  });
+
+  test('P0-12: スマホ幅でも解答ヘッダーが1行に収まり解答欄数を表示する', async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/exam/SA-2025-Spring-PM1/PM1/1?mode=practice');
+    await page.waitForLoadState('domcontentloaded');
+
+    const header = page.getByTestId('pm-answer-pane-header');
+    await expect(header).toBeVisible();
+    await expect(header.getByText('設問一覧')).toBeVisible();
+    await expect(header.getByText('解答欄 10')).toBeVisible();
+    await expect(header.getByText('スコア')).toBeVisible();
+    await expect(header.getByText('0/100')).toBeVisible();
+    await expect(header.getByText('全3問')).toHaveCount(0);
+
+    const headerBox = await header.boundingBox();
+    expect(headerBox?.height).toBeLessThanOrEqual(56);
+
+    await captureEvidence(page, testInfo, 'P0-12_mobile_compact_answer_header', { fullPage: false });
+  });
 });

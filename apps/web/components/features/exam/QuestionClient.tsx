@@ -34,6 +34,7 @@ const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false })
 import ExamSummary from './ExamSummary';
 import AIAnswerBox from './AIAnswerBox';
 import SCPMExamView from './SCPMExamView';
+import { buildPMAnswerFieldId, buildPMDraftKey, extractAnswerLimit } from './pmAnswerUtils';
 
 interface QuestionClientProps {
     question: Question;
@@ -310,7 +311,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const isPractice = mode === 'practice';
 
     const getSubQId = (baseId: string, idx: number, subIdx?: number) => {
-        return `${baseId}-${idx}${subIdx !== undefined ? `-${subIdx}` : ''}`;
+        return buildPMAnswerFieldId(baseId, idx, subIdx);
     };
 
     const handleSaveAIScore = async (data: { answer: string; result: any }, subQIdx: number, subSubIdx?: number) => {
@@ -685,35 +686,34 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     // --- SC/PM Exam View Injection (New Format) ---
     if (question.context) {
         return (
-            <div className="flex flex-col h-screen overflow-hidden bg-background">
-                {/* Optional: Keep minimal header or custom header for PM View */}
-                <header className="flex-none h-16 border-b px-4 flex items-center justify-between bg-card text-foreground">
-                    <div className="flex items-center gap-4">
-                        <Link href="/" className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+            <div className={styles.pmExamShell}>
+                <header className={styles.pmExamHeader}>
+                    <div className={styles.pmHeaderInfo}>
+                        <Link href="/" className={styles.pmBrandLink}>
                             IpaLab
                         </Link>
-                        <span className="text-sm font-medium text-muted-foreground border-l pl-4 border-gray-300 dark:border-gray-700">
+                        <span className={styles.pmExamMeta}>
                             {examLabel} {isMock ? '(模試モード)' : ''}
                         </span>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className={styles.pmHeaderActions}>
                         <button
                             onClick={() => router.push(`/exam/${year}/${type}`)}
-                            className="text-sm px-4 py-2 rounded-md font-medium border border-gray-200 dark:border-gray-800 bg-white dark:bg-zinc-950 hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors shadow-sm"
+                            className={styles.pmExitButton}
                         >
                             終了して一覧へ
                         </button>
                     </div>
                 </header>
 
-                <div className="flex-1 overflow-hidden">
+                <div className={styles.pmExamContent}>
                     <SCPMExamView
                         question={question}
                         onAnswerSubmit={(subQIdx, answer) => {
                             // This might be for simple text input updates if needed, 
                             // but AIAnswerBox handles its own state mostly.
                         }}
-                        onGrade={(data, subQIdx) => handleSaveAIScore(data, subQIdx as number)}
+                        onGrade={(data, subQIdx, subSubIdx) => handleSaveAIScore(data, subQIdx as number, subSubIdx)}
                         descriptiveHistory={descriptiveHistory}
                     />
                 </div>
@@ -781,8 +781,10 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                 <AIAnswerBox
                                     questionText={`${question.text}\n\n${currentSubQ.text}`}
                                     modelAnswer=""
+                                    limit={extractAnswerLimit(currentSubQ.text)}
                                     initialAnswer={descriptiveHistory[getSubQId(question.id, currentSubQIndex)]?.answer}
                                     initialResult={descriptiveHistory[getSubQId(question.id, currentSubQIndex)]?.result}
+                                    draftKey={buildPMDraftKey(getSubQId(question.id, currentSubQIndex))}
                                     onSave={(data) => handleSaveAIScore(data, currentSubQIndex)}
                                 />
                             </div>

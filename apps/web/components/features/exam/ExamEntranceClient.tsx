@@ -37,10 +37,31 @@ function formatAttemptDate(dateString: string): string {
     });
 }
 
+function getOrderedQuestionNumbers(questions: Question[]): number[] {
+    return questions
+        .map(question => question.qNo)
+        .filter((qNo): qNo is number => Number.isInteger(qNo) && qNo > 0)
+        .sort((left, right) => left - right);
+}
+
+function getFirstQuestionNumber(questions: Question[]): number {
+    return getOrderedQuestionNumbers(questions)[0] ?? 1;
+}
+
+function getNextQuestionNumber(questions: Question[], currentQuestionNo: number): number {
+    const questionNumbers = getOrderedQuestionNumbers(questions);
+    const currentIndex = questionNumbers.indexOf(currentQuestionNo);
+    if (currentIndex >= 0 && currentIndex < questionNumbers.length - 1) {
+        return questionNumbers[currentIndex + 1];
+    }
+
+    return questionNumbers[0] ?? 1;
+}
+
 export default function ExamEntranceClient({ year, type, examId, examLabel, questions }: ExamEntranceClientProps) {
     const { data: session } = useSession();
     const router = useRouter();
-    const [nextQNo, setNextQNo] = useState<number>(1);
+    const [nextQNo, setNextQNo] = useState<number>(() => getFirstQuestionNumber(questions));
     const [progress, setProgress] = useState<{ completed: number, total: number }>({ completed: 0, total: questions.length });
     const [isLoaded, setIsLoaded] = useState(false);
 
@@ -132,17 +153,15 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                 // Determine Next Question (First Unanswered)
                 const answeredQIds = new Set([...Object.keys(newStatusMap)]);
 
-                let firstUnanswered: number = 1;
+                let firstUnanswered = getFirstQuestionNumber(questions);
                 for (const q of questions) {
                     if (!answeredQIds.has(q.id)) {
                         firstUnanswered = q.qNo;
                         break;
                     }
-                    if (q.qNo >= firstUnanswered) firstUnanswered = q.qNo + 1;
+                    firstUnanswered = getNextQuestionNumber(questions, q.qNo);
                 }
-                if (firstUnanswered > questions.length) firstUnanswered = 1;
-                // If all answered, loop back to 1 (or stay at end?)
-                if (answeredQIds.size >= questions.length && firstUnanswered > questions.length) firstUnanswered = 1;
+                if (answeredQIds.size >= questions.length) firstUnanswered = getFirstQuestionNumber(questions);
 
                 setNextQNo(firstUnanswered);
                 setProgress({ completed: answeredQIds.size, total: questions.length });
@@ -280,7 +299,7 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                         <span className={styles.btnSub}>即座に解説を表示</span>
                     </button>
                     <button
-                        onClick={() => startSession(1, 'mock')}
+                        onClick={() => startSession(getFirstQuestionNumber(questions), 'mock')}
                         className={`${styles.btn} ${styles.btnMock}`}
                     >
                         模擬試験モードで開始
@@ -312,8 +331,9 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                             const accuracyPercent = attempt.answeredCount > 0
                                 ? Math.round((attempt.correctCount / attempt.answeredCount) * 100)
                                 : 0;
-                            const nextQuestionNo = attempt.lastQuestionNo ? attempt.lastQuestionNo + 1 : 1;
-                            const safeQuestionNo = nextQuestionNo > totalQuestions ? 1 : nextQuestionNo;
+                            const safeQuestionNo = attempt.lastQuestionNo
+                                ? getNextQuestionNumber(questions, attempt.lastQuestionNo)
+                                : getFirstQuestionNumber(questions);
                             const continueHref = `/exam/${year}/${type}/${safeQuestionNo}?mode=${attempt.mode}&sessionId=${attempt.id}`;
                             const resultHref = `/exam/${year}/${type}/result?sessionId=${attempt.id}&mode=${attempt.mode}`;
                             const isExpanded = expandedSessionId === attempt.id;
