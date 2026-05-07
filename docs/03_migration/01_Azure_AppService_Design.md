@@ -208,7 +208,7 @@ az webapp create \
   --name app-pm-exam-dx-prod \
   --resource-group rg-pm-exam-dx-prod \
   --plan plan-pm-exam-dx-prod \
-  --runtime "NODE:20-lts"
+  --runtime "NODE:24-lts"
 ```
 
 ### 8.3 Application Insights 有効化
