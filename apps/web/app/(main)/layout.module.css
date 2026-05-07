@@ -22,6 +22,10 @@
 
 .logoArea {
   padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .logo {
@@ -46,6 +50,44 @@
   border-radius: 6px;
   transform: rotate(-10deg);
   box-shadow: 0 4px 12px rgba(0, 118, 243, 0.3);
+}
+
+.sidebarCollapseButton,
+.sidebarRestoreButton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: var(--fs-lg);
+  line-height: 1;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.sidebarCollapseButton:hover,
+.sidebarRestoreButton:hover {
+  background: rgba(0, 112, 243, 0.1);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.sidebarCollapseButton:focus-visible,
+.sidebarRestoreButton:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.sidebarRestoreButton {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1100;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.16);
 }
 
 .mobileLogo {
@@ -245,6 +287,20 @@
 
 /* PC Specific Tweaks - ensuring full width */
 @media (min-width: 769px) {
+  .sidebarCollapseButton,
+  .sidebarRestoreButton {
+    display: inline-flex;
+  }
+
+  .sidebarCollapsed .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebarCollapsed .mainContent {
+    margin-left: 0;
+    width: 100%;
+  }
+
   .mainContent {
     max-width: none;
     /* Remove any previous constraints */

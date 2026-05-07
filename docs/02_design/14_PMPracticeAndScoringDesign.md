@@ -4,6 +4,7 @@
 
 | 日付 | 変更内容 |
 |------|------|
+| 2026-05-07 | 午後解答時にアプリ全体の左サイドナビをデスクトップで開閉できる UI を追加 |
 | 2026-05-07 | 新形式午後画面で解答中に問題文左ペインをトグル表示できる UI を追加 |
 | 2026-05-06 | 変換済み午後データの `subQuestions` 空配列、`section.answer`、`section.questions`、PM2 論述設問を解答欄として扱うフォールバック、疎な `qNo` の位置番号フォールバック、日本語 Mermaid 図表のサニタイズ強化を追加 |
 | 2026-05-06 | 参考静的サイト (`SA/files`) の保存・文字数表示構成を踏まえ、午後解答欄の localStorage 下書き保存、文字数上限表示、100点満点の総合スコア表示、変換済み午後画面ヘッダーの CSS Modules 化を追加 |
@@ -35,6 +36,7 @@
 - 文字数制限の表示と超過時の採点抑止
 - 午後問題の新旧データ形式への対応
 - 新形式午後画面の問題文ペイン開閉 UI
+- 午後解答時のデスクトップサイドナビ開閉 UI
 
 ### 対象外
 
@@ -90,6 +92,14 @@ sequenceDiagram
     View-->>User: 問題文・設問・入力欄を表示
 ```
 
+### 4.1.1 解答中の表示領域調整
+
+1. デスクトップではアプリ左サイドナビの「サイドナビを隠す」ボタンでナビを退避できる
+2. ナビ退避中は本文領域を画面幅いっぱいに広げる
+3. 左上の「サイドナビを表示」ボタンでナビを復元する
+4. 新形式午後画面では、必要に応じて問題文ペインも「問題文を隠す / 表示」で開閉できる
+5. サイドナビの開閉状態は localStorage に保存し、解答中の再読み込み後も維持する
+
 ### 4.2 AI 採点
 
 ```mermaid
@@ -124,6 +134,7 @@ sequenceDiagram
 | Component | `apps/web/components/features/exam/QuestionClient.tsx` | 午後形式判定、採点結果保存、統計更新 |
 | Component | `apps/web/components/features/exam/AIAnswerBox.tsx` | 回答入力、採点 API 呼び出し、スコア表示 |
 | Component | `apps/web/components/features/exam/SCPMExamView.tsx` | 新形式ケース問題の分割表示と図表参照 |
+| Component | `apps/web/app/(main)/layout.tsx` | メインサイドナビ表示とデスクトップ開閉状態の保持 |
 | Utility | `apps/web/components/features/exam/pmAnswerUtils.ts` | 午後答案の文字数制限抽出、設問ID、下書き保存キー生成 |
 | Component | `apps/web/components/features/exam/ExamSummary.tsx` | 総合スコアとレーダー集計表示 |
 | API | `apps/web/app/api/score/route.ts` | Gemini を用いた CLKS 採点 |
