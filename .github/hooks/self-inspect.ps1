@@ -28,6 +28,11 @@
 #   R16. AM/AM2 問題データ差分で answers/questions の qNo・正答・選択肢が不整合なパターン
 #   R17. PM/PM1/PM2 問題データ差分で questions_transformed.json が欠落し、解答欄が生成されないパターン
 #   R18. Mermaid 図表データ差分でブラウザ描画に失敗しやすいリンクラベル・節点表記を含むパターン
+#   R19. 新形式午後画面で Tailwind 風の未適用クラスへ戻り、ヘッダー/終了ボタンのスタイルが欠落するパターン
+#   R20. AIAnswerBox から午後答案の下書き保存・文字数制限が消えるパターン
+#   R21. SCPMExamView の総合スコアが 100 点満点ではなく小問合計点表示へ戻るパターン
+#   R22. SCPMExamView が subQuestions 以外の午後データ形を解答欄化できなくなるパターン
+#   R23. Mermaid サニタイズが日本語 ER 図・日本語 subgraph を扱えなくなるパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -651,13 +656,105 @@ foreach ($relPath in $changedQuestionDataFiles) {
     }
 }
 
+# ---------------------------------------------------------------------------
+# R19: 新形式午後画面で Tailwind 風の未適用クラスへ戻っていないか
+#      (CSS Modules ベースでないと「終了して一覧へ」ボタンやヘッダー背景が未適用になる)
+# ---------------------------------------------------------------------------
+if (Test-Path $questionClient) {
+    $raw = Get-Content -LiteralPath $questionClient -Raw
+    $badPmShellPatterns = @(
+        'className="flex flex-col h-screen overflow-hidden bg-background"',
+        'className="flex-none h-16 border-b px-4 flex items-center justify-between bg-card text-foreground"',
+        'className="text-sm px-4 py-2 rounded-md font-medium border'
+    )
+
+    foreach ($pattern in $badPmShellPatterns) {
+        if ($raw -match [regex]::Escape($pattern)) {
+            Add-Finding -Rule 'R19-pm-shell-unscoped-utility-classes' -Severity 'High' `
+                -File $questionClient `
+                -Detail '新形式午後画面のヘッダー/終了ボタンが Tailwind 風の未適用クラスへ戻っています (推奨: QuestionClient.module.css の pmExamShell / pmExitButton を使用)'
+            break
+        }
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R20: 午後答案の下書き保存・文字数制限が AIAnswerBox から消えていないか
+#      (午後試験は採点前に長文回答を中断・復元できる必要がある)
+# ---------------------------------------------------------------------------
+$aiAnswerBox = Join-Path $WebRoot 'components\features\exam\AIAnswerBox.tsx'
+if (Test-Path $aiAnswerBox) {
+    $raw = Get-Content -LiteralPath $aiAnswerBox -Raw
+    if ($raw -notmatch 'draftKey' -or
+        $raw -notmatch 'localStorage\.setItem\(draftKey' -or
+        $raw -notmatch 'isOverLimit' -or
+        $raw -notmatch '文字数制限を超えています') {
+        Add-Finding -Rule 'R20-pm-draft-and-limit-missing' -Severity 'High' `
+            -File $aiAnswerBox `
+            -Detail 'AIAnswerBox の午後答案下書き保存または文字数制限表示が欠落しています (推奨: draftKey + localStorage + isOverLimit を維持)'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R21: SCPMExamView の総合スコアが小問合計点表示へ戻っていないか
+#      (例: 300/300 は利用者に意味が伝わらないため、回答済み小問の平均を /100 で表示する)
+# ---------------------------------------------------------------------------
+$scpmExamView = Join-Path $WebRoot 'components\features\exam\SCPMExamView.tsx'
+if (Test-Path $scpmExamView) {
+    $raw = Get-Content -LiteralPath $scpmExamView -Raw
+    if ($raw -match 'questions\s*\?\s*questions\.length\s*\*\s*100' -or
+        $raw -match 'scoreMax[^\n]+questions\.length\s*\*\s*100' -or
+        $raw -notmatch 'aria-label="総合スコア 100点満点"' -or
+        $raw -notmatch 'answerFieldCount' -or
+        $raw -match '全\{questions\?\.length \|\| 0\}問' -or
+        $raw -notmatch 'Math\.round\(totalScore / answeredScoreCount\)') {
+        Add-Finding -Rule 'R21-pm-overall-score-100-scale' -Severity 'High' `
+            -File $scpmExamView `
+            -Detail 'SCPMExamView の総合スコアまたは設問数表示が逸脱しています (推奨: answeredScoreCount 平均 + /100、解答欄数表示)'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R22: 新形式午後画面が subQuestions 以外の既存データ形を解答欄化できるか
+#      (section.answer / section.questions / subQuestions 空配列の午後データで textarea 欠落を再発させない)
+# ---------------------------------------------------------------------------
+if (Test-Path $scpmExamView) {
+    $raw = Get-Content -LiteralPath $scpmExamView -Raw
+    if ($raw -notmatch 'getAnswerItems' -or
+        $raw -notmatch 'section\?\.questions' -or
+        $raw -notmatch 'hasDirectAnswerContent' -or
+        $raw -notmatch 'promptText') {
+        Add-Finding -Rule 'R22-pm-section-answer-field-fallback' -Severity 'High' `
+            -File $scpmExamView `
+            -Detail 'SCPMExamView が subQuestions 以外の section.answer / section.questions / 空 subQuestions を解答欄として扱えない状態です'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R23: Mermaid サニタイズが日本語 ER 図・日本語 subgraph を扱えるか
+#      (SC/PM 午後データの図表で「図の描画に失敗しました」を再発させない)
+# ---------------------------------------------------------------------------
+$mermaidSanitize = Join-Path $WebRoot 'lib\mermaid\sanitize.ts'
+if (Test-Path $mermaidSanitize) {
+    $raw = Get-Content -LiteralPath $mermaidSanitize -Raw
+    if ($raw -notmatch 'convertErDiagramToFlowchart' -or
+        $raw -notmatch 'sanitizeSubgraphLabels' -or
+        $raw -notmatch 'relationCardinality' -or
+        $raw -notmatch '\(\(' -or
+        $raw -notmatch '\[\^\\x00-\\x7F\]') {
+        Add-Finding -Rule 'R23-mermaid-japanese-diagram-sanitize' -Severity 'Medium' `
+            -File $mermaidSanitize `
+            -Detail 'Mermaid サニタイズが日本語 ER 図・日本語 subgraph・日本語ノードラベルの描画失敗を防ぐ実装から逸脱しています'
+    }
+}
+
 $tag = if ($Mode -eq 'start') { 'SESSION-START' } else { 'SESSION-END' }
 Write-Host ""
 Write-Host "## [self-inspect $tag] 自己点検レポート"
 Write-Host ""
 
 if ($findings.Count -eq 0) {
-    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16 / R17 / R18)"
+    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16 / R17 / R18 / R19 / R20 / R21 / R22 / R23)"
     exit 0
 }
 
@@ -671,7 +768,7 @@ foreach ($f in $findings) {
 }
 
 Write-Host ""
-Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から接続文字列・API キー実値を除去 / R13 → download.ts で content-type と %PDF- ヘッダーを検証し、壊れた既存 PDF は再取得する / R14 → npx 直接 spawn ではなく process.execPath + ts-node/register を使う / R15 → npm_config_* と node --require ts-node/register で npm run 引数を安定化する / R16 → AM/AM2 の answers_raw.json と questions_raw.json の qNo・correctOption・選択肢を同期する / R17 → PM/PM1/PM2 は questions_transformed.json と subQuestions 解答欄を同期する / R18 → Mermaid のリンクラベルは -->|label| または ---|label| に正規化し、非ASCIIの円形節点ラベルは引用する"
+Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から接続文字列・API キー実値を除去 / R13 → download.ts で content-type と %PDF- ヘッダーを検証し、壊れた既存 PDF は再取得する / R14 → npx 直接 spawn ではなく process.execPath + ts-node/register を使う / R15 → npm_config_* と node --require ts-node/register で npm run 引数を安定化する / R16 → AM/AM2 の answers_raw.json と questions_raw.json の qNo・correctOption・選択肢を同期する / R17 → PM/PM1/PM2 は questions_transformed.json と subQuestions 解答欄を同期する / R18 → Mermaid のリンクラベルは -->|label| または ---|label| に正規化し、非ASCIIの円形節点ラベルは引用する / R19 → 新形式午後ヘッダーは CSS Modules を使う / R20 → AIAnswerBox の draftKey・文字数制限を維持する / R21 → 新形式午後の総合スコアは平均を /100、件数は解答欄数で表示する / R22 → section.answer・section.questions・空 subQuestions も解答欄化する / R23 → 日本語 ER 図・subgraph は sanitizeMermaid で描画可能に正規化する"
 
 if ($FailOnFinding) { exit 1 }
 exit 0

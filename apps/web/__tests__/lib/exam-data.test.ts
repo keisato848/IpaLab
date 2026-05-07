@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
     findQuestionByNo,
+    findQuestionByNoOrPosition,
     hasSuspiciousPlaceholderQuestions,
     normalizeExamQuestions,
     resolveQuestionNo,
@@ -34,6 +35,16 @@ describe('exam-data', () => {
 
         expect(resolveQuestionNo('1')).toBe(1);
         expect(findQuestionByNo(questions, 1)?.id).toBe('AP-PM-1');
+    });
+
+    it('qNo が疎な午後データでは位置番号で利用可能な問題へフォールバックする', () => {
+        const questions = [
+            { id: 'AP-2025-Spring-PM-1', examId: 'AP-2025-Spring-PM', qNo: 1, text: 'Q1' },
+            { id: 'AP-2025-Spring-PM-3', examId: 'AP-2025-Spring-PM', qNo: 3, text: 'Q3' },
+        ] as any;
+
+        expect(findQuestionByNoOrPosition(questions, 2)?.id).toBe('AP-2025-Spring-PM-3');
+        expect(findQuestionByNoOrPosition(questions, 3)?.id).toBe('AP-2025-Spring-PM-3');
     });
 
     it('午後問題の qNo=99 だけのデータを同期プレースホルダーとして検知する', () => {

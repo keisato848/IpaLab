@@ -41,12 +41,11 @@ describe('sanitizeMermaid', () => {
         expect(sanitizeMermaid(input)).toContain('C["演算 n: M, -1, 1"]');
     });
 
-    it('does not quote simple labels', () => {
+    it('quotes non-ASCII labels so Mermaid 10 can parse them consistently', () => {
         const input = 'graph TD\nA[開始]\nF[終了]';
         const out = sanitizeMermaid(input);
-        expect(out).toContain('A[開始]');
-        expect(out).toContain('F[終了]');
-        expect(out).not.toContain('"開始"');
+        expect(out).toContain('A["開始"]');
+        expect(out).toContain('F["終了"]');
     });
 
     it('does not double-quote already quoted labels', () => {
@@ -95,12 +94,114 @@ describe('sanitizeMermaid', () => {
             '    C --> E --> F',
         ].join('\n');
         const out = sanitizeMermaid(input);
-        expect(out).toContain('A[開始]');
+        expect(out).toContain('A["開始"]');
         expect(out).toContain('B["x <- 1"]');
         expect(out).toContain('C["演算 n: M, -1, 1"]');
         expect(out).toContain('D["x <- (x x n)"]');
-        expect(out).toContain('E[演算]');
+        expect(out).toContain('E["演算"]');
         expect(out).toContain('A --> B --> C');
+    });
+
+    it('quotes subgraph labels containing Japanese text or spaces', () => {
+        const input = ['graph LR', '  subgraph 本プロジェクト (AI活用)', '    A[開始]', '  end'].join('\n');
+        const out = sanitizeMermaid(input);
+        expect(out).toContain('subgraph sanitized_subgraph_1["本プロジェクト (AI活用)"]');
+        expect(out).toContain('A["開始"]');
+    });
+
+    it('preserves subgraph identifiers when quoting bracket labels', () => {
+        const input = ['graph LR', '  subgraph Start [開始時点の盤面]', '    S1[8 6 7]', '  end', '  Start --> Goal'].join('\n');
+        const out = sanitizeMermaid(input);
+        expect(out).toContain('subgraph Start["開始時点の盤面"]');
+        expect(out).toContain('Start --> Goal');
+        expect(out).not.toContain('sanitized_subgraph_1["Start');
+    });
+
+    it('quotes non-ASCII double-circle node labels without changing the shape', () => {
+        const input = 'graph TD\nA((インターネット)) --> B[FW]';
+        const out = sanitizeMermaid(input);
+        expect(out).toContain('A(("インターネット"))');
+        expect(out).toContain('A(("インターネット")) --> B[FW]');
+    });
+
+    it('preserves empty double-circle nodes', () => {
+        const input = 'graph LR\nStart --> Arrow(( ))\nArrow --> Goal';
+        const out = sanitizeMermaid(input);
+        expect(out).toContain('Arrow(( ))');
+    });
+
+    it('converts Japanese erDiagram entities to a flowchart representation', () => {
+        const input = [
+            'erDiagram',
+            '    % 利用者マスター',
+            '    利用者マスター {',
+            '        string 利用者ID PK',
+            '    }',
+            '    得意先マスター {',
+            '        string 得意先コード PK',
+            '    }',
+            '    得意先マスター ||--o{ 利用者マスター : 所属',
+        ].join('\n');
+        const out = sanitizeMermaid(input);
+        expect(out).toContain('flowchart LR');
+        expect(out).toContain('ER1["利用者マスター<br/>string 利用者ID PK"]');
+        expect(out).toContain('ER2["得意先マスター<br/>string 得意先コード PK"]');
+        expect(out).toContain('ER2 -->|"所属 1:N"| ER1');
+        expect(out).not.toContain('erDiagram');
+    });
+
+    it('fixes spaced arrow "-- >" to "-->" (SC-2022-Fall-PM2 fig2/fig6 pattern)', () => {
+        const input = 'graph TD\nInternet -- > Firewall(ファイアウォール)\nFirewall -- > VPN_G(VPN-G)';
+        const out = sanitizeMermaid(input);
+        expect(out).toContain('Internet --> Firewall');
+        expect(out).toContain('Firewall --> VPN_G');
+        expect(out).not.toContain('-- >');
+    });
+
+    it('preserves labeled arrows "-- text -->" without modification', () => {
+        const input = 'graph LR\nA -- 接続 --> B\nC -- No --> D';
+        const out = sanitizeMermaid(input);
+        expect(out).toContain('A -- 接続 --> B');
+        expect(out).toContain('C -- No --> D');
+    });
+
+    it('comments out invalid "A & B & C: label" lines (SC-2022-Spring-PM2 fig7 pattern)', () => {
+        const input = 'graph LR\n    subgraph フェーズ\n        D1 & I1 & T1 & D2 & I2 & T2: 開発フェーズ\n    end';
+        const out = sanitizeMermaid(input);
+        expect(out).toContain('%% D1 & I1 & T1 & D2 & I2 & T2: 開発フェーズ');
+        expect(out).not.toMatch(/^    D1 & I1/m);
+    });
+
+    it('does not touch valid parallel-edge syntax "A & B --> C"', () => {
+        const input = 'graph TD\nA & B --> C';
+        const out = sanitizeMermaid(input);
+        expect(out).toContain('A & B --> C');
+    });
+
+    it('closes unclosed subgraph blocks (SC-2022-Fall-PM2 fig2 pattern)', () => {
+        const input = [
+            'graph TD',
+            '    subgraph Outer',
+            '        subgraph Inner',
+            '        end',
+            '        A --> B',
+        ].join('\n');
+        const out = sanitizeMermaid(input);
+        // Outer subgraph has no end → one `end` appended
+        const endCount = (out.match(/^\s*end\s*$/gm) ?? []).length;
+        expect(endCount).toBe(2);
+    });
+
+    it('does not add extra end when all subgraphs are already closed', () => {
+        const input = [
+            'graph TD',
+            '    subgraph A',
+            '        X --> Y',
+            '    end',
+        ].join('\n');
+        const out = sanitizeMermaid(input);
+        const endCount = (out.match(/^\s*end\s*$/gm) ?? []).length;
+        expect(endCount).toBe(1);
     });
 });
 
