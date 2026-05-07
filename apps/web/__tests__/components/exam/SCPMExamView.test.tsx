@@ -26,6 +26,7 @@ const question = {
             subQNo: '1',
             text: '設問1の本文',
             answer: 'モデル答案',
+            explanation: '### 解説見出し\n\n**重要**な観点です。',
         },
     ],
 } as any;
@@ -45,5 +46,16 @@ describe('SCPMExamView', () => {
 
         expect(screen.getByRole('heading', { name: '午後試験ケース本文' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: '問題文を隠す' })).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('解答例の解説MarkdownをHTMLとして描画する', () => {
+        render(<SCPMExamView question={question} />);
+
+        fireEvent.click(screen.getByRole('button', { name: '解答例を表示' }));
+
+        expect(screen.getByRole('heading', { name: '解説見出し' })).toBeInTheDocument();
+        expect(screen.getByText('重要')).toBeInTheDocument();
+        expect(screen.queryByText(/### 解説見出し/)).not.toBeInTheDocument();
+        expect(screen.queryByText(/\*\*重要\*\*/)).not.toBeInTheDocument();
     });
 });

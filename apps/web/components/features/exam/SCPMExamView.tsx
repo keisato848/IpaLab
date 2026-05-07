@@ -516,6 +516,10 @@ function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, initialData }: { sq
     );
     const promptText = sq.promptText || sq.text || '';
     const answerLimit = useMemo(() => extractAnswerLimit(promptText), [promptText]);
+    const normalizedExplanation = useMemo(
+        () => normalizeMermaidCodeBlocks(sq.explanation || ''),
+        [sq.explanation]
+    );
 
     return (
         <div className={styles.subQuestionItem}>
@@ -567,7 +571,15 @@ function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, initialData }: { sq
                             <span className={styles.explanationBadge}>
                                 AIによる解説
                             </span>
-                            <p style={{ marginTop: '0.5rem' }}>{sq.explanation}</p>
+                            <div className={`${styles.markdownContent} ${styles.explanationMarkdown}`}>
+                                <ReactMarkdown
+                                    remarkPlugins={[remarkGfm, remarkMath] as any}
+                                    rehypePlugins={[rehypeRaw, rehypeKatex] as any}
+                                    components={markdownComponents}
+                                >
+                                    {normalizedExplanation || '解説はありません。'}
+                                </ReactMarkdown>
+                            </div>
                         </div>
                     </div>
                 )}
