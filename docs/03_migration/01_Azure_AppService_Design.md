@@ -43,7 +43,7 @@
 
 | キー | 値 | 備考 |
 |------|-----|------|
-| `WEBSITE_NODE_DEFAULT_VERSION` | `~20` | Node.js バージョン |
+| `WEBSITE_NODE_DEFAULT_VERSION` | `~24` | Node.js バージョン |
 | `WEBSITES_PORT` | `8080` | Oryx が `PORT=8080` を設定するため合わせる |
 | `WEBSITE_RUN_FROM_PACKAGE` | `1` | ZIP パッケージを直接マウントして実行。Oryx の node_modules.tar.gz 展開をバイパスする |
 | `NODE_ENV` | `production` | 本番モード |

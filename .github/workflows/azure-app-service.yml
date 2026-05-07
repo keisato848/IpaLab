@@ -35,7 +35,7 @@ permissions:
 env:
   AZURE_WEBAPP_NAME: app-pm-exam-dx-prod
   AZURE_WEBAPP_PACKAGE_PATH: './apps/web/.next/standalone'
-  NODE_VERSION: '20.x'
+  NODE_VERSION: '24.x'
 
 jobs:
   test:
@@ -44,10 +44,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -65,10 +65,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -138,7 +138,7 @@ jobs:
           ls -la .next/static/ 2>/dev/null || echo ".next/static not found!"
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: webapp-artifact
           path: apps/web/.next/standalone/
@@ -153,7 +153,7 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: webapp-artifact
           path: ./deploy
@@ -167,7 +167,7 @@ jobs:
 
       # Service Principal を使用して Azure にログイン（Microsoft推奨方式）
       - name: Azure Login
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -273,7 +273,7 @@ jobs:
 
       - name: Download artifact from build job
         if: steps.config-check.outputs.configured == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: webapp-artifact
           path: ./deploy
@@ -288,7 +288,7 @@ jobs:
       # 本番と同じ Service Principal を使用してログイン
       - name: Azure Login
         if: steps.config-check.outputs.configured == 'true'
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
