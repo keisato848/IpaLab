@@ -20,6 +20,7 @@
 #   R8. 実装変更に docs/ 配下の設計書・手順書更新が伴っていないパターン
 #   R9. QuestionClient のセッション進捗保存が表示用 sessionStats に依存するパターン
 #   R10. 静的問題データ由来の Mermaid CODE_BLOCK マーカーを除去しないパターン
+#   R11. StudyPlan 移行が単純な migratedFor フラグだけでスキップされるパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -320,13 +321,29 @@ if (Test-Path $mermaidSanitize) {
     }
 }
 
+# ---------------------------------------------------------------------------
+# R11: StudyPlan localStorage → server 移行が単純な migratedFor フラグだけで
+#      スキップされていないか
+#      (初回ログイン時に空状態でフラグが立つと、後から作成した計画がサーバ未同期のまま
+#       server 空配列で localStorage を上書きされ、ダッシュボードから消える)
+# ---------------------------------------------------------------------------
+$apiTs = Join-Path $WebRoot 'lib\api.ts'
+if (Test-Path $apiTs) {
+    $raw = Get-Content -LiteralPath $apiTs -Raw
+    if ($raw -match 'if\s*\(\s*localStorage\.getItem\(\s*flagKey\s*\)\s*\)\s*return\s+-1') {
+        Add-Finding -Rule 'R11-study-plan-migration-flag-only' -Severity 'High' `
+            -File $apiTs `
+            -Detail 'studyPlans:migratedFor フラグだけで移行をスキップすると、後から作成した未同期計画が消える可能性があります (推奨: 計画セットの署名でスキップ判定)'
+    }
+}
+
 $tag = if ($Mode -eq 'start') { 'SESSION-START' } else { 'SESSION-END' }
 Write-Host ""
 Write-Host "## [self-inspect $tag] 自己点検レポート"
 Write-Host ""
 
 if ($findings.Count -eq 0) {
-    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10)"
+    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11)"
     exit 0
 }
 
@@ -340,7 +357,7 @@ foreach ($f in $findings) {
 }
 
 Write-Host ""
-Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去"
+Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → studyPlans 移行は計画セット署名でスキップ判定"
 
 if ($FailOnFinding) { exit 1 }
 exit 0

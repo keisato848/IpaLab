@@ -8,6 +8,7 @@ describe('API ユーティリティ', () => {
     beforeEach(() => {
         vi.resetModules();
         mockFetch.mockReset();
+        localStorage.clear();
     });
 
     afterEach(() => {
@@ -381,6 +382,62 @@ describe('API ユーティリティ', () => {
             const { syncLearningRecords } = await import('@/lib/api');
             await syncLearningRecords([]);
 
+            expect(mockFetch).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('migrateLocalStudyPlansToServer', () => {
+        const validPlan = {
+            id: 'plan-1',
+            title: '応用情報 2026-06-01 11h/週',
+            targetExam: 'AP',
+            examDate: '2026-06-01',
+            monthlyGoal: '基礎を固める',
+            weeklySchedule: [
+                {
+                    weekNumber: 1,
+                    startDate: '2026-05-07',
+                    endDate: '2026-05-13',
+                    goal: '週次目標',
+                    dailyTasks: [{ date: '2026-05-07', goal: '午前問題', questionCount: 10 }],
+                },
+            ],
+            generatedAt: '2026-05-07T05:00:00.000Z',
+        };
+
+        it('旧形式の移行済みフラグがあっても、未同期のlocalStorage計画を送信する', async () => {
+            localStorage.setItem('studyPlans:migratedFor:u1', '2026-05-07T00:00:00.000Z');
+            localStorage.setItem('studyPlans', JSON.stringify([validPlan]));
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ count: 1 }),
+            });
+
+            const { migrateLocalStudyPlansToServer } = await import('@/lib/api');
+            const result = await migrateLocalStudyPlansToServer('u1');
+
+            expect(result).toBe(1);
+            expect(mockFetch).toHaveBeenCalledWith(
+                expect.stringContaining('/study-plan'),
+                expect.objectContaining({
+                    method: 'POST',
+                    body: JSON.stringify([validPlan]),
+                }),
+            );
+        });
+
+        it('同じ計画セットは再送せずスキップする', async () => {
+            localStorage.setItem('studyPlans', JSON.stringify([validPlan]));
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ count: 1 }),
+            });
+
+            const { migrateLocalStudyPlansToServer } = await import('@/lib/api');
+            await expect(migrateLocalStudyPlansToServer('u1')).resolves.toBe(1);
+
+            mockFetch.mockReset();
+            await expect(migrateLocalStudyPlansToServer('u1')).resolves.toBe(-1);
             expect(mockFetch).not.toHaveBeenCalled();
         });
     });
