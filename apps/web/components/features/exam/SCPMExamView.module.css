@@ -698,6 +698,16 @@
     color: var(--text-secondary);
 }
 
+.explanationMarkdown {
+    margin-top: 0.5rem;
+}
+
+.explanationMarkdown :global(p:last-child),
+.explanationMarkdown :global(ul:last-child),
+.explanationMarkdown :global(ol:last-child) {
+    margin-bottom: 0;
+}
+
 /* Markdown Content */
 .markdownContent {
     color: var(--text-primary);
