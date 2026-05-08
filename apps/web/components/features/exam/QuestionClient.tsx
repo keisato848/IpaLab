@@ -34,7 +34,7 @@ const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false })
 import ExamSummary from './ExamSummary';
 import AIAnswerBox from './AIAnswerBox';
 import SCPMExamView from './SCPMExamView';
-import { buildPMAnswerFieldId, buildPMDraftKey, extractAnswerLimit } from './pmAnswerUtils';
+import { AfternoonObjectiveAnswerHistory, AfternoonObjectiveAnswerSubmission, buildPMAnswerFieldId, buildPMDraftKey, extractAnswerLimit, parseSelectedOptionIdsFromAnswer } from './pmAnswerUtils';
 
 interface QuestionClientProps {
     question: Question;
@@ -89,6 +89,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
     // AI Score Persistence State
     const [descriptiveHistory, setDescriptiveHistory] = useState<Record<string, { answer: string; result: any }>>({});
+    const [objectiveHistory, setObjectiveHistory] = useState<Record<string, AfternoonObjectiveAnswerHistory>>({});
     const [reviewRecord, setReviewRecord] = useState<LearningRecord | null | undefined>(undefined);
 
     // Review Later State
@@ -116,6 +117,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 const records = await getLearningRecords(userId, question.examId);
                 // ... (existing historyMap logic) ...
                 const historyMap: Record<string, { answer: string; result: any }> = {};
+                const objectiveHistoryMap: Record<string, AfternoonObjectiveAnswerHistory> = {};
                 records.forEach(r => {
                     // ... existing logic ...
                     if (r.isDescriptive && r.userAnswer && r.questionId) {
@@ -129,8 +131,17 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                             }
                         };
                     }
+                    if (!r.isDescriptive && r.questionId && (r.userAnswer || r.selectedOptionId)) {
+                        const userAnswer = r.userAnswer || r.selectedOptionId || '';
+                        objectiveHistoryMap[r.questionId] = {
+                            userAnswer,
+                            selectedOptionIds: r.selectedOptionId ? [r.selectedOptionId] : parseSelectedOptionIdsFromAnswer(userAnswer),
+                            isCorrect: r.isCorrect,
+                        };
+                    }
                 });
                 setDescriptiveHistory(historyMap);
+                setObjectiveHistory(objectiveHistoryMap);
 
                 // 2. Fetch Progress (Bookmarks)
                 const progress = await getExamProgress(userId, question.examId);
@@ -411,6 +422,103 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
         } catch (e) {
             console.error("Failed to save AI score", e);
+        }
+    };
+
+    const handleSaveObjectiveAnswer = async (data: AfternoonObjectiveAnswerSubmission) => {
+        const isCorrect = data.isCorrect;
+        const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+        const selectedOptionId = data.mode === 'single-choice' ? data.selectedOptionIds?.[0] : undefined;
+        const record: LearningRecord = {
+            id: uuidv4(),
+            userId: session?.user?.id || guestManager.getGuestId() || 'anonymous',
+            questionId: data.answerFieldId,
+            examId: question.examId,
+            category: question.category || type,
+            subCategory: question.subCategory,
+            isDescriptive: false,
+            userAnswer: data.userAnswer,
+            selectedOptionId,
+            isCorrect,
+            isFlagged,
+            sessionId: sessionId || undefined,
+            answeredAt: new Date().toISOString(),
+            timeTakenSeconds: timeTaken,
+        };
+
+        const nextCurrentSessionStats = sessionId ? incrementStats(currentSessionStats, isCorrect) : currentSessionStats;
+
+        statsVersionRef.current += 1;
+        setSessionStats(prev => incrementStats(prev, isCorrect));
+        if (sessionId) {
+            setCurrentSessionStats(prev => incrementStats(prev, isCorrect));
+        }
+        setExamStats(prev => {
+            const currentTotal = prev?.total || 0;
+            const currentCorrect = prev?.correct || 0;
+            return {
+                total: currentTotal + 1,
+                correct: currentCorrect + (isCorrect ? 1 : 0),
+            };
+        });
+
+        try {
+            if (session?.user?.id) {
+                const savePromises: Promise<any>[] = [
+                    saveLearningRecord(record),
+                    saveExamProgress(session.user.id, question.examId, {
+                        statusUpdate: { questionId: data.answerFieldId, isCorrect }
+                    })
+                ];
+
+                if (sessionId) {
+                    savePromises.push(
+                        updateSessionProgress(sessionId, {
+                            answeredCount: nextCurrentSessionStats.total,
+                            correctCount: nextCurrentSessionStats.correct,
+                            lastQuestionNo: parseInt(qNo),
+                        })
+                    );
+                }
+
+                await Promise.all(savePromises);
+            } else {
+                if (!guestManager.hasShownWarning()) {
+                    setShowGuestWarning(true);
+                    guestManager.markWarningShown();
+                }
+                guestManager.saveHistory(record);
+            }
+
+            setObjectiveHistory(prev => ({
+                ...prev,
+                [data.answerFieldId]: {
+                    userAnswer: data.userAnswer,
+                    selectedOptionIds: data.selectedOptionIds,
+                    correctAnswer: data.correctAnswer,
+                    isCorrect,
+                }
+            }));
+
+            window.dispatchEvent(new CustomEvent('ai-assistant-context', {
+                detail: {
+                    questionId: data.answerFieldId,
+                    questionText: data.prompt || question.text || question.context?.background || '',
+                    userAnswer: data.userAnswer,
+                    correctAnswer: data.correctAnswer,
+                    explanation: data.explanation || '',
+                    isCorrect,
+                    examId: question.examId,
+                    isDescriptive: false,
+                },
+            }));
+
+            setAllExamRecords(prev => {
+                const filtered = prev.filter(r => r.questionId !== data.answerFieldId);
+                return [...filtered, record];
+            });
+        } catch (e) {
+            console.error("Failed to save objective answer", e);
         }
     };
 
@@ -712,6 +820,8 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                         }}
                         onGrade={(data, subQIdx, subSubIdx) => handleSaveAIScore(data, subQIdx as number, subSubIdx)}
                         descriptiveHistory={descriptiveHistory}
+                        onObjectiveAnswer={handleSaveObjectiveAnswer}
+                        objectiveHistory={objectiveHistory}
                     />
                 </div>
             </div>

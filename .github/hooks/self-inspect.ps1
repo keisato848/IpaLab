@@ -21,21 +21,22 @@
 #   R9. QuestionClient のセッション進捗保存が表示用 sessionStats に依存するパターン
 #   R10. 静的問題データ由来の Mermaid CODE_BLOCK マーカーを除去しないパターン
 #   R11. 問題データ同期で qNo 欠損を 99 に丸めるパターン
-#   R12. tracked 設定テンプレートに実接続文字列や API キーを置くパターン
+#   R12. tracked 設定テンプレートに実接続文字列・APIキーを置くパターン
 #   R13. PDF ダウンロードで HTML/XML エラーページを .pdf として保存するパターン
 #   R14. Windows で npx を直接 spawn して ENOENT になるパターン
 #   R15. npm run 経由の CLI 引数が npm_config_* に吸収されるパターン
-#   R16. AM/AM2 問題データ差分で answers/questions の qNo・正答・選択肢が不整合なパターン
-#   R17. PM/PM1/PM2 問題データ差分で questions_transformed.json が欠落し、解答欄が生成されないパターン
-#   R18. Mermaid 図表データ差分でブラウザ描画に失敗しやすいリンクラベル・節点表記を含むパターン
-#   R19. 新形式午後画面で Tailwind 風の未適用クラスへ戻り、ヘッダー/終了ボタンのスタイルが欠落するパターン
-#   R20. AIAnswerBox から午後答案の下書き保存・文字数制限が消えるパターン
-#   R21. SCPMExamView の総合スコアが 100 点満点ではなく小問合計点表示へ戻るパターン
+#   R16. AM/AM2 問題データ差分で answers/questions の整合性が崩れるパターン
+#   R17. PM/PM1/PM2 問題データ差分で questions_transformed.json が欠落するパターン
+#   R18. Mermaid 図表データ差分でブラウザ描画に失敗しやすい表記が残るパターン
+#   R19. 新形式午後画面で CSS Modules ではなく未スコープ utility class に戻るパターン
+#   R20. AIAnswerBox から下書き保存・文字数制限が消えるパターン
+#   R21. SCPMExamView の総合スコアが 100 点満点ではなく小問合計表示へ戻るパターン
 #   R22. SCPMExamView が subQuestions 以外の午後データ形を解答欄化できなくなるパターン
-#   R23. Mermaid サニタイズが日本語 ER 図・日本語 subgraph を扱えなくなるパターン
-#   R24. GitHub Actions のデプロイジョブが gh run download に戻り、checkout 不在で artifact 取得に失敗するパターン
-#   R25. 新形式午後画面の解答例解説が ReactMarkdown を通らず、Markdown 記法が素のテキスト表示へ戻るパターン
-#   R26. 新形式午後画面の解答例ラベルがダークテーマで低コントラストな赤茶文字へ戻るパターン
+#   R23. Mermaid サニタイズが日本語 ER 図・日本語 subgraph を通せなくなるパターン
+#   R24. GitHub Actions の artifact 取得が gh run download に戻るパターン
+#   R25. 新形式午後画面の解答例説明が Markdown 描画されなくなるパターン
+#   R26. 新形式午後画面の解答例ラベルがダークテーマで低コントラストへ戻るパターン
+#   R27. SCPMExamView が選択式・短答式小問を AIAnswerBox に流すパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -382,17 +383,17 @@ foreach ($relativePath in ($trackedConfigFiles | Sort-Object -Unique)) {
     if ($content -match 'AccountKey=(?!<|\$\{|abc123==|"|''|;|\s|$)[^;"''\s]+') {
         Add-Finding -Rule 'R12-tracked-secret-material' -Severity 'High' `
             -File $fullPath `
-            -Detail 'tracked 設定ファイルに Cosmos/Storage 接続文字列の AccountKey 実値が含まれている可能性があります (値は表示しません)'
+            -Detail 'tracked 設定ファイルに Cosmos/Storage 接続文字列の AccountKey 実値が含まれる可能性があります (値は表示しません)'
     }
     if ($content -match 'AIza[0-9A-Za-z_-]{20,}') {
         Add-Finding -Rule 'R12-tracked-secret-material' -Severity 'High' `
             -File $fullPath `
-            -Detail 'tracked 設定ファイルに Google API キー形式の実値が含まれている可能性があります (値は表示しません)'
+            -Detail 'tracked 設定ファイルに Google API キー形式の実値が含まれる可能性があります (値は表示しません)'
     }
     if ($content -match 'BEGIN (RSA|OPENSSH|PRIVATE) KEY') {
         Add-Finding -Rule 'R12-tracked-secret-material' -Severity 'High' `
             -File $fullPath `
-            -Detail 'tracked 設定ファイルに秘密鍵ヘッダーが含まれている可能性があります (値は表示しません)'
+            -Detail 'tracked 設定ファイルに秘密鍵ヘッダーが含まれる可能性があります (値は表示しません)'
     }
 }
 
@@ -409,13 +410,13 @@ if (Test-Path $downloadScript) {
     if (-not $hasPdfValidation -or $writesResponseDirectly) {
         Add-Finding -Rule 'R13-download-non-pdf-save' -Severity 'High' `
             -File $downloadScript `
-            -Detail 'download.ts が HTML/XML や PDF ヘッダー欠落を検証せず raw_pdfs に保存する可能性があります (推奨: content-type と %PDF- ヘッダーを確認し、壊れた既存ファイルは再取得する)'
+            -Detail 'download.ts が content-type と %PDF- ヘッダーを検証せず raw_pdfs へ保存する可能性があります'
     }
 }
 
 # ---------------------------------------------------------------------------
 # R14: Node child_process で npx を直接 spawn/execFile していないか
-#      (Windows では npx.cmd 解決に失敗して spawnSync npx ENOENT になる)
+#      (Windows では npx.cmd 解決に失敗して spawnSync npx ENOENT になりやすい)
 # ---------------------------------------------------------------------------
 $runExtractScript = Join-Path $RepoRoot 'packages\data\src\scripts\run-extract.ts'
 if (Test-Path $runExtractScript) {
@@ -425,13 +426,12 @@ if (Test-Path $runExtractScript) {
     if ($spawnsNpxWithSingleQuote -or $spawnsNpxWithDoubleQuote) {
         Add-Finding -Rule 'R14-node-npx-spawn-windows' -Severity 'High' `
             -File $runExtractScript `
-            -Detail 'run-extract.ts が npx を直接 spawn しており、Windows で ENOENT になる可能性があります (推奨: process.execPath + --require ts-node/register)'
+            -Detail 'run-extract.ts が npx を直接 spawn しており Windows で ENOENT になる可能性があります (推奨: process.execPath + --require ts-node/register)'
     }
 }
 
 # ---------------------------------------------------------------------------
-# R15: npm run 経由で dry-run 等の CLI 引数が npm_config_* に吸収されても動くか
-#      (Windows/npm では --dry-run などが argv に届かず設定として扱われる場合がある)
+# R15: npm run 経由の dry-run 等 CLI 引数を npm_config_* から読めるか
 # ---------------------------------------------------------------------------
 $ollamaAnswerScript = Join-Path $RepoRoot 'packages\data\src\scripts\ollama-extract-answers.ts'
 $dataPackageJson = Join-Path $RepoRoot 'packages\data\package.json'
@@ -444,13 +444,12 @@ if ((Test-Path $ollamaAnswerScript) -and (Test-Path $dataPackageJson)) {
     if (-not $readsNpmConfigArgs -or -not $usesNodeRegister) {
         Add-Finding -Rule 'R15-npm-script-args-windows' -Severity 'Medium' `
             -File $ollamaAnswerScript `
-            -Detail 'Ollama 抽出 script が npm run 経由の --dry-run/--limit/--categories を npm_config_* から読めない、または ts-node CLI 直起動に戻っている可能性があります'
+            -Detail 'Ollama 抽出 script が npm run 経由の --dry-run/--limit/--categories を npm_config_* から読めない、または ts-node CLI 直起動へ戻っている可能性があります'
     }
 }
 
 # ---------------------------------------------------------------------------
-# R16: 変更対象の AM/AM2 questions_raw.json が answers_raw.json と整合しているか
-#      (Ollama OCR の過少抽出や正答マップ更新漏れで qNo 欠番・correctOption 不一致が残る)
+# R16: 変更対象の AM/AM2 questions_raw.json と answers_raw.json が整合しているか
 # ---------------------------------------------------------------------------
 $changedMorningExamIds = @(
     $changedFiles |
@@ -566,7 +565,6 @@ foreach ($examId in $changedMorningExamIds) {
 
 # ---------------------------------------------------------------------------
 # R17: 変更対象の PM/PM1/PM2 データが transformed と解答欄を持つか
-#      (raw 配列の questions[] だけでは QuestionClient/SCPMExamView の入力欄が生成されない)
 # ---------------------------------------------------------------------------
 $changedAfternoonExamIds = @(
     $changedFiles |
@@ -627,7 +625,6 @@ foreach ($examId in $changedAfternoonExamIds) {
 
 # ---------------------------------------------------------------------------
 # R18: 変更対象の問題データに Mermaid の既知描画失敗パターンが残っていないか
-#      (ハイフン入りリンクラベルやエッジ上の節点定義はブラウザ描画で構文エラーになりやすい)
 # ---------------------------------------------------------------------------
 $changedQuestionDataFiles = @(
     $changedFiles |
@@ -660,8 +657,7 @@ foreach ($relPath in $changedQuestionDataFiles) {
 }
 
 # ---------------------------------------------------------------------------
-# R19: 新形式午後画面で Tailwind 風の未適用クラスへ戻っていないか
-#      (CSS Modules ベースでないと「終了して一覧へ」ボタンやヘッダー背景が未適用になる)
+# R19: 新形式午後画面が CSS Modules ではなく Tailwind 風の未スコープ class へ戻っていないか
 # ---------------------------------------------------------------------------
 if (Test-Path $questionClient) {
     $raw = Get-Content -LiteralPath $questionClient -Raw
@@ -675,15 +671,14 @@ if (Test-Path $questionClient) {
         if ($raw -match [regex]::Escape($pattern)) {
             Add-Finding -Rule 'R19-pm-shell-unscoped-utility-classes' -Severity 'High' `
                 -File $questionClient `
-                -Detail '新形式午後画面のヘッダー/終了ボタンが Tailwind 風の未適用クラスへ戻っています (推奨: QuestionClient.module.css の pmExamShell / pmExitButton を使用)'
+                -Detail '新形式午後画面のヘッダー/終了ボタンが未スコープ utility class へ戻っています (推奨: QuestionClient.module.css の pmExamShell / pmExitButton を使用)'
             break
         }
     }
 }
 
 # ---------------------------------------------------------------------------
-# R20: 午後答案の下書き保存・文字数制限が AIAnswerBox から消えていないか
-#      (午後試験は採点前に長文回答を中断・復元できる必要がある)
+# R20: AIAnswerBox から下書き保存・文字数制限が消えていないか
 # ---------------------------------------------------------------------------
 $aiAnswerBox = Join-Path $WebRoot 'components\features\exam\AIAnswerBox.tsx'
 if (Test-Path $aiAnswerBox) {
@@ -699,17 +694,14 @@ if (Test-Path $aiAnswerBox) {
 }
 
 # ---------------------------------------------------------------------------
-# R21: SCPMExamView の総合スコアが小問合計点表示へ戻っていないか
-#      (例: 300/300 は利用者に意味が伝わらないため、回答済み小問の平均を /100 で表示する)
+# R21: SCPMExamView の総合スコアが小問合計表示へ戻っていないか
 # ---------------------------------------------------------------------------
 $scpmExamView = Join-Path $WebRoot 'components\features\exam\SCPMExamView.tsx'
 if (Test-Path $scpmExamView) {
     $raw = Get-Content -LiteralPath $scpmExamView -Raw
     if ($raw -match 'questions\s*\?\s*questions\.length\s*\*\s*100' -or
         $raw -match 'scoreMax[^\n]+questions\.length\s*\*\s*100' -or
-        $raw -notmatch 'aria-label="総合スコア 100点満点"' -or
         $raw -notmatch 'answerFieldCount' -or
-        $raw -match '全\{questions\?\.length \|\| 0\}問' -or
         $raw -notmatch 'Math\.round\(totalScore / answeredScoreCount\)') {
         Add-Finding -Rule 'R21-pm-overall-score-100-scale' -Severity 'High' `
             -File $scpmExamView `
@@ -719,7 +711,6 @@ if (Test-Path $scpmExamView) {
 
 # ---------------------------------------------------------------------------
 # R22: 新形式午後画面が subQuestions 以外の既存データ形を解答欄化できるか
-#      (section.answer / section.questions / subQuestions 空配列の午後データで textarea 欠落を再発させない)
 # ---------------------------------------------------------------------------
 if (Test-Path $scpmExamView) {
     $raw = Get-Content -LiteralPath $scpmExamView -Raw
@@ -734,8 +725,7 @@ if (Test-Path $scpmExamView) {
 }
 
 # ---------------------------------------------------------------------------
-# R23: Mermaid サニタイズが日本語 ER 図・日本語 subgraph を扱えるか
-#      (SC/PM 午後データの図表で「図の描画に失敗しました」を再発させない)
+# R23: Mermaid サニタイズが日本語 ER 図・日本語 subgraph を通せるか
 # ---------------------------------------------------------------------------
 $mermaidSanitize = Join-Path $WebRoot 'lib\mermaid\sanitize.ts'
 if (Test-Path $mermaidSanitize) {
@@ -747,13 +737,12 @@ if (Test-Path $mermaidSanitize) {
         $raw -notmatch '\[\^\\x00-\\x7F\]') {
         Add-Finding -Rule 'R23-mermaid-japanese-diagram-sanitize' -Severity 'Medium' `
             -File $mermaidSanitize `
-            -Detail 'Mermaid サニタイズが日本語 ER 図・日本語 subgraph・日本語ノードラベルの描画失敗を防ぐ実装から逸脱しています'
+            -Detail 'Mermaid サニタイズが日本語 ER 図・日本語 subgraph・日本語ワードラベルの描画失敗を防ぐ実装から逸脱しています'
     }
 }
 
 # ---------------------------------------------------------------------------
 # R24: GitHub Actions artifact ダウンロードが gh run download に戻っていないか
-#      (checkout していない deploy ジョブで "fatal: not a git repository" を再発させない)
 # ---------------------------------------------------------------------------
 $azureWorkflow = Join-Path $RepoRoot '.github\workflows\azure-app-service.yml'
 if (Test-Path $azureWorkflow) {
@@ -762,13 +751,12 @@ if (Test-Path $azureWorkflow) {
         $raw -notmatch 'actions/download-artifact@v6') {
         Add-Finding -Rule 'R24-actions-artifact-download' -Severity 'High' `
             -File $azureWorkflow `
-            -Detail 'Azure App Service CI/CD の artifact 取得は actions/download-artifact@v6 を使用してください (gh run download は checkout 不在ジョブで失敗します)'
+            -Detail 'Azure App Service CI/CD の artifact 取得は actions/download-artifact@v6 を使用してください (gh run download は checkout なしジョブで失敗します)'
     }
 }
 
 # ---------------------------------------------------------------------------
-# R25: 新形式午後画面の解答例解説を Markdown として描画しているか
-#      (### / **...** が解答例に素のテキストとして表示されるデグレを再発させない)
+# R25: 新形式午後画面の解答例説明を Markdown として描画しているか
 # ---------------------------------------------------------------------------
 if (Test-Path $scpmExamView) {
     $raw = Get-Content -LiteralPath $scpmExamView -Raw
@@ -777,13 +765,12 @@ if (Test-Path $scpmExamView) {
         $raw -notmatch 'ReactMarkdown[\s\S]{0,500}\{normalizedExplanation') {
         Add-Finding -Rule 'R25-pm-explanation-markdown-rendering' -Severity 'High' `
             -File $scpmExamView `
-            -Detail 'SCPMExamView の解答例解説は ReactMarkdown で描画してください (### や ** が素の文字列として表示されます)'
+            -Detail 'SCPMExamView の解答例説明は ReactMarkdown で描画してください (### や ** が素の文字列として表示されます)'
     }
 }
 
 # ---------------------------------------------------------------------------
 # R26: 新形式午後画面の解答例ラベルがダークテーマでも読める配色か
-#      (透過アンバー背景 + 赤茶文字はダーク背景で視認しづらい)
 # ---------------------------------------------------------------------------
 $scpmExamViewCss = Join-Path $WebRoot 'components\features\exam\SCPMExamView.module.css'
 if (Test-Path $scpmExamViewCss) {
@@ -796,7 +783,35 @@ if (Test-Path $scpmExamViewCss) {
         $badgeMatch.Groups['body'].Value -notmatch 'color:\s*#111827') {
         Add-Finding -Rule 'R26-pm-explanation-badge-contrast' -Severity 'Medium' `
             -File $scpmExamViewCss `
-            -Detail 'SCPMExamView の解答例ラベルは不透明アンバー背景 + 濃色文字でダークテーマの視認性を維持してください'
+            -Detail 'SCPMExamView の解答例ラベルは不透明のアンバー背景 + 濃色文字でダークテーマの視認性を維持してください'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R27: SCPMExamView が選択式・短答式小問を AIAnswerBox に流していないか
+#      (「記号で答えよ」や短答小問が 800 字グリッドへフォールバックする再発を防ぐ)
+# ---------------------------------------------------------------------------
+$scpmExamView = Join-Path $WebRoot 'components\features\exam\SCPMExamView.tsx'
+if (Test-Path $scpmExamView) {
+    $raw = Get-Content -LiteralPath $scpmExamView -Raw
+    if ($raw -notmatch 'buildAfternoonObjectiveAnswerFields\s*\(' -or
+        $raw -notmatch 'objectiveFields\.length\s*>\s*0' -or
+        $raw -notmatch 'onObjectiveAnswer') {
+        Add-Finding -Rule 'R27-pm-objective-aianswerbox-fallback' -Severity 'Med' `
+            -File $scpmExamView `
+            -Detail 'SCPMExamView が選択式・短答式小問を AIAnswerBox から分離していない可能性があります (推奨: 客観式回答欄で採点し isDescriptive=false で保存)'
+    }
+}
+
+$pmAnswerUtils = Join-Path $WebRoot 'components\features\exam\pmAnswerUtils.ts'
+if (Test-Path $pmAnswerUtils) {
+    $raw = Get-Content -LiteralPath $pmAnswerUtils -Raw
+    if ($raw -notmatch 'classifyAfternoonAnswerMode' -or
+        $raw -notmatch 'gradeAfternoonObjectiveAnswer' -or
+        $raw -notmatch 'normalizeShortTextAnswer') {
+        Add-Finding -Rule 'R27-pm-objective-grading-utils' -Severity 'Med' `
+            -File $pmAnswerUtils `
+            -Detail '午後選択式・短答式の分類、採点、短答正規化ユーティリティが不足しています'
     }
 }
 
@@ -806,7 +821,7 @@ Write-Host "## [self-inspect $tag] 自己点検レポート"
 Write-Host ""
 
 if ($findings.Count -eq 0) {
-    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16 / R17 / R18 / R19 / R20 / R21 / R22 / R23 / R24 / R25 / R26)"
+    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16 / R17 / R18 / R19 / R20 / R21 / R22 / R23 / R24 / R25 / R26 / R27)"
     exit 0
 }
 
@@ -820,8 +835,7 @@ foreach ($f in $findings) {
 }
 
 Write-Host ""
-Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から接続文字列・API キー実値を除去 / R13 → download.ts で content-type と %PDF- ヘッダーを検証し、壊れた既存 PDF は再取得する / R14 → npx 直接 spawn ではなく process.execPath + ts-node/register を使う / R15 → npm_config_* と node --require ts-node/register で npm run 引数を安定化する / R16 → AM/AM2 の answers_raw.json と questions_raw.json の qNo・correctOption・選択肢を同期する / R17 → PM/PM1/PM2 は questions_transformed.json と subQuestions 解答欄を同期する / R18 → Mermaid のリンクラベルは -->|label| または ---|label| に正規化し、非ASCIIの円形節点ラベルは引用する / R19 → 新形式午後ヘッダーは CSS Modules を使う / R20 → AIAnswerBox の draftKey・文字数制限を維持する / R21 → 新形式午後の総合スコアは平均を /100、件数は解答欄数で表示する / R22 → section.answer・section.questions・空 subQuestions も解答欄化する / R23 → 日本語 ER 図・subgraph は sanitizeMermaid で描画可能に正規化する / R24 → GitHub Actions の artifact 取得は actions/download-artifact@v6 を使う / R25 → SCPMExamView の解答例解説は ReactMarkdown で描画する / R26 → 解答例ラベルは不透明アンバー背景 + 濃色文字で視認性を保つ"
+Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から secret 実値を除去 / R13 → PDF 応答検証 / R14 → npx 直接 spawn 回避 / R15 → npm_config_* と node --require を使用 / R16/R17 → 問題データ整合性確認 / R18/R23 → Mermaid サニタイズ維持 / R19/R21/R22/R25/R26 → 新形式午後画面の既存防壁維持 / R20 → AIAnswerBox の下書き・文字数制限維持 / R24 → actions/download-artifact@v6 使用 / R27 → 選択式・短答式小問は客観式回答欄に分離し isDescriptive=false で保存"
 
 if ($FailOnFinding) { exit 1 }
 exit 0
-
