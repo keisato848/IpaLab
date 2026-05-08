@@ -198,6 +198,9 @@ sequenceDiagram
 2. なければ `questions_raw.json` を使う
 3. `Questions`、`Exams`、`Metrics`、`PlanJobs` の存在を事前保証する
 4. 試験フォルダ名から `examId`、`type`、`title` を導出する
+5. `qNo` は正の整数または数値文字列のみを有効とし、欠損時に `99` へ丸めてはならない
+6. Form A / B / C の各形式を明示的に展開し、親問題番号を正規化できない場合はその試験フォルダの同期を失敗として扱う
+7. 1件でも同期失敗した試験フォルダがある場合、同期スクリプト全体を非0終了にし、古い Cosmos データを成功扱いで残さない
 
 ### 10.2 `ssg-helper.ts` の読込ルール
 
@@ -220,6 +223,8 @@ sequenceDiagram
 
 - 運用時の正本は Cosmos DB `Questions` / `Exams` である
 - ただし page route は可用性優先で file system fallback を持つ
+- Cosmos に当該 `examId` のデータが存在しても対象 `qNo` が欠落している場合は、部分不整合として page route から file system fallback を試行する
+- 午後問題で `qNo=99` のみが返るケースは旧同期由来のプレースホルダー疑いとして扱い、午前問題の正規 Q99 とは区別する
 
 ### 11.2 ビルド / 開発時の挙動
 
@@ -248,12 +253,16 @@ sequenceDiagram
 
 - 接続文字列が見つからない場合は `process.exit(1)` で終了する
 - 各試験フォルダ処理中の例外はログ出力する
+- `qNo` 欠損はデータ品質エラーとして扱い、`qNo=99` の代替値で保存しない
+- フォルダ単位の失敗を集約し、同期全体の終了コードを失敗にする
 
 ### 13.2 Web サーバー
 
 - repository 読込失敗時は握りつぶして file system fallback に移行する
 - `getExamData()` 自体が失敗した場合は `[]` を返す
 - API route は 500 を返すため、page route と可用性方針が異なる
+- repository が0件ではなく一部データを返した場合でも、要求 `qNo` が欠落していれば file system fallback を試行する
+- fallback 発動時は `Filesystem fallback engaged for examId=...` を warn 出力し、Cosmos 件数、要求 `qNo`、プレースホルダー疑いの有無をログへ残す
 
 ---
 
@@ -264,6 +273,7 @@ sequenceDiagram
 - `sync-db.ts` の console log
 - `ssg-helper.ts` の `[SSG]` ログ
 - page route での `console.warn`
+- self-inspect R11 により、`sync-db.ts` へ `qNo || 99` / `parentQNo = 99` 系の丸め処理が再導入されていないかを検出する
 
 問題データ供給の鮮度や DB / FS フォールバック発生率は現状可視化されていない。
 
@@ -274,10 +284,13 @@ sequenceDiagram
 | 種別 | 観点 |
 |------|------|
 | Unit | `ssg-helper.ts` が `questions_transformed.json` を優先すること |
+| Unit | filesystem データ Form A / B / C を page route 用の `Question[]` に正規化できること |
+| Unit | 午後問題の `qNo=99` のみを旧同期プレースホルダーとして検知し、午前問題の Q99 と区別すること |
 | Unit | データディレクトリ探索が候補パスから正しく解決されること |
 | Repository | `questionRepository.listByExamId()` が qNo 順に返すこと |
 | API | `/api/exams/[examId]/questions` が欠損フィールドを補完すること |
 | Integration | DB 不可時に page route が file system fallback で継続すること |
+| Integration | Cosmos が部分不整合で対象 `qNo` を返さない場合に page route が file system fallback で対象問題を表示できること |
 
 ---
 
@@ -295,6 +308,7 @@ sequenceDiagram
 ### 16.3 欠損補完がデータ品質問題を隠す
 
 - questions API が `category` / `subCategory` を補完するため、元データ欠損が運用上見えにくい
+- `qNo` 欠損は表示上の補完対象にせず、同期時に失敗させて検知する
 
 ### 16.4 ルーティング識別子の特殊性
 
@@ -311,3 +325,11 @@ sequenceDiagram
 3. `15_CommonApiAndErrorDesign.md`
 
 演習機能の安定性は、このデータ供給境界に強く依存する。
+
+---
+
+## 18. 変更履歴
+
+| 日付 | 変更内容 |
+|------|----------|
+| 2026-05-01 | Cosmos 部分不整合時の page route filesystem fallback、同期時の `qNo` 正規化、不正な `qNo=99` 丸め禁止、self-inspect R11 を追記 |

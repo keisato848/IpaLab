@@ -128,7 +128,8 @@ async function extractQuestions(examId: string, rawDir: string, outDir: string, 
     }
 
     let promptText = await fs.readFile(promptPath, 'utf-8');
-    promptText += "\n\nIMPORTANT: Output ONLY the JSON array. Do not wrap in markdown code blocks.";
+    const outputKind = isAfternoon ? 'JSON object' : 'JSON array';
+    promptText += `\n\nIMPORTANT: Output ONLY the ${outputKind}. Do not wrap in markdown code blocks.`;
 
     // Retry loop for KEY ROTATION
     const MAX_KEY_RETRIES = 5;
@@ -166,6 +167,10 @@ async function extractQuestions(examId: string, rawDir: string, outDir: string, 
                 console.log(`[Key #${client.keyIndex}] Quota exceeded or Overloaded. Switching to next key...`);
                 // Continue loop -> gets new client -> new key
                 await new Promise(r => setTimeout(r, 2000)); // Small pause
+            } else if (e.status === 400 || e.message?.includes('400 Bad Request') || e.message?.includes('no pages')) {
+                // Non-retryable: broken/empty PDF. Skip immediately.
+                console.warn(`[Key #${client.keyIndex}] Non-retryable 400 error (bad/empty PDF). Skipping QUESTIONS for ${examId}.`);
+                break;
             } else {
                 // Non-recoverable or unknown error? 
                 // For now, let's treat most errors as "try another key" unless it's file IO
@@ -226,6 +231,10 @@ async function extractAnswers(examId: string, rawDir: string, outDir: string, st
             if (e.status === 429 || e.message?.includes('429') || e.status === 503) {
                 console.log(`[Key #${client.keyIndex}] Quota exceeded. Switching to next key...`);
                 await new Promise(r => setTimeout(r, 2000));
+            } else if (e.status === 400 || e.message?.includes('400 Bad Request') || e.message?.includes('no pages')) {
+                // Non-retryable: broken/empty PDF. Skip immediately.
+                console.warn(`[Key #${client.keyIndex}] Non-retryable 400 error (bad/empty PDF). Skipping ANSWERS for ${examId}.`);
+                break;
             } else {
                 await new Promise(r => setTimeout(r, 2000));
             }
@@ -247,6 +256,16 @@ function formatJson(text: string): string {
 }
 
 async function main() {
+    const args = process.argv.slice(2);
+    const examIdArg = args.find(arg => arg.startsWith('--exam-id='))?.split('=')[1];
+    const force = args.includes('--force');
+    const questionsOnly = args.includes('--questions-only');
+    const answersOnly = args.includes('--answers-only');
+
+    if (questionsOnly && answersOnly) {
+        throw new Error('--questions-only and --answers-only cannot be used together.');
+    }
+
     const rawDir = path.resolve(__dirname, '../../data/raw_pdfs');
     const outDir = path.resolve(__dirname, '../../data/questions');
 
@@ -261,10 +280,20 @@ async function main() {
             (f.startsWith('PM-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('SC-') && (f.includes('-AM2') || f.includes('-PM') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('IP-') && f.includes('-AM')) ||
+            (f.startsWith('NW-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
+            (f.startsWith('DB-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
+            (f.startsWith('ES-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('SA-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('ST-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2')))
         )
     );
+
+    if (examIdArg) {
+        examFiles = examFiles.filter(f => path.basename(f, '.pdf') === examIdArg);
+        if (examFiles.length === 0) {
+            throw new Error(`Question PDF not found for --exam-id=${examIdArg}`);
+        }
+    }
 
     // Sort Newest First
     examFiles.sort((a, b) => {
@@ -291,11 +320,13 @@ async function main() {
                 let skipQ = false;
                 try {
                     await fs.access(qOut);
-                    console.log(`[SKIP] Questions for ${examId} already exist.`);
-                    skipQ = true;
+                    if (!force) {
+                        console.log(`[SKIP] Questions for ${examId} already exist.`);
+                        skipQ = true;
+                    }
                 } catch { }
 
-                if (!skipQ) {
+                if (!skipQ && !answersOnly) {
                     await extractQuestions(examId, rawDir, outDir, 0);
                 }
             })(),
@@ -304,11 +335,13 @@ async function main() {
                 let skipA = false;
                 try {
                     await fs.access(aOut);
-                    console.log(`[SKIP] Answers for ${examId} already exist.`);
-                    skipA = true;
+                    if (!force) {
+                        console.log(`[SKIP] Answers for ${examId} already exist.`);
+                        skipA = true;
+                    }
                 } catch { }
 
-                if (!skipA) {
+                if (!skipA && !questionsOnly) {
                     await extractAnswers(examId, rawDir, outDir, 0);
                 }
             })()

@@ -7,6 +7,7 @@
 | 2026-04-29 | 1.0 | 初版作成（2026-04-29 公式ドキュメントに準拠した監査結果を反映） |
 | 2026-04-29 | 1.1 | Git 履歴に基づく Scrum Team Custom Agents とルーティングを追加 |
 | 2026-04-29 | 1.2 | PM 一元受付と SIer 型フェーズゲート、PM 用 Prompt Files を追加 |
+| 2026-05-02 | 1.3 | VS Code hooks 公式イベント `SessionStart` / `SubagentStart` / `SubagentStop` に基づく agent activity logging、データ管理 Skill、データ管理/セキュリティ specialist agent を追加 |
 
 ---
 
@@ -117,10 +118,12 @@ Git 履歴（v0.24〜v0.29 系）では、ダッシュボード UI デグレ、�
 | `solution-architect` | Next.js/Azure/Cosmos/AI 横断設計 | App Service、api-ai、Cosmos、Gemini 地域制限の複合構成 |
 | `frontend-learning-engineer` | 学習 UI、ダッシュボード、試験 UI | Performance Insights、カード配置、採点結果 UI、差分ハイライト |
 | `backend-data-engineer` | API、Cosmos、試験データ防壁 | ensureContainer、fallback guard、StudyPlan 永続化、PerformanceProfile |
+| `data-management-specialist` | IPA 問題データ抽出、登録、Cosmos dry-run/同期 | `exam-list.ts`、ローカル JSON 監査、qNo=99 旧プレースホルダー削除計画 |
 | `ai-scoring-engineer` | 午後試験 AI 採点、Gemini、SSE | 採点 API v2、ルーブリック、SSE、CLKS/論述評価 |
 | `devops-sre-engineer` | Azure、CI/CD、hooks、監視 | App Service startup、Functions deploy、workflow YAML、repository guards |
 | `qa-evidence-engineer` | Vitest、Playwright、E2E 証跡 | custom-report、E2E evidence policy、UI 回帰テスト |
 | `security-observability-engineer` | セキュリティ、ログ、再発防止 | R2 console.error、Application Insights、CodeQL、gh pr merge 禁止 hook |
+| `security-agent` | security alerts、secret scanning、機微情報レビュー | GitHub alerts、Dependabot、CodeQL、Cosmos 操作ログ、secret 出力禁止 |
 
 ### PM ルーティング方針
 
@@ -128,9 +131,10 @@ Git 履歴（v0.24〜v0.29 系）では、ダッシュボード UI デグレ、�
 2. `project-manager` は Phase 0〜6 の現在位置、成果物、承認ゲート、担当 agent を明示する。
 3. UI 変更は `frontend-learning-engineer` と `qa-evidence-engineer` を必ず通し、E2E evidence 要否を判定する。
 4. Cosmos/試験データ変更は `backend-data-engineer` を通し、fallback guard と standalone tracing を確認する。
-5. Azure/CI/CD 変更は `devops-sre-engineer` と `security-observability-engineer` を通し、公式ドキュメントと禁止操作を確認する。
-6. AI 採点変更は `ai-scoring-engineer` を通し、Gemini 地域制限、schema 検証、設計書同期を確認する。
-7. 仕様変更や割り込みが発生した場合は `project-manager` が変更管理票を作成し、承認後に計画を更新する。
+5. IPA データ抽出・登録・再同期は `data-management-specialist` を通し、apply 前に `security-agent` のレビューを必ず受ける。
+6. Azure/CI/CD 変更は `devops-sre-engineer` と `security-observability-engineer` を通し、公式ドキュメントと禁止操作を確認する。
+7. AI 採点変更は `ai-scoring-engineer` を通し、Gemini 地域制限、schema 検証、設計書同期を確認する。
+8. 仕様変更や割り込みが発生した場合は `project-manager` が変更管理票を作成し、承認後に計画を更新する。
 
 ### PM フェーズゲート
 
@@ -188,6 +192,22 @@ Git 履歴（v0.24〜v0.29 系）では、ダッシュボード UI デグレ、�
 ```
 
 > ⚠️ `powershell` フィールドは非公式。`command`（全プラットフォーム）または `windows`/`linux`/`osx` を使用すること。
+
+### 5.3 Agent Activity Logging
+
+`.github/hooks/agent-activity.json` は VS Code 公式 hook 形式に従い、`SessionStart`、`SubagentStart`、`SubagentStop` で `.github/hooks/write-agent-activity-log.ps1` を実行する。
+ログは `agent_logs/hooks/agent-activity.log` に JSON Lines として追記し、`*.log` として git 管理対象外にする。
+
+記録する情報は以下に限定する。
+
+- UTC タイムスタンプ
+- hook event 名
+- リポジトリ名
+- session id の短い SHA-256 hash
+- agent 名または subagent 名の安全化済み token
+- prompt、tool input、接続文字列、キー、トークンを除外した hook 入力フィールド名
+
+hook は監査ログ用途であり、失敗しても通常の agent 作業をブロックしない。ただし、secret 出力が疑われる変更は `security-agent` のレビュー対象とする。
 
 ---
 

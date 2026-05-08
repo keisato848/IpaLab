@@ -21,6 +21,7 @@ export interface GenkoyoshiInputProps {
   /** 字数オーバーをUIで許容するか（API側でも別途検査） */
   allowOverflow?: boolean;
   ariaLabel?: string;
+  disabled?: boolean;
 }
 
 export function GenkoyoshiInput(props: GenkoyoshiInputProps): JSX.Element {
@@ -31,6 +32,7 @@ export function GenkoyoshiInput(props: GenkoyoshiInputProps): JSX.Element {
     placeholder = 'タップして入力',
     allowOverflow = true,
     ariaLabel = '解答入力欄',
+    disabled = false,
   } = props;
 
   const [focused, setFocused] = useState(false);
@@ -65,10 +67,12 @@ export function GenkoyoshiInput(props: GenkoyoshiInputProps): JSX.Element {
     <div className={styles.outer}>
       <div
         ref={wrapRef}
-        className={`${styles.wrap} ${focused ? styles.focused : ''} ${
+        className={`${styles.wrap} ${focused ? styles.focused : ''} ${disabled ? styles.disabled : ''} ${
           charCount > 0 ? styles.hasContent : ''
         }`}
-        onClick={() => textareaRef.current?.focus()}
+        onClick={() => {
+          if (!disabled) textareaRef.current?.focus();
+        }}
       >
         <div className={styles.grid} aria-hidden>
           {cells}
@@ -104,6 +108,7 @@ export function GenkoyoshiInput(props: GenkoyoshiInputProps): JSX.Element {
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           aria-label={ariaLabel}
+          disabled={disabled}
           spellCheck={false}
           autoComplete="off"
           autoCorrect="off"

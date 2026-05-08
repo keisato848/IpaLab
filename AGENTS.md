@@ -23,10 +23,12 @@ GitHub Copilot エージェントがタスクを受け取った際のルーテ�
 | `solution-architect` | `.github/agents/solution-architect.agent.md` | Next.js/Azure/Cosmos/AI を横断した実装設計 |
 | `frontend-learning-engineer` | `.github/agents/frontend-learning-engineer.agent.md` | 学習 UI、ダッシュボード、試験画面、採点結果 UI 実装 |
 | `backend-data-engineer` | `.github/agents/backend-data-engineer.agent.md` | API、Cosmos、試験データ、防壁ルール実装 |
+| `data-management-specialist` | `.github/agents/data-management-specialist.agent.md` | IPA 過去問題データの抽出、検証、登録、Cosmos DB 同期計画 |
 | `ai-scoring-engineer` | `.github/agents/ai-scoring-engineer.agent.md` | 午後試験 AI 採点、Gemini プロキシ、SSE 実装 |
 | `devops-sre-engineer` | `.github/agents/devops-sre-engineer.agent.md` | Azure、CI/CD、hooks、監視、デプロイ運用 |
 | `qa-evidence-engineer` | `.github/agents/qa-evidence-engineer.agent.md` | テスト戦略、E2E 証跡、品質ゲート |
 | `security-observability-engineer` | `.github/agents/security-observability-engineer.agent.md` | セキュリティ、ログ、再発防止、可観測性 |
+| `security-agent` | `.github/agents/security-agent.agent.md` | GitHub security alerts、secret scanning、Dependabot、CodeQL、機微情報レビュー |
 
 ---
 
@@ -80,6 +82,9 @@ DO: `project-manager` が受付・設計ゲート確認後、`frontend-learning-
 WHEN: API Routes、Cosmos DB、試験データ、fallback guard、packages/data を実装したい
 DO: `project-manager` が受付・設計ゲート確認後、`backend-data-engineer` へ handoff する
 
+WHEN: IPA 過去問題データの抽出、ローカル検証、登録、Cosmos DB dry-run、Questions 再同期、qNo=99 プレースホルダー修復を行いたい
+DO: `project-manager` が受付・同期方式・承認ゲートを確認後、`data-management-specialist` へ handoff し、apply 前に `security-agent` のレビューを通す
+
 WHEN: 午後試験 AI 採点、Gemini プロキシ、SSE、ルーブリック、AI 出力検証を実装したい
 DO: `project-manager` が受付・設計ゲート確認後、`ai-scoring-engineer` へ handoff する
 
@@ -88,6 +93,9 @@ DO: `project-manager` が受付・設計ゲート確認後、`devops-sre-enginee
 
 WHEN: セキュリティ、ログ、CodeQL、self-inspect、再発防止ルールを確認したい
 DO: `project-manager` がリスク確認タスクとして `security-observability-engineer` へ handoff する
+
+WHEN: GitHub security alerts、secret scanning、Dependabot alerts、CodeQL alerts、機微情報漏えい、本番 DB 操作ログを確認したい
+DO: `project-manager` がリスク確認タスクとして `security-agent` へ handoff し、権限不足で未確認の場合は未解決リスクとして扱う
 
 WHEN: テスト戦略、Vitest、Playwright、E2E 証跡、PR 品質ゲートを確認したい
 DO: `project-manager` が品質計画タスクとして `qa-evidence-engineer` へ handoff する

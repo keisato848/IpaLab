@@ -27,6 +27,11 @@
     min-height: 50vh;
 }
 
+.container.expanded .genkoyoshiWrapper {
+    min-height: 50vh;
+    overflow-y: auto;
+}
+
 .expandBtn {
     background: transparent;
     border: 1px solid #ccc;
@@ -62,6 +67,13 @@
     overflow-y: hidden;
     min-height: 120px;
     transition: border-color 0.2s, height 0.1s;
+    background: var(--bg-primary, #fff);
+    color: var(--text-primary, #1e293b);
+}
+
+.textarea[aria-invalid="true"] {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
 }
 
 .charCounter {
@@ -75,16 +87,77 @@
     font-weight: bold;
 }
 
+.limitWarning {
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: var(--fs-sm);
+}
+
 .textarea:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.genkoyoshiWrapper {
+    border-radius: 8px;
+}
+
+.genkoyoshiWrapper[aria-invalid="true"] {
+    border: 1px solid #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
 .actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
     margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.draftArea {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: min(100%, 260px);
+}
+
+.draftBtn {
+    background: var(--bg-secondary, #f8fafc);
+    color: var(--text-primary, #334155);
+    border: 1px solid var(--border-color, #cbd5e1);
+    padding: 0.55rem 0.9rem;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.draftBtn:hover:not(:disabled) {
+    background: var(--bg-primary, #fff);
+    border-color: #3b82f6;
+    color: #2563eb;
+}
+
+.draftBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.draftStatus,
+.draftError {
+    font-size: var(--fs-xs);
+    color: #64748b;
+    white-space: nowrap;
+}
+
+.draftError {
+    color: #b91c1c;
 }
 
 .scoreBtn {
@@ -243,6 +316,19 @@
         padding: 0.6rem 1.2rem;
         font-size: var(--fs-sm);
         width: 100%;
+    }
+
+    .actions {
+        align-items: stretch;
+    }
+
+    .draftArea {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .draftBtn {
+        min-height: 40px;
     }
 
     .resultArea {
