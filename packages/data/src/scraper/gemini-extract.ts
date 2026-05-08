@@ -128,7 +128,7 @@ async function extractQuestions(examId: string, rawDir: string, outDir: string, 
     }
 
     let promptText = await fs.readFile(promptPath, 'utf-8');
-    const outputKind = isAfternoon ? 'JSON object' : 'JSON array';
+    const outputKind = 'JSON array';
     promptText += `\n\nIMPORTANT: Output ONLY the ${outputKind}. Do not wrap in markdown code blocks.`;
 
     // Retry loop for KEY ROTATION
