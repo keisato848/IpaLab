@@ -39,6 +39,7 @@
 | 2026-05-08 | SC区分 PM/PM1/PM2 の本文内解答群を answerChoices に構造化し、symbolNoStructuralChoices を 87件から56件へ削減 |
 | 2026-05-08 | SC区分 PM1/PM2 の複数字数制限設問を項目別の子設問へ分割し、multipleLimits を0件化 |
 | 2026-05-08 | 新形式午後画面で answerChoices を持つ小問を選択式UIへ分岐し、択一はラジオ、複数選択はチェックボックスで採点・記録するよう修正 |
+| 2026-05-08 | DB / AU / SM / ES の抽出前状態を再監査し、DB/ESはraw PDFあり、AU/SMは公式URL同期とPDF取得から必要であることを記録 |
 
 ## 1. 目的
 
@@ -65,10 +66,10 @@
 | ST | 既存データあり | PM1を中心に親見出しの800字欄化リスクが高い |
 | NW | 既存データあり | `NW-2025-Spring-PM2` で下線・親見出しリスクあり |
 | FE | 既存データあり | 選択式中心。午後記述補正ではなく選択肢本文の復元が必要 |
-| DB | 未抽出 | 既存修正ではなく公式PDFからの新規抽出が必要 |
-| AU | 未抽出 | 既存修正ではなく公式PDFからの新規抽出が必要 |
-| SM | 未抽出 | 既存修正ではなく公式PDFからの新規抽出が必要 |
-| ES | 未抽出 | 既存修正ではなく公式PDFからの新規抽出が必要 |
+| DB | 未抽出 | ローカル `questions` は0件。`raw_pdfs` には2016〜2025の午後PDF・解答PDFが存在するため、抽出工程から開始可能 |
+| AU | 未抽出 | ローカル `questions` は0件、`raw_pdfs` も0件。公式ソース監査ではPDF URLを検出できるため、`exam-list.ts` 同期または公式URLからの取得が先行 |
+| SM | 未抽出 | ローカル `questions` は0件、`raw_pdfs` も0件。公式ソース監査ではPDF URLを検出できるため、`exam-list.ts` 同期または公式URLからの取得が先行 |
+| ES | 未抽出 | ローカル `questions` は0件。`raw_pdfs` には2016〜2025の午後PDF・解答PDFが存在するため、抽出工程から開始可能 |
 
 ### 2.2 監査基準
 
@@ -89,6 +90,8 @@
 
 確認時点では `OFFICIAL_EXAM_NOT_IN_EXAM_LIST` と `OFFICIAL_EXAM_MISSING_LOCAL_QUESTIONS` が合計約116件検出され、代表例として `SM-2018-Fall-PM2`、`SM-2018-Fall-PM1`、`SM-2019-Fall-PM2`、`SM-2019-Fall-PM1`、`SM-2022-Spring-PM2` が挙がった。
 このため、DB / AU / SM / ES はローカル監査だけでなく公式To-Be上も未整備として扱い、既存JSON補正ではなく公式PDF取得からの抽出工程で進める。
+
+2026-05-08 の再監査では、DB / AU / SM / ES のローカル午後 `questions` ディレクトリはいずれも0件であった。`packages/data/data/raw_pdfs/` には DB が50件、ESが50件存在する一方、AU / SM は0件であった。公式ソース監査は `officialQuestionExamCount=117`、`missingLocalQuestionCount=116`、`missingLocalAnswerCount=116`、`missingExamListCount=57` を検出しているため、DB / ES は既存PDFから抽出を開始し、AU / SM は公式URL同期とPDF取得を先に行う。
 
 ## 3. 修正方針
 
@@ -113,6 +116,8 @@ DB / AU / SM / ES は、午後 `*-PM*` のローカルデータが存在しな�
 4. 公式PDF画像で下線、図表、表、解答群、字数条件を spot check する
 5. `questions_transformed.json` を作成し、アプリ表示用の解答欄へ正規化する
 6. Cosmos 同期は dry-run とユーザー承認後に限定する
+
+抽出順序は、ローカルPDFが揃っている DB / ES を先行し、AU / SM は公式ソース監査結果を `exam-list.ts` に同期してから Stage A（PDF取得・検証）へ進める。全区分を一括でOCRしない。まず各区分の最新年度1試験で `questions_raw.json` / `answers_raw.json` / `questions_transformed.json` の形を確定し、監査を通してから年度を広げる。
 
 ### 3.3 UI共通修正
 
