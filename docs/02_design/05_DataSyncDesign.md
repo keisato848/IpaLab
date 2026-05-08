@@ -4,6 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-08 | 全試験区分の午後データ品質監査 `audit:afternoon-data`、DB/AU/SM など未抽出区分の抽出必要性、親見出し800字欄化の再発防止を追加 |
 | 2026-05-06 | `PM-2020-Fall-AM2` / `PM-2016-Spring-AM2` / `SA-2025-Spring-AM2` / `ST-2025-Spring-AM2` の AM2 正答不整合補正と self-inspect R16 強化を追加 |
 | 2026-05-06 | `SA-2025-Spring-PM1` / `SA-2025-Spring-PM2` / `ST-2025-Spring-PM1` / `ST-2025-Spring-PM2` の午後問題 transformed 追加実績を追加 |
 | 2026-05-06 | `NW-2025-Spring-PM2` の Gemini API による解説込み問題・解答PDF抽出実績を追加 |
@@ -144,7 +145,28 @@ Stage A の完了条件は `status=RAW_PDF_AUDIT_OK`、`missingQuestionCount=0`�
 この条件を満たすまで `npm run extract -w packages/data` へ進まない。
 Windows 環境では `npx` を子プロセスから直接 spawn すると `spawnSync npx ENOENT` になる場合があるため、Gemini OCR は `npm run extract -w packages/data` から起動し、内部では `process.execPath` と `ts-node/register` で `gemini-extract.ts` を実行する。
 
-#### 7.2.0 Gemini OCR Stage B 対象限定実行
+#### 7.2.0 午後データ品質監査
+
+午後問題を修正・抽出・同期する前に、全区分を対象にローカルデータの構造不備を監査する。
+
+```powershell
+npm run audit:afternoon-data
+npm run audit:afternoon-data -- --json
+```
+
+監査対象は `packages/data/data/questions/*-(PM|PM1|PM2)` で、AP / SA / PM / SC / ST / NW / FE / DB / AU / SM / ES を標準の確認対象とする。ローカルに `*-PM*` データが存在しない区分は `missingTargetCategories` に出力し、DB / AU / SM のような未抽出区分は既存データ修正ではなく公式PDFからの新規抽出工程へ進める。
+
+監査では以下を検出する。
+
+- 設問に `下線①` などの参照があるが、本文側に下線表現や参照番号が見当たらない疑い
+- 子設問を持つ親設問が `explanation` だけで直接解答欄化され、800字欄になる疑い
+- 1設問に複数の字数条件が混在し、解答欄分割が必要な疑い
+- 記号回答なのに `choices` / `options` / `answerChoices` がなく、設問文にも解答群本文がない疑い
+- 広い `〜について答えよ` 形式で字数条件がない親見出し欄
+
+`self-inspect` R27 は、親見出しを直接解答欄化しない UI 判定と `scripts/audit-afternoon-data-quality.mjs` の存在を検査する。データ修正 PR では、監査結果、公式PDF照合対象、抽出対象区分、未修正の残リスクを PR 本文または `docs/04_reports/` の報告書に記録する。
+
+#### 7.2.1 Gemini OCR Stage B 対象限定実行
 
 午後問題を Gemini API で抽出する場合、`gemini_pm_ocr_prompt.md` に従い、`questions_raw.json` には問題本文、図表の Mermaid 表現、設問、設問ごとの `explanation` を含める。
 全PDFを一括処理すると不要な再抽出やレート消費が発生するため、`gemini-extract.ts` は対象試験を限定できる。
@@ -184,7 +206,7 @@ E2Eでは各大問ページの解答欄数、空設問なし、Mermaid描画失�
 再発防止として `.github/hooks/self-inspect.ps1` の R16 を強化し、`questions_raw.json` が配列形式または `{ questions: [...] }` 形式のどちらでも正規化し、`answers_raw.json` も key-value map、配列、`answers` ラッパーを照合対象にする。
 また、問題側に qNo が存在するのに解答mapへ対応する正答がない場合も R16 で検出する。
 
-#### 7.2.1 Ollama 解答PDF抽出 pilot
+#### 7.2.2 Ollama 解答PDF抽出 pilot
 
 Gemini のレート制限回避やローカル検証のため、解答PDFだけを `extract:answers:ollama` で抽出できる。
 この pilot は `answers_raw.json` の補完用であり、問題本文・図表・Mermaid 変換を含む `questions_raw.json` の正式抽出を代替しない。
