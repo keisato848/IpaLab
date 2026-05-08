@@ -19,6 +19,7 @@
     "test": "turbo run test",
     "test:unit": "turbo run test:run --filter=web",
     "test:e2e": "cd apps/web && npx playwright test",
+    "audit:afternoon-data": "node scripts/audit-afternoon-data-quality.mjs",
     "guard:exam-data": "node scripts/guard-exam-data-fallback.mjs",
     "guard:exam-data:test": "node scripts/__tests__/guard-exam-data-fallback.test.mjs",
     "prepare": "husky"
