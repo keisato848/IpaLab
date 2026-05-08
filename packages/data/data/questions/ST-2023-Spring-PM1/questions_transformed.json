@@ -26,7 +26,6 @@
       {
         "subQNo": "設問4",
         "text": "〔マーケットプレイスの構築〕について答えよ。",
-        "explanation": "NFTとスマートコントラクトの柔軟性を活用した施策に関する設問です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -74,7 +73,6 @@
       {
         "subQNo": "設問2",
         "text": "〔PoC 協議会の提言〕について答えよ。",
-        "explanation": "プラットフォームの設計意図を問う設問です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -93,7 +91,6 @@
       {
         "subQNo": "設問3",
         "text": "〔PoC の実施〕について答えよ。",
-        "explanation": "実証実験の効果測定に関する設問です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -145,7 +142,6 @@
       {
         "subQNo": "設問3",
         "text": "〔デジタル活用施策の概要〕について答えよ。",
-        "explanation": "投票収集と分析基盤の役割に関する設問です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -164,7 +160,6 @@
       {
         "subQNo": "設問4",
         "text": "〔CTO からのコメント〕について答えよ。",
-        "explanation": "投資判断とUX強化策に関する設問です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -207,7 +202,6 @@
       {
         "subQNo": "設問1",
         "text": "〔市場分析〕について答えよ。",
-        "explanation": "市場適合性と環境条件に関する設問です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -226,7 +220,6 @@
       {
         "subQNo": "設問2",
         "text": "〔新製品の検討〕について答えよ。",
-        "explanation": "アライアンス戦略の意図を問う設問です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -251,7 +244,6 @@
       {
         "subQNo": "設問3",
         "text": "〔将来の事業展開〕について答えよ。",
-        "explanation": "長期的な事業価値に関する設問です。",
         "subQuestions": [
           {
             "label": "(1)",
