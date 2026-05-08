@@ -7,7 +7,7 @@ const repoRoot = process.cwd();
 const ipaBaseUrl = 'https://www.ipa.go.jp';
 const questionsRoot = path.join(repoRoot, 'packages', 'data', 'data', 'questions');
 const examListPath = path.join(repoRoot, 'packages', 'data', 'src', 'scraper', 'exam-list.ts');
-const defaultTargetCategories = ['AP', 'PM', 'SC', 'FE', 'NW', 'DB', 'SA', 'ES', 'ST'];
+const defaultTargetCategories = ['AP', 'PM', 'SC', 'FE', 'NW', 'DB', 'AU', 'SM', 'SA', 'ES', 'ST'];
 const supportedTypes = ['AM', 'AM1', 'AM2', 'PM', 'PM1', 'PM2'];
 
 const args = process.argv.slice(2);

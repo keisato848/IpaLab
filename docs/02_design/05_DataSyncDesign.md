@@ -122,7 +122,7 @@ packages/data/
 
 ### 7.1 公式ソース To-Be 監査
 
-対象カテゴリは AP / PM / SC / FE / NW / DB / SA / ES / ST、年度範囲は 2016 年以降を標準とする。
+対象カテゴリは AP / PM / SC / FE / NW / DB / AU / SM / SA / ES / ST、年度範囲は 2016 年以降を標準とする。
 `official-source-coverage-audit.mjs` は IPA の年度別 HTML から `_qs.pdf` と `_ans.pdf` を抽出し、問題 PDF が存在する単位を To-Be として扱う。
 公式解答 PDF が存在する場合は `exam-list.ts` の `answerUrl` と `packages/data/data/questions/{examId}/answers_raw.json` も検証対象に含める。
 差分は `representativeGaps` として As-Is / To-Be の形で出力し、本番同期 dry-run 前に説明する。
@@ -134,11 +134,11 @@ PDF ダウンロード後、Gemini OCR へ進む前に `packages/data/data/raw_p
 大規模整備では対象カテゴリを `DOWNLOAD_CATEGORIES` で明示し、監査も同じカテゴリで実行する。
 
 ```powershell
-$env:DOWNLOAD_CATEGORIES = "AP,PM,SC,FE,NW,DB,SA,ES,ST"
+$env:DOWNLOAD_CATEGORIES = "AP,PM,SC,FE,NW,DB,AU,SM,SA,ES,ST"
 npm run download -w packages/data
 Remove-Item Env:DOWNLOAD_CATEGORIES
 
-npm run -w packages/data audit:raw-pdfs -- --categories=AP,PM,SC,FE,NW,DB,SA,ES,ST
+npm run -w packages/data audit:raw-pdfs -- --categories=AP,PM,SC,FE,NW,DB,AU,SM,SA,ES,ST
 ```
 
 Stage A の完了条件は `status=RAW_PDF_AUDIT_OK`、`missingQuestionCount=0`、`missingAnswerCount=0`、`invalidPdfCount=0` とする。
