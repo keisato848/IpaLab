@@ -18,7 +18,6 @@
       {
         "subQNo": "設問1",
         "text": "〔A社の戦略〕について答えよ。",
-        "explanation": "A社の戦略の核心は、既存の多様なサービス（EC、検索、決済）を統合し、顧客がその中で活動し続ける「デジタル経済圏」を構築することです。\n\n### A経済圏の構想図\n[CODE_BLOCK:mermaid]graph TD\n    A[A社グループサービス]\n    B[EC/検索/旅行/広告]\n    C[A-Pay 決済]\n    D[銀行/証券/保険 金融]\n    E((A経済圏))\n    \n    A --> B\n    A --> C\n    A --> D\n    B --> E\n    C --> E\n    D --> E\n    E -- 循環 --> A[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -38,12 +37,11 @@
         "references": [
           "table1"
         ],
-        "explanation": "A-Payの課題は「現金化の手数料」と「入金サイクル」でした。J銀行との連携により、これらのコストやタイムラグを解消することを目指しています。\n\n### 利便性強化のポイント\n[CODE_BLOCK:mermaid]graph LR\n    User[利用者] -- 手数料無料化 --> JBank((J銀行))\n    Shop[加盟店] -- 早期入金/毎日集計 --> JBank\n    JBank -- 資金流動性向上 --> User & Shop[/CODE_BLOCK]"
+        "explanation": "A-Payの課題は「現金化の手数料」と「入金サイクル」でした。J銀行との連携により、これらのコストやタイムラグを解消することを目指しています。\n\n### 利便性強化のポイント\n[CODE_BLOCK:mermaid]graph LR\n    User[利用者] -- 手数料無料化 --> JBank((\"J銀行\"))\n    Shop[加盟店] -- 早期入金/毎日集計 --> JBank\n    JBank -- 資金流動性向上 --> User & Shop[/CODE_BLOCK]"
       },
       {
         "subQNo": "設問3",
         "text": "〔Aアプリの開発〕について答えよ。",
-        "explanation": "若者世代（デジタルネイティブ）は「煩雑な手続き」を嫌い、「効率」と「将来の安心」を求めています。Aアプリはこれらを解決するプラットフォームとして設計されています。\n\n### 煩雑さの解消フロー\n[CODE_BLOCK:mermaid]sequenceDiagram\n    participant U as 若者世代\n    participant App as Aアプリ\n    participant Data as 個人情報DB\n    participant Fin as 金融サービス\n    \n    U->>App: サービス申込\n    App->>Data: 保存済み情報の呼出\n    Data-->>App: 自動入力\n    App->>Fin: ワンストップ契約完了\n    Note over U, Fin: 書類郵送や手書きを排除[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -60,7 +58,6 @@
       {
         "subQNo": "設問4",
         "text": "〔J銀行勘定系システムの再構築〕について答えよ。",
-        "explanation": "レガシーな勘定系システムは機能が密結合（スパゲッティ状態）だったため、改修が困難でした。これをマイクロサービスのように細分化（疎結合）することで、Aアプリとの連携を容易にしています。\n\n### システム構造の変化\n[CODE_BLOCK:mermaid]graph TD\n    subgraph Old [旧システム: 密結合]\n        A[預金] --- B[為替]\n        B --- C[融資]\n    end\n    \n    subgraph New [新システム: API基盤]\n        D[預金API]\n        E[為替API]\n        F[データ管理API]\n    end\n    \n    App[Aアプリ] --> D & E & F[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -88,7 +85,6 @@
       {
         "subQNo": "設問1",
         "text": "〔デジタルメディアの立ち上げ〕について答えよ。",
-        "explanation": "H社は「一方向の情報提供（新聞）」から「双方向のコミュニケーションハブ」へと役割を変えようとしています。\n\n### ビジネスモデルの転換図\n[CODE_BLOCK:mermaid]graph LR\n    Old[従来: 一方向]\n    New[変革後: 双方向/ハブ]\n    \n    H1[H社] -- 記事 --> R[読者]\n    \n    H2[H社] <--> R2[読者/住民]\n    H2 <--> G[行政/企業]\n    H2 <--> K[文化人/工芸家]\n    \n    subgraph Hub [コミュニケーションハブ]\n        H2\n    end[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -105,7 +101,6 @@
       {
         "subQNo": "設問2",
         "text": "〔トナレポデジタル〕について答えよ。",
-        "explanation": "トナレポデジタルの特徴は、読者が自ら社会課題を提起し、行政や研究者を巻き込んだ議論ができる点にあります。これは従来の「投書」をデジタルで高度化したものです。\n\n### トナレポの価値共創サイクル\n[CODE_BLOCK:mermaid]sequenceDiagram\n    participant U as 投稿者(読者)\n    participant H as H社編集部\n    participant G as 自治体/団体\n    \n    U->>H: 社会課題の投稿\n    H->>G: 深掘り取材/共同研究\n    H->>U: 記事掲載\n    U->>G: スレッドでの直接対話\n    G->>U: 政策への反映/フィードバック[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -122,7 +117,6 @@
       {
         "subQNo": "設問3",
         "text": "〔観光TM〕について答えよ。",
-        "explanation": "観光TMはメタバース（V地域）を利用し、地理的・言語的制約を超えた体験を提供します。H社の膨大なアーカイブ（史実や研究内容）が展示の質を高めています。\n\n### 観光TMの構造\n[CODE_BLOCK:mermaid]graph TD\n    V[V地域/メタバース]\n    V --> Show[V展示場: 伝統工芸購入/史実紹介]\n    V --> Guide[V案内所: 地域人材紹介/交流]\n    \n    AI[AI翻訳] -.-> V\n    \n    User[外国人観光客] -- アバター --> V\n    Agent[旅行会社] -- 案内 --> User[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -149,7 +143,7 @@
           "id": "fig1",
           "label": "図1 旅館管理システムの概要",
           "type": "mermaid",
-          "content": "graph LR\n    User((利用者)) -- \"予約/アンケート\" --> BookingSite[旅行予約サイト]\n    BookingSite <--> System\n    \n    subgraph System [旅館管理システム（クラウドサービス）]\n        direction TB\n        Chat[社内チャット] \n        KB[ナレッジベース] \n        Mgmt[予約管理 / 顧客管理 / 清掃管理]\n        Chat <--> KB\n        KB <--> Mgmt\n    end\n    \n    Mgmt <--> Tablet[タブレット]\n    Chat <--> Tablet\n    Tablet --- Staff[従業員]\n    Staff --- Intercom[インカム]"
+          "content": "graph LR\n    User((\"利用者\")) -- \"予約/アンケート\" --> BookingSite[旅行予約サイト]\n    BookingSite <--> System\n    \n    subgraph System [旅館管理システム（クラウドサービス）]\n        direction TB\n        Chat[社内チャット] \n        KB[ナレッジベース] \n        Mgmt[予約管理 / 顧客管理 / 清掃管理]\n        Chat <--> KB\n        KB <--> Mgmt\n    end\n    \n    Mgmt <--> Tablet[タブレット]\n    Chat <--> Tablet\n    Tablet --- Staff[従業員]\n    Staff --- Intercom[インカム]"
         }
       ]
     },
@@ -157,12 +151,11 @@
       {
         "subQNo": "設問1",
         "text": "〔B旅館における業務改革推進の背景〕について、B旅館が経営目標を達成するために活用すべき強みは何か。30字以内で答えよ。",
-        "explanation": "B旅館の強みは、長年の経験に基づく「接客情報」と、それを用いた「一歩先のおおもてなし」です。ITはこの強みを補完し、人手不足の中でも維持するために導入されます。\n\n### 強みの活用構造\n[CODE_BLOCK:mermaid]graph LR\n    Data[蓄積された接客情報] --> Service[おもてなし]\n    Service --> UX[顧客体験価値の向上]\n    UX --> Repeat[リピーター獲得]\n    \n    IT((IT活用)) -- 可視化/共有 --> Data[/CODE_BLOCK]"
+        "explanation": "B旅館の強みは、長年の経験に基づく「接客情報」と、それを用いた「一歩先のおおもてなし」です。ITはこの強みを補完し、人手不足の中でも維持するために導入されます。\n\n### 強みの活用構造\n[CODE_BLOCK:mermaid]graph LR\n    Data[蓄積された接客情報] --> Service[おもてなし]\n    Service --> UX[顧客体験価値の向上]\n    UX --> Repeat[リピーター獲得]\n    \n    IT((\"IT活用\")) -- 可視化/共有 --> Data[/CODE_BLOCK]"
       },
       {
         "subQNo": "設問2",
         "text": "〔旅館のアクションプラン〕について答えよ。",
-        "explanation": "アクションプランは、現状の課題（手作業、属人性、人手不足）を直接解決するように構成されています。\n\n### アクションプランの対応関係\n[CODE_BLOCK:mermaid]graph TD\n    Problem1[人手不足/多忙] --> Action1[業務効率化]\n    Problem2[閑散期の稼働率] --> Action2[集客力向上]\n    Problem3[育成の長期化] --> Action3[育成早期化][/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -187,7 +180,6 @@
         "references": [
           "fig1"
         ],
-        "explanation": "旅館管理システムは、単なる台帳管理ではなく、ベテランの「暗黙知」を「形式知（ナレッジ）」に変え、AIで教育を自動化する仕組みを持っています。\n\n### ナレッジ継承の流れ\n[CODE_BLOCK:mermaid]sequenceDiagram\n    participant V as ベテラン仲居\n    participant Chat as 社内チャット\n    participant KB as ナレッジベース\n    participant AI as AI学習機能\n    participant Y as 若手仲居\n    \n    V->>Chat: 接客コツを投稿\n    Chat->>KB: ノウハウとして蓄積\n    KB->>AI: 問題作成\n    AI->>Y: 自己学習・実践[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -214,7 +206,6 @@
       {
         "subQNo": "設問4",
         "text": "〔従業員からの意見〕について答えよ。",
-        "explanation": "高級旅館の「雰囲気」を壊さないことと、「利便性」を両立させることが求められています。音声入力の活用などが想定されます。\n\n### UI/UXの改善\n[CODE_BLOCK:mermaid]graph LR\n    Input[手を使わない登録] --> Voice[音声入力機能]\n    Design[目立たないデバイス] --> Atmosphere[旅館の雰囲気維持]\n    \n    Voice --> Efficiency[業務効率化]\n    Atmosphere --> Brand[伝統と格式][/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",

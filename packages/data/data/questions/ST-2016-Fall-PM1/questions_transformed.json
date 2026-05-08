@@ -33,7 +33,6 @@
         "references": [
           "table2"
         ],
-        "explanation": "第1段階（暫定対応）における各業務の統合の進め方と、現状把握の不足点、運用ルールに関する問題です。\n\n### システム構成のイメージ\n[CODE_BLOCK:mermaid]\ngraph LR\n    subgraph \"第1段階: ネットワーク統合\"\n        UnivA[A大学 基幹NW] -- 接続 --- UnivB[他大学 基幹NW]\n        UnivA --- Admin[学術情報センタ 一元管理]\n    end\n    subgraph \"課題\"\n        Faculty[学部LAN/NW機器] -. 不明 .-> Admin\n    end\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -64,7 +63,6 @@
         "references": [
           "table3"
         ],
-        "explanation": "本格統合フェーズにおけるシステム連携とリスク管理に関する問題です。\n\n### 認証連携のイメージ\n[CODE_BLOCK:mermaid]\ngraph TD\n    HR[人事給与システム] -->|教職員情報| Auth[NW認証機能]\n    Student[学務システム] -->|学生情報| Auth\n    Auth -->|一元認証| NW[学内ネットワーク]\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -108,7 +106,6 @@
       {
         "subQNo": "設問1",
         "text": "連携システムの効果について、(1)、(2)に答えよ。",
-        "explanation": "システム導入による医療関係者および患者へのメリットを特定します。\n\n### 連携イメージ\n[CODE_BLOCK:mermaid]\ngraph LR\n    Hospital[総合病院] -- 検査データ --> System[連携システム]\n    Clinic[医療機関/かかりつけ医] -- 参照 --> System\n    Patient[患者] -- かかりつけ医で結果確認 --> Clinic\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -127,7 +124,6 @@
       {
         "subQNo": "設問2",
         "text": "共有サーバにおける訪問記録の利用について、(1)、(2)に答えよ。",
-        "explanation": "訪問看護における業務効率化とシステム要件の問題です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -146,7 +142,6 @@
       {
         "subQNo": "設問3",
         "text": "法人Dが行うことについて、(1)、(2)に答えよ。",
-        "explanation": "法人の運営方針とデータ標準化に関する問題です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -176,7 +171,6 @@
       {
         "subQNo": "設問1",
         "text": "AP-1について、(1)～(3)に答えよ。",
-        "explanation": "社内の情報共有基盤の構築に関する詳細を確認します。\n\n### 部門間連携の流れ\n[CODE_BLOCK:mermaid]\ngraph TD\n    Sales[営業] <--> DB[(顧客情報管理システム)]\n    Eng[工務] -- 設置工事情報 --> DB\n    Main[保守] -- 参照 --> DB\n    DB -- タイムリな提案 --> Sales\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -201,7 +195,6 @@
       {
         "subQNo": "設問2",
         "text": "AP-2について、(1)～(3)に答えよ。",
-        "explanation": "顧客ニーズに合わせたサービス拡充戦略に関する問題です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -226,7 +219,6 @@
       {
         "subQNo": "設問3",
         "text": "AP-3について、(1)、(2)に答えよ。",
-        "explanation": "IoT/データ分析を活用した予防保守ビジネスへの転換に関する問題です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -261,7 +253,6 @@
       {
         "subQNo": "設問2",
         "text": "[システム化の検討] について、(1)～(3)に答えよ。",
-        "explanation": "システムの設置場所やデータ活用、リスク分析に関する問題です。\n\n### データの流れ\n[CODE_BLOCK:mermaid]\ngraph TD\n    Sensor[振動センサ/メータ] -- 無線 --> FServer[F社サーバ]\n    FServer -- 分析 --> Result[漏水予兆特定]\n    GIS[他社GISソフト] -- 埋設管位置表示 --> Result\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -286,7 +277,6 @@
       {
         "subQNo": "設問3",
         "text": "[新システムの様々な市場展開] について、(1)～(3)に答えよ。",
-        "explanation": "グローバル展開や異業種連携（高速道路・重機）に関する戦略です。",
         "subQuestions": [
           {
             "label": "(1)",
