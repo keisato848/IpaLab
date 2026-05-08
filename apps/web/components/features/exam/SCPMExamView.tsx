@@ -17,7 +17,19 @@ import { normalizeMermaidCodeBlocks } from '@/lib/mermaid/sanitize';
 import styles from './SCPMExamView.module.css';
 import AIAnswerBox from './AIAnswerBox';
 import { ScoreResult } from './AIAnswerBox';
-import { buildPMAnswerFieldId, buildPMDraftKey, extractAnswerLimit } from './pmAnswerUtils';
+import {
+    AfternoonAnswerField,
+    AfternoonObjectiveAnswerHistory,
+    AfternoonObjectiveAnswerSubmission,
+    buildAfternoonObjectiveAnswerFields,
+    buildPMAnswerFieldId,
+    buildPMDraftKey,
+    extractAnswerLimit,
+    formatAfternoonCorrectAnswer,
+    gradeAfternoonObjectiveAnswer,
+    hasAfternoonObjectiveCorrectAnswer,
+    parseSelectedOptionIdsFromAnswer,
+} from './pmAnswerUtils';
 // Replaced missing UI components with native elements
 // import { Badge } from '@/components/ui/badge';
 // import { Button } from '@/components/ui/button';
@@ -67,7 +79,10 @@ const getAnswerItems = (section: any) => {
 const countAnswerFields = (questions: any[] | undefined) => {
     if (!questions) return 0;
     return questions.reduce((total, item) => {
-        return total + getAnswerItems(item).length;
+        return total + getAnswerItems(item).reduce((itemTotal, answerItem, index) => {
+            const objectiveFieldCount = buildAfternoonObjectiveAnswerFields(answerItem, `count-${index}`).length;
+            return itemTotal + Math.max(1, objectiveFieldCount);
+        }, 0);
     }, 0);
 };
 
@@ -115,9 +130,11 @@ interface SCPMExamViewProps {
     onAnswerSubmit?: (subQNo: string | number, answer: string) => void;
     onGrade?: (data: { answer: string; result: ScoreResult }, subQIndex: number, subSubIndex?: number) => void;
     descriptiveHistory?: Record<string, { answer: string; result: any }>; // Pass history
+    onObjectiveAnswer?: (data: AfternoonObjectiveAnswerSubmission) => void;
+    objectiveHistory?: Record<string, AfternoonObjectiveAnswerHistory>;
 }
 
-export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descriptiveHistory }: SCPMExamViewProps) {
+export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descriptiveHistory, onObjectiveAnswer, objectiveHistory }: SCPMExamViewProps) {
     const { context, questions } = question;
     const [selectedDiagram, setSelectedDiagram] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'context' | 'answer'>('context');
@@ -455,10 +472,12 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                                 parentQuestionId={question.id}
                                 parentContext={context}
                                 onGrade={onGrade ? (data, subSubIndex) => onGrade(data, idx, subSubIndex) : undefined}
-                                getInitialData={(subSubIndex) => {
-                                    if (!descriptiveHistory) return undefined;
-                                    return descriptiveHistory[buildPMAnswerFieldId(question.id, idx, subSubIndex)]
-                                        || descriptiveHistory[q.id || `sq-${idx}`];
+                                onObjectiveAnswer={onObjectiveAnswer}
+                                getInitialData={(answerFieldId) => {
+                                    return descriptiveHistory?.[answerFieldId]
+                                        || objectiveHistory?.[answerFieldId]
+                                        || descriptiveHistory?.[q.id || `sq-${idx}`]
+                                        || objectiveHistory?.[q.id || `sq-${idx}`];
                                 }}
                             />
                         ))}
@@ -470,7 +489,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
 
 }
 
-function SubQuestionBlock({ question, index, parentQuestionId, parentContext, onGrade, getInitialData }: { question: any, index: number, parentQuestionId: string, parentContext: any, onGrade?: (data: any, subSubIndex?: number) => void, getInitialData?: (subSubIndex?: number) => any }) {
+function SubQuestionBlock({ question, index, parentQuestionId, parentContext, onGrade, onObjectiveAnswer, getInitialData }: { question: any, index: number, parentQuestionId: string, parentContext: any, onGrade?: (data: any, subSubIndex?: number) => void, onObjectiveAnswer?: (data: AfternoonObjectiveAnswerSubmission) => void, getInitialData?: (answerFieldId: string) => any }) {
     const normalizedQuestionText = useMemo(
         () => normalizeMermaidCodeBlocks(question.text),
         [question.text]
@@ -499,7 +518,8 @@ function SubQuestionBlock({ question, index, parentQuestionId, parentContext, on
                             sIdx={sIdx}
                             answerFieldId={buildPMAnswerFieldId(parentQuestionId, index, sIdx)}
                             onGrade={onGrade ? (data) => onGrade(data, sIdx) : undefined}
-                            initialData={getInitialData?.(sIdx)}
+                            onObjectiveAnswer={onObjectiveAnswer}
+                            getInitialData={getInitialData}
                         />
                     ))}
                 </div>
@@ -508,7 +528,7 @@ function SubQuestionBlock({ question, index, parentQuestionId, parentContext, on
     );
 }
 
-function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, initialData }: { sq: any, sIdx: number, answerFieldId: string, onGrade?: (data: any) => void, initialData?: any }) {
+function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, onObjectiveAnswer, getInitialData }: { sq: any, sIdx: number, answerFieldId: string, onGrade?: (data: any) => void, onObjectiveAnswer?: (data: AfternoonObjectiveAnswerSubmission) => void, getInitialData?: (answerFieldId: string) => any }) {
     const [showExplanation, setShowExplanation] = useState(false);
     const normalizedText = useMemo(
         () => normalizeMermaidCodeBlocks(sq.text),
@@ -516,10 +536,12 @@ function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, initialData }: { sq
     );
     const promptText = sq.promptText || sq.text || '';
     const answerLimit = useMemo(() => extractAnswerLimit(promptText), [promptText]);
+    const objectiveFields = useMemo(() => buildAfternoonObjectiveAnswerFields(sq, answerFieldId), [sq, answerFieldId]);
     const normalizedExplanation = useMemo(
         () => normalizeMermaidCodeBlocks(sq.explanation || ''),
         [sq.explanation]
     );
+    const aiInitialData = getInitialData?.(answerFieldId);
 
     return (
         <div className={styles.subQuestionItem}>
@@ -538,19 +560,31 @@ function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, initialData }: { sq
                 </div>
             )}
 
-            {/* AI Grading Box */}
             <div style={{ marginTop: '1rem' }}>
-                <AIAnswerBox
-                    questionText={`[${sq.label}] ${promptText}`}
-                    modelAnswer={sq.answer}
-                    limit={answerLimit}
-                    onSave={onGrade}
-                    initialAnswer={initialData?.answer}
-                    initialResult={initialData?.result}
-                    draftKey={buildPMDraftKey(answerFieldId)}
-                    inputVariant="genkoyoshi"
-                    hideChart={true}
-                />
+                {objectiveFields.length > 0 ? (
+                    <div className={styles.objectiveAnswerList}>
+                        {objectiveFields.map((field) => (
+                            <AfternoonObjectiveAnswerBox
+                                key={field.id}
+                                field={field}
+                                initialData={getInitialData?.(field.id)}
+                                onSubmit={onObjectiveAnswer}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <AIAnswerBox
+                        questionText={`[${sq.label}] ${promptText}`}
+                        modelAnswer={sq.answer}
+                        limit={answerLimit}
+                        onSave={onGrade}
+                        initialAnswer={aiInitialData?.answer}
+                        initialResult={aiInitialData?.result}
+                        draftKey={buildPMDraftKey(answerFieldId)}
+                        inputVariant="genkoyoshi"
+                        hideChart={true}
+                    />
+                )}
             </div>
 
             <div className={styles.explanationToggle}>
@@ -585,5 +619,140 @@ function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, initialData }: { sq
                 )}
             </div>
         </div>
+    );
+}
+
+function AfternoonObjectiveAnswerBox({ field, initialData, onSubmit }: { field: AfternoonAnswerField, initialData?: AfternoonObjectiveAnswerHistory, onSubmit?: (data: AfternoonObjectiveAnswerSubmission) => void }) {
+    const initialSelectedIds = useMemo(
+        () => initialData?.selectedOptionIds || parseSelectedOptionIdsFromAnswer(initialData?.userAnswer),
+        [initialData?.selectedOptionIds, initialData?.userAnswer]
+    );
+    const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
+    const [textAnswer, setTextAnswer] = useState(initialData?.userAnswer || '');
+    const [result, setResult] = useState<AfternoonObjectiveAnswerHistory | null>(initialData || null);
+    const hasCorrectAnswer = hasAfternoonObjectiveCorrectAnswer(field);
+    const isChoice = field.mode === 'single-choice' || field.mode === 'multiple-choice';
+    const hasUserAnswer = isChoice ? selectedIds.length > 0 : textAnswer.trim().length > 0;
+
+    useEffect(() => {
+        const nextSelectedIds = initialData?.selectedOptionIds || parseSelectedOptionIdsFromAnswer(initialData?.userAnswer);
+        setSelectedIds(nextSelectedIds);
+        setTextAnswer(initialData?.userAnswer || '');
+        setResult(initialData || null);
+    }, [field.id, initialData]);
+
+    const toggleChoice = (optionId: string) => {
+        if (result) return;
+
+        if (field.mode === 'single-choice') {
+            setSelectedIds([optionId]);
+            return;
+        }
+
+        setSelectedIds(prev => prev.includes(optionId)
+            ? prev.filter(id => id !== optionId)
+            : [...prev, optionId]
+        );
+    };
+
+    const handleSubmit = () => {
+        if (!hasUserAnswer || !hasCorrectAnswer) return;
+
+        const userAnswer = isChoice ? selectedIds.join(', ') : textAnswer.trim();
+        const correctAnswer = formatAfternoonCorrectAnswer(field);
+        const isCorrect = gradeAfternoonObjectiveAnswer(field, isChoice ? selectedIds : textAnswer);
+        const nextResult: AfternoonObjectiveAnswerHistory = {
+            userAnswer,
+            selectedOptionIds: isChoice ? selectedIds : undefined,
+            correctAnswer,
+            isCorrect,
+        };
+
+        setResult(nextResult);
+        onSubmit?.({
+            answerFieldId: field.id,
+            label: field.label,
+            mode: field.mode as Exclude<AfternoonAnswerField['mode'], 'descriptive'>,
+            prompt: field.prompt,
+            userAnswer,
+            selectedOptionIds: isChoice ? selectedIds : undefined,
+            correctAnswer,
+            isCorrect,
+            explanation: field.explanation,
+        });
+    };
+
+    return (
+        <section
+            className={styles.objectiveAnswerBox}
+            aria-labelledby={`${field.id}-label`}
+            data-testid="afternoon-objective-answer"
+            data-answer-field-id={field.id}
+            data-answer-mode={field.mode}
+        >
+            <div className={styles.objectiveAnswerHeader}>
+                <h4 id={`${field.id}-label`} className={styles.objectiveAnswerTitle}>{field.label}</h4>
+                <span className={styles.objectiveModeBadge}>
+                    {field.mode === 'single-choice' ? '択一' : field.mode === 'multiple-choice' ? '複数選択' : '短答'}
+                </span>
+            </div>
+
+            {isChoice ? (
+                <div className={styles.objectiveOptions} role="group" aria-label={`${field.label}の選択肢`}>
+                    {field.options?.map((option) => (
+                        <label
+                            key={option.id}
+                            className={`${styles.objectiveOption} ${selectedIds.includes(option.id) ? styles.objectiveOptionSelected : ''}`}
+                        >
+                            <input
+                                type={field.mode === 'single-choice' ? 'radio' : 'checkbox'}
+                                name={field.id}
+                                value={option.id}
+                                checked={selectedIds.includes(option.id)}
+                                disabled={Boolean(result)}
+                                onChange={() => toggleChoice(option.id)}
+                            />
+                            <span className={styles.objectiveOptionLabel}>{option.label}</span>
+                            <span className={styles.objectiveOptionText}>{option.text}</span>
+                        </label>
+                    ))}
+                </div>
+            ) : (
+                <div className={styles.shortTextAnswerGroup}>
+                    <input
+                        type="text"
+                        className={styles.shortTextAnswerInput}
+                        value={textAnswer}
+                        maxLength={field.limit}
+                        disabled={Boolean(result)}
+                        onChange={(event) => setTextAnswer(event.target.value)}
+                        aria-label={`${field.label}の回答`}
+                    />
+                    {field.limit && (
+                        <span className={styles.shortTextCounter}>{textAnswer.length}/{field.limit}</span>
+                    )}
+                </div>
+            )}
+
+            {!hasCorrectAnswer && (
+                <p className={styles.objectiveNotice}>正答データが未設定のため、この小問は自動採点できません。</p>
+            )}
+
+            {result ? (
+                <div className={`${styles.objectiveResult} ${result.isCorrect ? styles.objectiveResultCorrect : styles.objectiveResultIncorrect}`}>
+                    <span className={styles.objectiveResultStatus}>{result.isCorrect ? '正解' : '不正解'}</span>
+                    <span>正答: {result.correctAnswer || formatAfternoonCorrectAnswer(field)}</span>
+                </div>
+            ) : (
+                <button
+                    type="button"
+                    className={styles.objectiveSubmitButton}
+                    disabled={!hasUserAnswer || !hasCorrectAnswer}
+                    onClick={handleSubmit}
+                >
+                    回答を確定
+                </button>
+            )}
+        </section>
     );
 }
