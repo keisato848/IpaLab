@@ -20,6 +20,7 @@ import * as dotenv from 'dotenv';
 
 // 環境変数の読み込み
 const possibleEnvPaths = [
+    path.resolve(__dirname, '../../.env'),
     path.resolve(__dirname, '../../../../apps/web/.env.local'),
     path.resolve(__dirname, '../../../../apps/web/.env'),
     path.resolve(__dirname, '../../../../.env'),
@@ -31,7 +32,13 @@ for (const envPath of possibleEnvPaths) {
     }
 }
 
-const API_KEY = (process.env.GEMINI_API_KEY_2 || process.env.GEMINI_API_KEY) as string;
+const API_KEYS = Array.from(new Set([
+    process.env.GEMINI_API_KEY,
+    process.env.GEMINI_API_KEY_1,
+    process.env.GEMINI_API_KEY_2,
+    process.env.GEMINI_API_KEY_3,
+    process.env.GEMINI_API_KEY_4,
+].filter((key): key is string => Boolean(key))));
 
 const MODEL_NAME = "gemini-2.5-flash";
 const DATA_DIR = path.resolve(__dirname, '../../data/questions');
@@ -53,18 +60,43 @@ async function delay(ms: number) {
 /**
  * リトライ付きAPI呼び出し
  */
+let apiKeyIndex = 0;
+
+function getRotatedModel() {
+    if (API_KEYS.length === 0) {
+        throw new Error('GEMINI_API_KEY または GEMINI_API_KEY_1〜4 が設定されていません。');
+    }
+
+    const key = API_KEYS[apiKeyIndex];
+    const keyLabel = apiKeyIndex;
+    apiKeyIndex = (apiKeyIndex + 1) % API_KEYS.length;
+
+    return {
+        keyLabel,
+        model: new GoogleGenerativeAI(key).getGenerativeModel({
+            model: MODEL_NAME,
+            generationConfig: { responseMimeType: "application/json" }
+        }),
+    };
+}
+
 async function callWithRetry(
-    fn: () => Promise<any>,
+    prompt: string,
     maxRetries: number = 3,
     baseDelay: number = 15000
 ): Promise<any> {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        const { keyLabel, model } = getRotatedModel();
         try {
-            return await fn();
+            console.log(`  [KEY ${keyLabel}] Gemini API 呼び出し (${attempt}/${maxRetries})`);
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            return response.text();
         } catch (e: any) {
             const isRetryable = e.message?.includes('fetch failed')
                 || e.message?.includes('429')
                 || e.message?.includes('503')
+                || e.message?.includes('API_KEY_INVALID')
                 || e.message?.includes('RESOURCE_EXHAUSTED')
                 || e.message?.includes('overloaded');
             if (!isRetryable || attempt === maxRetries) {
@@ -318,12 +350,12 @@ async function main() {
     }
 
     // API キーの確認
-    if (!API_KEY) {
-        console.error("\nGEMINI_API_KEY_2 または GEMINI_API_KEY が設定されていません。");
+    if (API_KEYS.length === 0) {
+        console.error("\nGEMINI_API_KEY または GEMINI_API_KEY_1〜4 が設定されていません。");
         process.exit(1);
     }
 
-    console.log(`\nAPI Key: ${API_KEY.length}文字`);
+    console.log(`\nAPI Keys: ${API_KEYS.length}件`);
     console.log(`モデル: ${MODEL_NAME}`);
 
     // プロンプトの読み込み
@@ -332,12 +364,6 @@ async function main() {
         process.exit(1);
     }
     const promptText = fs.readFileSync(PROMPT_FILE_PATH, 'utf-8');
-
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({
-        model: MODEL_NAME,
-        generationConfig: { responseMimeType: "application/json" }
-    });
 
     let successCount = 0;
     let failCount = 0;
@@ -407,11 +433,7 @@ ${rawData}
 
             console.log(`  Gemini API送信中... (入力: ${totalInputLength.toLocaleString()}文字)`);
 
-            const apiResult = await callWithRetry(async () => {
-                const result = await model.generateContent(fullPrompt);
-                const response = await result.response;
-                return response.text();
-            });
+            const apiResult = await callWithRetry(fullPrompt, Math.max(3, API_KEYS.length * 2));
             const text = apiResult as string;
 
             // JSONの抽出（responseMimeType: "application/json" 使用時は直接パースを優先）

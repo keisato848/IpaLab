@@ -39,6 +39,8 @@
 #   R27. 午後試験の親見出しが余分な800字欄になり、全区分監査が欠落するパターン
 #   R28. 午後問題の qNo 不一致を位置番号で誤解決するパターン
 #   R29. 午後選択式小問が AI 採点欄に戻り、ラジオ/チェックボックス採点が消えるパターン
+#   R30. 午後OCRが単一JSON object前提に戻り、複数大問PDFの問2以降を落とすパターン
+#   R31. 午後変換が単一Geminiキー前提に戻り、無効キーで停止するパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -322,6 +324,50 @@ if (Test-Path $questionClient) {
         Add-Finding -Rule 'R9-session-progress-display-stats' -Severity 'High' `
             -File $questionClient `
             -Detail 'LearningSession の answeredCount/correctCount 保存が表示用 sessionStats に依存しています (推奨: currentSessionStats を使用)'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R30: 午後OCRは複数大問PDFに対応するため JSON array を要求すること
+#      (DB/ES/SC PM1 などで単一 object 前提に戻ると問2以降が欠落する)
+# ---------------------------------------------------------------------------
+$pmOcrPrompt = Join-Path $RepoRoot 'docs\prompts\gemini_pm_ocr_prompt.md'
+$geminiExtract = Join-Path $RepoRoot 'packages\data\src\scraper\gemini-extract.ts'
+if (Test-Path $pmOcrPrompt) {
+    $raw = Get-Content -LiteralPath $pmOcrPrompt -Raw
+    if ($raw -notmatch 'JSON Array' -or
+        $raw -notmatch 'one or more afternoon questions' -or
+        $raw -match 'Output a SINGLE JSON object') {
+        Add-Finding -Rule 'R30-afternoon-ocr-multi-question-array' -Severity 'High' `
+            -File $pmOcrPrompt `
+            -Detail '午後OCRプロンプトは複数大問PDFに対応するため JSON array を要求し、問2以降を抽出してください'
+    }
+}
+if (Test-Path $geminiExtract) {
+    $raw = Get-Content -LiteralPath $geminiExtract -Raw
+    if ($raw -match "isAfternoon \? 'JSON object'" -or
+        $raw -notmatch "const outputKind = 'JSON array'") {
+        Add-Finding -Rule 'R30-afternoon-ocr-multi-question-array' -Severity 'High' `
+            -File $geminiExtract `
+            -Detail 'Gemini OCR 呼び出しは午後問題にも JSON array を要求してください'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R31: 午後変換はGeminiキーをローテーションすること
+#      (単一キー優先に戻ると、無効な GEMINI_API_KEY_2 等でDB/ES抽出後変換が停止する)
+# ---------------------------------------------------------------------------
+$transformAllPm = Join-Path $RepoRoot 'packages\data\src\scripts\transform-batch-all-pm.ts'
+if (Test-Path $transformAllPm) {
+    $raw = Get-Content -LiteralPath $transformAllPm -Raw
+    if ($raw -match 'GEMINI_API_KEY_2\s*\|\|\s*process\.env\.GEMINI_API_KEY' -or
+        $raw -notmatch 'API_KEYS' -or
+        $raw -notmatch 'getRotatedModel' -or
+        $raw -notmatch "path\.resolve\(__dirname, '../../\.env'\)" -or
+        $raw -notmatch 'API_KEY_INVALID') {
+        Add-Finding -Rule 'R31-afternoon-transform-key-rotation' -Severity 'Medium' `
+            -File $transformAllPm `
+            -Detail '午後変換スクリプトは GEMINI_API_KEY / GEMINI_API_KEY_1〜4 をローテーションし、無効キーで即停止しないようにしてください'
     }
 }
 
@@ -906,7 +952,7 @@ Write-Host "## [self-inspect $tag] 自己点検レポート"
 Write-Host ""
 
 if ($findings.Count -eq 0) {
-    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16 / R17 / R18 / R19 / R20 / R21 / R22 / R23 / R24 / R25 / R26 / R27 / R28 / R29)"
+    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16 / R17 / R18 / R19 / R20 / R21 / R22 / R23 / R24 / R25 / R26 / R27 / R28 / R29 / R30 / R31)"
     exit 0
 }
 
@@ -920,7 +966,7 @@ foreach ($f in $findings) {
 }
 
 Write-Host ""
-Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から接続文字列・API キー実値を除去 / R13 → download.ts で content-type と %PDF- ヘッダーを検証し、壊れた既存 PDF は再取得する / R14 → npx 直接 spawn ではなく process.execPath + ts-node/register を使う / R15 → npm_config_* と node --require ts-node/register で npm run 引数を安定化する / R16 → AM/AM2 の answers_raw.json と questions_raw.json の qNo・correctOption・選択肢を同期する / R17 → PM/PM1/PM2 は questions_transformed.json と subQuestions 解答欄を同期する / R18 → Mermaid のリンクラベルは -->|label| または ---|label| に正規化し、非ASCIIの円形節点ラベルは引用する / R19 → 新形式午後ヘッダーは CSS Modules を使う / R20 → AIAnswerBox の draftKey・文字数制限を維持する / R21 → 新形式午後の総合スコアは平均を /100、件数は解答欄数で表示する / R22 → section.answer・section.questions・空 subQuestions も解答欄化する / R23 → 日本語 ER 図・subgraph は sanitizeMermaid で描画可能に正規化する / R24 → GitHub Actions の artifact 取得は actions/download-artifact@v6 を使う / R25 → SCPMExamView の解答例解説は ReactMarkdown で描画する / R26 → 解答例ラベルは不透明アンバー背景 + 濃色文字で視認性を保つ / R27 → 子設問を持つ説明だけの親見出しは解答欄化せず、午後データ監査を全区分で実行する / R28 → 午後問題は qNo 完全一致だけで解決し、位置番号フォールバックを再導入しない / R29 → answerChoices を持つ午後小問は radio/checkbox 選択式UIで採点・記録する"
+Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から接続文字列・API キー実値を除去 / R13 → download.ts で content-type と %PDF- ヘッダーを検証し、壊れた既存 PDF は再取得する / R14 → npx 直接 spawn ではなく process.execPath + ts-node/register を使う / R15 → npm_config_* と node --require ts-node/register で npm run 引数を安定化する / R16 → AM/AM2 の answers_raw.json と questions_raw.json の qNo・correctOption・選択肢を同期する / R17 → PM/PM1/PM2 は questions_transformed.json と subQuestions 解答欄を同期する / R18 → Mermaid のリンクラベルは -->|label| または ---|label| に正規化し、非ASCIIの円形節点ラベルは引用する / R19 → 新形式午後ヘッダーは CSS Modules を使う / R20 → AIAnswerBox の draftKey・文字数制限を維持する / R21 → 新形式午後の総合スコアは平均を /100、件数は解答欄数で表示する / R22 → section.answer・section.questions・空 subQuestions も解答欄化する / R23 → 日本語 ER 図・subgraph は sanitizeMermaid で描画可能に正規化する / R24 → GitHub Actions の artifact 取得は actions/download-artifact@v6 を使う / R25 → SCPMExamView の解答例解説は ReactMarkdown で描画する / R26 → 解答例ラベルは不透明アンバー背景 + 濃色文字で視認性を保つ / R27 → 子設問を持つ説明だけの親見出しは解答欄化せず、午後データ監査を全区分で実行する / R28 → 午後問題は qNo 完全一致だけで解決し、位置番号フォールバックを再導入しない / R29 → answerChoices を持つ午後小問は radio/checkbox 選択式UIで採点・記録する / R30 → 午後OCRは複数大問PDF向けに JSON array を要求する / R31 → 午後変換はGeminiキーをローテーションする"
 
 if ($FailOnFinding) { exit 1 }
 exit 0

@@ -180,7 +180,7 @@ node --require ts-node/register src/scraper/gemini-extract.ts --exam-id=NW-2025-
 `--exam-id=<examId>` は対象PDFを1試験に限定する。
 `--questions-only` は問題PDFだけ、`--answers-only` は解答PDFだけを処理する。
 `--force` は既存の `questions_raw.json` / `answers_raw.json` を上書きするため、対象ファイルを確認してから使用する。
-午後問題では出力が単一オブジェクトまたはオブジェクト配列になるため、午前問題のような `JSON array` 固定のプロンプト追記は行わず、午後問題では `JSON object` を要求する。
+午後問題PDFは、DB / ES / SC の PM1 のように複数のトップレベル大問を含む場合があるため、Gemini OCR では午後問題も `JSON array` を要求する。PDF内の各 `問` を1要素として出力し、単一大問PDFの場合だけ1要素配列にする。これにより、単一 `JSON object` 前提で大問1だけが抽出される欠落を防ぐ。
 
 2026-05-06 に `NW-2025-Spring-PM2` を Gemini API で抽出し、`questions_raw.json` は2問、各問4設問、全設問で20文字超の `explanation` あり、Mermaidブロックありの構造を確認した。
 `answers_raw.json` は63項目、全値が非空文字列であることを確認した。

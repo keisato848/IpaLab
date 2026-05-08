@@ -21,39 +21,47 @@ For each sub-question, you MUST generate a **beginner-friendly explanation** ("�
 - **Content**: Explain *why* the answer is derived from the case study text.
 
 ## Task
-Extract the content from the provided PDF/Images and output a structured **JSON Object**.
+Extract the content from the provided PDF/Images and output a structured **JSON Array**.
 
 ## Input
-A PDF or images containing a single "Question" (e.g., 問1). The content typically flows as:
+A PDF or images containing one or more afternoon questions (e.g., 問1, 問2, 問3). The content typically flows as:
 1.  **Title/Theme**
 2.  **Description** (Case Study): Several pages of text, tables, and diagrams.
 3.  **Questions** (設問): Sub-questions asking about the description.
 
 ## Output Format (JSON)
-Output a SINGLE JSON object.
+Output a JSON array. Each element is one top-level question. If the PDF contains only one top-level question, output an array with one element. Do not stop after 問1 when 問2 or later questions exist in the same PDF.
 
 ```json
-{
-  "qNo": 1, // The Question Number (e.g. 問1 -> 1)
-  "theme": "Information Security / System Architecture etc.", // The title of the question
-  "description": "The entire case study text. \n\n When you encounter a diagram, insert the mermaid code block here.\n\n ```mermaid\n graph TD...\n ``` \n\n Use Markdown for headers (##) and tables.",
-  "questions": [
-    {
-      "subQNo": "設問1",
-      "text": "The text of sub-question 1",
-      "explanation": "Detailed explanation here. \n\n ### 処理の流れ \n ```mermaid\n sequenceDiagram\n ...\n ``` \n\n Explain why the answer is X...",
-      "subQuestions": [ // If the sub-question has (1), (2)...
-        { "label": "(1)", "text": "..." },
-        { "label": "(2)", "text": "..." }
-      ]
-    },
-     {
-      "subQNo": "設問2",
-      "text": "...",
-      "explanation": "..."
-    }
-  ]
-}
+[
+  {
+    "qNo": 1,
+    "theme": "Information Security / System Architecture etc.",
+    "description": "The entire case study text.\n\nWhen you encounter a diagram, insert the mermaid code block here.\n\n```mermaid\ngraph TD...\n```\n\nUse Markdown for headers (##) and tables.",
+    "questions": [
+      {
+        "subQNo": "設問1",
+        "text": "The text of sub-question 1",
+        "explanation": "Detailed explanation here.\n\n### 処理の流れ\n```mermaid\nsequenceDiagram\n...\n```\n\nExplain why the answer is X...",
+        "subQuestions": [
+          { "label": "(1)", "text": "..." },
+          { "label": "(2)", "text": "..." }
+        ]
+      },
+      {
+        "subQNo": "設問2",
+        "text": "...",
+        "explanation": "..."
+      }
+    ]
+  },
+  {
+    "qNo": 2,
+    "theme": "...",
+    "description": "...",
+    "questions": []
+  }
+]
 ```
 
 ## detailed Rules
@@ -69,7 +77,11 @@ Output a SINGLE JSON object.
 3.  **Sub-Questions**:
     - Structure them cleanly.
     - Often, questions ask to fill in blanks (a, b, c...). Preserve the marks like `[  a  ]`.
+4.  **Completeness**:
+  - Extract every top-level 問 in the PDF.
+  - The output array length must match the number of top-level questions visible in the PDF.
+  - Do not mix the descriptions or sub-questions of different top-level questions into one object.
 
 ## Important
-- Output **ONLY** the JSON object. Do not wrap in markdown code blocks in the final output if possible, but if you do, I will filter it.
+- Output **ONLY** the JSON array. Do not wrap in markdown code blocks in the final output if possible, but if you do, I will filter it.
 - Ensure Japanese characters are encoding correctly.
