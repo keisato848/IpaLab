@@ -25,7 +25,6 @@
       {
         "subQNo": "設問1",
         "text": "A社の製造データの作成について答えよ。",
-        "explanation": "A社では後続工程（充填）から遡って製造指示を作成する「バックワードスケジューリング」を採用しています。これは後続工程で必要な量から前工程の製造数を決め、また後続工程の開始時刻から前工程の終了時刻を逆算するためです。\n\n### 製造指示作成の順序\n[CODE_BLOCK:mermaid]\ngraph BT\n    F[充填工程] -- \"開始時刻から逆算\" --> S[殺菌工程]\n    S -- \"開始時刻から逆算\" --> M[調合工程]\n    M -- \"開始時刻から逆算\" --> L[仕込工程]\n    style F fill:#e1f5fe\n    style L fill:#fff9c4\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -45,7 +44,6 @@
       {
         "subQNo": "設問2",
         "text": "〔システム統合の方針〕について答えよ。",
-        "explanation": "B社は受注生産であり、製品や仕掛品の在庫を持ちません。そのため、A社のシステムへ移行する際は、B社の品目の「在庫管理有無フラグ」を適切に設定する必要があります。また、B社は1日に複数回同じ製品を製造するため、日付だけを主キーにしているA社のテーブル構造ではデータが重複する可能性があります。\n\n### データの重複問題と解決策\n[CODE_BLOCK:mermaid]\nerDiagram\n    MANUFACTURING ||--o{ INPUT : \"creates\"\n    MANUFACTURING {\n        string factory_code PK\n        date start_date PK\n        string process_code PK\n        int sequence_no PK \"追加が必要\"\n    }\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -67,7 +65,6 @@
       {
         "subQNo": "設問3",
         "text": "〔システム稼働後の評価〕について答えよ。",
-        "explanation": "統合前、B社では製造実績を手書きの表に記録し、月末にまとめてシステム入力していましたが、これがミスの原因や負荷増大を招いていました。統合後はタブレットによるリアルタイム入力に変わったため、これらの問題が解消されました。\n\n### 業務プロセスの変化\n[CODE_BLOCK:mermaid]\ngraph LR\n    subgraph 統合前\n        B1[手書き記録] --> B2[月末一括入力]\n        B2 --> B3[管理指標の算出]\n    end\n    subgraph 統合後\n        A1[タブレット入力] --> A2[リアルタイム集計]\n        A2 --> A3[翌日の指標参照]\n    end\n    style B2 fill:#ffcdd2\n    style A1 fill:#c8e6c9\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
