@@ -125,7 +125,13 @@
             "label": "(2)",
             "text": "図6中及び図7中の [ c ] に入れる適切な文字列を、解答群の中から選び、記号で答えよ。\n\n解答群\nア onmouseover=alert('XSS!')\nイ \"><script>alert('XSS!')</script>\nウ http: <script>alert('XSS!')</script>\nエ javascript:alert('XSS!')",
             "answer": "エ",
-            "explanation": "### (2) c の特定\n診断用URL2を入力した際、画面Bの参考URLリンクをクリックするとXSSが発動した(図3, (4))ことから、`refURL`の値が`href`属性に注入され、クリックイベントでスクリプトが実行されたことがわかります。\n図7の出力構造は `<a href=\" [ c ] \"> [ c ] </a>` であり、クリック時にスクリプトを実行可能にするためには、`javascript:`スキームを使用するのが典型的です。\n\n解答群「エ javascript:alert('XSS!')」を`c`に代入すると、リンクは`<a href=\"javascript:alert('XSS!')\">javascript:alert('XSS!')</a>`となり、クリックによってアラートが実行されます。これは診断結果と一致します。\n\nしたがって、`c`には **エ** が入ります。"
+            "explanation": "### (2) c の特定\n診断用URL2を入力した際、画面Bの参考URLリンクをクリックするとXSSが発動した(図3, (4))ことから、`refURL`の値が`href`属性に注入され、クリックイベントでスクリプトが実行されたことがわかります。\n図7の出力構造は `<a href=\" [ c ] \"> [ c ] </a>` であり、クリック時にスクリプトを実行可能にするためには、`javascript:`スキームを使用するのが典型的です。\n\n解答群「エ javascript:alert('XSS!')」を`c`に代入すると、リンクは`<a href=\"javascript:alert('XSS!')\">javascript:alert('XSS!')</a>`となり、クリックによってアラートが実行されます。これは診断結果と一致します。\n\nしたがって、`c`には **エ** が入ります。",
+            "answerChoices": [
+              "ア onmouseover=alert('XSS!')",
+              "イ \"><script>alert('XSS!')</script>",
+              "ウ http: <script>alert('XSS!')</script>",
+              "エ javascript:alert('XSS!')"
+            ]
           }
         ],
         "references": [
@@ -172,7 +178,13 @@
               "d": "ウ",
               "e": "ア"
             },
-            "explanation": "### (1) d, e の特定\nクラウドサービスの国際規格に関する問題です。\n*   ISO/IEC 27017は、クラウドサービス提供者が適用すべきセキュリティ管理策のガイダンスです。 d: **ウ 情報セキュリティ管理策**。\n*   ISO/IEC 27018は、パブリッククラウドにおけるPII（個人を特定できる情報）の保護に関する規範です。 e: **ア 個人情報保護**。\n\n"
+            "explanation": "### (1) d, e の特定\nクラウドサービスの国際規格に関する問題です。\n*   ISO/IEC 27017は、クラウドサービス提供者が適用すべきセキュリティ管理策のガイダンスです。 d: **ウ 情報セキュリティ管理策**。\n*   ISO/IEC 27018は、パブリッククラウドにおけるPII（個人を特定できる情報）の保護に関する規範です。 e: **ア 個人情報保護**。\n\n",
+            "answerChoices": [
+              "ア 個人情報保護",
+              "イ システム監査",
+              "ウ 情報セキュリティ管理策",
+              "エ 審査及び認証"
+            ]
           },
           {
             "label": "(2)",
