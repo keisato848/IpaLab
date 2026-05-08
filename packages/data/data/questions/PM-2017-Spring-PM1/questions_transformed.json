@@ -10,7 +10,7 @@
           "id": "fig1",
           "label": "図1 MESの構成図",
           "type": "mermaid",
-          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    subgraph \"W社パッケージの範囲\"\n        Basic[基本機能]\n        History[履歴管理機能]\n        Analysis[分析機能]\n    end\n    \n    Plan[生産計画] <--> |連携| Basic\n    Plan <--> |連携| History\n    \n    Worker((作業員)) <--> |作業指示/作業履歴| Basic\n    Basic --> |条件設定| History\n    \n    History --- Analysis\n    \n    History <--> |測定データ抽出| Control[制御装置]\n    Control <--> |コントロール/製造データ| Device[製造装置]\n    \n    style Basic fill:#fff,stroke:#333\n    style History fill:#fff,stroke:#333\n    style Analysis fill:#fff,stroke:#333\n    style Plan fill:#fff,stroke:#333\n    style Worker fill:#fff,stroke:#333\n    style Control fill:#fff,stroke:#333\n    style Device fill:#fff,stroke:#333\n[/CODE_BLOCK]"
+          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    subgraph \"W社パッケージの範囲\"\n        Basic[基本機能]\n        History[履歴管理機能]\n        Analysis[分析機能]\n    end\n    \n    Plan[生産計画] <--> |連携| Basic\n    Plan <--> |連携| History\n    \n    Worker((\"作業員\")) <--> |作業指示/作業履歴| Basic\n    Basic --> |条件設定| History\n    \n    History --- Analysis\n    \n    History <--> |測定データ抽出| Control[制御装置]\n    Control <--> |コントロール/製造データ| Device[製造装置]\n    \n    style Basic fill:#fff,stroke:#333\n    style History fill:#fff,stroke:#333\n    style Analysis fill:#fff,stroke:#333\n    style Plan fill:#fff,stroke:#333\n    style Worker fill:#fff,stroke:#333\n    style Control fill:#fff,stroke:#333\n    style Device fill:#fff,stroke:#333\n[/CODE_BLOCK]"
         },
         {
           "id": "fig2",
@@ -37,7 +37,6 @@
         "subQNo": "設問3",
         "text": "〔リスク対応計画〕について、(1)、(2)に答えよ。",
         "references": [],
-        "explanation": "### 解説\n**(1) 下線②の提案理由**\nL部長から「作業員を集中させるのは難しい」という回答がありました。U課長は、T社だけで無理に進めると検証段階で工数が増える（＝遅延リスク）と考えました。そのため、K社がどれだけ協力できるか（投入可能工数）に合わせて、現実的に終わる範囲（スコープ）を決めようとしています。\n\n**(2) 下線③のリソース及びスケジュールに関するリスク源**\n本文から以下の二つを読み取ります。\n*   **リソース**: K社の作業員が既存業務で多忙であり、プロジェクトへの協力が限られること。\n*   **スケジュール**: 商用運転開始（4月）および輸出開始（6月）というデッドラインに余裕がないこと。",
         "subQuestions": [
           {
             "label": "(1)",
