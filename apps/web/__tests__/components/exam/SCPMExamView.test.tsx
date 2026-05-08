@@ -58,4 +58,28 @@ describe('SCPMExamView', () => {
         expect(screen.queryByText(/### 解説見出し/)).not.toBeInTheDocument();
         expect(screen.queryByText(/\*\*重要\*\*/)).not.toBeInTheDocument();
     });
+
+    it('子設問を持つ説明だけの親見出しは解答欄化しない', () => {
+        render(<SCPMExamView question={{
+            ...question,
+            questions: [
+                {
+                    id: 'q1',
+                    subQNo: '1',
+                    text: '設問1 A社の製造データの作成について答えよ。',
+                    explanation: '親設問の説明',
+                    subQuestions: [
+                        {
+                            label: '(1)',
+                            text: 'A社が作成する製造データを20字以内で答えよ。',
+                            answer: '製造計画データ',
+                        },
+                    ],
+                },
+            ],
+        } as any} />);
+
+        expect(screen.getAllByTestId('ai-answer-box')).toHaveLength(1);
+        expect(screen.getByText('解答欄 1')).toBeInTheDocument();
+    });
 });

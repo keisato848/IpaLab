@@ -17,7 +17,13 @@ import { normalizeMermaidCodeBlocks } from '@/lib/mermaid/sanitize';
 import styles from './SCPMExamView.module.css';
 import AIAnswerBox from './AIAnswerBox';
 import { ScoreResult } from './AIAnswerBox';
-import { buildPMAnswerFieldId, buildPMDraftKey, extractAnswerLimit } from './pmAnswerUtils';
+import {
+    buildPMAnswerFieldId,
+    buildPMDraftKey,
+    extractAnswerLimit,
+    getPMChildAnswerItems,
+    shouldRenderPMSectionAnswerItem,
+} from './pmAnswerUtils';
 // Replaced missing UI components with native elements
 // import { Badge } from '@/components/ui/badge';
 // import { Button } from '@/components/ui/button';
@@ -26,10 +32,6 @@ import { buildPMAnswerFieldId, buildPMDraftKey, extractAnswerLimit } from './pmA
 const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false });
 
 const hasText = (value: unknown) => typeof value === 'string' && value.trim().length > 0;
-
-const hasDirectAnswerContent = (item: any) => {
-    return hasText(item?.answer) || hasText(item?.explanation) || hasText(item?.modelAnswer);
-};
 
 const buildSectionAnswerItem = (section: any) => ({
     label: section.subQNo || section.label || '解答',
@@ -42,14 +44,10 @@ const buildSectionAnswerItem = (section: any) => ({
 });
 
 const getAnswerItems = (section: any) => {
-    const childItems = Array.isArray(section?.subQuestions) && section.subQuestions.length > 0
-        ? section.subQuestions
-        : Array.isArray(section?.questions) && section.questions.length > 0
-            ? section.questions
-            : [];
+    const childItems = getPMChildAnswerItems(section);
 
     const items: any[] = [];
-    if (hasDirectAnswerContent(section)) {
+    if (shouldRenderPMSectionAnswerItem(section, childItems)) {
         items.push(buildSectionAnswerItem(section));
     }
 

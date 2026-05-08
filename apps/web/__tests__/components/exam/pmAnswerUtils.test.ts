@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { buildPMAnswerFieldId, buildPMDraftKey, extractAnswerLimit } from '@/components/features/exam/pmAnswerUtils';
+import {
+    buildPMAnswerFieldId,
+    buildPMDraftKey,
+    extractAnswerLimit,
+    shouldRenderPMSectionAnswerItem,
+} from '@/components/features/exam/pmAnswerUtils';
 
 describe('pmAnswerUtils', () => {
     it('単一の字数制限を設問文から抽出する', () => {
@@ -15,5 +20,26 @@ describe('pmAnswerUtils', () => {
         const answerFieldId = buildPMAnswerFieldId('SA-2025-Spring-PM1-1', 2, 4);
         expect(answerFieldId).toBe('SA-2025-Spring-PM1-1-2-4');
         expect(buildPMDraftKey(answerFieldId)).toBe('ipalab_pm_answer_draft_v1:SA-2025-Spring-PM1-1-2-4');
+    });
+
+    it('子設問を持つ説明だけの親設問は解答欄化しない', () => {
+        const section = {
+            text: '設問1 A社の製造データの作成について答えよ。',
+            explanation: '親設問の説明',
+            subQuestions: [{ label: '(1)', text: '20字以内で答えよ。', answer: '解答' }],
+        };
+
+        expect(shouldRenderPMSectionAnswerItem(section)).toBe(false);
+    });
+
+    it('子設問を持っていても親に明示答案がある場合は解答欄化できる', () => {
+        const section = {
+            text: '設問1 全体方針を答えよ。',
+            answer: '全体方針',
+            explanation: '親設問の解説',
+            subQuestions: [{ label: '(1)', text: '20字以内で答えよ。', answer: '解答' }],
+        };
+
+        expect(shouldRenderPMSectionAnswerItem(section)).toBe(true);
     });
 });
