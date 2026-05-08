@@ -35,6 +35,13 @@
             "text": "本文中の [b] に入れる最も適切な字句を解答群の中から選び、記号で答えよ。",
             "answer": "イ"
           }
+        ],
+        "answerChoices": [
+          "ア 機能",
+          "イ 権限",
+          "ウ ツール",
+          "エ 取引",
+          "オ 秘密"
         ]
       },
       {
@@ -54,7 +61,13 @@
               "fig2"
             ],
             "explanation": "### 処理の流れ\n```mermaid\nsequenceDiagram\n    actor User\n    participant PC\n    participant MailManagementServer as メール管理サーバ\n    participant MailServer as メールサーバ\n    participant Supervisor as 上司\n\n    User->>PC: 添付ファイル付きメール作成・送信\n    PC->>MailManagementServer: メール転送\n    MailManagementServer->>MailManagementServer: ②指定された処理 (情報漏えい対策)\n    alt 添付ファイル付きメールの場合\n        MailManagementServer->>Supervisor: 承認依頼\n        Supervisor->>MailManagementServer: 承認\n        MailManagementServer->>MailServer: メール転送\n    else 承認不要なメールの場合\n        MailManagementServer->>MailServer: メール転送\n    end\n    MailServer->>Outside: メール送信\n```\n\nA社のメール管理システムの目的は「誤送信防止」であり、PCから送信されたメールは既に「一旦保留され、送信者による確認操作後に転送」される仕組みが導入されています（本文中）。添付ファイル付きメールは情報漏えいのリスクが高いため、特に厳重な管理が必要です。\n\n解答群の中で「情報漏えい対策機能」として最も適切かつ、既存の仕組みをさらに強化するものは「ア あらかじめ指定された上司に通知し、上司の承認後に送信する。」です。これにより、重要な情報の社外送付に二重のチェックが入り、情報漏えいや誤送信のリスクをより効果的に低減できます。\n\n**解答:** ア",
-            "answer": "ア"
+            "answer": "ア",
+            "answerChoices": [
+              "ア あらかじめ指定された上司に通知し、上司の承認後に送信する。",
+              "イ 一旦保留し、送信者によるメール内容の確認操作後に送信する。",
+              "ウ 添付ファイルを暗号化し、パスワードを別メールで送信する。",
+              "エ 添付ファイルを削除して、メールの本文だけを送信する。"
+            ]
           },
           {
             "label": "(3)",
