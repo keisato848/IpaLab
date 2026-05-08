@@ -98,6 +98,8 @@ DB-2025-Fall-PM1 の初回 Gemini 抽出パイロットでは、問題側が大�
 
 変換工程では、Gemini APIキーをローテーションし `packages/data/.env` も読むようにして `API_KEY_INVALID` による停止を回避した。生成後は親見出し explanation を削除し、`answers_raw.json` の公式解答を子設問へ同期した。DB区分監査は `files=1`、`answerFields=18`、`broadPromptNoLimit=0`、`parentDirectWithChildren=0`、`multipleLimits=0`、`symbolNoStructuralChoices=0`、`underlineNoEvidence=0`、`underlineRefMissing=0` である。
 
+追加データは `packages/data/data/questions/DB-2025-Fall-PM1/` に保存し、`questions_raw.json`、`answers_raw.json`、`questions_transformed.json` の3ファイルを追跡対象とする。初期変換失敗時のログは追跡対象に含めない。
+
 ## 3. 修正方針
 
 ### 3.1 既存データあり区分
