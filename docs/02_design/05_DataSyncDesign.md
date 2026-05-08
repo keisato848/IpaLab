@@ -4,6 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-08 | 午後解答PDFの Gemini OCR プロンプトを午前択一表専用から記述式解答対応へ拡張し、self-inspect R32 を追加 |
 | 2026-05-08 | 全試験区分の午後データ品質監査 `audit:afternoon-data`、DB/AU/SM など未抽出区分の抽出必要性、親見出し800字欄化の再発防止を追加 |
 | 2026-05-06 | `PM-2020-Fall-AM2` / `PM-2016-Spring-AM2` / `SA-2025-Spring-AM2` / `ST-2025-Spring-AM2` の AM2 正答不整合補正と self-inspect R16 強化を追加 |
 | 2026-05-06 | `SA-2025-Spring-PM1` / `SA-2025-Spring-PM2` / `ST-2025-Spring-PM1` / `ST-2025-Spring-PM2` の午後問題 transformed 追加実績を追加 |
@@ -181,6 +182,8 @@ node --require ts-node/register src/scraper/gemini-extract.ts --exam-id=NW-2025-
 `--questions-only` は問題PDFだけ、`--answers-only` は解答PDFだけを処理する。
 `--force` は既存の `questions_raw.json` / `answers_raw.json` を上書きするため、対象ファイルを確認してから使用する。
 午後問題PDFは、DB / ES / SC の PM1 のように複数のトップレベル大問を含む場合があるため、Gemini OCR では午後問題も `JSON array` を要求する。PDF内の各 `問` を1要素として出力し、単一大問PDFの場合だけ1要素配列にする。これにより、単一 `JSON object` 前提で大問1だけが抽出される欠落を防ぐ。
+
+午後の解答PDFは午前の択一表と異なり、`問`、`設問`、小問番号、空欄ラベル、記述式模範解答が混在する。`gemini_answer_ocr_prompt.md` は午前のア〜エを `a`〜`d` へ変換する一方で、午後では `問1-設問1-(1)` や `問2-設問3-(2)-(a)-j` のような階層キーを使い、値には公式解答の日本語本文を保持する。午後抽出後は `answers_raw.json` の項目数が1件など極端に少なくないことを確認し、`questions_transformed.json` のリーフ設問へ同期する。
 
 2026-05-06 に `NW-2025-Spring-PM2` を Gemini API で抽出し、`questions_raw.json` は2問、各問4設問、全設問で20文字超の `explanation` あり、Mermaidブロックありの構造を確認した。
 `answers_raw.json` は63項目、全値が非空文字列であることを確認した。

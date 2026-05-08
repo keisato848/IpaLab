@@ -41,6 +41,7 @@
 #   R29. 午後選択式小問が AI 採点欄に戻り、ラジオ/チェックボックス採点が消えるパターン
 #   R30. 午後OCRが単一JSON object前提に戻り、複数大問PDFの問2以降を落とすパターン
 #   R31. 午後変換が単一Geminiキー前提に戻り、無効キーで停止するパターン
+#   R32. 午後解答OCRが午前択一表専用に戻り、記述式解答を落とすパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -368,6 +369,23 @@ if (Test-Path $transformAllPm) {
         Add-Finding -Rule 'R31-afternoon-transform-key-rotation' -Severity 'Medium' `
             -File $transformAllPm `
             -Detail '午後変換スクリプトは GEMINI_API_KEY / GEMINI_API_KEY_1〜4 をローテーションし、無効キーで即停止しないようにしてください'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R32: 解答OCRは午後記述式の模範解答も抽出すること
+#      (午前択一表専用に戻ると ES/DB PM1 の answers_raw.json がほぼ空になる)
+# ---------------------------------------------------------------------------
+$answerOcrPrompt = Join-Path $RepoRoot 'docs\prompts\gemini_answer_ocr_prompt.md'
+if (Test-Path $answerOcrPrompt) {
+    $raw = Get-Content -LiteralPath $answerOcrPrompt -Raw
+    if ($raw -notmatch 'afternoon descriptive answer key' -or
+        $raw -notmatch '問1-設問1-1' -or
+        $raw -notmatch 'Do not convert descriptive answers to option letters' -or
+        $raw -match 'Values should be single lowercase letters') {
+        Add-Finding -Rule 'R32-afternoon-answer-ocr-descriptive' -Severity 'High' `
+            -File $answerOcrPrompt `
+            -Detail '解答OCRプロンプトは午前択一だけでなく、午後記述式の問・設問・空欄ラベル付き模範解答を抽出してください'
     }
 }
 
