@@ -41,6 +41,7 @@
 | 2026-05-08 | 新形式午後画面で answerChoices を持つ小問を選択式UIへ分岐し、択一はラジオ、複数選択はチェックボックスで採点・記録するよう修正 |
 | 2026-05-08 | DB / AU / SM / ES の抽出前状態を再監査し、DB/ESはraw PDFあり、AU/SMは公式URL同期とPDF取得から必要であることを記録 |
 | 2026-05-08 | DB-2025-Fall-PM1 の抽出パイロットを再実行し、全3大問・公式解答55件・監査0件の transformed データを追加 |
+| 2026-05-08 | ES-2025-Fall-PM1 の抽出パイロットを実行し、午後解答OCRプロンプト修正後に全2大問・公式解答33件・監査0件の transformed データを追加 |
 
 ## 1. 目的
 
@@ -70,7 +71,7 @@
 | DB | 最新年度パイロット済み | `DB-2025-Fall-PM1` を抽出・変換・正規化済み。過年度展開はパイロット結果を基準に段階実施 |
 | AU | 未抽出 | ローカル `questions` は0件、`raw_pdfs` も0件。公式ソース監査ではPDF URLを検出できるため、`exam-list.ts` 同期または公式URLからの取得が先行 |
 | SM | 未抽出 | ローカル `questions` は0件、`raw_pdfs` も0件。公式ソース監査ではPDF URLを検出できるため、`exam-list.ts` 同期または公式URLからの取得が先行 |
-| ES | 未抽出 | ローカル `questions` は0件。`raw_pdfs` には2016〜2025の午後PDF・解答PDFが存在するため、抽出工程から開始可能 |
+| ES | 最新年度パイロット済み | `ES-2025-Fall-PM1` を抽出・変換・正規化済み。過年度展開はパイロット結果を基準に段階実施 |
 
 ### 2.2 監査基準
 
@@ -99,6 +100,8 @@ DB-2025-Fall-PM1 の初回 Gemini 抽出パイロットでは、問題側が大�
 変換工程では、Gemini APIキーをローテーションし `packages/data/.env` も読むようにして `API_KEY_INVALID` による停止を回避した。生成後は親見出し explanation を削除し、`answers_raw.json` の公式解答を子設問へ同期した。DB区分監査は `files=1`、`answerFields=18`、`broadPromptNoLimit=0`、`parentDirectWithChildren=0`、`multipleLimits=0`、`symbolNoStructuralChoices=0`、`underlineNoEvidence=0`、`underlineRefMissing=0` である。
 
 追加データは `packages/data/data/questions/DB-2025-Fall-PM1/` に保存し、`questions_raw.json`、`answers_raw.json`、`questions_transformed.json` の3ファイルを追跡対象とする。初期変換失敗時のログは追跡対象に含めない。
+
+ES-2025-Fall-PM1 の抽出パイロットでは、問題PDFから qNo=1/2 の全2大問を取得した。初回の `answers_raw.json` は1件のみで、原因は `gemini_answer_ocr_prompt.md` が午前択一表を前提としていたことだった。プロンプトを午後記述式解答に対応させて再抽出した結果、公式解答33件を取得した。生成後は親見出し explanation を削除し、公式解答を子設問へ同期した。ES区分監査は `files=1`、`answerFields=19`、`broadPromptNoLimit=0`、`parentDirectWithChildren=0`、`multipleLimits=0`、`symbolNoStructuralChoices=0`、`underlineNoEvidence=0`、`underlineRefMissing=0` である。
 
 ## 3. 修正方針
 
@@ -221,5 +224,5 @@ E2E は UI 変更または代表データ修正の完了時に実行する。実
 - SA-2024-Spring-PM1 qNo=1 の表示 spot check（親見出しはUI抑止済み、公式解答同期済み）
 - SC-PM1/PM2 の下線・記号回答・図表参照の高リスク箇所の公式PDF照合
 - FE-2024-Public-PM の選択肢本文復元
-- DB過年度・ES最新年度・AU/SM公式PDF取得の段階抽出計画具体化
+- DB/ES過年度・AU/SM公式PDF取得の段階抽出計画具体化
 - 受験者想定 E2E のシナリオ追加
