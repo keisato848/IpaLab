@@ -18,6 +18,7 @@
 | 2026-05-08 | AP-2024-Fall-PM qNo=1 の親見出し explanation を子設問側へ集約済みの構造へ整理 |
 | 2026-05-08 | AP区分 PM の親見出し explanation / 直下集約回答を整理し、parentDirectWithChildren を区分内0件化 |
 | 2026-05-08 | AP-2020-Fall-PM / AP-2021-Fall-PM の空 subQuestions 単独設問を既存解答付きの子設問へ正規化 |
+| 2026-05-08 | AP区分 PM の本文内解答群を answerChoices に構造化し、symbolNoStructuralChoices を 52件から12件へ削減 |
 | 2026-05-08 | NW-2025-Spring-PM2 の親見出し explanation を子設問側へ集約済みの構造へ整理 |
 | 2026-05-08 | ST区分 PM1/PM2 の親見出し explanation を子設問側へ集約済みの構造へ整理 |
 | 2026-05-08 | ST-2017-Fall-PM1 / ST-2019-Fall-PM1 の空 subQuestions 単独設問を公式解答付きの子設問へ正規化 |
@@ -184,6 +185,7 @@ E2E は UI 変更または代表データ修正の完了時に実行する。実
 - AP-2024-Fall-PM qNo=1 の表示 spot check（親見出し explanation 削除により余分な親解答欄リスクを補正済み）
 - AP区分 PM の表示 spot check（親見出し explanation / 直下集約回答削除により parentDirectWithChildren を区分内 0 件化）
 - AP-2020-Fall-PM / AP-2021-Fall-PM の単独設問表示 spot check（空 subQuestions を既存解答付きの子設問に正規化し、self-inspect R17 を解消）
+- AP区分 PM の選択式表示 spot check（本文または親設問本文に明示された解答群を `answerChoices` に構造化し、残る12件は公式PDF確認が必要な手動対象として維持）
 - NW-2025-Spring-PM2 の表示 spot check（親見出し explanation 削除により余分な親解答欄リスクを補正済み）
 - ST区分 PM1/PM2 の表示 spot check（親見出し explanation 削除により broadPromptNoLimit / parentDirectWithChildren を区分内 0 件化）
 - ST-2017-Fall-PM1 / ST-2019-Fall-PM1 の単独設問表示 spot check（空 subQuestions を 1 件の子設問に正規化し、self-inspect R17 を解消）
