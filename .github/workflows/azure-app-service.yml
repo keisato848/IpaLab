@@ -26,16 +26,18 @@ on:
     paths:
       - 'apps/web/**'
       - 'packages/**'
+      - '.github/workflows/azure-app-service.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read     # artifact ダウンロードでビルド成果物を取得するために必要
   pull-requests: write  # Staging デプロイ完了後のPRコメント投稿に必要
 
 env:
   AZURE_WEBAPP_NAME: app-pm-exam-dx-prod
   AZURE_WEBAPP_PACKAGE_PATH: './apps/web/.next/standalone'
-  NODE_VERSION: '20.x'
+  NODE_VERSION: '24.x'
 
 jobs:
   test:
@@ -44,10 +46,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -65,10 +67,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -138,7 +140,7 @@ jobs:
           ls -la .next/static/ 2>/dev/null || echo ".next/static not found!"
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: webapp-artifact
           path: apps/web/.next/standalone/
@@ -153,7 +155,7 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: webapp-artifact
           path: ./deploy
@@ -167,7 +169,7 @@ jobs:
 
       # Service Principal を使用して Azure にログイン（Microsoft推奨方式）
       - name: Azure Login
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -222,11 +224,15 @@ jobs:
               TELEMETRY_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}"
 
       - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          package: ./deploy
+        run: |
+          rm -f deploy.zip
+          (cd deploy && zip -qr ../deploy.zip .)
+          ls -lh deploy.zip
+          az webapp deploy \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group rg-pm-exam-dx-prod \
+            --src-path deploy.zip \
+            --type zip
 
       # VNet 統合の維持確認 (CosmosDB ゼロトラスト保護)
       # コードデプロイでは VNet 統合設定は影響を受けないが、念のため確認
@@ -273,7 +279,7 @@ jobs:
 
       - name: Download artifact from build job
         if: steps.config-check.outputs.configured == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: webapp-artifact
           path: ./deploy
@@ -288,7 +294,7 @@ jobs:
       # 本番と同じ Service Principal を使用してログイン
       - name: Azure Login
         if: steps.config-check.outputs.configured == 'true'
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -347,11 +353,15 @@ jobs:
 
       - name: Deploy to Staging Web App
         if: steps.config-check.outputs.configured == 'true'
-        id: deploy-to-staging
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.STAGING_APP_NAME }}
-          package: ./deploy
+        run: |
+          rm -f deploy.zip
+          (cd deploy && zip -qr ../deploy.zip .)
+          ls -lh deploy.zip
+          az webapp deploy \
+            --name "$STAGING_APP_NAME" \
+            --resource-group "$STAGING_RG" \
+            --src-path deploy.zip \
+            --type zip
 
       - name: Azure Logout
         if: steps.config-check.outputs.configured == 'true'
@@ -361,7 +371,7 @@ jobs:
       # secrets は github-script 内で直接展開できないため、env 経由で渡す
       - name: Comment PR with Staging URL
         if: steps.config-check.outputs.configured == 'true'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           STAGING_APP_NAME: ${{ env.STAGING_APP_NAME }}
         with:

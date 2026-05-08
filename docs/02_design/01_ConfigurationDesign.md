@@ -10,7 +10,7 @@
   - `apps/*`: アプリケーション (web, api, api-ai)
   - `packages/*`: 共通ライブラリ
 - **PackageManager**: `npm@10.9.2`
-- **Node.js バージョン**: `20` (LTS)
+- **Node.js バージョン**: `>=20 <25` (CI は Node.js 24 LTS)
 - **Scripts**:
   - `dev`: `turbo run dev`
   - `build`: `turbo run build`
@@ -120,6 +120,8 @@
 
 ### 4.1 必要な環境変数
 
+tracked file である `apps/*/local.settings.json` と `.env.template` には、接続文字列や API キーの実値を記載しない。ローカル実行時はユーザー環境の未追跡 `.env.local`、Azure CLI / Key Vault から取得した一時環境変数、またはローカル端末の Secret Store から注入する。
+
 #### Web アプリケーション
 
 ```env
@@ -163,9 +165,11 @@ COSMOS_DB_CONNECTION=<cosmos_connection>
 1. `node scripts/guard-exam-data-fallback.mjs`
    - 午後試験データ fallback の本番防壁を検証します。
 2. `pwsh .github/hooks/self-inspect.ps1 -Mode end -FailOnFinding`
-   - 過去インシデントに基づく再発防止ルール R1〜R8 を検証します。
+  - 過去インシデントに基づく再発防止ルール R1〜R12 を検証します。
 
 `self-inspect` の R8 は、`apps/`、`packages/`、`.github/hooks/`、`.github/workflows/`、`.husky/`、主要なルート設定ファイルに実装変更があるにもかかわらず `docs/` 配下の更新がない場合に検出します。検出時はコミットを中止し、該当する設計書・手順書の更新を `document-agent` の担当作業として促します。
+
+`self-inspect` の R12 は、tracked 設定ファイルに Cosmos / Storage 接続文字列の `AccountKey` 実値、Google API キー形式の実値、秘密鍵ヘッダーが混入していないかを値非表示で検出します。
 
 テスト実行は `pre-push` に集約し、コミット時の待ち時間を抑えつつ、push 前にユニットテストを必ず通す構成とします。
 
@@ -203,6 +207,9 @@ read / edit / search / execute / agent / web / todo
 
 ## 変更履歴
 
+- **2026-05-02**: tracked 設定ファイルの secret material 禁止方針を追加
+  - `local.settings.json` / `.env.template` は空値またはプレースホルダーのみとし、実値は未追跡環境から注入する方針を明記
+  - `self-inspect` R12 による tracked 設定ファイルの secret material 検出を追記
 - **2026-04-30**: GitHub Actions の日本語フィールド同期 workflow 設計を追記
   - `PROJECT_PAT` 未提供時は同期をスキップし、PR の品質ゲートをブロックしない方針を明記
 - **2026-04-29**: Copilot Agent カスタマイズ設定セクションを追加

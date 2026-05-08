@@ -1,7 +1,7 @@
 // Rebuild Trigger (Fixed)
 import Link from 'next/link';
-import { getQuestions, Question } from '@/lib/api';
-import { getExamData } from '@/lib/ssg-helper';
+import { Question } from '@/lib/api';
+import { findQuestionByNo, findQuestionByNoOrPosition, hasSuspiciousPlaceholderQuestions, loadFilesystemQuestions } from '@/lib/exam-data';
 import QuestionClient from '@/components/features/exam/QuestionClient';
 import styles from './page.module.css';
 import { Suspense } from 'react';
@@ -23,7 +23,12 @@ export async function generateMetadata({ params }: { params: Promise<{ year: str
 
     try {
         const questions = await questionRepository.listByExamId(examId);
-        const question = questions.find((q: any) => q.qNo === parseInt(qNo));
+        const qNoInt = Number.parseInt(qNo, 10);
+        let question = findQuestionByNoOrPosition(questions as unknown as Question[], qNoInt);
+        if (!question) {
+            const fsQuestions = await loadFilesystemQuestions(examId);
+            question = findQuestionByNoOrPosition(fsQuestions, qNoInt);
+        }
 
         if (!question) return { title: `Not Found` };
 
@@ -50,13 +55,15 @@ export default async function ExamQuestionPage({ params }: { params: Promise<{ y
     const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
 
     // Fetch Questions
-    // 状態を3種類に区別する:
+    // 状態を4種類に区別する:
     //   - 'ok'              : DB から問題セットを取得できた（その後 qNo 不一致なら本物の Not Found）
     //   - 'db_error'        : DB アクセスで例外発生（接続/権限/タイムアウト等）
     //   - 'data_unavailable': DB は応答したが、当該 examId のデータが0件（同期漏れの可能性大）
+    //   - 'cosmos_partial'   : DB は応答したが、対象 qNo 欠落などの部分不整合がある
     let questions: Question[] = [];
-    let loadStatus: 'ok' | 'db_error' | 'data_unavailable' = 'ok';
+    let loadStatus: 'ok' | 'db_error' | 'data_unavailable' | 'cosmos_partial' = 'ok';
     let dbError: unknown = null;
+    const qNoInt = Number.parseInt(qNo, 10);
 
     try {
         const data = await questionRepository.listByExamId(examId);
@@ -75,22 +82,24 @@ export default async function ExamQuestionPage({ params }: { params: Promise<{ y
     // packages/data の JSON は next.config.js の outputFileTracingIncludes で
     // standalone build に同梱される。Cosmos 同期漏れ・接続障害時の最終防衛線。
     // observability: fallback が発動した場合は warn を出して根本原因 (Cosmos 欠損 / 同期漏れ) の追跡可能性を確保する。
-    if (questions.length === 0) {
+    const questionMissingFromCosmos = Number.isInteger(qNoInt) && !findQuestionByNo(questions, qNoInt);
+    const suspiciousPlaceholderQuestions = hasSuspiciousPlaceholderQuestions(examId, questions);
+    if (questions.length === 0 || questionMissingFromCosmos || suspiciousPlaceholderQuestions) {
         try {
-            const fsData = await getExamData(examId);
-            if (fsData && !Array.isArray(fsData)) {
-                if ('qNo' in fsData) {
-                    questions = [fsData] as unknown as Question[];
-                } else if ('questions' in fsData) {
-                    questions = (fsData as any).questions as Question[];
+            const cosmosQuestionCount = questions.length;
+            const fsQuestions = await loadFilesystemQuestions(examId);
+            const fsQuestion = Number.isInteger(qNoInt) ? findQuestionByNo(fsQuestions, qNoInt) : undefined;
+            const shouldReplaceWithFs = cosmosQuestionCount === 0 || Boolean(fsQuestion) || suspiciousPlaceholderQuestions;
+
+            if (fsQuestions.length > 0 && shouldReplaceWithFs) {
+                questions = fsQuestions;
+                if (cosmosQuestionCount > 0) {
+                    loadStatus = 'cosmos_partial';
                 }
-            } else if (Array.isArray(fsData)) {
-                questions = fsData as unknown as Question[];
-            }
-            if (questions.length > 0) {
                 console.warn(
                     `[Page] Filesystem fallback engaged for examId=${examId} (loaded ${questions.length} questions). ` +
-                    `Cosmos status=${loadStatus}. Investigate sync gap or DB outage.`
+                    `Cosmos status=${loadStatus}, cosmosTotal=${cosmosQuestionCount}, requestedQNo=${qNo}. ` +
+                    `Investigate sync gap, stale qNo, or DB outage.`
                 );
             }
         } catch (e) {
@@ -99,12 +108,11 @@ export default async function ExamQuestionPage({ params }: { params: Promise<{ y
     }
 
     // Find current question by qNo
-    const qNoInt = parseInt(qNo);
-    const question = questions.find(q => q.qNo === qNoInt);
+    const question = findQuestionByNoOrPosition(questions, qNoInt);
 
     if (!question) {
         // examId 配下のデータが0件 or DBエラー → "見つからない"ではなく"準備中/障害"として案内
-        const isDataMissing = loadStatus !== 'ok' || questions.length === 0;
+        const isDataMissing = loadStatus === 'db_error' || questions.length === 0;
         const heading = isDataMissing
             ? `この試験のデータが見つかりません`
             : `問題が見つかりません (Q${qNo})`;

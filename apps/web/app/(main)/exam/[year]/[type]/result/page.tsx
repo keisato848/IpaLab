@@ -1,7 +1,7 @@
-import Link from 'next/link';
-import { getQuestions, Question } from '@/lib/api';
+import { Question } from '@/lib/api';
 import ExamResult from '@/components/features/exam/ExamResult';
 import { questionRepository } from '@/lib/repositories/questionRepository';
+import { hasSuspiciousPlaceholderQuestions, loadFilesystemQuestions } from '@/lib/exam-data';
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
@@ -20,7 +20,22 @@ export default async function ExamResultPage({ params }: { params: Promise<{ yea
         questions = data as unknown as Question[];
     } catch (e) {
         console.warn(`[ResultPage] DB fetch failed for ${examId}`, e);
-        // Fallback or empty logic if needed
+    }
+
+    const suspiciousPlaceholderQuestions = hasSuspiciousPlaceholderQuestions(examId, questions);
+    if (questions.length === 0 || suspiciousPlaceholderQuestions) {
+        try {
+            const fsQuestions = await loadFilesystemQuestions(examId);
+            if (fsQuestions.length > 0) {
+                console.warn(
+                    `[ResultPage] Filesystem fallback engaged for examId=${examId} (loaded ${fsQuestions.length} questions). ` +
+                    `cosmosTotal=${questions.length}, suspiciousPlaceholder=${suspiciousPlaceholderQuestions}.`
+                );
+                questions = fsQuestions;
+            }
+        } catch (e) {
+            console.warn(`[ResultPage] FS Data load failed for ${examId}:`, e instanceof Error ? e.message : e);
+        }
     }
 
     return (

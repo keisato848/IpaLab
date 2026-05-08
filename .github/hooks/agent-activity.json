@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/write-agent-activity-log.ps1\" -Event SessionStart",
+        "windows": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/write-agent-activity-log.ps1\" -Event SessionStart",
+        "timeout": 5
+      }
+    ],
+    "SubagentStart": [
+      {
+        "type": "command",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/write-agent-activity-log.ps1\" -Event SubagentStart",
+        "windows": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/write-agent-activity-log.ps1\" -Event SubagentStart",
+        "timeout": 5
+      }
+    ],
+    "SubagentStop": [
+      {
+        "type": "command",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/write-agent-activity-log.ps1\" -Event SubagentStop",
+        "windows": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/write-agent-activity-log.ps1\" -Event SubagentStop",
+        "timeout": 5
+      }
+    ]
+  }
+}

@@ -37,7 +37,7 @@ jobs:
     
     steps:
       - name: Copilot Coding Agent に自動アサイン
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const issueNumber = context.issue.number;

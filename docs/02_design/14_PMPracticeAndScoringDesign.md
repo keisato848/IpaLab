@@ -1,5 +1,17 @@
 # 午後演習・AI採点 詳細設計書
 
+## 変更履歴
+
+| 日付 | 変更内容 |
+|------|------|
+| 2026-05-07 | ダークテーマで新形式午後画面の解答例ラベルが低コントラストになる問題を修正し、self-inspect検出ルールを追加 |
+| 2026-05-07 | 新形式午後画面の解答例解説をMarkdownとして描画し、同種デグレをself-inspectで検出するルールを追加 |
+| 2026-05-07 | 午後試験ヘッダーの不要な `IpaLab` リンクを削除し、午後記述欄を原稿用紙形式入力に変更 |
+| 2026-05-07 | アプリ全体の左サイドナビをデスクトップで常時開閉でき、状態を localStorage に保存する UI を追加 |
+| 2026-05-07 | 新形式午後画面で解答中に問題文左ペインをトグル表示できる UI を追加 |
+| 2026-05-06 | 変換済み午後データの `subQuestions` 空配列、`section.answer`、`section.questions`、PM2 論述設問を解答欄として扱うフォールバック、疎な `qNo` の位置番号フォールバック、日本語 Mermaid 図表のサニタイズ強化を追加 |
+| 2026-05-06 | 参考静的サイト (`SA/files`) の保存・文字数表示構成を踏まえ、午後解答欄の localStorage 下書き保存、文字数上限表示、100点満点の総合スコア表示、変換済み午後画面ヘッダーの CSS Modules 化を追加 |
+
 ## 1. 概要
 
 本書は、午後問題の表示、記述回答入力、AI 採点、採点結果の永続化、レーダー集計表示を含む午後演習機能の詳細を定義する。
@@ -8,8 +20,10 @@
 
 - 午後問題の表示形式判定
 - ケース本文、図表、設問、記述入力 UI
+- 午後記述欄の原稿用紙形式入力 UI
 - `/api/score` による CLKS ベース採点
 - 採点結果の `LearningRecord` への保存
+- 採点前の回答下書きの localStorage 保存
 - セッション進捗更新と集計表示
 - `ExamSummary` と `scoring.ts` による総合スコア算出
 
@@ -23,7 +37,12 @@
 - `AIAnswerBox`、`SCPMExamView`、`ExamSummary`
 - `LearningRecord` の記述式拡張項目
 - `/api/score` と `lib/scoring.ts`
+- 文字数制限の表示と超過時の採点抑止
+- 午後記述欄の原稿用紙形式表示と文字数制限の可視化
+- 解答例・AIフィードバック・改善回答などMarkdown文字列のHTML描画
 - 午後問題の新旧データ形式への対応
+- 新形式午後画面の問題文ペイン開閉 UI
+- アプリ全体で常時利用できるデスクトップサイドナビ開閉 UI
 
 ### 対象外
 
@@ -79,6 +98,14 @@ sequenceDiagram
     View-->>User: 問題文・設問・入力欄を表示
 ```
 
+### 4.1.1 解答中の表示領域調整
+
+1. デスクトップではアプリ全体で左サイドナビの「サイドナビを隠す」ボタンによりナビを退避できる
+2. ナビ退避中は本文領域を画面幅いっぱいに広げる
+3. 左上の「サイドナビを表示」ボタンでナビを復元する
+4. 新形式午後画面では、必要に応じて問題文ペインも「問題文を隠す / 表示」で開閉できる
+5. サイドナビの開閉状態は localStorage に保存し、再読み込み後も維持する
+
 ### 4.2 AI 採点
 
 ```mermaid
@@ -113,6 +140,9 @@ sequenceDiagram
 | Component | `apps/web/components/features/exam/QuestionClient.tsx` | 午後形式判定、採点結果保存、統計更新 |
 | Component | `apps/web/components/features/exam/AIAnswerBox.tsx` | 回答入力、採点 API 呼び出し、スコア表示 |
 | Component | `apps/web/components/features/exam/SCPMExamView.tsx` | 新形式ケース問題の分割表示と図表参照 |
+| Component | `apps/web/components/features/scoring/GenkoyoshiInput.tsx` | 原稿用紙形式の答案入力と字数カウンタ表示 |
+| Component | `apps/web/app/(main)/layout.tsx` | メインサイドナビ表示とデスクトップ開閉状態の保持 |
+| Utility | `apps/web/components/features/exam/pmAnswerUtils.ts` | 午後答案の文字数制限抽出、設問ID、下書き保存キー生成 |
 | Component | `apps/web/components/features/exam/ExamSummary.tsx` | 総合スコアとレーダー集計表示 |
 | API | `apps/web/app/api/score/route.ts` | Gemini を用いた CLKS 採点 |
 | Utility | `apps/web/lib/scoring.ts` | 総合スコアと平均レーダー算出 |
@@ -131,6 +161,7 @@ sequenceDiagram
 | Azure Cosmos DB LearningSessions | 認証ユーザーの進捗更新 |
 | Azure Cosmos DB ExamProgress | 午後問題の最新状態保存 |
 | localStorage | ゲスト時の採点履歴保存 |
+| localStorage | 採点前の午後答案下書き保存 |
 
 ---
 
@@ -177,6 +208,18 @@ sequenceDiagram
 | `question.id-{idx}` | `AP-2023-PM-01-0` | サブ設問単位の記録 |
 | `question.id-{idx}-{subIdx}` | `AP-2023-PM-01-0-1` | ネスト設問単位の記録 |
 
+### 8.4 午後答案下書き
+
+採点前の途中答案は、参考静的サイトの「保存 / 読込」構成を踏まえ、ブラウザ localStorage に自動保存する。
+
+| フィールド | 内容 |
+|------|------|
+| storage key | `ipalab_pm_answer_draft_v1:{answerFieldId}` |
+| `answer` | 入力中の答案 |
+| `savedAt` | ISO 8601 形式の保存日時 |
+
+`answerFieldId` は `question.id-{idx}` または `question.id-{idx}-{subIdx}` とし、採点結果の `LearningRecord.questionId` と同じ粒度にそろえる。
+
 ---
 
 ## 9. API / サーバー処理
@@ -204,9 +247,31 @@ sequenceDiagram
 
 1. `question.context` が存在する場合、`SCPMExamView` を優先表示する
 2. `{{diagram:id}}` プレースホルダを展開し、Mermaid または markdown 図表を埋め込む
-3. 設問回答は `AIAnswerBox` に委譲し、親コンポーネントへ採点結果を返す
+3. `subQuestions` がある場合はその小問を解答欄にする
+4. `subQuestions` が空でも、設問直下の `answer` / `modelAnswer` / `explanation` がある場合は、その設問自体を解答欄にする
+5. `section.questions` にネストした設問がある場合は、その配下を解答欄として扱う
+6. PM2 論述式の設問ア・イ・ウのように設問本文だけで構成されるデータは、本文をプロンプトとして解答欄を生成する
+7. 設問回答は `AIAnswerBox` に委譲し、親コンポーネントへ採点結果を返す
+8. 回答済み設問の総合スコアは合計点ではなく平均点として算出し、100点満点で表示する
+9. 解答ペインの件数は大問ブロック数ではなく、実際に描画される解答欄数で表示する
+10. 解答ペインヘッダーのトグルで、問題文左ペインを非表示にして解答欄を全幅表示できる
+11. 非表示中も同じトグルで問題文左ペインを再表示できる
 
-### 10.3 採点 API
+### 10.3 問題番号フォールバック
+
+1. 試験入口画面は `questions` の実在 `qNo` を昇順に並べ、最初の問題番号・次の未回答番号・再開リンクを生成する
+2. 個別問題ページはまず要求 `qNo` の完全一致を探す
+3. 完全一致がない場合、正規化済み `qNo` 昇順の `qNo - 1` 番目の問題を位置番号として返す
+4. これにより、`qNo=1,3` や `qNo=3` のような疎な午後データでも、入口や直接 URL で「データが見つかりません」にならない
+
+### 10.4 採点前下書き保存
+
+1. `AIAnswerBox` は `draftKey` を受け取った場合、入力変更を debounce して localStorage に自動保存する
+2. ユーザーは「下書き保存」ボタンで任意のタイミングでも保存できる
+3. 同じ設問を再表示した場合、採点済み履歴よりも下書きを優先して復元する
+4. 下書き保存は採点結果・進捗とは独立し、採点前の離脱対策として扱う
+
+### 10.5 採点 API
 
 1. Route Handler が request body を検証する
 2. CLKS モデルを説明したプロンプトを生成する
@@ -237,6 +302,15 @@ sequenceDiagram
 
 - `ExamSummary` は `calculateExamResult()` の戻り値で総合スコアを表示する
 - `calculateAggregatedRadar()` は `aiRadarData` の平均を表示する
+- `SCPMExamView` の新形式午後画面では、回答済み小問の AI スコア平均を `0〜100` に丸め、コンパクトな `スコア N/100` 表示にする
+- スマートフォンの解答ペインヘッダーは、`設問一覧`、`解答欄 N`、`スコア N/100` を1行に収める
+- 新形式午後画面の問題文左ペインは、解答ペインヘッダーのトグルから閉じる/戻すことができる
+
+### 11.5 文字数制限
+
+- 設問文に単一の `N字以内` / `N文字以内` が含まれる場合、`AIAnswerBox` は `N` を上限として表示する
+- 複数の異なる字数制限が同一入力欄に含まれる場合は、単一上限として扱えないため自動制限を行わない
+- 上限超過時はカウンタと警告を表示し、AI 採点ボタンを無効化する
 
 ---
 
@@ -300,6 +374,14 @@ sequenceDiagram
 | Unit | `calculateExamResult()` が配点付き午後問題を正しく集計すること |
 | Unit | `calculateAggregatedRadar()` が軸平均を算出すること |
 | Integration | 採点後に `descriptiveHistory` と `allExamRecords` が更新されること |
+| UI | 午後解答欄で文字数制限、超過警告、下書き保存状態が表示されること |
+| UI | 新形式午後画面の総合スコアが 100 点満点で表示されること |
+| UI | 新形式午後画面の件数表示が大問数ではなく解答欄数で表示されること |
+| UI | 新形式午後画面で問題文左ペインを閉じると解答ペインが全幅になり、再表示できること |
+| UI | 変換済み午後画面のヘッダーと「終了して一覧へ」ボタンに CSS Modules のスタイルが適用されること |
+| UI | `subQuestions` が空の午後データでも、設問直下またはネスト配下の解答情報から入力欄が表示されること |
+| UI | 疎な `qNo` の午後データでも、入口・再開・直接 URL から実在問題へ遷移できること |
+| Unit | Mermaid サニタイズが日本語 subgraph、named subgraph、日本語 ER 図、二重括弧ノードを描画可能な構文へ正規化すること |
 
 ---
 
