@@ -1,4 +1,6 @@
 const LIMIT_PATTERN = /(\d{1,4})\s*(?:字|文字)\s*(?:以内|以下|まで)/g;
+const CHOICE_PREFIX_PATTERN = /^([A-Za-z]|[0-9]+|[ア-ン])(?:[\s:：\.．\)）、-]+)(.+)$/;
+const MULTIPLE_CHOICE_PATTERN = /(全て|すべて|複数|二つ|2つ|三つ|3つ|四つ|4つ).{0,12}選/;
 
 const hasText = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0;
 
@@ -45,4 +47,82 @@ export function buildPMAnswerFieldId(baseId: string, sectionIndex: number, field
 
 export function buildPMDraftKey(answerFieldId: string): string {
     return `ipalab_pm_answer_draft_v1:${answerFieldId}`;
+}
+
+export type PMChoiceOption = {
+    id: string;
+    text: string;
+};
+
+function normalizeChoiceOption(value: unknown): PMChoiceOption | null {
+    if (typeof value === 'string') {
+        const raw = value.trim();
+        if (!raw) return null;
+        const match = raw.match(CHOICE_PREFIX_PATTERN);
+        if (!match) return { id: raw, text: raw };
+        return { id: match[1], text: match[2].trim() || raw };
+    }
+
+    if (value && typeof value === 'object') {
+        const option = value as Record<string, unknown>;
+        const id = String(option.id ?? option.key ?? option.value ?? option.label ?? '').trim();
+        const text = String(option.text ?? option.label ?? option.value ?? id).trim();
+        if (!id) return null;
+        return { id, text: text || id };
+    }
+
+    return null;
+}
+
+export function getPMChoiceOptions(item: any): PMChoiceOption[] {
+    const rawChoices = item?.answerChoices ?? item?.choices ?? item?.options;
+    if (!Array.isArray(rawChoices)) return [];
+
+    return rawChoices
+        .map(normalizeChoiceOption)
+        .filter((option): option is PMChoiceOption => Boolean(option));
+}
+
+function collectAnswerText(value: unknown): string[] {
+    if (Array.isArray(value)) return value.flatMap(collectAnswerText);
+    if (value && typeof value === 'object') return Object.values(value).flatMap(collectAnswerText);
+    if (typeof value === 'string') return [value];
+    return [];
+}
+
+export function getPMCorrectChoiceIds(answer: unknown, options: PMChoiceOption[]): string[] {
+    const optionIds = new Set(options.map(option => option.id));
+    const values = collectAnswerText(answer);
+    const ids: string[] = [];
+
+    for (const value of values) {
+        if (value.trim() === 'ALL_CORRECT') return ['ALL_CORRECT'];
+        for (const option of options) {
+            if (value.trim() === option.id || value.trim().startsWith(`${option.id}:`) || value.trim().startsWith(`${option.id}：`)) {
+                ids.push(option.id);
+            }
+        }
+        for (const match of value.matchAll(/[A-Za-z]|[0-9]+|[ア-ン]/g)) {
+            if (optionIds.has(match[0])) ids.push(match[0]);
+        }
+    }
+
+    return [...new Set(ids)];
+}
+
+export function isPMMultipleChoice(item: any, options = getPMChoiceOptions(item)): boolean {
+    if (options.length === 0) return false;
+    if (item?.multiple === true || item?.selectionMode === 'multiple' || item?.choiceMode === 'checkbox') return true;
+    const prompt = `${item?.promptText ?? ''}\n${item?.text ?? ''}`;
+    if (MULTIPLE_CHOICE_PATTERN.test(prompt)) return true;
+    return getPMCorrectChoiceIds(item?.answer ?? item?.modelAnswer, options).length > 1;
+}
+
+export function isPMChoiceCorrect(selectedIds: string[], answer: unknown, options: PMChoiceOption[]): boolean {
+    const correctIds = getPMCorrectChoiceIds(answer, options);
+    if (correctIds.includes('ALL_CORRECT')) return selectedIds.length > 0;
+    if (selectedIds.length === 0 || selectedIds.length !== correctIds.length) return false;
+
+    const selected = new Set(selectedIds);
+    return correctIds.every(id => selected.has(id));
 }

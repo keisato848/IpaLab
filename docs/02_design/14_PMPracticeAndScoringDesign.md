@@ -116,6 +116,8 @@ sequenceDiagram
 
 記述式のリーフ設問は従来どおり `AIAnswerBox` の `genkoyoshi` 入力を使用し、字数制限が1つだけ抽出できる場合はその上限を表示する。複数字数条件を含む設問はデータ側で解答欄を分割し、記号回答は公式PDFに基づく解答群を構造化した上で選択式UIへ渡す。
 
+`answerChoices` / `choices` / `options` を持つリーフ設問は選択式UIへ分岐する。択一選択はラジオボタンで選択時に採点し、複数選択はチェックボックスで選択後に採点する。採点結果は午前問題と同じく `LearningRecord.selectedOptionId` と `isCorrect` に保存し、ゲスト履歴・セッション進捗・試験進捗の更新対象に含める。
+
 ### 4.2 AI 採点
 
 ```mermaid
