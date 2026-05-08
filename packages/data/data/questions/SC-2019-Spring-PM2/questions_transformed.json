@@ -10,7 +10,7 @@
           "id": "fig1",
           "label": "図1 N社のLAN構成",
           "type": "mermaid",
-          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((インターネット)) --- FW1[FW1]\n    FW1 --- DMZ[DMZセグメント]\n    FW1 --- FW2[FW2]\n    FW1 --- GeneralAffairs[総務部セグメント]\n\n    subgraph DMZ\n        L2SW1[L2SW] --- Proxy[プロキシサーバ]\n        L2SW1 --- ExtDNS[外部DNSサーバ]\n        L2SW1 --- ExtMail[外部メールサーバ]\n    end\n\n    subgraph GeneralAffairs\n        L2SW6[L2SW] --- WAP((W-AP))\n        WAP -.-> Tablet[タブレットPC]\n        L2SW6 --- InquiryPC[問合せ用PC]\n        L2SW6 --- DHCPSrv[DHCPサーバ]\n    end\n\n    FW2 --- InternalServer[内部サーバセグメント]\n    FW2 --- SalesSeg[営業部セグメント]\n    FW2 --- MfgSeg[製造部セグメント]\n    FW2 --- ITSSeg[情シスセグメント]\n\n    subgraph InternalServer\n        L2SW2[L2SW] --- FileSrv[ファイルサーバ]\n        L2SW2 --- IntMail[内部メールサーバ]\n        L2SW2 --- IntDNS[内部DNSサーバ]\n        L2SW2 --- AuthSrv[認証サーバ]\n        L2SW2 --- IntraPortal[イントラポータルサーバ]\n    end\n\n    subgraph SalesSeg\n        L2SW3[L2SW] --- DPC1[D-PC]\n    end\n\n    subgraph MfgSeg\n        L2SW4[L2SW] --- DPC2[D-PC]\n    end\n\n    subgraph ITSSeg\n        L2SW5[L2SW] --- DPC3[D-PC]\n    end\n\n    Router[ルータ] --- Internet\n    Router --- Factory[工場]\n\n    style DMZ fill:#f9f,stroke:#333\n    style GeneralAffairs fill:#bbf,stroke:#333\n[/CODE_BLOCK]"
+          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((\"インターネット\")) --- FW1[FW1]\n    FW1 --- DMZ[DMZセグメント]\n    FW1 --- FW2[FW2]\n    FW1 --- GeneralAffairs[総務部セグメント]\n\n    subgraph DMZ\n        L2SW1[L2SW] --- Proxy[プロキシサーバ]\n        L2SW1 --- ExtDNS[外部DNSサーバ]\n        L2SW1 --- ExtMail[外部メールサーバ]\n    end\n\n    subgraph GeneralAffairs\n        L2SW6[L2SW] --- WAP((W-AP))\n        WAP -.-> Tablet[タブレットPC]\n        L2SW6 --- InquiryPC[問合せ用PC]\n        L2SW6 --- DHCPSrv[DHCPサーバ]\n    end\n\n    FW2 --- InternalServer[内部サーバセグメント]\n    FW2 --- SalesSeg[営業部セグメント]\n    FW2 --- MfgSeg[製造部セグメント]\n    FW2 --- ITSSeg[情シスセグメント]\n\n    subgraph InternalServer\n        L2SW2[L2SW] --- FileSrv[ファイルサーバ]\n        L2SW2 --- IntMail[内部メールサーバ]\n        L2SW2 --- IntDNS[内部DNSサーバ]\n        L2SW2 --- AuthSrv[認証サーバ]\n        L2SW2 --- IntraPortal[イントラポータルサーバ]\n    end\n\n    subgraph SalesSeg\n        L2SW3[L2SW] --- DPC1[D-PC]\n    end\n\n    subgraph MfgSeg\n        L2SW4[L2SW] --- DPC2[D-PC]\n    end\n\n    subgraph ITSSeg\n        L2SW5[L2SW] --- DPC3[D-PC]\n    end\n\n    Router[ルータ] --- Internet\n    Router --- Factory[工場]\n\n    style DMZ fill:#f9f,stroke:#333\n    style GeneralAffairs fill:#bbf,stroke:#333\n[/CODE_BLOCK]"
         },
         {
           "id": "table1",
@@ -54,7 +54,6 @@
         "text": "〔無線LANの脆弱性〕について答えよ。",
         "references": [],
         "answer": null,
-        "explanation": "### 設問3の解説\n\n無線LANのMACアドレスは、通信のヘッダに含まれており、暗号化されずに送信されるためです。\n\n正規のW-APと同一のSSIDを設定した偽のW-APを設置し、KRACKsを悪用して端末を偽のW-APに接続させる。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -77,7 +76,6 @@
           "fig3"
         ],
         "answer": null,
-        "explanation": "### 設問4の解説\n\nヘッダの一部や固定的なフィールドなど、同一内容のデータが繰り返し現れる特徴。\n\nECBモードでは同一の「平文ブロック」(c)が同一の暗号文になります。CTRモードでは「カウンタ値」(d)を暗号化し、平文と「排他的論理和」(e)をとります。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -98,7 +96,6 @@
         "text": "〔未知マルウェア対策の改良〕について答えよ。",
         "references": [],
         "answer": null,
-        "explanation": "### 設問5の解説\n\nHTTP通信の場合、プロキシサーバは通信内容を「解析（または閲覧・取得）」することができます。\n\nCONNECTメソッドでは「ホスト」(g)名が渡されますが、パス(h)部分は暗号化されるため指定できません。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -133,7 +130,7 @@
           "id": "fig1",
           "label": "図1 A社のネットワーク構成",
           "type": "mermaid",
-          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((インターネット)) --- Cloud[クラウドサービスT]\n    Internet --- L3SW1[L3SW1]\n    L3SW1 --- FW[FW]\n    FW --- DMZ[DMZ]\n    subgraph DMZ\n        L2SW1[L2SW1] --- CacheDNS[A社キャッシュDNSサーバ]\n        L2SW1 --- Proxy[プロキシサーバ]\n    end\n    FW --- InternalLAN[内部システムLAN]\n    subgraph InternalLAN\n        L2SW2[L2SW2] --- DesignMgmt[設計情報管理サーバ]\n        L2SW2 --- MfgMgmt[製造情報管理サーバ]\n        L2SW2 --- DHCPSrv[DHCPサーバ]\n    end\n    L3SW1 --- AdminLAN[管理部LAN]\n    L3SW1 --- DesignLAN[設計部LAN]\n    L3SW1 --- MfgLAN[製造部LAN]\n    L3SW1 --- L3SW2[L3SW2]\n    L3SW2 --- SalesBase[営業拠点]\n    L3SW2 --- Factory[工場]\n[/CODE_BLOCK]"
+          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((\"インターネット\")) --- Cloud[クラウドサービスT]\n    Internet --- L3SW1[L3SW1]\n    L3SW1 --- FW[FW]\n    FW --- DMZ[DMZ]\n    subgraph DMZ\n        L2SW1[L2SW1] --- CacheDNS[A社キャッシュDNSサーバ]\n        L2SW1 --- Proxy[プロキシサーバ]\n    end\n    FW --- InternalLAN[内部システムLAN]\n    subgraph InternalLAN\n        L2SW2[L2SW2] --- DesignMgmt[設計情報管理サーバ]\n        L2SW2 --- MfgMgmt[製造情報管理サーバ]\n        L2SW2 --- DHCPSrv[DHCPサーバ]\n    end\n    L3SW1 --- AdminLAN[管理部LAN]\n    L3SW1 --- DesignLAN[設計部LAN]\n    L3SW1 --- MfgLAN[製造部LAN]\n    L3SW1 --- L3SW2[L3SW2]\n    L3SW2 --- SalesBase[営業拠点]\n    L3SW2 --- Factory[工場]\n[/CODE_BLOCK]"
         }
       ]
     },

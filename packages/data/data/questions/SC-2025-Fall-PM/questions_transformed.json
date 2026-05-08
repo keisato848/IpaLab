@@ -43,7 +43,6 @@
       {
         "subQNo": "設問1",
         "text": "本文中の [ a ], [ b ] に入れる適切な字句を、“できる”,“できない”のいずれかでそれぞれ答えよ。",
-        "explanation": "### 解説\n図1のHTTPレスポンスヘッダーに含まれるCSPの設定は `Content-Security-Policy: default-src 'self';` です。\n\n1.  **Sサービス以外のドメインからのリソースの読込み ([ a ])**\n    `default-src 'self'` は、リソースの読み込み元を自身のオリジンに限定します。外部ドメインからの読み込みは許可されません。\n2.  **script タグ内に直接記述されたスクリプトの実行 ([ b ])**\n    `default-src 'self'` のみでは、インラインスクリプトの実行は許可されません。\n\n**a の答え**: できない\n**b の答え**: できない",
         "subQuestions": [
           {
             "label": "a",
@@ -60,7 +59,6 @@
       {
         "subQNo": "設問2",
         "text": "〔インシデントの発生とその調査〕について答えよ。",
-        "explanation": "### 解説",
         "subQuestions": [
           {
             "label": "(1)",
@@ -112,7 +110,6 @@
       {
         "subQNo": "設問3",
         "text": "〔インシデントへの対応及び攻撃への対策〕について答えよ。",
-        "explanation": "### 解説",
         "subQuestions": [
           {
             "label": "(1)",

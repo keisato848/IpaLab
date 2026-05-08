@@ -31,7 +31,6 @@
       {
         "subQNo": "設問1",
         "text": "〔XSS 脆弱性の説明と修正〕について，(1)～(5)に答えよ。",
-        "explanation": "XSS（クロスサイトスクリプティング）は、ユーザーの入力値を適切にエスケープ（無害化）せずにHTMLとして出力することで、悪意のあるスクリプトをブラウザ上で実行させる脆弱性です。\\n\\n### 攻撃の仕組み\\n[CODE_BLOCK:mermaid]\\nsequenceDiagram\\n    autonumber\\n    Attacker->>Victim: 攻撃用リンクを送付\\n    Note right of Attacker: https://kensho.m-sha.co.jp/...keyword=script src=\".../Login.js\"\\n    Victim->>VulnerableServer: リンクをクリックしてリクエスト\\n    VulnerableServer->>Victim: 悪意のあるスクリプトを含むHTMLを応答\\n    Note right of Victim: ブラウザがスクリプトを実行\\n    Victim->>AttackerServer: ID・パスワードを送信\\n[/CODE_BLOCK]\\n\\n1. (1) スクリプトの送信先は攻撃者のサーバである wana.example.jp です。\\n2. (2) 画面2-2を表示しているオリジナルのサーバは kensho.m-sha.co.jp です。\\n3. (3) 異なるドメイン間のスクリプト実行やデータアクセスを制限する仕組みは「Same Origin Policy（同源ポリシー）」です。\\n4. (4) 図7のフレーム構成では、攻撃者が用意したページ内に正規のページを読み込んでいます。src属性のcには正規のURL、dには攻撃用スクリプトのURLが入ります。\\n5. (5) 攻撃が成功するためには、被害者が正規のサイト（懸賞システム）にログインした状態（セッションが維持されている状態）である必要があります。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -53,7 +52,6 @@
       {
         "subQNo": "設問2",
         "text": "〔CSRF 対策の説明と懸賞システムの修正〕について，(1), (2)に答えよ。",
-        "explanation": "CSRF（クロスサイトリクエストフォージェリ）は、利用者が意図しないリクエスト（データの更新や削除など）を、利用者がログイン中のWebアプリケーションに対して強制的に送信させる攻撃です。\\n\\n### CSRF対策の原理\\n1. サーバーは、正規の画面（フォーム）を表示する際に、推測困難な「トークン」を発行し、hiddenフィールドに埋め込みます。\\n2. サーバーは、リクエストを受けた際に、送信されてきたトークンが、自身が発行した正当なものかを確認します。\\n\\n[CODE_BLOCK:mermaid]\\nsequenceDiagram\\n    Server->>Browser: トークン(e)を埋め込んだフォーム(f: hidden)を送信\\n    Browser->>Server: トークンを含めてPOSTリクエスト\\n    Server->>Server: 保持しているトークンと一致するか検証\\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -81,7 +79,7 @@
           "id": "fig1",
           "label": "図1 U社情報システムの構成",
           "type": "mermaid",
-          "content": "graph TD\\n    Internet((インターネット)) --- FW[FW]\\n    FW --- L2SW_DMZ[L2SW]\\n    L2SW_DMZ --- Proxy[プロキシサーバ]\\n    L2SW_DMZ --- ExtMail[外部メールサーバ]\\n    L2SW_DMZ --- Web[Webサーバ]\\n    FW --- L3SW[L3SW]\\n    L3SW --- L2SW_LAN1[L2SW]\\n    L3SW --- L2SW_LAN2[L2SW]\\n    L2SW_LAN1 --- Multifunction[複合機]\\n    L2SW_LAN2 --- IntMail[内部メールサーバ]\\n    L2SW_LAN2 --- BizServer[業務サーバ]"
+          "content": "graph TD\\n    Internet((\"インターネット\")) --- FW[FW]\\n    FW --- L2SW_DMZ[L2SW]\\n    L2SW_DMZ --- Proxy[プロキシサーバ]\\n    L2SW_DMZ --- ExtMail[外部メールサーバ]\\n    L2SW_DMZ --- Web[Webサーバ]\\n    FW --- L3SW[L3SW]\\n    L3SW --- L2SW_LAN1[L2SW]\\n    L3SW --- L2SW_LAN2[L2SW]\\n    L2SW_LAN1 --- Multifunction[複合機]\\n    L2SW_LAN2 --- IntMail[内部メールサーバ]\\n    L2SW_LAN2 --- BizServer[業務サーバ]"
         },
         {
           "id": "fig4",

@@ -61,7 +61,6 @@
         "subQNo": "設問1",
         "text": "〔情報連携機能の実装についての検討〕について、(1)〜(3)に答えよ。",
         "references": [],
-        "explanation": "CORS（Cross-Origin Resource Sharing）と同一オリジンポリシー（Same-Origin Policy）に関する基本的な理解を問う問題です。\n\n### 解法のポイント\n- **同一オリジンポリシー**: ブラウザのセキュリティ機能で、「スキーム（プロトコル）」「ホスト（ドメイン名・FQDN）」「ポート番号」の3つがすべて一致する場合を「同一オリジン」とみなします。\n- **JSONPの脆弱性**: JSONPは<script>タグを利用して制限を回避しますが、認証情報（Cookieなど）が自動的に送信されるため、被害者が対象サイトにログイン済みの場合、攻撃者のサイトからでも機密情報を取得できてしまうリスク（CSRFに似た構造）があります。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -90,8 +89,13 @@
           "fig6",
           "fig7"
         ],
-        "explanation": "### CORSにおけるCookie送信\nCORSにおいて、別ドメインにCookieを送信するためには、クライアント側（JavaScript）で `withCredentials = true` を設定する必要があります。Cookieはプリフライトリクエストではなく、実際のリクエストである「メインリクエスト」において送信されます。\n\n[CODE_BLOCK:mermaid]\ngraph LR\n    A[Browser] -- \"(v) メインリクエスト<br/>(Cookie含む)\" --> B[Server2]\n[/CODE_BLOCK]",
-        "subQuestions": []
+        "subQuestions": [
+          {
+            "label": "e",
+            "text": "本文中の [ e ] に入れる適切な記号を、(iii)〜(vi)の中から選び、答えよ。",
+            "answer": "(v)"
+          }
+        ]
       },
       {
         "subQNo": "設問3",
@@ -99,7 +103,6 @@
         "references": [
           "table1"
         ],
-        "explanation": "CORSのヘッダ制御に関する応用的な実装方法についての問題です。\n\n### 複数オリジンの許可方法\n`Access-Control-Allow-Origin` ヘッダには、原則として一つのオリジンしか記述できません。複数のサイトを許可したい場合、サーバ側で「リクエストのOriginヘッダ」を確認し、それが「許可リスト」に含まれていれば、その値をそのままレスポンスの `Access-Control-Allow-Origin` にセットして返す動的な処理が必要になります。",
         "subQuestions": [
           {
             "label": "(1)",

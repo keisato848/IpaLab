@@ -48,7 +48,6 @@
       {
         "subQNo": "設問1",
         "text": "本文中の [ a ], [ b ] に入れる適切な脆弱性名を、解答群の中から選び、記号で答えよ。",
-        "explanation": "### 解説\nこの問題は、メモリ管理に関する典型的な脆弱性を問うものです。\n- **[ a ]**: 確保したバッファ（メモリ領域）のサイズを超えてデータを書き込むことで、隣接するメモリ領域を破壊する攻撃を**バッファオーバフロー** (Buffer Overflow) と呼びます。\n- **[ b ]**: 動的に確保し、一度解放 (free/delete) したメモリ領域を、ポインタがその領域を指したままの状態で再度アクセスしてしまう脆弱性を **Use-After-Free** と呼びます。例示プログラムの `DeleteNote` でポインタが NULL にされていないことが原因です。\n\n```mermaid\ngraph TD\n    A[メモリ確保] --> B[利用]\n    B --> C[メモリ解放 delete]\n    C -- ポインタが残っている --> D[再度利用 Use-After-Free]\n```",
         "subQuestions": [
           {
             "label": "a",
@@ -130,7 +129,7 @@
           "id": "fig1",
           "label": "図1 T社のネットワーク構成",
           "type": "mermaid",
-          "content": "graph TD\n    Internet((インターネット)) --- FW[FW]\n    FW --- L3SW1[L3SW1]\n    \n    subgraph DMZ\n        L3SW1 --- L2SW1[L2SW1]\n        L2SW1 --- Spam[迷惑メール対策サーバ]\n        L2SW1 --- DNS[DNSサーバ]\n        L2SW1 --- Mail[外部メールサーバ]\n        L2SW1 --- Proxy[プロキシサーバ]\n    end\n    \n    subgraph InternalLAN [内部システムLAN]\n        L3SW1 --- L2SW2[L2SW2]\n        L2SW2 --- WebMail[Webメールサーバ]\n        L2SW2 --- SalesInfo[営業情報サーバ]\n        L2SW2 --- Business[業務サーバ]\n    end\n    \n    subgraph PC-LAN\n        L3SW1 --- L3SW2[L3SW2]\n        L3SW2 --- SalesLAN[営業部LAN]\n        L3SW2 --- BizLAN[業務部LAN]\n        L3SW2 --- SysLAN[システム部LAN]\n    end"
+          "content": "graph TD\n    Internet((\"インターネット\")) --- FW[FW]\n    FW --- L3SW1[L3SW1]\n    \n    subgraph DMZ\n        L3SW1 --- L2SW1[L2SW1]\n        L2SW1 --- Spam[迷惑メール対策サーバ]\n        L2SW1 --- DNS[DNSサーバ]\n        L2SW1 --- Mail[外部メールサーバ]\n        L2SW1 --- Proxy[プロキシサーバ]\n    end\n    \n    subgraph InternalLAN [内部システムLAN]\n        L3SW1 --- L2SW2[L2SW2]\n        L2SW2 --- WebMail[Webメールサーバ]\n        L2SW2 --- SalesInfo[営業情報サーバ]\n        L2SW2 --- Business[業務サーバ]\n    end\n    \n    subgraph PC-LAN\n        L3SW1 --- L3SW2[L3SW2]\n        L3SW2 --- SalesLAN[営業部LAN]\n        L3SW2 --- BizLAN[業務部LAN]\n        L3SW2 --- SysLAN[システム部LAN]\n    end"
         },
         {
           "id": "table1",
@@ -162,7 +161,6 @@
           "table2",
           "fig2"
         ],
-        "explanation": "### 解説\n(1) SPFレコードには、自社からメールを送信する正当なサーバのIPアドレスを記述します。T社では「外部メールサーバ」がインターネットへメールを送信するため、そのIPアドレス `x1.y1.z1.4` が入ります。\n(2) FWのフィルタリングルール（表3）を埋める問題です。項番1はインターネットから届くメール、項番2は内部へ転送されるメール、項番3は内部から外部へ送るメールの流れを考えます。\n\n### メールの流れ\n```mermaid\ngraph LR\n    I((インターネット)) -- SMTP --> Spam[迷惑メール対策サーバ]\n    Spam -- SMTP --> WM[Webメールサーバ]\n    WM -- SMTP --> EM[外部メールサーバ]\n    EM -- SMTP --> I\n```",
         "subQuestions": [
           {
             "label": "(1)",
@@ -189,7 +187,7 @@
           "id": "fig1",
           "label": "図1 N社のネットワーク構成",
           "type": "mermaid",
-          "content": "graph TD\n    Internet((インターネット)) --- FW1[FW1]\n    FW1 --- L2SW[L2SW]\n    L2SW --- RD_File[研究開発用ファイルサーバ]\n    L2SW --- Gen_File[一般事務用ファイルサーバ]\n    L2SW --- DNS[内部DNSサーバ]\n    L2SW --- PC[社内PC]"
+          "content": "graph TD\n    Internet((\"インターネット\")) --- FW1[FW1]\n    FW1 --- L2SW[L2SW]\n    L2SW --- RD_File[研究開発用ファイルサーバ]\n    L2SW --- Gen_File[一般事務用ファイルサーバ]\n    L2SW --- DNS[内部DNSサーバ]\n    L2SW --- PC[社内PC]"
         },
         {
           "id": "table1",
@@ -207,7 +205,7 @@
           "id": "fig3",
           "label": "図3 LAN分離案",
           "type": "mermaid",
-          "content": "graph TD\n    Internet((インターネット)) --- FW2[FW2]\n    FW2 --- FW1[FW1]\n    \n    subgraph RD_LAN [研究開発LAN]\n        L2SW_RD[L2SW] --- RD_File2[研究開発用ファイルサーバ]\n        L2SW_RD --- RD_PC[研究開発用PC]\n    end\n    \n    subgraph Mid_LAN [中間LAN]\n        FW1 --- L2SW_Mid[L2SW]\n        L2SW_Mid --- File_Trans[ファイル転送サーバ]\n    end\n    \n    subgraph Biz_LAN [事務LAN]\n        FW1 --- L2SW_Biz[L2SW]\n        L2SW_Biz --- Gen_File2[一般事務用ファイルサーバ]\n        L2SW_Biz --- Biz_PC[事務用PC]\n        L2SW_Biz --- In_DNS[内部DNSサーバ]\n    end\n    \n    FW2 --- RD_LAN\n    FW2 --- Mid_LAN"
+          "content": "graph TD\n    Internet((\"インターネット\")) --- FW2[FW2]\n    FW2 --- FW1[FW1]\n    \n    subgraph RD_LAN [研究開発LAN]\n        L2SW_RD[L2SW] --- RD_File2[研究開発用ファイルサーバ]\n        L2SW_RD --- RD_PC[研究開発用PC]\n    end\n    \n    subgraph Mid_LAN [中間LAN]\n        FW1 --- L2SW_Mid[L2SW]\n        L2SW_Mid --- File_Trans[ファイル転送サーバ]\n    end\n    \n    subgraph Biz_LAN [事務LAN]\n        FW1 --- L2SW_Biz[L2SW]\n        L2SW_Biz --- Gen_File2[一般事務用ファイルサーバ]\n        L2SW_Biz --- Biz_PC[事務用PC]\n        L2SW_Biz --- In_DNS[内部DNSサーバ]\n    end\n    \n    FW2 --- RD_LAN\n    FW2 --- Mid_LAN"
         }
       ]
     },
@@ -218,7 +216,6 @@
         "references": [
           "table2"
         ],
-        "explanation": "### 解説\nJIS Q 31000 におけるリスク管理プロセスの順序を問う問題です。\n1. **リスク特定** (a): どのようなリスクがあるかを洗い出す。\n2. **リスク分析**: リスクの大きさ（起こりやすさと結果）を特定する。\n3. **リスク評価** (b): 分析結果を基準と比較し、対策の優先順位を決める。\nこれらを合わせて「リスクアセスメント」と呼び、その後「リスク対応」を行います。",
         "subQuestions": [
           {
             "label": "(1)",

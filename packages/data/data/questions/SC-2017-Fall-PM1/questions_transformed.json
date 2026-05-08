@@ -10,7 +10,7 @@
           "id": "fig1",
           "label": "図1 B社のシステム構成",
           "type": "mermaid",
-          "content": "graph TD\n    Internet((インターネット)) -- \"FW/R\" --- HQ[本社]\n    HQ --- IP-VPN{IP-VPN}\n    IP-VPN --- SalesOffice[営業店 1-10]\n    IP-VPN --- Warehouse[倉庫]\n    \n    subgraph HQ [本社]\n        D_Server[Dサーバ: 業務AP / 共有フォルダ]\n        G_Server[Gサーバ: 共有フォルダ]\n        PC_HQ[本社用PC01-50]\n    end\n\n    subgraph SalesOffice [営業店]\n        R1[R/L2SW]\n        PC_Sales[営業用PC01-05]\n    end\n\n    subgraph Warehouse [倉庫]\n        R2[R/L2SW]\n        PC_Work[作業用PC01-50]\n        HT[HT: ハンディターミナル]\n        PC_Work --- HT\n    end"
+          "content": "graph TD\n    Internet((\"インターネット\")) -- \"FW/R\" --- HQ[本社]\n    HQ --- IP-VPN{IP-VPN}\n    IP-VPN --- SalesOffice[営業店 1-10]\n    IP-VPN --- Warehouse[倉庫]\n    \n    subgraph HQ [本社]\n        D_Server[Dサーバ: 業務AP / 共有フォルダ]\n        G_Server[Gサーバ: 共有フォルダ]\n        PC_HQ[本社用PC01-50]\n    end\n\n    subgraph SalesOffice [営業店]\n        R1[R/L2SW]\n        PC_Sales[営業用PC01-05]\n    end\n\n    subgraph Warehouse [倉庫]\n        R2[R/L2SW]\n        PC_Work[作業用PC01-50]\n        HT[HT: ハンディターミナル]\n        PC_Work --- HT\n    end"
         },
         {
           "id": "table1",
@@ -39,8 +39,7 @@
             "text": "ア アクセス日時、イ 更新日時、ウ 削除日時、エ 作成日時",
             "answer": "イ"
           }
-        ],
-        "explanation": "L君は、破損（暗号化）されたファイルがいつ作成または更新されたかを特定することで、マルウェアがいつから活動を開始したかを調査しました。タイムラインのNo.8にある通り、特定のファイルが暗号化された時刻を特定するには、ファイルの「更新日時」を確認するのが一般的です。"
+        ]
       },
       {
         "subQNo": "設問2",
@@ -83,8 +82,7 @@
             "explanation": "ランサムウェア X はドライブをアルファベット順に処理します。PC05（ローカル）の後にDサーバ（ネットワーク）を処理するため、早期遮断により「Dサーバ上のファイルの暗号化」を防げたはずです。",
             "answer": "Dサーバ上の出荷ファイルの暗号化"
           }
-        ],
-        "explanation": "### 設問2の解説\n\nUnicode制御文字 RLO (Right-to-Left Override) は、文字の表示順序を右から左へ逆転させます。これを利用して invoice.fdp.exe を invoice.exe.pdf と見せかける手法が有名です。また、メールの経路情報は Received ヘッダに記録されます。\n\nバックアップデータは、暗号化される「直前」の正常な状態である必要があります。したがって、バックアップが完了した時刻（作成された時刻）を比較対象とします。\n\n原因(設定): Dサーバの共有フォルダがネットワークドライブとして割り当てられていた。 \n原因(特徴): アクセス可能なネットワークドライブを探索してファイルを暗号化する特徴。\n\nランサムウェア X はドライブをアルファベット順に処理します。PC05（ローカル）の後にDサーバ（ネットワーク）を処理するため、早期遮断により「Dサーバ上のファイルの暗号化」を防げたはずです。"
+        ]
       },
       {
         "subQNo": "設問3",
@@ -114,8 +112,7 @@
             "explanation": "シャットダウンによってメモリ上の共通鍵が消去されてしまうから。",
             "answer": "シャットダウンでメモリ上の共通鍵が消去されるため"
           }
-        ],
-        "explanation": "### 設問3の解説\n\n業務フローに基づき、必要な権限のみを与えます。出荷担当者は更新（書き込み）が必要ですが、営業や本社スタッフは閲覧（読み込み）のみで十分なはずです。\n\nファイルごとに異なる共通鍵が公開鍵で暗号化されているから。\n\nシャットダウンによってメモリ上の共通鍵が消去されてしまうから。"
+        ]
       },
       {
         "subQNo": "設問4",
