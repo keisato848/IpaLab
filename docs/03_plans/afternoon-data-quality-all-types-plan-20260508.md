@@ -26,9 +26,11 @@
 | 2026-05-08 | PM区分 PM1 の親見出し explanation を子設問側へ集約済みの構造へ整理 |
 | 2026-05-08 | PM-2019-Spring-PM1 / PM-2024-Fall-PM1 の空 subQuestions 単独設問を公式解答付きの子設問へ正規化 |
 | 2026-05-08 | PM-2017-Spring-PM1 / PM-2019-Spring-PM1 の Mermaid 日本語円形ノードを描画ルールに合わせて引用化 |
+| 2026-05-08 | PM-2019-Spring-PM1 の複数字数制限設問を1回目/2回目の子設問へ分割し、PM区分の multipleLimits を0件化 |
 | 2026-05-08 | SA区分 PM1/PM2 の親見出し explanation を子設問側へ集約済みの構造へ整理 |
 | 2026-05-08 | SA-2017-Fall-PM1 / SA-2019-Fall-PM1 / SA-2021-Spring-PM1 の空 subQuestions 単独設問を公式解答付きの子設問へ正規化 |
 | 2026-05-08 | SA-2018-Fall-PM1 / SA-2022-Spring-PM1 の Mermaid 日本語円形ノードを描画ルールに合わせて引用化 |
+| 2026-05-08 | ST-2017-Fall-PM1 の複数字数制限設問を特徴/事業戦略の子設問へ分割し、ST区分の multipleLimits を0件化 |
 | 2026-05-08 | SC区分 PM/PM1/PM2 の親見出し explanation を子設問側へ集約済みの構造へ整理 |
 | 2026-05-08 | SC-2022-Fall-PM2 qNo=2 の入れ子 subQuestions を表示可能な一段構造へフラット化 |
 | 2026-05-08 | SC-2018-Fall-PM1 / SC-2019-Spring-PM1 / SC-2022-Fall-PM1 の空 subQuestions 単独設問を公式解答付きの子設問へ正規化 |
@@ -190,8 +192,10 @@ E2E は UI 変更または代表データ修正の完了時に実行する。実
 - NW-2025-Spring-PM2 の表示 spot check（親見出し explanation 削除により余分な親解答欄リスクを補正済み）
 - ST区分 PM1/PM2 の表示 spot check（親見出し explanation 削除により broadPromptNoLimit / parentDirectWithChildren を区分内 0 件化）
 - ST-2017-Fall-PM1 / ST-2019-Fall-PM1 の単独設問表示 spot check（空 subQuestions を 1 件の子設問に正規化し、self-inspect R17 を解消）
+- ST-2017-Fall-PM1 qNo=4 の複数字数制限表示 spot check（特徴40字/事業戦略15字を別解答欄に分割し、ST区分の multipleLimits を0件化）
 - PM区分 PM1 の表示 spot check（親見出し explanation 削除により broadPromptNoLimit / parentDirectWithChildren を区分内 0 件化）
 - PM-2019-Spring-PM1 / PM-2024-Fall-PM1 の単独設問表示 spot check（空 subQuestions を 1 件の子設問に正規化し、self-inspect R17 を解消）
+- PM-2019-Spring-PM1 qNo=1 の複数字数制限表示 spot check（1回目30字/2回目35字を別解答欄に分割し、PM区分の multipleLimits を0件化）
 - SA区分 PM1/PM2 の表示 spot check（親見出し explanation 削除により broadPromptNoLimit / parentDirectWithChildren を区分内 0 件化）
 - SA-2017-Fall-PM1 / SA-2019-Fall-PM1 / SA-2021-Spring-PM1 の単独設問表示 spot check（空 subQuestions を公式解答付きの子設問に正規化し、self-inspect R17 を解消）
 - SC区分 PM/PM1/PM2 の表示 spot check（親見出し explanation 削除と入れ子設問フラット化により broadPromptNoLimit / parentDirectWithChildren を区分内 0 件化）
