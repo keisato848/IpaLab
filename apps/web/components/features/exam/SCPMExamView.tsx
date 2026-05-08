@@ -21,7 +21,11 @@ import {
     buildPMAnswerFieldId,
     buildPMDraftKey,
     extractAnswerLimit,
+    getPMChoiceOptions,
+    getPMCorrectChoiceIds,
     getPMChildAnswerItems,
+    isPMChoiceCorrect,
+    isPMMultipleChoice,
     shouldRenderPMSectionAnswerItem,
 } from './pmAnswerUtils';
 // Replaced missing UI components with native elements
@@ -112,10 +116,19 @@ interface SCPMExamViewProps {
     question: Question;
     onAnswerSubmit?: (subQNo: string | number, answer: string) => void;
     onGrade?: (data: { answer: string; result: ScoreResult }, subQIndex: number, subSubIndex?: number) => void;
+    onChoiceGrade?: (data: PMChoiceGradeData, subQIndex: number, subSubIndex?: number) => void;
     descriptiveHistory?: Record<string, { answer: string; result: any }>; // Pass history
 }
 
-export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descriptiveHistory }: SCPMExamViewProps) {
+export type PMChoiceGradeData = {
+    answer: string;
+    correctAnswer: string;
+    isCorrect: boolean;
+    questionText: string;
+    explanation?: string;
+};
+
+export default function SCPMExamView({ question, onAnswerSubmit, onGrade, onChoiceGrade, descriptiveHistory }: SCPMExamViewProps) {
     const { context, questions } = question;
     const [selectedDiagram, setSelectedDiagram] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'context' | 'answer'>('context');
@@ -453,6 +466,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
                                 parentQuestionId={question.id}
                                 parentContext={context}
                                 onGrade={onGrade ? (data, subSubIndex) => onGrade(data, idx, subSubIndex) : undefined}
+                                onChoiceGrade={onChoiceGrade ? (data, subSubIndex) => onChoiceGrade(data, idx, subSubIndex) : undefined}
                                 getInitialData={(subSubIndex) => {
                                     if (!descriptiveHistory) return undefined;
                                     return descriptiveHistory[buildPMAnswerFieldId(question.id, idx, subSubIndex)]
@@ -468,7 +482,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, descri
 
 }
 
-function SubQuestionBlock({ question, index, parentQuestionId, parentContext, onGrade, getInitialData }: { question: any, index: number, parentQuestionId: string, parentContext: any, onGrade?: (data: any, subSubIndex?: number) => void, getInitialData?: (subSubIndex?: number) => any }) {
+function SubQuestionBlock({ question, index, parentQuestionId, parentContext, onGrade, onChoiceGrade, getInitialData }: { question: any, index: number, parentQuestionId: string, parentContext: any, onGrade?: (data: any, subSubIndex?: number) => void, onChoiceGrade?: (data: PMChoiceGradeData, subSubIndex?: number) => void, getInitialData?: (subSubIndex?: number) => any }) {
     const normalizedQuestionText = useMemo(
         () => normalizeMermaidCodeBlocks(question.text),
         [question.text]
@@ -497,6 +511,7 @@ function SubQuestionBlock({ question, index, parentQuestionId, parentContext, on
                             sIdx={sIdx}
                             answerFieldId={buildPMAnswerFieldId(parentQuestionId, index, sIdx)}
                             onGrade={onGrade ? (data) => onGrade(data, sIdx) : undefined}
+                            onChoiceGrade={onChoiceGrade ? (data) => onChoiceGrade(data, sIdx) : undefined}
                             initialData={getInitialData?.(sIdx)}
                         />
                     ))}
@@ -506,7 +521,7 @@ function SubQuestionBlock({ question, index, parentQuestionId, parentContext, on
     );
 }
 
-function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, initialData }: { sq: any, sIdx: number, answerFieldId: string, onGrade?: (data: any) => void, initialData?: any }) {
+function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, onChoiceGrade, initialData }: { sq: any, sIdx: number, answerFieldId: string, onGrade?: (data: any) => void, onChoiceGrade?: (data: PMChoiceGradeData) => void, initialData?: any }) {
     const [showExplanation, setShowExplanation] = useState(false);
     const normalizedText = useMemo(
         () => normalizeMermaidCodeBlocks(sq.text),
@@ -518,6 +533,8 @@ function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, initialData }: { sq
         () => normalizeMermaidCodeBlocks(sq.explanation || ''),
         [sq.explanation]
     );
+    const choiceOptions = useMemo(() => getPMChoiceOptions(sq), [sq]);
+    const hasChoices = choiceOptions.length > 0;
 
     return (
         <div className={styles.subQuestionItem}>
@@ -536,20 +553,28 @@ function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, initialData }: { sq
                 </div>
             )}
 
-            {/* AI Grading Box */}
-            <div style={{ marginTop: '1rem' }}>
-                <AIAnswerBox
-                    questionText={`[${sq.label}] ${promptText}`}
-                    modelAnswer={sq.answer}
-                    limit={answerLimit}
-                    onSave={onGrade}
-                    initialAnswer={initialData?.answer}
-                    initialResult={initialData?.result}
-                    draftKey={buildPMDraftKey(answerFieldId)}
-                    inputVariant="genkoyoshi"
-                    hideChart={true}
+            {hasChoices ? (
+                <PMChoiceAnswer
+                    sq={sq}
+                    promptText={promptText}
+                    options={choiceOptions}
+                    onGrade={onChoiceGrade}
                 />
-            </div>
+            ) : (
+                <div style={{ marginTop: '1rem' }}>
+                    <AIAnswerBox
+                        questionText={`[${sq.label}] ${promptText}`}
+                        modelAnswer={sq.answer}
+                        limit={answerLimit}
+                        onSave={onGrade}
+                        initialAnswer={initialData?.answer}
+                        initialResult={initialData?.result}
+                        draftKey={buildPMDraftKey(answerFieldId)}
+                        inputVariant="genkoyoshi"
+                        hideChart={true}
+                    />
+                </div>
+            )}
 
             <div className={styles.explanationToggle}>
                 <button
@@ -582,6 +607,89 @@ function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, initialData }: { sq
                     </div>
                 )}
             </div>
+        </div>
+    );
+}
+
+function PMChoiceAnswer({ sq, promptText, options, onGrade }: { sq: any, promptText: string, options: ReturnType<typeof getPMChoiceOptions>, onGrade?: (data: PMChoiceGradeData) => void }) {
+    const multiple = useMemo(() => isPMMultipleChoice(sq, options), [sq, options]);
+    const correctIds = useMemo(() => getPMCorrectChoiceIds(sq.answer ?? sq.modelAnswer, options), [sq, options]);
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const isCorrect = isSubmitted && isPMChoiceCorrect(selectedIds, sq.answer ?? sq.modelAnswer, options);
+
+    const toggleOption = (id: string) => {
+        if (isSubmitted) return;
+        if (!multiple) {
+            const next = [id];
+            setSelectedIds(next);
+            submit(next);
+            return;
+        }
+
+        setSelectedIds(current => current.includes(id)
+            ? current.filter(value => value !== id)
+            : [...current, id]);
+    };
+
+    const submit = (ids = selectedIds) => {
+        if (ids.length === 0) return;
+        const correct = isPMChoiceCorrect(ids, sq.answer ?? sq.modelAnswer, options);
+        setIsSubmitted(true);
+        onGrade?.({
+            answer: ids.join(','),
+            correctAnswer: correctIds.join(','),
+            isCorrect: correct,
+            questionText: `[${sq.label}] ${promptText}`,
+            explanation: sq.explanation || '',
+        });
+    };
+
+    return (
+        <div className={styles.choiceAnswerBox}>
+            <div className={styles.choiceOptions} role="group" aria-label={`${sq.label || '設問'}の選択肢`}>
+                {options.map(option => {
+                    const selected = selectedIds.includes(option.id);
+                    const correct = correctIds.includes(option.id) || correctIds.includes('ALL_CORRECT');
+                    let optionClass = styles.choiceOption;
+                    if (selected) optionClass += ` ${styles.choiceSelected}`;
+                    if (isSubmitted && selected && correct) optionClass += ` ${styles.choiceCorrect}`;
+                    if (isSubmitted && selected && !correct) optionClass += ` ${styles.choiceIncorrect}`;
+                    if (isSubmitted && !selected && correct) optionClass += ` ${styles.choiceCorrectHint}`;
+
+                    return (
+                        <label key={option.id} className={optionClass}>
+                            <input
+                                type={multiple ? 'checkbox' : 'radio'}
+                                name={`pm-choice-${sq.label || promptText}`}
+                                checked={selected}
+                                disabled={isSubmitted}
+                                onChange={() => toggleOption(option.id)}
+                            />
+                            <span className={styles.choiceId}>{option.id}</span>
+                            <span className={styles.choiceText}>{option.text}</span>
+                        </label>
+                    );
+                })}
+            </div>
+
+            {multiple && !isSubmitted && (
+                <button
+                    type="button"
+                    className={styles.choiceSubmitButton}
+                    disabled={selectedIds.length === 0}
+                    onClick={() => submit()}
+                >
+                    採点する
+                </button>
+            )}
+
+            {isSubmitted && (
+                <div className={`${styles.choiceResult} ${isCorrect ? styles.choiceResultCorrect : styles.choiceResultIncorrect}`}>
+                    <span>{isCorrect ? '正解' : '不正解'}</span>
+                    <span>正答: {correctIds.join(', ') || '未設定'}</span>
+                </div>
+            )}
         </div>
     );
 }

@@ -3,6 +3,9 @@ import {
     buildPMAnswerFieldId,
     buildPMDraftKey,
     extractAnswerLimit,
+    getPMChoiceOptions,
+    isPMChoiceCorrect,
+    isPMMultipleChoice,
     shouldRenderPMSectionAnswerItem,
 } from '@/components/features/exam/pmAnswerUtils';
 
@@ -41,5 +44,29 @@ describe('pmAnswerUtils', () => {
         };
 
         expect(shouldRenderPMSectionAnswerItem(section)).toBe(true);
+    });
+
+    it('午後選択式の文字列選択肢をIDと本文に正規化する', () => {
+        expect(getPMChoiceOptions({ answerChoices: ['ア HTTP', 'イ DNS'] })).toEqual([
+            { id: 'ア', text: 'HTTP' },
+            { id: 'イ', text: 'DNS' },
+        ]);
+    });
+
+    it('午後選択式の択一と複数選択を正誤判定する', () => {
+        const options = getPMChoiceOptions({ answerChoices: ['ア HTTP', 'イ DNS', 'ウ SMTP'] });
+        expect(isPMChoiceCorrect(['イ'], 'イ', options)).toBe(true);
+        expect(isPMChoiceCorrect(['ア'], 'イ', options)).toBe(false);
+        expect(isPMChoiceCorrect(['ア', 'ウ'], 'ア, ウ', options)).toBe(true);
+    });
+
+    it('複数選択を促す設問はcheckbox扱いにする', () => {
+        const item = {
+            text: '適切なものを二つ選び、記号で答えよ。',
+            answerChoices: ['ア HTTP', 'イ DNS', 'ウ SMTP'],
+            answer: 'ア, ウ',
+        };
+
+        expect(isPMMultipleChoice(item)).toBe(true);
     });
 });

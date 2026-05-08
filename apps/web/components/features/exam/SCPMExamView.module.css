@@ -639,6 +639,127 @@
     color: var(--text-primary);
 }
 
+.choiceAnswerBox {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.choiceOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.choiceOption {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.choiceOption:hover {
+    border-color: var(--accent-color);
+}
+
+.choiceOption input {
+    flex: none;
+    margin-top: 0.2rem;
+}
+
+.choiceSelected {
+    border-color: var(--accent-color);
+    background: var(--bg-secondary);
+}
+
+.choiceCorrect {
+    border-color: var(--success-text);
+    background: var(--success-bg);
+    color: var(--success-text);
+}
+
+.choiceIncorrect {
+    border-color: var(--error-text);
+    background: var(--error-bg);
+    color: var(--error-text);
+}
+
+.choiceCorrectHint {
+    border-color: var(--success-text);
+    border-style: dashed;
+    background: var(--success-bg);
+}
+
+.choiceId {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    min-width: 1.75rem;
+    height: 1.75rem;
+    padding: 0 0.375rem;
+    border-radius: 9999px;
+    background: var(--bg-secondary);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.choiceText {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    line-height: 1.6;
+}
+
+.choiceSubmitButton {
+    align-self: flex-start;
+    min-height: 36px;
+    padding: 0.45rem 0.875rem;
+    border: 1px solid var(--accent-color);
+    border-radius: 8px;
+    background: var(--accent-color);
+    color: white;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.choiceSubmitButton:disabled {
+    border-color: var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-tertiary);
+    cursor: not-allowed;
+}
+
+.choiceResult {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+}
+
+.choiceResultCorrect {
+    background: var(--success-bg);
+    color: var(--success-text);
+}
+
+.choiceResultIncorrect {
+    background: var(--error-bg);
+    color: var(--error-text);
+}
+
 /* Explanation Toggle */
 .explanationToggle {
     margin-top: 0.75rem;

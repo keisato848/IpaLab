@@ -34,6 +34,7 @@ const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false })
 import ExamSummary from './ExamSummary';
 import AIAnswerBox from './AIAnswerBox';
 import SCPMExamView from './SCPMExamView';
+import type { PMChoiceGradeData } from './SCPMExamView';
 import { buildPMAnswerFieldId, buildPMDraftKey, extractAnswerLimit } from './pmAnswerUtils';
 
 interface QuestionClientProps {
@@ -414,6 +415,89 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         }
     };
 
+    const handleSavePMChoiceScore = async (data: PMChoiceGradeData, subQIdx: number, subSubIdx?: number) => {
+        const qId = getSubQId(question.id, subQIdx, subSubIdx);
+        const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+        const record: LearningRecord = {
+            id: uuidv4(),
+            userId: session?.user?.id || guestManager.getGuestId() || 'anonymous',
+            questionId: qId,
+            examId: question.examId,
+            category: question.category,
+            subCategory: question.subCategory,
+            isCorrect: data.isCorrect,
+            sessionId: sessionId || undefined,
+            selectedOptionId: data.answer,
+            answeredAt: new Date().toISOString(),
+            timeTakenSeconds: timeTaken,
+        };
+
+        const nextCurrentSessionStats = sessionId ? incrementStats(currentSessionStats, data.isCorrect) : currentSessionStats;
+
+        statsVersionRef.current += 1;
+        setSessionStats(prev => incrementStats(prev, data.isCorrect));
+        if (sessionId) {
+            setCurrentSessionStats(prev => incrementStats(prev, data.isCorrect));
+        }
+        setExamStats(prev => {
+            const currentTotal = prev?.total || 0;
+            const currentCorrect = prev?.correct || 0;
+            return {
+                total: currentTotal + 1,
+                correct: currentCorrect + (data.isCorrect ? 1 : 0)
+            };
+        });
+
+        try {
+            if (session?.user?.id) {
+                const savePromises: Promise<any>[] = [
+                    saveLearningRecord(record),
+                    saveExamProgress(session.user.id, question.examId, {
+                        statusUpdate: { questionId: qId, isCorrect: data.isCorrect }
+                    })
+                ];
+
+                if (sessionId) {
+                    savePromises.push(
+                        updateSessionProgress(sessionId, {
+                            answeredCount: nextCurrentSessionStats.total,
+                            correctCount: nextCurrentSessionStats.correct,
+                            lastQuestionNo: parseInt(qNo),
+                        })
+                    );
+                }
+
+                await Promise.all(savePromises);
+            } else {
+                if (!guestManager.hasShownWarning()) {
+                    setShowGuestWarning(true);
+                    guestManager.markWarningShown();
+                }
+                guestManager.saveHistory(record);
+            }
+
+            window.dispatchEvent(new CustomEvent('ai-assistant-context', {
+                detail: {
+                    questionId: qId,
+                    questionText: data.questionText,
+                    userAnswer: data.answer,
+                    correctAnswer: data.correctAnswer,
+                    explanation: data.explanation || '',
+                    isCorrect: data.isCorrect,
+                    examId: question.examId,
+                    isDescriptive: false,
+                },
+            }));
+
+            setAllExamRecords(prev => {
+                const filtered = prev.filter(r => r.questionId !== qId);
+                return [...filtered, record];
+            });
+        } catch (e) {
+            console.error('Failed to save PM choice score', e);
+        }
+    };
+
     const handleOptionClick = async (optionId: string) => {
         if (showExplanation && isPractice) return; // Prevent changing answer after showing explanation
         setSelectedOption(optionId);
@@ -711,6 +795,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                             // but AIAnswerBox handles its own state mostly.
                         }}
                         onGrade={(data, subQIdx, subSubIdx) => handleSaveAIScore(data, subQIdx as number, subSubIdx)}
+                        onChoiceGrade={(data, subQIdx, subSubIdx) => handleSavePMChoiceScore(data, subQIdx as number, subSubIdx)}
                         descriptiveHistory={descriptiveHistory}
                     />
                 </div>

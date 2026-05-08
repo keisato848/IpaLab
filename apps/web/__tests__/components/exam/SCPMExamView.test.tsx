@@ -82,4 +82,62 @@ describe('SCPMExamView', () => {
         expect(screen.getAllByTestId('ai-answer-box')).toHaveLength(1);
         expect(screen.getByText('解答欄 1')).toBeInTheDocument();
     });
+
+    it('午後の択一選択式はラジオボタンで即時採点する', () => {
+        const onChoiceGrade = vi.fn();
+        render(<SCPMExamView question={{
+            ...question,
+            questions: [
+                {
+                    id: 'q1',
+                    subQNo: '1',
+                    text: '設問1',
+                    subQuestions: [
+                        {
+                            label: '(1)',
+                            text: '適切なものを解答群から選び、記号で答えよ。',
+                            answerChoices: ['ア HTTP', 'イ DNS'],
+                            answer: 'イ',
+                        },
+                    ],
+                },
+            ],
+        } as any} onChoiceGrade={onChoiceGrade} />);
+
+        const radio = screen.getByRole('radio', { name: /イ DNS/ });
+        fireEvent.click(radio);
+
+        expect(onChoiceGrade).toHaveBeenCalledWith(expect.objectContaining({ answer: 'イ', isCorrect: true }), 0, 0);
+        expect(screen.getByText('正解')).toBeInTheDocument();
+        expect(screen.queryByTestId('ai-answer-box')).not.toBeInTheDocument();
+    });
+
+    it('午後の複数選択式はチェックボックスで採点する', () => {
+        const onChoiceGrade = vi.fn();
+        render(<SCPMExamView question={{
+            ...question,
+            questions: [
+                {
+                    id: 'q1',
+                    subQNo: '1',
+                    text: '設問1',
+                    subQuestions: [
+                        {
+                            label: '(1)',
+                            text: '適切なものを二つ選び、記号で答えよ。',
+                            answerChoices: ['ア HTTP', 'イ DNS', 'ウ SMTP'],
+                            answer: 'ア, ウ',
+                        },
+                    ],
+                },
+            ],
+        } as any} onChoiceGrade={onChoiceGrade} />);
+
+        fireEvent.click(screen.getByRole('checkbox', { name: /ア HTTP/ }));
+        fireEvent.click(screen.getByRole('checkbox', { name: /ウ SMTP/ }));
+        fireEvent.click(screen.getByRole('button', { name: '採点する' }));
+
+        expect(onChoiceGrade).toHaveBeenCalledWith(expect.objectContaining({ answer: 'ア,ウ', isCorrect: true }), 0, 0);
+        expect(screen.getByText('正解')).toBeInTheDocument();
+    });
 });
