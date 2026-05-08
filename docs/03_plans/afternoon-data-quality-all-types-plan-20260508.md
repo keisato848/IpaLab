@@ -33,6 +33,7 @@
 | 2026-05-08 | SC-2022-Fall-PM2 qNo=2 の入れ子 subQuestions を表示可能な一段構造へフラット化 |
 | 2026-05-08 | SC-2018-Fall-PM1 / SC-2019-Spring-PM1 / SC-2022-Fall-PM1 の空 subQuestions 単独設問を公式解答付きの子設問へ正規化 |
 | 2026-05-08 | SC区分の Mermaid 日本語円形ノードを描画ルールに合わせて引用化 |
+| 2026-05-08 | SC区分 PM/PM1/PM2 の本文内解答群を answerChoices に構造化し、symbolNoStructuralChoices を 87件から56件へ削減 |
 
 ## 1. 目的
 
@@ -195,6 +196,7 @@ E2E は UI 変更または代表データ修正の完了時に実行する。実
 - SA-2017-Fall-PM1 / SA-2019-Fall-PM1 / SA-2021-Spring-PM1 の単独設問表示 spot check（空 subQuestions を公式解答付きの子設問に正規化し、self-inspect R17 を解消）
 - SC区分 PM/PM1/PM2 の表示 spot check（親見出し explanation 削除と入れ子設問フラット化により broadPromptNoLimit / parentDirectWithChildren を区分内 0 件化）
 - SC-2018-Fall-PM1 / SC-2019-Spring-PM1 / SC-2022-Fall-PM1 の単独設問表示 spot check（空 subQuestions を公式解答付きの子設問に正規化し、self-inspect R17 を解消）
+- SC区分 PM/PM1/PM2 の選択式表示 spot check（本文または親設問本文に明示された解答群を `answerChoices` に構造化し、残る56件は公式PDF確認が必要な手動対象として維持）
 - SA-2024-Spring-PM1 qNo=1 の表示 spot check（親見出しはUI抑止済み、公式解答同期済み）
 - SC-PM1/PM2 の下線・記号回答・図表参照の高リスク箇所の公式PDF照合
 - FE-2024-Public-PM の選択肢本文復元

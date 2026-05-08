@@ -45,7 +45,12 @@
           {
             "label": "(3)",
             "text": "本文中の [ b ] に入れる適切な字句を解答群の中から選び，記号で答えよ。 (ア: AJAX, イ: HSTS, ウ: JSON, エ: Same Origin Policy)",
-            "answer": "エ"
+            "answer": "エ",
+            "answerChoices": [
+              "イ : HSTS,",
+              "ウ : JSON,",
+              "エ : Same Origin Policy)"
+            ]
           }
         ]
       },

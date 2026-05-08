@@ -70,7 +70,11 @@
           {
             "label": "(2)",
             "text": "本文中の [ b ] 〜 [ d ] に入れる適切な字句を解答群の中から選び、記号で答えよ。\n解答群：ア Cookie、イ FQDN、ウ Locationヘッダフィールド、エ Refererヘッダフィールド、オ User-Agentヘッダフィールド、カ 時刻、キ スキーム、ク ポート番号",
-            "answer": "b: イ, c: キ, d: ク"
+            "answer": "b: イ, c: キ, d: ク",
+            "answerChoices": [
+              "ス キーム、ク",
+              "ポ ート番号"
+            ]
           },
           {
             "label": "(3)",

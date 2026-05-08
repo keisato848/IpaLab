@@ -51,7 +51,16 @@
             "references": [
               "table2"
             ],
-            "answer": "カ, エ"
+            "answer": "カ, エ",
+            "answerChoices": [
+              "イ : FIN ACK受信,",
+              "ウ : FIN受信,",
+              "エ : RST ACK受信,",
+              "オ : RST受信,",
+              "カ : SYN ACK受信,",
+              "キ : SYN受信,",
+              "ク : 応答なし)"
+            ]
           },
           {
             "label": "(3)",
