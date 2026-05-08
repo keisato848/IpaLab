@@ -5,6 +5,7 @@
 | 日付 | 内容 |
 |------|------|
 | 2026-05-08 | 初版作成。AP / SA 起点不具合を全試験区分へ拡張し、既存データ修正・未抽出区分の抽出・UI再発防止・検証計画を定義 |
+| 2026-05-08 | 公式ソース監査の対象に AU / SM を追加し、DB / AU / SM / ES の午後データ抽出対象が公式To-Be上も検出されることを確認 |
 
 ## 1. 目的
 
@@ -49,6 +50,13 @@
 | 広い設問 | `〜について答えよ` 形式で字数条件がなく、親見出し扱いが疑われる箇所を検出する |
 | 未抽出区分 | DB / AU / SM / ES など、ローカル午後データが存在しない区分を検出する |
 
+### 2.3 公式ソース監査の確認結果
+
+`.github/skills/exam-data-management/scripts/official-source-coverage-audit.mjs --json --categories=DB,AU,SM,ES` を実行し、公式年度別 HTML から DB / AU / SM / ES の午後 PDF が検出されることを確認した。
+
+確認時点では `OFFICIAL_EXAM_NOT_IN_EXAM_LIST` と `OFFICIAL_EXAM_MISSING_LOCAL_QUESTIONS` が合計約116件検出され、代表例として `SM-2018-Fall-PM2`、`SM-2018-Fall-PM1`、`SM-2019-Fall-PM2`、`SM-2019-Fall-PM1`、`SM-2022-Spring-PM2` が挙がった。
+このため、DB / AU / SM / ES はローカル監査だけでなく公式To-Be上も未整備として扱い、既存JSON補正ではなく公式PDF取得からの抽出工程で進める。
+
 ## 3. 修正方針
 
 ### 3.1 既存データあり区分
@@ -89,6 +97,7 @@ DB / AU / SM / ES は、午後 `*-PM*` のローカルデータが存在しな�
 | 0 | ブランチ分離・計画書作成 | `fix/exam-data-quality-all-types` で作業し、計画書をコミット | `docs: 全区分午後データ品質修正計画を追加` |
 | 1 | 共通UI修正 | 親見出しの800字欄化が単体テストで防止される | `fix: 午後親見出しの余分な解答欄を抑止` |
 | 2 | 監査基盤追加 | `npm run audit:afternoon-data` で全区分監査結果が出る | `chore: 午後データ品質監査を追加` |
+| 2.5 | 公式ソース監査対象拡張 | DB / AU / SM / ES の公式午後PDFが To-Be として検出される | `chore: 公式ソース監査の午後対象区分を拡張` |
 | 3 | AP / SA 起点データ修正 | 起点URLの下線・解答群・親見出し欄が解消される | 小さな examId 単位でコミット |
 | 4 | PM / SC / ST / NW / FE 代表修正 | 監査結果の P0 代表例を区分ごとに解消 | 区分または examId 単位でコミット |
 | 5 | DB / AU / SM / ES 抽出計画具体化 | 公式PDF対象一覧、raw PDF状態、抽出順序が確定 | `docs: 未抽出午後区分の抽出計画を更新` |
