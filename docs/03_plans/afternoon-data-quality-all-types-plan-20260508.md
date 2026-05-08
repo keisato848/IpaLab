@@ -9,6 +9,7 @@
 | 2026-05-08 | SA-2024-Spring-PM1 qNo=1 の transformed 解答を公式解答PDF / answers_raw.json と同期 |
 | 2026-05-08 | AP-2025-Spring-PM qNo=1 の表2・解答群・下線根拠・複数字数設問（設問3/4）を公式PDFに基づき補正 |
 | 2026-05-08 | AP-2022-Fall-PM qNo=1 の親見出し explanation を子設問側へ集約済みの構造へ整理 |
+| 2026-05-08 | SA-2024-Spring-PM1 qNo=2 の本文下線根拠と公式解答を同期 |
 
 ## 1. 目的
 
@@ -152,6 +153,7 @@ E2E は UI 変更または代表データ修正の完了時に実行する。実
 
 - AP-2025-Spring-PM qNo=1 の表示 spot check（表2・解答群・下線根拠・設問3/4分割は公式PDFに基づき補正済み）
 - AP-2022-Fall-PM qNo=1 の表示 spot check（親見出し explanation 削除により余分な親解答欄リスクを補正済み）
+- SA-2024-Spring-PM1 qNo=2 の表示 spot check（下線①〜⑤の本文根拠と公式解答同期は補正済み）
 - SA-2024-Spring-PM1 qNo=1 の表示 spot check（親見出しはUI抑止済み、公式解答同期済み）
 - SC-PM1/PM2 の下線・記号回答・図表参照の高リスク箇所の公式PDF照合
 - FE-2024-Public-PM の選択肢本文復元
