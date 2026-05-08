@@ -662,6 +662,7 @@ function PMChoiceAnswer({ sq, promptText, options, onGrade }: { sq: any, promptT
                             <input
                                 type={multiple ? 'checkbox' : 'radio'}
                                 name={`pm-choice-${sq.label || promptText}`}
+                                aria-label={`${option.id} ${option.text}`}
                                 checked={selected}
                                 disabled={isSubmitted}
                                 onChange={() => toggleOption(option.id)}
