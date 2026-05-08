@@ -11,7 +11,7 @@
           "id": "fig1",
           "label": "図1 N社の情報システムの構成",
           "type": "mermaid",
-          "content": "graph TD\n  Internet((インターネット)) --- Router[ルータ]\n  Router --- FW[FW: ファイアウォール]\n\n  subgraph N_Company [N社]\n    FW --- L2SW1[L2SW]\n    \n    subgraph DMZ\n      L2SW1 --- Proxy[プロキシサーバ]\n      L2SW1 --- ExtDNS[外部DNSサーバ]\n      L2SW1 --- ExtMail[外部メールサーバ]\n    end\n\n    FW --- L3SW[L3SW]\n    \n    L3SW --- L2SW2[L2SW]\n    subgraph Server_Segment [サーバセグメント]\n      L2SW2 --- IntMail[内部メールサーバ]\n      L2SW2 --- IntDNS[内部DNSサーバ]\n    end\n\n    L3SW --- L2SW3[L2SW]\n    subgraph PC_Segment [PCセグメント]\n      L2SW3 --- PC[PC]\n    end\n  end\n\n  style N_Company fill:#f9f,stroke:#333,stroke-width:2px\n  style DMZ fill:#dfd,stroke:#333,stroke-dasharray: 5 5"
+          "content": "graph TD\n  Internet((\"インターネット\")) --- Router[ルータ]\n  Router --- FW[FW: ファイアウォール]\n\n  subgraph N_Company [N社]\n    FW --- L2SW1[L2SW]\n    \n    subgraph DMZ\n      L2SW1 --- Proxy[プロキシサーバ]\n      L2SW1 --- ExtDNS[外部DNSサーバ]\n      L2SW1 --- ExtMail[外部メールサーバ]\n    end\n\n    FW --- L3SW[L3SW]\n    \n    L3SW --- L2SW2[L2SW]\n    subgraph Server_Segment [サーバセグメント]\n      L2SW2 --- IntMail[内部メールサーバ]\n      L2SW2 --- IntDNS[内部DNSサーバ]\n    end\n\n    L3SW --- L2SW3[L2SW]\n    subgraph PC_Segment [PCセグメント]\n      L2SW3 --- PC[PC]\n    end\n  end\n\n  style N_Company fill:#f9f,stroke:#333,stroke-width:2px\n  style DMZ fill:#dfd,stroke:#333,stroke-dasharray: 5 5"
         },
         {
           "id": "fig2",
@@ -60,7 +60,6 @@
       {
         "subQNo": "設問2",
         "text": "〔送信ドメイン認証技術の検討〕について、(1)〜(4)に答えよ。",
-        "explanation": "### 表1の解説\nSPF認証が成功（○）するためには、「送信側のDNSにSPFレコードが設定されていること」かつ「受信側のメールサーバでSPF検証を実施していること」の両方が必要です。\n- b, d, f: 攻撃1は「取引先ドメイン」を騙る攻撃です。取引先のDNSが「未設定」であれば、N社が検証を実施しても判断不可のため × です。\n- c, e, g: 攻撃2は「N社ドメイン」を騙る攻撃です。N社のDNSは「設定済み」です。受信側（取引先）が検証を「実施しない」場合（c, e, g）は、判断不可のため × です。\n- h, i: 送信側のN社のDNSが「未設定」なので、検証を実施しても × です。\n\n### 図4 [ j ] の解説\nN社の外部メールサーバのIPアドレスを指定します。図2より、`mail.n-sha.co.jp` のIPアドレスは `x1.y1.z1.1` です。\n\n### 下線①の解説\nメール転送時は、送信元IPアドレスが転送元サーバのものに変わるため、送信ドメインのSPFレコードに記載されたIPアドレスと一致しなくなるからです。\n\n### 下線②の解説\nデジタル署名を使用しているため、「メール本文やヘッダが改ざんされていないこと（完全性）」が確認できます。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -114,7 +113,7 @@
           "id": "fig1",
           "label": "図1 Z社のネットワーク構成",
           "type": "mermaid",
-          "content": "graph TD\n  Internet((インターネット)) --- FW[FW]\n\n  subgraph DMZ\n    FW --- L2SW_DMZ[L2SW]\n    L2SW_DMZ --- ExtDNS[外部DNSサーバ]\n    L2SW_DMZ --- PubWeb[公開Webサーバ]\n  end\n\n  subgraph Office_Segment [オフィスセグメント]\n    FW --- L2SW_Office[L2SW]\n    L2SW_Office --- PC[PC]\n  end\n\n  subgraph Internal_Server_Segment [内部サーバセグメント]\n    FW --- L2SW_Int[L2SW]\n    L2SW_Int --- Proxy[プロキシサーバ]\n    L2SW_Int --- Mail[メールサーバ]\n    L2SW_Int --- IntWeb[内部Webサーバ]\n    L2SW_Int --- Auth[認証サーバ]\n    L2SW_Int --- IntDNS[内部DNSサーバ]\n  end"
+          "content": "graph TD\n  Internet((\"インターネット\")) --- FW[FW]\n\n  subgraph DMZ\n    FW --- L2SW_DMZ[L2SW]\n    L2SW_DMZ --- ExtDNS[外部DNSサーバ]\n    L2SW_DMZ --- PubWeb[公開Webサーバ]\n  end\n\n  subgraph Office_Segment [オフィスセグメント]\n    FW --- L2SW_Office[L2SW]\n    L2SW_Office --- PC[PC]\n  end\n\n  subgraph Internal_Server_Segment [内部サーバセグメント]\n    FW --- L2SW_Int[L2SW]\n    L2SW_Int --- Proxy[プロキシサーバ]\n    L2SW_Int --- Mail[メールサーバ]\n    L2SW_Int --- IntWeb[内部Webサーバ]\n    L2SW_Int --- Auth[認証サーバ]\n    L2SW_Int --- IntDNS[内部DNSサーバ]\n  end"
         },
         {
           "id": "table1",
@@ -128,7 +127,6 @@
       {
         "subQNo": "設問1",
         "text": "〔ISACからの情報提供と対応〕について、(1)〜(4)に答えよ。",
-        "explanation": "### 下線①の解説\nオフィスセグメントからインターネット（グローバルIP M）への直接のHTTP通信は、FWルールで許可されていない（ルール7で拒否される）ためです。通常、Web閲覧はプロキシ経由で行う必要があります。\n\n### [ a ] の解説\nプロキシを経由しない直接の通信試行は、ファイアウォールの「拒否（deny）」ログに記録されます。よって [ a ] は **FW** です。\n\n### 下線②の解説\n「持ち出し」の痕跡としては、(1)プロキシサーバのアクセスログにおける外部への大量のデータ送信、(2)FWの動作ログにおける外部への異常な通信量、などが考えられます。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -161,7 +159,7 @@
           "id": "fig1",
           "label": "図1 J社情報システムの概要",
           "type": "mermaid",
-          "content": "graph TD\n  Internet((インターネット)) --- FW[FW]\n  \n  subgraph J_Company [J社]\n    FW --- L2SW_Int[L2SW]\n    \n    subgraph DMZ\n      L2SW_Int --- ExtMail[外部メールサーバ]\n      L2SW_Int --- ExtDNS[外部DNSサーバ]\n    end\n\n    subgraph User_LAN [利用者LAN]\n      L2SW_Int --- PC[PC]\n    end\n\n    subgraph Internal_System_LAN [内部システムLAN]\n      L2SW_Int --- LogServer[ログ蓄積サーバ]\n      L2SW_Int --- IntMail[内部メールサーバ]\n      L2SW_Int --- AdminServer[管理サーバ: Rシステム]\n      L2SW_Int --- IntDNS[内部DNSサーバ]\n      L2SW_Int --- BusinessServer[業務サーバ]\n    end\n  end\n\n  P_Service[Pサービス] --- Internet"
+          "content": "graph TD\n  Internet((\"インターネット\")) --- FW[FW]\n  \n  subgraph J_Company [J社]\n    FW --- L2SW_Int[L2SW]\n    \n    subgraph DMZ\n      L2SW_Int --- ExtMail[外部メールサーバ]\n      L2SW_Int --- ExtDNS[外部DNSサーバ]\n    end\n\n    subgraph User_LAN [利用者LAN]\n      L2SW_Int --- PC[PC]\n    end\n\n    subgraph Internal_System_LAN [内部システムLAN]\n      L2SW_Int --- LogServer[ログ蓄積サーバ]\n      L2SW_Int --- IntMail[内部メールサーバ]\n      L2SW_Int --- AdminServer[管理サーバ: Rシステム]\n      L2SW_Int --- IntDNS[内部DNSサーバ]\n      L2SW_Int --- BusinessServer[業務サーバ]\n    end\n  end\n\n  P_Service[Pサービス] --- Internet"
         },
         {
           "id": "table2",
@@ -181,7 +179,6 @@
       {
         "subQNo": "設問1",
         "text": "〔標的型攻撃対策〕について、(1), (2)に答えよ。",
-        "explanation": "### (1) の解説\n「電源を入れたまま」にするのは、メモリ上の情報（実行中のプロセスや通信ログなど）が消えないようにし、フォレンジック調査に役立てるためです。\n\n### (2) の解説\n切り離さない場合の懸念点は、(1)マルウェアによる他の端末への感染拡大、(2)C&Cサーバを通じたさらなる情報漏洩や遠隔操作、が挙げられます。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -206,7 +203,6 @@
       {
         "subQNo": "設問3",
         "text": "〔インシデント対応手順の改善〕について、(1)〜(3)に答えよ。",
-        "explanation": "Pサービスからの通知より前に、FWログに「C&CサーバのIPアドレスとの通信」が含まれていないかを確認する必要があります。よって [ e ] は `C&CサーバのIPアドレス`（または w1.x1.y1.z1）です。",
         "subQuestions": [
           {
             "label": "(1)",

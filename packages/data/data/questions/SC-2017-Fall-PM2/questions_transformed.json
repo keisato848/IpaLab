@@ -10,7 +10,7 @@
           "id": "fig1",
           "label": "図1 Z システムの概要",
           "type": "mermaid",
-          "content": "graph TD\n    subgraph Z_Cloud [Z クラウド]\n        Storage[大容量ストレージ]\n        Storage --- Video[動画]\n        WebApps[Web アプリケーションサーバ]\n        DB_Srv[DB サーバ]\n        DB_Srv --- DB[(DB)]\n        WebApps --- DB_Srv\n        FW1[FW]\n        Web_Srv[Web サーバ]\n        FW1 --- Web_Srv\n    end\n\n    Internet((インターネット)) --- Web_Srv\n    Internet --- FW1\n    \n    subgraph Mobile [モバイル端末]\n        Browser[Web ブラウザ]\n        App[Z アプリ]\n    end\n    \n    Internet --- Browser\n    Internet --- App\n    \n    subgraph Local [利用者宅など]\n        AP[無線 LAN アクセスポイント]\n        Camera[Z カメラ]\n        Camera --- AP\n        AP --- Internet\n        App -.->|Bluetooth| Camera\n    end\n\n    %% Legend\n    %% DB: データベース, FW: ファイアウォール\n    %% Z クラウド: Z カメラを利用するためのクラウドサービス\n    %% Z アプリ: 設定・操作用モバイルアプリ"
+          "content": "graph TD\n    subgraph Z_Cloud [Z クラウド]\n        Storage[大容量ストレージ]\n        Storage --- Video[動画]\n        WebApps[Web アプリケーションサーバ]\n        DB_Srv[DB サーバ]\n        DB_Srv --- DB[(DB)]\n        WebApps --- DB_Srv\n        FW1[FW]\n        Web_Srv[Web サーバ]\n        FW1 --- Web_Srv\n    end\n\n    Internet((\"インターネット\")) --- Web_Srv\n    Internet --- FW1\n    \n    subgraph Mobile [モバイル端末]\n        Browser[Web ブラウザ]\n        App[Z アプリ]\n    end\n    \n    Internet --- Browser\n    Internet --- App\n    \n    subgraph Local [利用者宅など]\n        AP[無線 LAN アクセスポイント]\n        Camera[Z カメラ]\n        Camera --- AP\n        AP --- Internet\n        App -.->|Bluetooth| Camera\n    end\n\n    %% Legend\n    %% DB: データベース, FW: ファイアウォール\n    %% Z クラウド: Z カメラを利用するためのクラウドサービス\n    %% Z アプリ: 設定・操作用モバイルアプリ"
         },
         {
           "id": "fig2",
@@ -36,7 +36,6 @@
       {
         "subQNo": "設問1",
         "text": "[Z カメラのセキュリティ検査と対策] について，(1)～(4)に答えよ。",
-        "explanation": "IoT機器のセキュリティの基本であるポートスキャンと、不要なサービスの停止に関する問題です。\n\n### 検査プロセスの論理\n[CODE_BLOCK:mermaid]\ngraph TD\n    A[全ポートスキャン] --> B{応答あり?}\n    B -- Yes --> C[プロトコル特定: TELNET等]\n    C --> D[辞書攻撃: 初期パスワード試行]\n    D -- 成功 --> E[外部コマンド実行: wget等]\n    E --> F[マルウェア実行確認]\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -72,7 +71,6 @@
       {
         "subQNo": "設問2",
         "text": "[カメラ IF 通信に対する脅威] について，(1)～(3)に答えよ。",
-        "explanation": "通信経路における中間者攻撃(MITM)とその防御策としての証明書検証に関する問題です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -94,7 +92,6 @@
       {
         "subQNo": "設問3",
         "text": "[Z クラウドに対する脅威] について，(1)～(10)に答えよ。",
-        "explanation": "クラウド側でのなりすまし対策や、ブルートフォース攻撃への防御策、内部不正対策としての暗号化設計を問う内容です。\n\n### リバースブルートフォース攻撃の概念\n[CODE_BLOCK:mermaid]\ngraph LR\n    Attacker[攻撃者] -->|固定パスワード| User1[利用者A]\n    Attacker -->|固定パスワード| User2[利用者B]\n    Attacker -->|固定パスワード| User3[利用者C]\n    Note over Attacker: 1つのパスワードで<br/>複数のIDを試行する\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -178,7 +175,6 @@
       {
         "subQNo": "設問1",
         "text": "[K1 システムにおける課題] について，(1)～(3)に答えよ。",
-        "explanation": "DESの脆弱性と計算機能力の向上による解読リスクの評価、および鍵管理の不備に関する問題です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -200,7 +196,6 @@
       {
         "subQNo": "設問2",
         "text": "[暗号方式の検討] について，(1)～(5)に答えよ。",
-        "explanation": "HSMの物理的セキュリティ特性（耐タンパ性）と、秘密分散法による管理体制の強化に関する設問です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -232,7 +227,6 @@
       {
         "subQNo": "設問3",
         "text": "[DB サーバ及び HSM サーバの構成設計] について，(1)，(2)に答えよ。",
-        "explanation": "冗長化構成におけるHSMの排他制御や鍵情報の共有方法に関する実務的な問題です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -255,7 +249,6 @@
       {
         "subQNo": "設問4",
         "text": "[K2 システムにおけるリスク対策の補完] について，(1)，(2)に答えよ。",
-        "explanation": "内部不正対策としてのログ監視と、物理的な情報の持ち出し（メモリダンプ）への対策を問う内容です。",
         "subQuestions": [
           {
             "label": "(1)",

@@ -28,7 +28,7 @@
           "id": "fig2",
           "label": "図2 R団体のネットワーク構成",
           "type": "mermaid",
-          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((インターネット)) --- FW[FW]\n    FW --- L3SW[L3SW]\n    \n    subgraph DataCenter [データセンタ]\n        L3SW --- L2SW_DMZ[L2SW]\n        subgraph DMZ\n            L2SW_DMZ --- R_Portal[Rポータル]\n            R_Portal --- WebAP[WebAPサーバ]\n            WebAP --- DB[DBサーバ]\n            L2SW_DMZ --- Proxy[プロキシサーバ]\n            L2SW_DMZ --- DNS_Auth[権威DNSサーバ]\n            L2SW_DMZ --- Mail_Ext[外部メールサーバ]\n            L2SW_DMZ --- SSL_Acc[SSLアクセラレータ]\n        end\n    end\n    \n    subgraph R_Office [R団体]\n        L3SW --- L2SW_SRV[L2SW]\n        subgraph Server_Segment [サーバセグメント]\n            L2SW_SRV --- HR_Srv[人事サーバ]\n            L2SW_SRV --- Step_Srv[踏み台サーバ]\n            L2SW_SRV --- Mail_Int[内部メールサーバ]\n            L2SW_SRV --- DNS_Cache[キャッシュDNSサーバ]\n        end\n        \n        L3SW --- L2SW_USR[L2SW]\n        subgraph User_Segment [利用者セグメント]\n            L2SW_USR --- PC[PC]\n            L2SW_USR --- Admin_PC[運用管理PC]\n        end\n    end\n\n    style DMZ fill:#f9f,stroke:#333,stroke-width:2px\n    style Server_Segment fill:#ccf,stroke:#333,stroke-width:2px\n    style User_Segment fill:#cfc,stroke:#333,stroke-width:2px\n[/CODE_BLOCK]"
+          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((\"インターネット\")) --- FW[FW]\n    FW --- L3SW[L3SW]\n    \n    subgraph DataCenter [データセンタ]\n        L3SW --- L2SW_DMZ[L2SW]\n        subgraph DMZ\n            L2SW_DMZ --- R_Portal[Rポータル]\n            R_Portal --- WebAP[WebAPサーバ]\n            WebAP --- DB[DBサーバ]\n            L2SW_DMZ --- Proxy[プロキシサーバ]\n            L2SW_DMZ --- DNS_Auth[権威DNSサーバ]\n            L2SW_DMZ --- Mail_Ext[外部メールサーバ]\n            L2SW_DMZ --- SSL_Acc[SSLアクセラレータ]\n        end\n    end\n    \n    subgraph R_Office [R団体]\n        L3SW --- L2SW_SRV[L2SW]\n        subgraph Server_Segment [サーバセグメント]\n            L2SW_SRV --- HR_Srv[人事サーバ]\n            L2SW_SRV --- Step_Srv[踏み台サーバ]\n            L2SW_SRV --- Mail_Int[内部メールサーバ]\n            L2SW_SRV --- DNS_Cache[キャッシュDNSサーバ]\n        end\n        \n        L3SW --- L2SW_USR[L2SW]\n        subgraph User_Segment [利用者セグメント]\n            L2SW_USR --- PC[PC]\n            L2SW_USR --- Admin_PC[運用管理PC]\n        end\n    end\n\n    style DMZ fill:#f9f,stroke:#333,stroke-width:2px\n    style Server_Segment fill:#ccf,stroke:#333,stroke-width:2px\n    style User_Segment fill:#cfc,stroke:#333,stroke-width:2px\n[/CODE_BLOCK]"
         },
         {
           "id": "table3",
@@ -64,7 +64,6 @@
           "fig3",
           "fig4"
         ],
-        "explanation": "### (1) 検知できない理由の解説\n脆弱性検査ツール（スキャナ）は通常、リクエストを送信し、その**レスポンスの HTML 内容**を解析して脆弱性を判断します。\nしかし、DOM-based XSS の場合、攻撃コードが含まれる「フラグメント識別子（`#` 以降）」はブラウザ側で処理され、**サーバには送信されません**。したがって、サーバからのレスポンスには攻撃コードが含まれず、単純なレスポンス解析ツールでは検知できないのです。\n\n### (2) 攻撃者の分析方法の解説\nDOM-based XSS は、JavaScript が URL の一部（フラグメントなど）を読み取り、適切にエスケープせずに DOM (Document Object Model) に出力することで発生します。\n攻撃者は、検索ページで使用されている JavaScript ソースコードを読み、どのパラメータがどのように動的にページへ反映されるかを調査することで、脆弱性を分析します。\n\n### (3) 実装方法の解説\nセッション管理を Cookie で行っている場合、JavaScript から `document.cookie` を介してセッション ID が盗まれるリスクがあります。これを防ぐのが `HttpOnly` 属性です。この属性が付与されていると、ブラウザ上のスクリプトからは Cookie にアクセスできなくなり、XSS があってもセッション奪取を阻止できます。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -100,7 +99,6 @@
           "table3",
           "fig2"
         ],
-        "explanation": "DB サーバを DMZ からサーバセグメント（より安全な内部）に移動させる「案 2」に関する問題です。\n\n- (1) 案 2 では、WebAP から DB へのアクセスを許可する必要があります。WebAP サーバの IP は DMZ 内、DB サーバの宛先 IP は新セグメント内のものになります。サービスは ODBC 通信（本文 4 ページ）に対応するもの（具体的には SQL 通信等ですが、表 4 に習うならポートやプロトコル指定）が必要です。\n- (2) セキュリティ対策基準違反の懸念：本文 4 ページに「DB サーバには、運用管理 PC からのアクセスだけが許可されている」とありますが、案 2 でサーバセグメント全体へのアクセスを許可する（表 3 の項番 4 のようなルール）を設定してしまうと、基準に反する可能性があります。\n- (3) 検出事項 2（共通アカウント）への対策を併せて行う必要があります。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -128,7 +126,6 @@
         "references": [
           "fig3"
         ],
-        "explanation": "図面の流出を技術的に防ぐ「DRM 方式」と「コンテナ方式」の比較です。\n\n- (1) コンテナ方式は PC 自体を隔離するため、製作パートナの PC 環境（OS や他の常駐ソフト等）との競合が起きます。そのため「動作環境（OS バージョン等）」を確認する必要があります。\n- (2) 不正行為の手口：コンテナ方式では外部との通信が遮断されますが、唯一の出口である「コンテナサーバ」の共有フォルダへ、外部公開を意図した操作（公開用フォルダへの移動など）を行うことが考えられます。\n- (3) DRM 方式は WebAP サーバを通じた配信になるため、FW で特定の宛先（DRM サーバ等）への通信のみを許可することで制御が可能です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -166,7 +163,7 @@
           "id": "fig2",
           "label": "図2 システム構成",
           "type": "mermaid",
-          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((インターネット)) --- FW1[FW]\n    \n    subgraph DataCenter_X [データセンタX]\n        FW1 --- L2SW1[L2SW]\n        subgraph DMZ_X [DMZ]\n            L2SW1 --- Web_Srv_X[WebサーバX]\n            L2SW1 --- Mail_Srv_X[外部メールサーバ]\n            L2SW1 --- DNS_Srv_X[DNSサーバ]\n        end\n        L2SW1 --- L2SW_DB[L2SW]\n        subgraph DB_Net [DBネットワーク]\n            L2SW_DB --- DB_Srv_X[DBサーバX]\n        end\n    end\n\n    subgraph B_Office [B社本社]\n        PC_LAN[B社PC-LAN] --- FW2[FW]\n        FW2 --- L2SW2[L2SW]\n        L2SW2 --- Admin_PC[PC]\n    end\n\n    Internet --- FW2\n[/CODE_BLOCK]"
+          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((\"インターネット\")) --- FW1[FW]\n    \n    subgraph DataCenter_X [データセンタX]\n        FW1 --- L2SW1[L2SW]\n        subgraph DMZ_X [DMZ]\n            L2SW1 --- Web_Srv_X[WebサーバX]\n            L2SW1 --- Mail_Srv_X[外部メールサーバ]\n            L2SW1 --- DNS_Srv_X[DNSサーバ]\n        end\n        L2SW1 --- L2SW_DB[L2SW]\n        subgraph DB_Net [DBネットワーク]\n            L2SW_DB --- DB_Srv_X[DBサーバX]\n        end\n    end\n\n    subgraph B_Office [B社本社]\n        PC_LAN[B社PC-LAN] --- FW2[FW]\n        FW2 --- L2SW2[L2SW]\n        L2SW2 --- Admin_PC[PC]\n    end\n\n    Internet --- FW2\n[/CODE_BLOCK]"
         },
         {
           "id": "fig4",
@@ -183,7 +180,6 @@
         "references": [
           "fig1"
         ],
-        "explanation": "### (1) 調査手法の解説\n下線①はアクセスログに残らない攻撃について言及しています。Web サーバ上のファイルが改ざんされている可能性があるため、全ての静的ファイルやスクリプトのハッシュ値を計算して、元々の正しい状態と比較する（または `diff` を取る）ことで、ログに残らない改ざんを検知できます。\n\n### (2) 脆弱性 K の解説\nWF-K の脆弱性は「特定の文字列を含む HTTP リクエストを送信すると、任意のファイルの読出しと書込みができる」ものです。したがって、Web サーバ上のファイルが期待通りの内容であるか（改ざんされていないか）を「完全性」の観点で確認する必要があります。\n\n### (3) SSH 認証方式の解説\n「SSH サービスは B 社 PC-LAN からだけアクセスできるように設定している」という記述がありますが、パスワード認証では辞書攻撃に弱いため、秘密鍵と公開鍵を用いた「公開鍵認証方式（または証明書認証方式）」を設定すべきです。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -218,7 +214,6 @@
       {
         "subQNo": "設問4",
         "text": "〔Web サイト Z に対する診断の実施〕について、(1)〜(4)に答えよ。",
-        "explanation": "### (1) SQL インジェクションの判定\n表 4 の自動診断ツール J の結果を見ると、項番 1（`'='1`）と 2（`'='2`）で「該当商品数」が異なります。通常 bag で 30 件なら、`'='1` (常に真) の場合は全件（100 件、本文注記参照）が表示されるはずです。g は「100」、h は「0」（`'='2` は常に偽のため）が適切です。\n\n### (2) XSS の攻撃コード\n図 8/9 より、親ウィンドウの DOM にアクセスするスクリプトです。`alert('NG')` を実行させるコードとして適切なものを選びます。カレンダ機能（子画面）から親画面の `input` に値をセットする挙動を悪用するため、適切なクォータ処理が必要です。正解は「ア」です。\n\n### (3) アクセス制御の欠落\n表 5 の項番 2「商品一覧画面で [ j ]」。有料会員限定商品が一般会員でも買える脆弱性（イ）についてです。商品一覧画面で「限定商品の URL (またはコード) を直接入力」することで、本来表示されないはずの画面に遷移できることを確認します。\n\n### (4) CSRF の診断\nCSRF 対策（トークン）の有無を確認します。k には「[ d ] (クロスサイト) リクエストフォージェリ」、l には「トークンなどのパラメータの有無」などの確認事項が入ります。",
         "subQuestions": [
           {
             "label": "(1)",

@@ -28,13 +28,13 @@
           "id": "fig2",
           "label": "修正後の情報選択機能のソースコード",
           "type": "image",
-          "content": "(省略) // package宣言, import宣言など\n1: public class SelectServlet extends HttpServlet {\n(省略) //変数の宣言やメソッドの定義など\n2: protected void doGet(HttpServletRequest request, HttpServletResponse response)\n   throws ServletException, IOException {\n3:     java.sql.Connection con = null;\n4:     try {\n(省略) //初期化処理など\n5:         con = java.sql.DriverManager.getConnection((省略)); // データベースに接続する処理\n6:         int projectId = (省略); // 利用者の参加プロジェクトのプロジェクトIDを利用者テーブルから取得し、代入する処理\n7:         String sql = \"SELECT 情報番号,情報名 FROM 情報管理テーブル WHERE プロジェクトID = ?\";\n8:         java.sql. [ b ] stmt = con.prepareStatement(sql);\n9:         [ c ].setInt(1, projectId);\n10:        java.sql.ResultSet rs = stmt.executeQuery();\n(省略) //例外処理やその他の処理"
+          "content": "(省略) // package宣言, import宣言など\n1: public class SelectServlet extends HttpServlet {\n(省略) //変数の宣言やメソッドの定義など\n2: protected void doGet(HttpServletRequest request, HttpServletResponse response)\n   throws ServletException, IOException {\n3:     java.sql.Connection con = null;\n4:     try {\n(省略) //初期化処理など\n5:         con = java.sql.DriverManager.getConnection((\"省略\")); // データベースに接続する処理\n6:         int projectId = (省略); // 利用者の参加プロジェクトのプロジェクトIDを利用者テーブルから取得し、代入する処理\n7:         String sql = \"SELECT 情報番号,情報名 FROM 情報管理テーブル WHERE プロジェクトID = ?\";\n8:         java.sql. [ b ] stmt = con.prepareStatement(sql);\n9:         [ c ].setInt(1, projectId);\n10:        java.sql.ResultSet rs = stmt.executeQuery();\n(省略) //例外処理やその他の処理"
         },
         {
           "id": "fig3",
           "label": "修正後の情報表示機能のソースコード",
           "type": "image",
-          "content": "(省略) // package宣言, import宣言など\n1: public class ShowServlet extends HttpServlet {\n(省略) //変数の宣言やメソッドの定義など\n2: protected void doGet(HttpServletRequest request, HttpServletResponse response)\n   throws ServletException, IOException {\n3:     int documentNo = Integer.parseInt(request.getParameter(\"no\"));\n4:     java.sql.Connection con = null;\n5:     try {\n(省略) //初期化処理など\n6:         con = java.sql.DriverManager.getConnection((省略)); // データベースに接続する処理\n7:         int projectId = (省略); // 利用者の参加プロジェクトのプロジェクトIDを利用者テーブルから取得し、代入する処理\n8:         String sql = \"SELECT 情報番号,情報名,情報内容 FROM 情報管理テーブル WHERE [ d ]\";\n9:         java.sql. [ b ] stmt = con.prepareStatement(sql);\n(省略) // SQL文のひな型に変数を代入する処理\n10:        java.sql.ResultSet rs = stmt.executeQuery();\n(省略) // 例外処理やその他の処理"
+          "content": "(省略) // package宣言, import宣言など\n1: public class ShowServlet extends HttpServlet {\n(省略) //変数の宣言やメソッドの定義など\n2: protected void doGet(HttpServletRequest request, HttpServletResponse response)\n   throws ServletException, IOException {\n3:     int documentNo = Integer.parseInt(request.getParameter(\"no\"));\n4:     java.sql.Connection con = null;\n5:     try {\n(省略) //初期化処理など\n6:         con = java.sql.DriverManager.getConnection((\"省略\")); // データベースに接続する処理\n7:         int projectId = (省略); // 利用者の参加プロジェクトのプロジェクトIDを利用者テーブルから取得し、代入する処理\n8:         String sql = \"SELECT 情報番号,情報名,情報内容 FROM 情報管理テーブル WHERE [ d ]\";\n9:         java.sql. [ b ] stmt = con.prepareStatement(sql);\n(省略) // SQL文のひな型に変数を代入する処理\n10:        java.sql.ResultSet rs = stmt.executeQuery();\n(省略) // 例外処理やその他の処理"
         }
       ]
     },
@@ -45,7 +45,6 @@
         "references": [
           "table1"
         ],
-        "explanation": "### (1) HTTP ヘッダインジェクション対策\n下線①は、HTTPヘッダインジェクションを試みるための「改行コードを意味する文字列」です。\nHTTPレスポンスヘッダにおいて、現在のヘッダ行を強制的に終了させ、新しいヘッダ行（またはコンテンツ本文）を挿入するためには、改行コード（CR: Carriage Return, LF: Line Feed）が必要です。\nURLエンコーディングでは、CRは `%0D`、LFは `%0A` と表現されます。したがって、改行コードを意味する文字列は、`%0D%0A` です。\n**解答群:** ア\n\n### (2) SQLインジェクション対策\n下線②の記号『?』は、SQL文のひな形の中で、後から変数の値を安全に埋め込むための場所を示す記号です。\nこの記号は通常「プレースホルダ」または「パラメータマーカ」と呼ばれます。これにより、データとSQLコマンドの構造を分離し、SQLインジェクションを防ぐことができます。10字以内という制限から、「プレースホルダ」が適切です。\n**解答:** プレースホルダ\n\n### (3) メールヘッダインジェクション対策\nメールヘッダインジェクションは、利用者の入力データに改行文字を混ぜることで、意図しないメールヘッダ（例：To, Cc, Bcc）を追加してしまう攻撃です。\n対策として、外部からの入力に含まれる全ての改行文字を削除することが有効です。5字以内の適切な字句は「改行文字」です。\n**解答:** 改行文字",
         "subQuestions": [
           {
             "label": "(1)",
@@ -71,7 +70,6 @@
           "fig2",
           "fig3"
         ],
-        "explanation": "### (1) 不正操作の具体的内容\n方法1では、利用者がGETリクエストのクエリ文字列 `id=プロジェクトID` を送信し、情報選択機能がこのIDをチェックせずに利用していました。利用者は参加していないプロジェクトのIDをこのクエリ文字列に指定することで、そのプロジェクトの情報リストを表示させることができます。\n**解答:** 他のプロジェクトIDをクエリ文字列(id=X)に指定して、情報選択機能にアクセスする。\n\n### (2) 方法2で脆弱性が解決される理由\n方法1はクライアントから提供される信頼できない情報（クエリ文字列）をプロジェクトIDとして利用していました。方法2は、ログインによって確立されたセッション情報（サーバ側で管理されている情報）から利用者情報を取得し、そこからプロジェクトIDを取得します。\nこれにより、利用者が勝手にプロジェクトIDを偽装することが不可能になります。\n**解答:** プロジェクトIDをセッション情報から取得するため、利用者が不正にIDを操作できないから。\n\n### (3) bに入る字句\n図2および図3は、プリペアドステートメント（パラメータ化クエリ）を用いてSQLを実行しているコードです。\n8行目では、`con.prepareStatement(sql)` を呼び出しています。このメソッドは、SQL文をプリコンパイルしたオブジェクトを返します。JavaのJDBCにおいて、このオブジェクトの型は `java.sql.PreparedStatement` です。\n**解答群:** ウ\n\n### (4) cに入る字句\n図2の9行目では、`[ c ].setInt(1, projectId)` となっており、これは8行目で宣言された `stmt` オブジェクトのメソッドを呼び出して、SQL文のプレースホルダ（1番目）に `projectId` の値を設定しています。\nしたがって、[ c ] には `stmt` が入ります。\n**解答:** stmt",
         "subQuestions": [
           {
             "label": "(1)",
@@ -102,7 +100,6 @@
           "fig3",
           "fig1"
         ],
-        "explanation": "図3の情報表示機能 (ShowServlet) は、利用者が選択した情報番号 (`documentNo`) の情報と、利用者が参加しているプロジェクトID (`projectId`) に関連付けられた情報のみを表示する必要があります。\n\nSQL文は `SELECT ... FROM 情報管理テーブル WHERE [ d ]` となっており、`WHERE` 句で2つの条件を結合する必要があります。\n\n1. 情報番号がリクエストされた番号 (`documentNo`) と一致する。\n2. プロジェクトIDが利用者のプロジェクトID (`projectId`) と一致する。\n\nこの両方を満たすように、図1の属性名である『情報番号』と『プロジェクトID』を用いて、プリペアドステートメントの形式で条件を指定します。\n\n**解答:** 情報番号 = ? AND プロジェクトID = ?",
         "subQuestions": [
           {
             "label": "",

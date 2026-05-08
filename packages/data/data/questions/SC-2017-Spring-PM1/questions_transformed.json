@@ -11,7 +11,7 @@
           "id": "fig1",
           "label": "図1 D社のネットワーク構成",
           "type": "mermaid",
-          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((インターネット)) --- FW[FW]\n\n    subgraph Server_Seg [サーバセグメント 192.168.1.0/24]\n        L2SW1[L2SW]\n        LDAP[LDAPサーバ] --- L2SW1\n        CRM[CRMサーバ] --- L2SW1\n    end\n\n    subgraph PC_Seg [PCセグメント 192.168.0.0/24]\n        L2SW2[L2SW]\n        PC[PC]\n        AdminPC[管理用PC]\n        PC --- L2SW2\n        AdminPC --- L2SW2\n    end\n\n    FW --- L2SW1\n    FW --- L2SW2\n\n    %% 注記等のテキスト表現\n    %% FW: ファイアウォール\n    %% L2SW: レイヤ2スイッチ\n    %% (イ) MAC: zz:zz:zz:bb:bb:01 / IP: 192.168.1.1\n    %% (ア) MAC: zz:zz:zz:bb:bb:02 / IP: 192.168.1.2 (CRMサーバ)\n    %% (オ) MAC: xx:xx:xx:aa:aa:01 / IP: 192.168.0.1 (FW)\n    %% (カ) MAC: xx:xx:xx:aa:aa:02 / IP: 192.168.0.2 (AdminPC)\n    %% (キ) MAC: xx:xx:xx:aa:aa:c8 / IP: 192.168.0.200 (PC)\n[/CODE_BLOCK]"
+          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((\"インターネット\")) --- FW[FW]\n\n    subgraph Server_Seg [サーバセグメント 192.168.1.0/24]\n        L2SW1[L2SW]\n        LDAP[LDAPサーバ] --- L2SW1\n        CRM[CRMサーバ] --- L2SW1\n    end\n\n    subgraph PC_Seg [PCセグメント 192.168.0.0/24]\n        L2SW2[L2SW]\n        PC[PC]\n        AdminPC[管理用PC]\n        PC --- L2SW2\n        AdminPC --- L2SW2\n    end\n\n    FW --- L2SW1\n    FW --- L2SW2\n\n    %% 注記等のテキスト表現\n    %% FW: ファイアウォール\n    %% L2SW: レイヤ2スイッチ\n    %% (イ) MAC: zz:zz:zz:bb:bb:01 / IP: 192.168.1.1\n    %% (ア) MAC: zz:zz:zz:bb:bb:02 / IP: 192.168.1.2 (CRMサーバ)\n    %% (オ) MAC: xx:xx:xx:aa:aa:01 / IP: 192.168.0.1 (FW)\n    %% (カ) MAC: xx:xx:xx:aa:aa:02 / IP: 192.168.0.2 (AdminPC)\n    %% (キ) MAC: xx:xx:xx:aa:aa:c8 / IP: 192.168.0.200 (PC)\n[/CODE_BLOCK]"
         },
         {
           "id": "table1",
@@ -31,7 +31,6 @@
       {
         "subQNo": "設問1",
         "text": "〔サーバへの侵入手口の調査〕について、(1)〜(3)に答えよ。",
-        "explanation": "ARPポイズニングとFWログの仕様に関する問題です。不審な通信が発生した際のARPテーブルの状態や、どの通信が盗聴可能だったかをネットワーク構成とフィルタリングルールから読み解く必要があります。\n\n### ARPポイズニングの仕組み\n[CODE_BLOCK:mermaid]\ngraph LR\n    AdminPC[管理用PC\n192.168.0.2] -- 通常の経路 --> FW[FW\n192.168.0.1]\n    AdminPC -. 攻撃後の経路 .-> Attacker[AさんのPC\n攻撃者]\n    Attacker -.-> FW\n    Note over Attacker: ARPポイズニングにより\n各端末のARPテーブルを書き換える\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -71,7 +70,6 @@
       {
         "subQNo": "設問3",
         "text": "〔セキュリティ対策の実施〕について、(1), (2)に答えよ。",
-        "explanation": "ネットワーク構成の変更とFWルールの強化に関する問題です。セグメントを分離し、宛先制限を厳格にすることで、なりすましや不正アクセスを防御する設計を理解しましょう。\n\n### 変更後のネットワーク（図4）\n[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((インターネット)) --- FW[FW]\n    FW --- SegA[サーバセグメントA]\n    FW --- SegB[サーバ管理セグメントB]\n    FW --- SegC[PCセグメントC]\n    SegB --- AdminPC[管理用PC]\n    SegC --- PC[一般PC]\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -117,7 +115,6 @@
       {
         "subQNo": "設問2",
         "text": "〔脆弱性1について〕について、(1)〜(4)に答えよ。",
-        "explanation": "脆弱性1はCSRF（クロスサイトリクエストフォージェリ）に関するものです。退会処理など重要な操作が、本人の意図しないリンククリックで実行される問題です。\n\n### CSRF攻撃の仕組み\n[CODE_BLOCK:mermaid]\nsequenceDiagram\n    participant User as 利用者のブラウザ\n    participant Mall as 攻撃者の罠サイト\n    participant App as サイトα\n\n    Note over User: サイトαにログイン中\n    User->>Mall: 閲覧\n    Mall-->>User: 自動送信するHTML(図2)\n    User->>App: (退会リクエスト)\n    Note right of App: ログインセッションを伴うため\n正規の要求として受理してしまう\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -148,7 +145,6 @@
       {
         "subQNo": "設問3",
         "text": "〔脆弱性2について〕について、(1)〜(3)に答えよ。",
-        "explanation": "脆弱性2はXSS（クロスサイトスクリプティング）に関するものです。入力されたスクリプトが他の利用者のブラウザ上で実行され、Cookieの窃取や勝手な操作が行われる危険性を検討します。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -198,7 +194,6 @@
       {
         "subQNo": "設問2",
         "text": "〔SAMLを用いた認証連携と接続制限方式の概要〕について、(1)〜(5)に答えよ。",
-        "explanation": "SAMLの基本的なシーケンスと、SP・IdP・ブラウザの役割分担を理解しましょう。",
         "subQuestions": [
           {
             "label": "(1)",

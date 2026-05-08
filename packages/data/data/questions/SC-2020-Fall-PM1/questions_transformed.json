@@ -11,7 +11,7 @@
           "id": "fig1",
           "label": "図1 Nシステムの概要",
           "type": "mermaid",
-          "content": "[CODE_BLOCK:mermaid]\ngraph LR\n    subgraph 店舗\n        A[タブレット端末<br/>店舗アプリ] -- \"無線\" --- B[無線LANルータ]\n    end\n    B -- \"HTTPS\" --- C((インターネット))\n    D[スマートフォン<br/>決済アプリ] -- \"HTTPS\" --- C\n    C -- \"HTTPS\" --- E[WebサーバN]\n    subgraph WebサーバN\n        E1[決済]\n        E2[ログ取得]\n        E3[アラート通知]\n    end\n[/CODE_BLOCK]"
+          "content": "[CODE_BLOCK:mermaid]\ngraph LR\n    subgraph 店舗\n        A[タブレット端末<br/>店舗アプリ] -- \"無線\" --- B[無線LANルータ]\n    end\n    B -- \"HTTPS\" --- C((\"インターネット\"))\n    D[スマートフォン<br/>決済アプリ] -- \"HTTPS\" --- C\n    C -- \"HTTPS\" --- E[WebサーバN]\n    subgraph WebサーバN\n        E1[決済]\n        E2[ログ取得]\n        E3[アラート通知]\n    end\n[/CODE_BLOCK]"
         },
         {
           "id": "table1",
@@ -46,7 +46,6 @@
         "references": [
           "fig3"
         ],
-        "explanation": "### 指摘1：なりすまし決済のリスク\n従来のポイントアプリでは16桁の固定の会員番号をバーコード表示していたため、そのバーコードを盗撮・複製されると、他者が本人になりすまして決済できてしまう脆弱性がありました。\n\n### 対策：HMACの導入\nQRコード内に「乱数」と「有効期限（時刻）」、そしてそれらを秘密鍵で署名した「HMAC」を含めることで、以下の効果があります：\n1. **偽造防止**: 秘密鍵を知らない攻撃者は正しいHMAC値を生成できません。\n2. **再利用防止**: 5分間という有効期限を設けることで、一度使われたり時間が経過したQRコードを無効化（リプレイアタック対策）します。\n\n設問1(2)の「a」は、QRコード内のHMAC値（β）と、サーバ側で計算したHMAC値（α）を比較して一致することを確認するプロセスが入ります。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -69,7 +68,6 @@
           "fig4",
           "table5"
         ],
-        "explanation": "### 指摘2, 3：無線LANルータの管理不備\n攻撃者が管理者権限を奪取すると、DNSサーバの設定を自身の用意した悪意あるサーバに向けさせる（DNS偽装）ことができます。これにより利用者は正規のサイトに繋いでいるつもりで偽サイトへ誘導される危険性があります。\n\n### 指認4：サーバ証明書の検証不備\nアプリ側でサーバ証明書を正しく検証（ホスト名が正しいか、信頼できる認証局か等）しないと、中間者攻撃に対して無防備になります。\n設問2(2)の選択肢について：\n- **b, d**: `subjectAltName` (dDNSName) または `commonName` を確認します。\n- **c**: 接続先のホスト名（WebサーバN）と一致するかを確認します。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -99,7 +97,7 @@
           "id": "fig1",
           "label": "図1 R社の情報システム",
           "type": "mermaid",
-          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((インターネット)) --- FW[ファイアウォール]\n    subgraph R社 内部システムLAN\n        FW --- L2SW1[L2スイッチ]\n        L2SW1 --- InternalMail[内部メールサーバ]\n        L2SW1 --- Directory[ディレクトリサーバ]\n        L2SW1 --- BizSrv[業務サーバ]\n    end\n    subgraph DMZ\n        FW --- L2SW2[L2スイッチ]\n        L2SW2 --- ExtMail[外部メールサーバ]\n        L2SW2 --- Proxy[プロキシサーバ]\n    end\n    FW --- L2SW3[L2スイッチ]\n    L2SW3 --- PCLAN[PC-LAN]\n[/CODE_BLOCK]"
+          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((\"インターネット\")) --- FW[ファイアウォール]\n    subgraph R社 内部システムLAN\n        FW --- L2SW1[L2スイッチ]\n        L2SW1 --- InternalMail[内部メールサーバ]\n        L2SW1 --- Directory[ディレクトリサーバ]\n        L2SW1 --- BizSrv[業務サーバ]\n    end\n    subgraph DMZ\n        FW --- L2SW2[L2スイッチ]\n        L2SW2 --- ExtMail[外部メールサーバ]\n        L2SW2 --- Proxy[プロキシサーバ]\n    end\n    FW --- L2SW3[L2スイッチ]\n    L2SW3 --- PCLAN[PC-LAN]\n[/CODE_BLOCK]"
         }
       ]
     },
@@ -110,7 +108,6 @@
         "references": [
           "table1"
         ],
-        "explanation": "### プロトコルの知識\nディレクトリサーバ（LDAP）へのアクセスには標準でTCP 389番ポートが使われます。英字5字以内なので「LDAP」となります。\nPCのWebブラウザがサーバ証明書の失効を確認するための仕組みとして、RFC 6960で規定されているのは「OCSP」です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -130,7 +127,6 @@
         "subQNo": "設問2",
         "text": "〔要望への対応〕について、(1)〜(3)に答えよ。",
         "references": null,
-        "explanation": "### メールのセキュリティ\nメールの通信経路（SMTP over TLS等）を暗号化しただけでは、サーバに保管されている間のメールや、転送先でのセキュリティが担保されません。つまり「エンドツーエンド」の暗号化にならないため、表3の項番1（送信者から受信者まで暗号化された状態）を満たせません。\n送信者ドメイン認証（SPF, DKIM, DMARC）などは、エンベロープ（From）の真偽を確認できますが、メール本文の署名（S/MIME）により、より確実に送信者の検証が可能です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -166,7 +162,7 @@
           "id": "fig1",
           "label": "図1 Pシステムのネットワーク構成",
           "type": "mermaid",
-          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((インターネット)) --- FW1\n    subgraph 本番環境 DMZ\n        FW1 --- NIPS[N-IPS]\n        NIPS --- L2SW_A[L2SW a]\n        L2SW_A --- SSL[SSLアクセラレータ]\n        SSL --- WebSrv[本番Webサーバ]\n    end\n    subgraph 本番環境 DB-LAN\n        FW1 --- L2SW_C[L2SW c]\n        L2SW_C --- DBSrv[本番DBサーバ]\n    end\n    subgraph 管理LAN\n        FW2 --- L2SW_B[L2SW b]\n        L2SW_B --- WebPC[Web管理PC]\n        L2SW_D[L2SW d] --- DBPC[DB管理PC]\n    end\n    FW2 --- L2SW_D\n[/CODE_BLOCK]"
+          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((\"インターネット\")) --- FW1\n    subgraph 本番環境 DMZ\n        FW1 --- NIPS[N-IPS]\n        NIPS --- L2SW_A[L2SW a]\n        L2SW_A --- SSL[SSLアクセラレータ]\n        SSL --- WebSrv[本番Webサーバ]\n    end\n    subgraph 本番環境 DB-LAN\n        FW1 --- L2SW_C[L2SW c]\n        L2SW_C --- DBSrv[本番DBサーバ]\n    end\n    subgraph 管理LAN\n        FW2 --- L2SW_B[L2SW b]\n        L2SW_B --- WebPC[Web管理PC]\n        L2SW_D[L2SW d] --- DBPC[DB管理PC]\n    end\n    FW2 --- L2SW_D\n[/CODE_BLOCK]"
         }
       ]
     },
@@ -177,7 +173,6 @@
         "references": [
           "table2"
         ],
-        "explanation": "### N-IPSの影響\n脆弱性診断はスキャンツールなどを用いて疑似的な攻撃パケットを大量に送るため、N-IPSが「攻撃」と判断して遮断してしまいます。遮断されると、その背後にあるサーバの真の脆弱性が検出できなくなるため、診断時は「検知モード（遮断しないモード）」に変更するのが一般的です。\n接続地点については、インターネットからの攻撃を想定した診断であれば、本来はインターネット（a地点）から行うべきですが、IPSの影響を避けるために内部（DMZ内）から行う選択肢もあります。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -203,7 +198,6 @@
         "subQNo": "設問2",
         "text": "〔Pシステムの診断計画レビュー〕について、(1)〜(4)に答えよ。",
         "references": null,
-        "explanation": "### 二次被害の防止\n本番DBサーバへの診断において、誤って管理用のアラート（警告灯）を点灯させてしまうリスクが指摘されました。ホスト型IPSが「DB管理PC」以外からのアクセスを検知して作動するため、FW2のフィルタリングルールを一時的に調整し、診断PCからの通信を許可または除外する必要があります。",
         "subQuestions": [
           {
             "label": "(1)",

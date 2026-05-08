@@ -11,7 +11,7 @@
           "id": "fig1",
           "label": "図1 R社のネットワーク構成",
           "type": "mermaid",
-          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n  Internet((インターネット)) --- FW1\n  FW1 --- DMZ\n  FW1 --- Seg_Internal[内部メール・Webサーバセグメント]\n  FW1 --- FW2\n  FW1 --- Seg_Manage[運用管理セグメント]\n  FW1 --- Seg_Office[事務PCセグメント]\n  \n  FW2 --- DC[データセンタ ECサイトセグメント]\n  FW2 --- Seg_EC[EC管理セグメント]\n  FW2 --- Seg_AuthProxy[認証・プロキシセグメント]\n\n  subgraph DMZ\n    ExtMail[外部メールサーバ]\n    ExtDNS[外部DNSサーバ]\n    L2SW1[L2SW]\n  end\n  ExtMail --- L2SW1\n  ExtDNS --- L2SW1\n  L2SW1 --- FW1\n\n  subgraph Seg_Internal\n    IntMail[内部メールサーバ]\n    IntWeb[内部Webサーバ]\n    L2SW2[L2SW]\n  end\n  IntMail --- L2SW2\n  IntWeb --- L2SW2\n  L2SW2 --- FW1\n\n  subgraph Seg_Manage\n    Patch[パッチ配信サーバ]\n    Mon[運用監視サーバ]\n    Virus[ウイルス対策管理サーバ]\n    L2SW3[L2SW]\n  end\n  Patch --- L2SW3\n  Mon --- L2SW3\n  Virus --- L2SW3\n  L2SW3 --- FW1\n\n  subgraph Seg_Office\n    DHCP[DHCPサーバ]\n    OfficePC[事務用PC]\n    L2SW4[L2SW]\n  end\n  DHCP --- L2SW4\n  OfficePC --- L2SW4\n  L2SW4 --- FW1\n\n  subgraph Seg_EC\n    ECPC[EC管理PC]\n    L2SW5[L2SW]\n  end\n  ECPC --- L2SW5\n  L2SW5 --- FW2\n\n  subgraph Seg_AuthProxy\n    Auth[認証サーバ]\n    Proxy[プロキシサーバ]\n    L2SW6[L2SW]\n  end\n  Auth --- L2SW6\n  Proxy --- L2SW6\n  L2SW6 --- FW2\n\n  DC --- FW2\n\n  classDef fw fill:#f96,stroke:#333,stroke-width:2px;\n  class FW1,FW2 fw;\n[/CODE_BLOCK]",
+          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n  Internet((\"インターネット\")) --- FW1\n  FW1 --- DMZ\n  FW1 --- Seg_Internal[内部メール・Webサーバセグメント]\n  FW1 --- FW2\n  FW1 --- Seg_Manage[運用管理セグメント]\n  FW1 --- Seg_Office[事務PCセグメント]\n  \n  FW2 --- DC[データセンタ ECサイトセグメント]\n  FW2 --- Seg_EC[EC管理セグメント]\n  FW2 --- Seg_AuthProxy[認証・プロキシセグメント]\n\n  subgraph DMZ\n    ExtMail[外部メールサーバ]\n    ExtDNS[外部DNSサーバ]\n    L2SW1[L2SW]\n  end\n  ExtMail --- L2SW1\n  ExtDNS --- L2SW1\n  L2SW1 --- FW1\n\n  subgraph Seg_Internal\n    IntMail[内部メールサーバ]\n    IntWeb[内部Webサーバ]\n    L2SW2[L2SW]\n  end\n  IntMail --- L2SW2\n  IntWeb --- L2SW2\n  L2SW2 --- FW1\n\n  subgraph Seg_Manage\n    Patch[パッチ配信サーバ]\n    Mon[運用監視サーバ]\n    Virus[ウイルス対策管理サーバ]\n    L2SW3[L2SW]\n  end\n  Patch --- L2SW3\n  Mon --- L2SW3\n  Virus --- L2SW3\n  L2SW3 --- FW1\n\n  subgraph Seg_Office\n    DHCP[DHCPサーバ]\n    OfficePC[事務用PC]\n    L2SW4[L2SW]\n  end\n  DHCP --- L2SW4\n  OfficePC --- L2SW4\n  L2SW4 --- FW1\n\n  subgraph Seg_EC\n    ECPC[EC管理PC]\n    L2SW5[L2SW]\n  end\n  ECPC --- L2SW5\n  L2SW5 --- FW2\n\n  subgraph Seg_AuthProxy\n    Auth[認証サーバ]\n    Proxy[プロキシサーバ]\n    L2SW6[L2SW]\n  end\n  Auth --- L2SW6\n  Proxy --- L2SW6\n  L2SW6 --- FW2\n\n  DC --- FW2\n\n  classDef fw fill:#f96,stroke:#333,stroke-width:2px;\n  class FW1,FW2 fw;\n[/CODE_BLOCK]",
           "references": []
         },
         {
@@ -54,7 +54,7 @@
           "id": "fig5",
           "label": "図5 変更後の詳細解析環境",
           "type": "mermaid",
-          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n  SuspectPC[被疑PC] --- L2SW\n  L2SW --- Proxy[解析用プロキシサーバ]\n  L2SW --- Auth[解析用認証サーバ]\n  L2SW --- DHCP[解析用DHCPサーバ]\n  L2SW --- Pcap[パケットキャプチャ装置]\n  Pcap --- Relay1[中継サーバ1]\n  Relay1 --- Relay2[中継サーバ2]\n  Relay2 --- Router[ルータ]\n  Router --- Internet((インターネット))\n  Relay2 --- SuspiciousServer[被疑サーバ]\n[/CODE_BLOCK]\n※注記 中継サーバ2は，R社が契約しているISPで用意しているDNSサーバにDNS問合せを送る。"
+          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n  SuspectPC[被疑PC] --- L2SW\n  L2SW --- Proxy[解析用プロキシサーバ]\n  L2SW --- Auth[解析用認証サーバ]\n  L2SW --- DHCP[解析用DHCPサーバ]\n  L2SW --- Pcap[パケットキャプチャ装置]\n  Pcap --- Relay1[中継サーバ1]\n  Relay1 --- Relay2[中継サーバ2]\n  Relay2 --- Router[ルータ]\n  Router --- Internet((\"インターネット\"))\n  Relay2 --- SuspiciousServer[被疑サーバ]\n[/CODE_BLOCK]\n※注記 中継サーバ2は，R社が契約しているISPで用意しているDNSサーバにDNS問合せを送る。"
         },
         {
           "id": "fig6",
@@ -98,7 +98,6 @@
           "table6",
           "fig1"
         ],
-        "explanation": "初動対応におけるログ調査とPC確保に関する問題です。\n\n### (1) 電源オンで消去される情報の例\n図2の下線①「電源をオフにすると消去されてしまう情報」には、メモリ上にのみ存在する揮発性情報が含まれます。\n- ア: HDDのパーティションテーブル（不揮発）\n- イ: OSのバージョン（不揮発）\n- ウ: 画面に表示されているウィンドウの名称（揮発性。表示されているだけでプロセスと結びついている）\n- エ: 起動しているプロセスの一覧（揮発性。メモリ上の情報）\n- オ: 脆弱性修正プログラムの適用状況（レジストリやファイル等に記録。不揮発）\n\n### (2) 空欄 a, b に入れる適切な字句\n- **空欄 [ a ]**: 不審な通信（被疑サーバ宛て）の送信元IPと時刻を特定するために使用するログ。図1より、社内PCから外部へのアクセスはプロキシサーバを経由するため、プロキシサーバのアクセスログを参照します。\n- **空欄 [ b ]**: IPアドレスからMACアドレスを特定するためのログ。DHCPサーバはIPの割り当て時にMACアドレスとIPの対応を記録するため、DHCPサーバのログが適切です。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -125,7 +124,6 @@
           "fig5",
           "fig6"
         ],
-        "explanation": "HTTPS通信の復号解析（SSL可視化）に関する技術的な設問です。\n\n### (1) 証明書のサブジェクト名\nマルウェア（被疑PC）が証明書の検証に成功するためには、アクセス先である「被疑サーバ」のFQDN（またはホスト名）が証明書の「サブジェクトのコモンネーム（CN）」に設定されている必要があります。\n\n### (2) 秘密鍵の組み込み先\n図5及び図6の構成では、「中継サーバ1」がHTTPSを復号してHTTPに変換しています。したがって、復号に必要な秘密鍵は中継サーバ1に組み込む必要があります。\n\n### (3) プロキシサーバの設定\n通常、HTTPS通信はプロキシを単に「トンネル（CONNECTメソッド）」として通過しますが、中継サーバで復号するためには、解析用プロキシサーバが中継サーバ1に対して通信を転送するように設定するか、あるいは証明書の検証を回避させるような特別なルーティング（または透過プロキシ設定）が必要です。最も直接的なのは、被疑サーバ宛のHTTPS通信を解析用プロキシサーバが中継サーバ1へ転送するように設定することです。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -151,7 +149,6 @@
           "fig7",
           "fig8"
         ],
-        "explanation": "アンチデバッグとパッカー（実行時解凍）に関する問題です。\n\n### (1) デバッガ検知の方法\nシステムコール以外の方法としては、「デバッグ中を示すフラグ（PEBのBeingDebuggedフラグなど）をチェックする」や「特定の命令を実行した際の例外処理の挙動を確認する」、「コードの実行時間を計測して遅延を検知する」などが挙げられます。\n\n### (2) パッカーによる検知の難しさ\nパッカーで保護されたマルウェアは、ファイルとして保存されている状態（静的な状態）では「本体のコード」が暗号化・圧縮されており、ウイルス定義ファイル（シグネチャ）とのマッチングができないためです。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -171,7 +168,6 @@
         "references": [
           "table5"
         ],
-        "explanation": "インシデント発生後の暫定的な封じ込め策に関する問題です。\n\n- [ c ]: プロキシサーバのブラックリスト（またはURLフィルタリングリスト）。被疑サーバへのアクセスを拒絶するため。\n- [ d ]: 全ての社内PCにおいて、マルウェアが利用していた脆弱性Kの修正プログラムが適用されているか確認し、未適用なら適用する。\n- [ e ]: パスワードの変更。認証情報が窃取されたため、不正ログインを防ぐ必要があります。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -197,7 +193,6 @@
           "table1",
           "fig3"
         ],
-        "explanation": "特定のPCだけが感染した理由（脆弱性の有無）を特定するプロセスです。\n\n### (1) 状態の差異\n比較対照用PCは「最新の修正プログラムを適用済み」の状態ですが、Sさんの被疑PCは「3か月間電源がオフ」であり、2か月前に公開された「脆弱性Kの修正プログラムが未適用」の状態でした。\n\n### (2) 空欄 f に入れる機器名\n脆弱性の適用状況を確認するログです。表1の「パッチ配信サーバ」のログには、各PCの脆弱性修正プログラム適用結果が記録されています。\n\n### (3) 感染の可能性の判断基準\n「Q社のWebサイトにアクセスした時刻」に、当該PCが「脆弱性Kの修正プログラムを未適用」であった場合に、感染の可能性があると判断します。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -222,7 +217,6 @@
         "references": [
           "fig3"
         ],
-        "explanation": "フォレンジックの原則と、パッカー等への対策改善です。\n\n### (1) タイミングの見直し\nデジタルフォレンジックスでは、揮発性情報（メモリ内容等）の消失を防ぐため、PCをシャットダウンする前やネットワークから切り離す直前にメモリダンプを取得するなどの「揮発性データの収集」作業のタイミングが重要です。\n\n### (2) 業務継続への対応\nPCを即座に没収すると業務が止まるため、「代替PCを即座に提供する」または「HDDの複製（イメージ）を迅速に取得してPC自体は返却する」などの配慮が必要です。\n\n### (3) チェックリストの追加項目 [ g ]\nパッカーを使ったマルウェアなどは、OSの起動設定や自動実行設定を書き換えます。本文中に「自身を所定の時間経過後に起動するための設定をOSに対して組み込み」とあるため、「OSの自動起動設定（レジストリ等）」が適切です。",
         "subQuestions": [
           {
             "label": "(1)",
