@@ -14,6 +14,7 @@
 | 2026-05-08 | AP-2023-Spring-PM qNo=1 の親見出し explanation を子設問側へ集約済みの構造へ整理 |
 | 2026-05-08 | FE-2023-Public-PM の既存解答群を選択肢データとして構造化 |
 | 2026-05-08 | FE-2022-Sample-PM の既存解答群を選択肢データとして構造化 |
+| 2026-05-08 | AP-2024-Spring-PM qNo=1 の親見出し explanation を子設問側へ集約済みの構造へ整理 |
 
 ## 1. 目的
 
@@ -162,6 +163,7 @@ E2E は UI 変更または代表データ修正の完了時に実行する。実
 - AP-2023-Spring-PM qNo=1 の表示 spot check（親見出し explanation 削除により余分な親解答欄リスクを補正済み）
 - FE-2023-Public-PM の表示 spot check（解答群から `answerChoices` への構造化は補正済み）
 - FE-2022-Sample-PM の表示 spot check（解答群から `answerChoices` への構造化は補正済み）
+- AP-2024-Spring-PM qNo=1 の表示 spot check（親見出し explanation 削除により余分な親解答欄リスクを補正済み）
 - SA-2024-Spring-PM1 qNo=1 の表示 spot check（親見出しはUI抑止済み、公式解答同期済み）
 - SC-PM1/PM2 の下線・記号回答・図表参照の高リスク箇所の公式PDF照合
 - FE-2024-Public-PM の選択肢本文復元
