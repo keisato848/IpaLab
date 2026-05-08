@@ -4,6 +4,7 @@
 
 | 日付 | 変更内容 |
 |------|------|
+| 2026-05-08 | 午後問題内の選択式・短答式小問をAI採点から分離し、ラジオボタン・チェックボックス・短答入力による正誤採点と午前問題相当の保存経路を追加 |
 | 2026-05-07 | ダークテーマで新形式午後画面の解答例ラベルが低コントラストになる問題を修正し、self-inspect検出ルールを追加 |
 | 2026-05-07 | 新形式午後画面の解答例解説をMarkdownとして描画し、同種デグレをself-inspectで検出するルールを追加 |
 | 2026-05-07 | 午後試験ヘッダーの不要な `IpaLab` リンクを削除し、午後記述欄を原稿用紙形式入力に変更 |
@@ -20,9 +21,10 @@
 
 - 午後問題の表示形式判定
 - ケース本文、図表、設問、記述入力 UI
+- 選択式・短答式小問の客観式回答 UI
 - 午後記述欄の原稿用紙形式入力 UI
 - `/api/score` による CLKS ベース採点
-- 採点結果の `LearningRecord` への保存
+- AI採点結果および客観式採点結果の `LearningRecord` への保存
 - 採点前の回答下書きの localStorage 保存
 - セッション進捗更新と集計表示
 - `ExamSummary` と `scoring.ts` による総合スコア算出
@@ -35,12 +37,14 @@
 
 - `QuestionClient` の午後分岐
 - `AIAnswerBox`、`SCPMExamView`、`ExamSummary`
+- `SCPMExamView` 内の客観式回答欄（ラジオ、チェックボックス、短答入力）
 - `LearningRecord` の記述式拡張項目
 - `/api/score` と `lib/scoring.ts`
 - 文字数制限の表示と超過時の採点抑止
 - 午後記述欄の原稿用紙形式表示と文字数制限の可視化
 - 解答例・AIフィードバック・改善回答などMarkdown文字列のHTML描画
 - 午後問題の新旧データ形式への対応
+- 午後問題内の選択式・短答式・記述式の回答形式分岐
 - 新形式午後画面の問題文ペイン開閉 UI
 - アプリ全体で常時利用できるデスクトップサイドナビ開閉 UI
 
@@ -64,9 +68,13 @@ graph TD
     PMJudge --> NewPM[SCPMExamView]
 
     LegacyPM --> ScoreApi[/api/score]
-    NewPM --> ScoreApi
+    NewPM --> AnswerJudge{回答形式判定}
+    AnswerJudge --> ObjectiveUI[客観式回答欄]
+    AnswerJudge --> DescriptiveUI[AIAnswerBox]
+    DescriptiveUI --> ScoreApi
     ScoreApi --> Gemini[Gemini API]
 
+    ObjectiveUI --> LearningRecordsApi
     QuestionClient --> LearningRecordsApi[/api/learning-records]
     QuestionClient --> ExamProgressApi[/api/exam-progress]
     QuestionClient --> SessionApi[/api/session]
@@ -106,7 +114,31 @@ sequenceDiagram
 4. 新形式午後画面では、必要に応じて問題文ペインも「問題文を隠す / 表示」で開閉できる
 5. サイドナビの開閉状態は localStorage に保存し、再読み込み後も維持する
 
-### 4.2 AI 採点
+### 4.2 客観式採点と AI 採点
+
+選択式・短答式として判定された午後小問は、AI採点を呼び出さない。`SCPMExamView` は `pmAnswerUtils` の分類結果に基づき、択一はラジオボタン、複数選択はチェックボックス、短答は短いテキスト入力を描画する。
+
+```mermaid
+sequenceDiagram
+    participant User as ユーザー
+    participant View as SCPMExamView
+    participant QC as QuestionClient
+    participant LR as /api/learning-records
+    participant EP as /api/exam-progress
+    participant Session as /api/session
+
+    User->>View: ラジオ/チェックボックス/短答で回答
+    User->>View: 回答を確定
+    View->>View: 正答記号または短答の正規化一致で採点
+    View->>QC: 客観式採点結果を通知
+    QC->>LR: isDescriptive=false の LearningRecord を保存
+    QC->>EP: statusMap を小問IDで更新
+    opt sessionId あり
+        QC->>Session: answeredCount / correctCount / lastQuestionNo を更新
+    end
+```
+
+記述式として判定された午後小問は、従来どおり `AIAnswerBox` から `/api/score` を呼び出す。
 
 ```mermaid
 sequenceDiagram
@@ -125,11 +157,12 @@ sequenceDiagram
 
 ### 4.3 採点結果の保存
 
-1. `AIAnswerBox` が `onSave()` で親に採点結果を返す
-2. `QuestionClient.handleSaveAIScore()` が `LearningRecord` を生成する
-3. `aiScore >= 60` を `isCorrect` とみなす
-4. 認証済みなら `learning-records`、`exam-progress`、`session` を更新する
-5. ゲストなら localStorage 履歴へ保存する
+1. 記述式では `AIAnswerBox` が `onSave()` で親に採点結果を返す
+2. 客観式では `SCPMExamView` が `onObjectiveAnswer()` で正誤・回答・正答を親に返す
+3. `QuestionClient.handleSaveAIScore()` または `handleSaveObjectiveAnswer()` が `LearningRecord` を生成する
+4. 記述式は `aiScore >= 60`、客観式は正答一致を `isCorrect` とする
+5. 認証済みなら `learning-records`、`exam-progress`、`session` を更新する
+6. ゲストなら localStorage 履歴へ保存する
 
 ---
 
@@ -140,9 +173,10 @@ sequenceDiagram
 | Component | `apps/web/components/features/exam/QuestionClient.tsx` | 午後形式判定、採点結果保存、統計更新 |
 | Component | `apps/web/components/features/exam/AIAnswerBox.tsx` | 回答入力、採点 API 呼び出し、スコア表示 |
 | Component | `apps/web/components/features/exam/SCPMExamView.tsx` | 新形式ケース問題の分割表示と図表参照 |
+| Component | `apps/web/components/features/exam/SCPMExamView.tsx` | 午後選択式・短答式の客観式回答欄と正誤表示 |
 | Component | `apps/web/components/features/scoring/GenkoyoshiInput.tsx` | 原稿用紙形式の答案入力と字数カウンタ表示 |
 | Component | `apps/web/app/(main)/layout.tsx` | メインサイドナビ表示とデスクトップ開閉状態の保持 |
-| Utility | `apps/web/components/features/exam/pmAnswerUtils.ts` | 午後答案の文字数制限抽出、設問ID、下書き保存キー生成 |
+| Utility | `apps/web/components/features/exam/pmAnswerUtils.ts` | 午後答案の文字数制限抽出、回答形式分類、客観式採点、設問ID、下書き保存キー生成 |
 | Component | `apps/web/components/features/exam/ExamSummary.tsx` | 総合スコアとレーダー集計表示 |
 | API | `apps/web/app/api/score/route.ts` | Gemini を用いた CLKS 採点 |
 | Utility | `apps/web/lib/scoring.ts` | 総合スコアと平均レーダー算出 |
@@ -199,7 +233,21 @@ sequenceDiagram
 | `aiFeedback` | string | 要約フィードバック |
 | `aiRadarData` | array | 軸別点数 |
 
-### 8.3 午後問題識別子
+### 8.3 LearningRecord の客観式午後小問
+
+選択式・短答式の午後小問は、午前問題と同じ意味の正誤レコードとして保存する。
+
+| フィールド | 型 | 用途 |
+|------|------|------|
+| `isDescriptive` | boolean | `false` を保存 |
+| `questionId` | string | `question.id-{idx}-{subIdx}` または客観式分割後の小問ID |
+| `userAnswer` | string | 選択記号のカンマ区切り、または短答入力 |
+| `selectedOptionId` | string optional | 択一選択時の選択記号 |
+| `isCorrect` | boolean | 正答集合一致または短答正規化一致の結果 |
+
+複数選択は `userAnswer` に選択記号を保存し、順序を無視した集合一致で採点する。短答式は前後空白、全角半角、英字大小、句読点を正規化して比較する。
+
+### 8.4 午後問題識別子
 
 `QuestionClient` は設問単位で以下の ID 生成規則を使う。
 
@@ -208,7 +256,7 @@ sequenceDiagram
 | `question.id-{idx}` | `AP-2023-PM-01-0` | サブ設問単位の記録 |
 | `question.id-{idx}-{subIdx}` | `AP-2023-PM-01-0-1` | ネスト設問単位の記録 |
 
-### 8.4 午後答案下書き
+### 8.5 午後答案下書き
 
 採点前の途中答案は、参考静的サイトの「保存 / 読込」構成を踏まえ、ブラウザ localStorage に自動保存する。
 
@@ -251,11 +299,14 @@ sequenceDiagram
 4. `subQuestions` が空でも、設問直下の `answer` / `modelAnswer` / `explanation` がある場合は、その設問自体を解答欄にする
 5. `section.questions` にネストした設問がある場合は、その配下を解答欄として扱う
 6. PM2 論述式の設問ア・イ・ウのように設問本文だけで構成されるデータは、本文をプロンプトとして解答欄を生成する
-7. 設問回答は `AIAnswerBox` に委譲し、親コンポーネントへ採点結果を返す
-8. 回答済み設問の総合スコアは合計点ではなく平均点として算出し、100点満点で表示する
-9. 解答ペインの件数は大問ブロック数ではなく、実際に描画される解答欄数で表示する
-10. 解答ペインヘッダーのトグルで、問題文左ペインを非表示にして解答欄を全幅表示できる
-11. 非表示中も同じトグルで問題文左ペインを再表示できる
+7. `解答群の中から選び、記号/番号で答えよ` のような選択式小問は、`AIAnswerBox` に流さずラジオボタンまたはチェックボックスで描画する
+8. `本文中の字句を用いて`、`名称で答えよ`、短い字数制限などの短答式小問は、原稿用紙ではなく短答入力で描画する
+9. 選択式・短答式は `SCPMExamView` 内で正誤を判定し、`QuestionClient.handleSaveObjectiveAnswer()` が `isDescriptive=false` として保存する
+10. 記述式設問だけを `AIAnswerBox` に委譲し、親コンポーネントへAI採点結果を返す
+11. 回答済み設問の総合スコアは合計点ではなく平均点として算出し、100点満点で表示する
+12. 解答ペインの件数は大問ブロック数ではなく、実際に描画される解答欄数で表示する
+13. 解答ペインヘッダーのトグルで、問題文左ペインを非表示にして解答欄を全幅表示できる
+14. 非表示中も同じトグルで問題文左ペインを再表示できる
 
 ### 10.3 問題番号フォールバック
 
