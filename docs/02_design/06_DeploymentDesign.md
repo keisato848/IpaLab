@@ -95,7 +95,7 @@ GitHub Actions ワークフロー: `.github/workflows/azure-app-service.yml`
 
 Artifact の取得は `actions/download-artifact@v6` を使用する。`gh run download` は checkout していない deploy ジョブで `fatal: not a git repository` となるため使用しない。
 
-PR の `pull_request` トリガーは `opened` / `synchronize` / `reopened` / `ready_for_review` を対象とし、`paths` フィルタでは絞り込まない。これにより、追加コミットがドキュメント・フック・データ監査などアプリ外のファイルだけを変更する場合でも、PR 更新時に同じ成果物を再ビルドして Staging App Service へ再デプロイする。同一PRで古いワークフロー実行が後から完了して新しいデプロイを上書きしないよう、ワークフロー全体に PR 番号単位の `concurrency` と `cancel-in-progress: true` を設定する。
+PR の `pull_request` トリガーは `opened` / `synchronize` / `reopened` / `ready_for_review` を対象とし、`paths` フィルタでは絞り込まない。これにより、追加コミットがドキュメント・フック・データ監査などアプリ外のファイルだけを変更する場合でも、PR 更新時に同じ成果物を再ビルドして Staging App Service へ再デプロイする。同一PRで古いワークフロー実行が後から完了して新しいデプロイを上書きしないよう、ワークフロー全体に PR 番号単位の `concurrency` と `cancel-in-progress: true` を設定する。PR コメントのコミット欄には、GitHub の一時 merge SHA ではなく `pull_request.head.sha` を表示し、レビュー対象ブランチのどの追加修正が Staging に反映されたかを追跡できるようにする。
 
 ### 4.2 必要な GitHub Secrets
 
