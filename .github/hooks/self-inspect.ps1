@@ -43,6 +43,9 @@
 #   R30. 午後OCRが単一JSON object前提に戻り、複数大問PDFの問2以降を落とすパターン
 #   R31. 午後変換が単一Geminiキー前提に戻り、無効キーで停止するパターン
 #   R32. 午後解答OCRが午前択一表専用に戻り、記述式解答を落とすパターン
+#   R33. 受講者想定E2Eからテスト答案入力・採点・ゲスト保存検証が消えるパターン
+#   R34. 午後回答欄IDが question.id 直参照に戻り、id欠落データで undefined 保存になるパターン
+#   R35. E2E証跡レポートが過去画像全件を再掲し、最新実行分だけに絞らないパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -387,6 +390,68 @@ if (Test-Path $answerOcrPrompt) {
         Add-Finding -Rule 'R32-afternoon-answer-ocr-descriptive' -Severity 'High' `
             -File $answerOcrPrompt `
             -Detail '解答OCRプロンプトは午前択一だけでなく、午後記述式の問・設問・空欄ラベル付き模範解答を抽出してください'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R33: 受講者想定E2Eはテスト答案の入力・採点・保存まで確認すること
+#      (表示確認だけに戻ると、実際の回答保存や採点結果表示のデグレを検出できない)
+# ---------------------------------------------------------------------------
+$pmAnswerFlowSpec = Join-Path $WebRoot 'e2e\pm-answer-flow.spec.ts'
+$pmAnswerFlowFixture = Join-Path $WebRoot 'e2e\fixtures\pm-answer-flow.json'
+if (-not (Test-Path $pmAnswerFlowSpec) -or -not (Test-Path $pmAnswerFlowFixture)) {
+    Add-Finding -Rule 'R33-pm-answer-flow-e2e-fixture' -Severity 'Medium' `
+        -File $WebRoot `
+        -Detail '午後回答の受講者想定E2Eは fixture 管理されたテスト答案で、採点とゲスト保存まで検証してください'
+} else {
+    $specRaw = Get-Content -LiteralPath $pmAnswerFlowSpec -Raw
+    $fixtureRaw = Get-Content -LiteralPath $pmAnswerFlowFixture -Raw
+    if ($specRaw -notmatch '\*\*/api/score' -or
+        $specRaw -notmatch 'ipalab_guest_history' -or
+        $specRaw -notmatch 'fixture\.draftKey' -or
+        $specRaw -notmatch 'captureEvidence' -or
+        $fixtureRaw -notmatch '"answerFieldId"' -or
+        $fixtureRaw -notmatch '"scoreResult"' -or
+        $fixtureRaw -notmatch '"answer"') {
+        Add-Finding -Rule 'R33-pm-answer-flow-e2e-fixture' -Severity 'Medium' `
+            -File $pmAnswerFlowSpec `
+            -Detail '午後回答E2Eは fixture の答案を実入力し、/api/score 経由の採点結果表示、draftKey、ipalab_guest_history 保存、エビデンス取得を確認してください'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R34: 午後回答欄IDは question.id 直参照ではなく安定基底IDから生成すること
+#      (transformed JSON に id がない場合、draftKey と LearningRecord.questionId が undefined 由来になる)
+# ---------------------------------------------------------------------------
+$pmAnswerUtils = Join-Path $WebRoot 'components\features\exam\pmAnswerUtils.ts'
+$questionClient = Join-Path $WebRoot 'components\features\exam\QuestionClient.tsx'
+$scpmExamView = Join-Path $WebRoot 'components\features\exam\SCPMExamView.tsx'
+if ((Test-Path $pmAnswerUtils) -and (Test-Path $questionClient) -and (Test-Path $scpmExamView)) {
+    $utilsRaw = Get-Content -LiteralPath $pmAnswerUtils -Raw
+    $questionClientRaw = Get-Content -LiteralPath $questionClient -Raw
+    $scpmExamViewRaw = Get-Content -LiteralPath $scpmExamView -Raw
+    if ($utilsRaw -notmatch 'resolvePMQuestionBaseId' -or
+        $questionClientRaw -match 'buildPMAnswerFieldId\(question\.id' -or
+        $scpmExamViewRaw -match 'parentQuestionId=\{question\.id\}' -or
+        $scpmExamViewRaw -match 'buildPMAnswerFieldId\(question\.id') {
+        Add-Finding -Rule 'R34-pm-answer-field-id-base' -Severity 'High' `
+            -File $scpmExamView `
+            -Detail '午後回答欄IDは resolvePMQuestionBaseId(question) を基底に生成し、id 欠落データで undefined の draftKey / questionId を作らないでください'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R35: E2E証跡レポートは今回実行で生成された画像だけを掲載すること
+#      (日付や年プレフィックスだけだと過去画像全件を再掲してレポートが巨大化する)
+# ---------------------------------------------------------------------------
+$customE2EReporter = Join-Path $WebRoot 'e2e\reporters\custom-report.ts'
+if (Test-Path $customE2EReporter) {
+    $reporterRaw = Get-Content -LiteralPath $customE2EReporter -Raw
+    if ($reporterRaw -match 'startsWith\(todayPrefix\.slice\(0, 4\)\)' -or
+        $reporterRaw -notmatch 'mtimeMs >= this\.startTime') {
+        Add-Finding -Rule 'R35-e2e-report-current-run-evidence' -Severity 'Medium' `
+            -File $customE2EReporter `
+            -Detail 'E2E証跡レポートの画像一覧はファイル更新時刻を実行開始時刻以降に絞り、過去画像全件を再掲しないでください'
     }
 }
 
@@ -1038,7 +1103,7 @@ Write-Host "## [self-inspect $tag] 自己点検レポート"
 Write-Host ""
 
 if ($findings.Count -eq 0) {
-    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16 / R17 / R18 / R19 / R20 / R21 / R22 / R23 / R24 / R24b / R25 / R26 / R27 / R28 / R29 / R30 / R31)"
+    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16 / R17 / R18 / R19 / R20 / R21 / R22 / R23 / R24 / R24b / R25 / R26 / R27 / R28 / R29 / R30 / R31 / R32 / R33 / R34 / R35)"
     exit 0
 }
 
@@ -1052,7 +1117,7 @@ foreach ($f in $findings) {
 }
 
 Write-Host ""
-Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から接続文字列・API キー実値を除去 / R13 → download.ts で content-type と %PDF- ヘッダーを検証し、壊れた既存 PDF は再取得する / R14 → npx 直接 spawn ではなく process.execPath + ts-node/register を使う / R15 → npm_config_* と node --require ts-node/register で npm run 引数を安定化する / R16 → AM/AM2 の answers_raw.json と questions_raw.json の qNo・correctOption・選択肢を同期する / R17 → PM/PM1/PM2 は questions_transformed.json と subQuestions 解答欄を同期する / R18 → Mermaid のリンクラベルは -->|label| または ---|label| に正規化し、非ASCIIの円形節点ラベルは引用する / R19 → 新形式午後ヘッダーは CSS Modules を使う / R20 → AIAnswerBox の draftKey・文字数制限を維持する / R21 → 新形式午後の総合スコアは平均を /100、件数は解答欄数で表示する / R22 → section.answer・section.questions・空 subQuestions も解答欄化する / R23 → 日本語 ER 図・subgraph は sanitizeMermaid で描画可能に正規化する / R24 → GitHub Actions の artifact 取得は actions/download-artifact@v6 を使う / R24b → PRの追加修正はpull_request synchronizeでStaging再デプロイし、古い実行をconcurrencyでキャンセルする / R25 → SCPMExamView の解答例解説は ReactMarkdown で描画する / R26 → 解答例ラベルは不透明アンバー背景 + 濃色文字で視認性を保つ / R27 → 子設問を持つ説明だけの親見出しは解答欄化せず、午後データ監査を全区分で実行する / R28 → 午後問題は qNo 完全一致だけで解決し、位置番号フォールバックを再導入しない / R29 → answerChoices を持つ午後小問は radio/checkbox 選択式UIで採点・記録する / R30 → 午後OCRは複数大問PDF向けに JSON array を要求する / R31 → 午後変換はGeminiキーをローテーションする"
+Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から接続文字列・API キー実値を除去 / R13 → download.ts で content-type と %PDF- ヘッダーを検証し、壊れた既存 PDF は再取得する / R14 → npx 直接 spawn ではなく process.execPath + ts-node/register を使う / R15 → npm_config_* と node --require ts-node/register で npm run 引数を安定化する / R16 → AM/AM2 の answers_raw.json と questions_raw.json の qNo・correctOption・選択肢を同期する / R17 → PM/PM1/PM2 は questions_transformed.json と subQuestions 解答欄を同期する / R18 → Mermaid のリンクラベルは -->|label| または ---|label| に正規化し、非ASCIIの円形節点ラベルは引用する / R19 → 新形式午後ヘッダーは CSS Modules を使う / R20 → AIAnswerBox の draftKey・文字数制限を維持する / R21 → 新形式午後の総合スコアは平均を /100、件数は解答欄数で表示する / R22 → section.answer・section.questions・空 subQuestions も解答欄化する / R23 → 日本語 ER 図・subgraph は sanitizeMermaid で描画可能に正規化する / R24 → GitHub Actions の artifact 取得は actions/download-artifact@v6 を使う / R24b → PRの追加修正はpull_request synchronizeでStaging再デプロイし、古い実行をconcurrencyでキャンセルする / R25 → SCPMExamView の解答例解説は ReactMarkdown で描画する / R26 → 解答例ラベルは不透明アンバー背景 + 濃色文字で視認性を保つ / R27 → 子設問を持つ説明だけの親見出しは解答欄化せず、午後データ監査を全区分で実行する / R28 → 午後問題は qNo 完全一致だけで解決し、位置番号フォールバックを再導入しない / R29 → answerChoices を持つ午後小問は radio/checkbox 選択式UIで採点・記録する / R30 → 午後OCRは複数大問PDF向けに JSON array を要求する / R31 → 午後変換はGeminiキーをローテーションする / R32 → 解答OCRは午後記述式の模範解答を抽出する / R33 → 受講者想定E2Eはfixture答案を入力し採点・保存まで検証する / R34 → 午後回答欄IDはresolvePMQuestionBaseIdで生成する / R35 → E2E証跡レポートは今回実行分の画像だけを掲載する"
 
 if ($FailOnFinding) { exit 1 }
 exit 0
