@@ -27,6 +27,7 @@ import {
     getPMChildAnswerItems,
     isPMChoiceCorrect,
     isPMMultipleChoice,
+    resolvePMQuestionBaseId,
     shouldUsePMGenkoyoshiInput,
     shouldRenderPMSectionAnswerItem,
 } from './pmAnswerUtils';
@@ -323,6 +324,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, onChoi
     const overallScore = answeredScoreCount > 0 ? Math.round(totalScore / answeredScoreCount) : 0;
     const answerFieldCount = countAnswerFields(questions);
     const isContextPaneHidden = layoutMode === 'paper' || isContextPaneCollapsed;
+    const questionBaseId = resolvePMQuestionBaseId(question);
 
     const toggleContextPane = () => {
         if (isContextPaneHidden) {
@@ -466,13 +468,13 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, onChoi
                                 question={q}
                                 index={idx}
                                 subCategory={question.subCategory}
-                                parentQuestionId={question.id}
+                                parentQuestionId={questionBaseId}
                                 parentContext={context}
                                 onGrade={onGrade ? (data, subSubIndex) => onGrade(data, idx, subSubIndex) : undefined}
                                 onChoiceGrade={onChoiceGrade ? (data, subSubIndex) => onChoiceGrade(data, idx, subSubIndex) : undefined}
                                 getInitialData={(subSubIndex) => {
                                     if (!descriptiveHistory) return undefined;
-                                    return descriptiveHistory[buildPMAnswerFieldId(question.id, idx, subSubIndex)]
+                                    return descriptiveHistory[buildPMAnswerFieldId(questionBaseId, idx, subSubIndex)]
                                         || descriptiveHistory[q.id || `sq-${idx}`];
                                 }}
                             />

@@ -7,6 +7,7 @@ import {
     getPMChoiceOptions,
     isPMChoiceCorrect,
     isPMMultipleChoice,
+    resolvePMQuestionBaseId,
     shouldUsePMGenkoyoshiInput,
     shouldRenderPMSectionAnswerItem,
 } from '@/components/features/exam/pmAnswerUtils';
@@ -33,6 +34,12 @@ describe('pmAnswerUtils', () => {
         const answerFieldId = buildPMAnswerFieldId('SA-2025-Spring-PM1-1', 2, 4);
         expect(answerFieldId).toBe('SA-2025-Spring-PM1-1-2-4');
         expect(buildPMDraftKey(answerFieldId)).toBe('ipalab_pm_answer_draft_v1:SA-2025-Spring-PM1-1-2-4');
+    });
+
+    it('idがない午後データはexamIdとqNoから保存用基底IDを生成する', () => {
+        expect(resolvePMQuestionBaseId({ examId: 'SA-2024-Spring-PM1', qNo: 1 })).toBe('SA-2024-Spring-PM1-1');
+        expect(resolvePMQuestionBaseId({ id: '1', examId: 'SA-2024-Spring-PM1', qNo: 1 })).toBe('SA-2024-Spring-PM1-1');
+        expect(resolvePMQuestionBaseId({ id: 'custom-id' })).toBe('custom-id');
     });
 
     it('子設問を持つ説明だけの親設問は解答欄化しない', () => {

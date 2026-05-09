@@ -60,6 +60,16 @@ export function buildPMAnswerFieldId(baseId: string, sectionIndex: number, field
     return `${baseId}-${sectionIndex}${fieldIndex !== undefined ? `-${fieldIndex}` : ''}`;
 }
 
+export function resolvePMQuestionBaseId(question: { id?: string; examId?: string; qNo?: string | number }): string {
+    const examId = String(question.examId ?? '').trim();
+    const questionNo = String(question.qNo ?? '').trim();
+    if (examId && questionNo) return `${examId}-${questionNo}`;
+
+    if (hasText(question.id)) return question.id.trim();
+
+    return examId || questionNo || 'unknown-question';
+}
+
 export function buildPMDraftKey(answerFieldId: string): string {
     return `ipalab_pm_answer_draft_v1:${answerFieldId}`;
 }

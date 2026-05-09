@@ -231,7 +231,15 @@ sequenceDiagram
 | `answer` | 入力中の答案 |
 | `savedAt` | ISO 8601 形式の保存日時 |
 
-`answerFieldId` は `question.id-{idx}` または `question.id-{idx}-{subIdx}` とし、採点結果の `LearningRecord.questionId` と同じ粒度にそろえる。
+`answerFieldId` は `examId-qNo-{idx}` または `examId-qNo-{idx}-{subIdx}` を優先し、`examId` / `qNo` がない場合だけ `question.id-{idx}` を使う。下書き保存キーと採点結果の `LearningRecord.questionId` は同じ粒度にそろえる。
+
+### 8.5 受講者想定 E2E テストデータ
+
+午後問題の受講者操作は、リポジトリ管理された fixture を使って検証する。代表ケースは `apps/web/e2e/fixtures/pm-answer-flow.json` に定義し、対象ページ、入力欄インデックス、期待する `answerFieldId`、下書き保存キー、入力答案、採点結果を固定する。
+
+`apps/web/e2e/pm-answer-flow.spec.ts` はこの fixture を読み込み、実際の画面で答案を入力し、下書き保存、AI 採点ボタン操作、採点結果表示、ゲスト履歴 `ipalab_guest_history` への保存、再読み込み後の答案復元を確認する。採点 API は外部 AI の非決定性を避けるため Playwright の route mock で fixture の採点結果を返すが、UI 上は通常の `/api/score` 呼び出しとして検証する。
+
+この検証は、データ修正 PR で午後問題の構造や回答欄生成を変更したときに、受講者が「入力できる」「保存できる」「採点結果を見られる」状態を壊していないことを確認するための基準とする。
 
 ---
 
