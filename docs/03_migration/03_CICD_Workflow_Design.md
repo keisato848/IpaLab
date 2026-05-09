@@ -351,14 +351,52 @@ az webapp deployment source sync --name app-pm-exam-dx-prod --resource-group rg-
 
 ---
 
-## 7. CodeQL Advanced スキャン制御
+## 8. Staging 環境変数の管理
 
-### 7.1 方針
+### 8.1 必須環境変数（Staging）
+
+Staging デプロイ時に `az webapp config appsettings set` で設定する環境変数一覧。
+設定漏れはサービス障害（認証失敗・AI機能停止等）に直結するため、変数を追加する際は
+ワークフロー (`azure-app-service.yml`) の `Configure Staging App Service settings` ステップも
+同時に更新すること。
+
+| 環境変数 | 説明 | 値の管理方法 |
+|---------|------|------------|
+| `WEBSITE_RUN_FROM_PACKAGE` | App Service 実行方式 | `1` 固定 |
+| `WEBSITES_PORT` | Listen ポート | `8080` 固定 |
+| `AUTH_TRUST_HOST` | NextAuth ホスト自動検出 | `true` 固定 |
+| `AUTH_SECRET` | NextAuth JWT 暗号化 | `NEXTAUTH_SECRET_STAGING` シークレット |
+| `AUTH_GITHUB_ID` | GitHub OAuth | `AUTH_GITHUB_ID` シークレット |
+| `AUTH_GITHUB_SECRET` | GitHub OAuth | `AUTH_GITHUB_SECRET` シークレット |
+| `AUTH_GOOGLE_ID` | Google OAuth | `AUTH_GOOGLE_ID` シークレット |
+| `AUTH_GOOGLE_SECRET` | Google OAuth | `AUTH_GOOGLE_SECRET` シークレット |
+| `COSMOS_DB_CONNECTION` | CosmosDB 接続文字列 | `COSMOS_DB_CONNECTION` シークレット |
+| `TELEMETRY_CONNECTION_STRING` | Application Insights | `APPLICATIONINSIGHTS_CONNECTION_STRING` シークレット |
+| `STAGING_BYPASS_TOKEN` | Staging アクセストークン | `STAGING_BYPASS_TOKEN` シークレット |
+| `STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID` | バイパス対象アカウント | `STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID` シークレット |
+| `AI_CHAT_FUNCTION_URL` | Gemini プロキシ (US Function) | ワークフロー内に直接記載（公開エンドポイント） |
+
+### 8.2 AI_CHAT_FUNCTION_URL の重要性
+
+`AI_CHAT_FUNCTION_URL` が未設定の場合、AI 採点機能 (`/api/score`) および
+午後試験採点 API (`/api/ai/scoring/*`) は East Asia から Gemini API を直接呼び出そうとするが、
+Gemini API は East Asia リージョンをサポートしないため **Scoring failed** エラーが発生する。
+
+本番・Staging ともに同一の US リージョン Function App を経由する:
+```
+https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat
+```
+
+---
+
+## 9. CodeQL Advanced スキャン制御
+
+### 9.1 方針
 
 CodeQL Advanced は **public リポジトリでのみ**実行する。
 private リポジトリでは GitHub Advanced Security ライセンスが必要なため、ジョブレベルの条件でスキップする。
 
-### 7.2 実装
+### 9.2 実装
 
 `.github/workflows/codeql.yml` の `analyze` ジョブに以下の条件を設定する:
 
@@ -369,7 +407,7 @@ if: ${{ !github.event.repository.private }}
 - `private == true`（現在）→ ジョブをスキップ、ワークフロー自体は `success` で終了
 - `private == false`（public に変更後）→ 自動的に再有効化される
 
-### 7.3 public 再公開時の確認手順
+### 9.3 public 再公開時の確認手順
 
 リポジトリを public に変更した際は以下を確認すること:
 
@@ -380,5 +418,5 @@ if: ${{ !github.event.repository.private }}
 ---
 
 **作成日**: 2026-02-04
-**更新日**: 2026-05-09
+**更新日**: 2026-05-09（8章: Staging環境変数の管理、9章: CodeQL制御追加）
 **ステータス**: 設計完了
