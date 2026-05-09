@@ -141,3 +141,9 @@ packages/
 - null/undefined の未ハンドリング
 - 日付フォーマットのタイムゾーン問題
 - 配列の空チェック不足
+
+## Gotchas
+
+- `apps/web/app/api/score/route.ts` を含む AI 系 API は `AI_CHAT_FUNCTION_URL` の有無を先にチェックすること。未設定のまま East Asia からデプロイすると Gemini 地域制限でエラーになる。
+- self-inspect フック (pre-commit) は実装変更時に `docs/` の更新も要求する（R8 ルール）。実装ファイルを修正したら関連する `docs/02_design/*.md` の変更履歴・図を同時に更新すること。
+- Vitest で複数の env var を使うルートをテストするとき、`process.env.GEMINI_API_KEY = ''` だけでなく `delete process.env.AI_CHAT_FUNCTION_URL` も行わないと、別テストの env が残留して誤ったコードパスが実行される。
