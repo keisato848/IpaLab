@@ -23,11 +23,16 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'apps/web/**'
-      - 'packages/**'
-      - '.github/workflows/azure-app-service.yml'
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read

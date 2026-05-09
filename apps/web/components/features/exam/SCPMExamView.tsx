@@ -20,12 +20,14 @@ import { ScoreResult } from './AIAnswerBox';
 import {
     buildPMAnswerFieldId,
     buildPMDraftKey,
+    estimatePMAnswerDisplayMaxChars,
     extractAnswerLimit,
     getPMChoiceOptions,
     getPMCorrectChoiceIds,
     getPMChildAnswerItems,
     isPMChoiceCorrect,
     isPMMultipleChoice,
+    shouldUsePMGenkoyoshiInput,
     shouldRenderPMSectionAnswerItem,
 } from './pmAnswerUtils';
 // Replaced missing UI components with native elements
@@ -463,6 +465,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, onChoi
                                 key={q.id || idx}
                                 question={q}
                                 index={idx}
+                                subCategory={question.subCategory}
                                 parentQuestionId={question.id}
                                 parentContext={context}
                                 onGrade={onGrade ? (data, subSubIndex) => onGrade(data, idx, subSubIndex) : undefined}
@@ -482,7 +485,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, onChoi
 
 }
 
-function SubQuestionBlock({ question, index, parentQuestionId, parentContext, onGrade, onChoiceGrade, getInitialData }: { question: any, index: number, parentQuestionId: string, parentContext: any, onGrade?: (data: any, subSubIndex?: number) => void, onChoiceGrade?: (data: PMChoiceGradeData, subSubIndex?: number) => void, getInitialData?: (subSubIndex?: number) => any }) {
+function SubQuestionBlock({ question, index, subCategory, parentQuestionId, parentContext, onGrade, onChoiceGrade, getInitialData }: { question: any, index: number, subCategory?: string, parentQuestionId: string, parentContext: any, onGrade?: (data: any, subSubIndex?: number) => void, onChoiceGrade?: (data: PMChoiceGradeData, subSubIndex?: number) => void, getInitialData?: (subSubIndex?: number) => any }) {
     const normalizedQuestionText = useMemo(
         () => normalizeMermaidCodeBlocks(question.text),
         [question.text]
@@ -509,6 +512,7 @@ function SubQuestionBlock({ question, index, parentQuestionId, parentContext, on
                             key={sIdx}
                             sq={sq}
                             sIdx={sIdx}
+                            subCategory={subCategory}
                             answerFieldId={buildPMAnswerFieldId(parentQuestionId, index, sIdx)}
                             onGrade={onGrade ? (data) => onGrade(data, sIdx) : undefined}
                             onChoiceGrade={onChoiceGrade ? (data) => onChoiceGrade(data, sIdx) : undefined}
@@ -521,14 +525,23 @@ function SubQuestionBlock({ question, index, parentQuestionId, parentContext, on
     );
 }
 
-function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, onChoiceGrade, initialData }: { sq: any, sIdx: number, answerFieldId: string, onGrade?: (data: any) => void, onChoiceGrade?: (data: PMChoiceGradeData) => void, initialData?: any }) {
+function SubQuestionItem({ sq, sIdx, subCategory, answerFieldId, onGrade, onChoiceGrade, initialData }: { sq: any, sIdx: number, subCategory?: string, answerFieldId: string, onGrade?: (data: any) => void, onChoiceGrade?: (data: PMChoiceGradeData) => void, initialData?: any }) {
     const [showExplanation, setShowExplanation] = useState(false);
     const normalizedText = useMemo(
         () => normalizeMermaidCodeBlocks(sq.text),
         [sq.text]
     );
     const promptText = sq.promptText || sq.text || '';
+    const modelAnswer = sq.answer || sq.modelAnswer || '';
     const answerLimit = useMemo(() => extractAnswerLimit(promptText), [promptText]);
+    const answerDisplayMaxChars = useMemo(
+        () => answerLimit === undefined ? estimatePMAnswerDisplayMaxChars(modelAnswer, subCategory) : undefined,
+        [answerLimit, modelAnswer, subCategory]
+    );
+    const answerInputVariant = useMemo(
+        () => shouldUsePMGenkoyoshiInput(promptText, subCategory, modelAnswer) ? 'genkoyoshi' : 'textarea',
+        [promptText, subCategory, modelAnswer]
+    );
     const normalizedExplanation = useMemo(
         () => normalizeMermaidCodeBlocks(sq.explanation || ''),
         [sq.explanation]
@@ -564,13 +577,14 @@ function SubQuestionItem({ sq, sIdx, answerFieldId, onGrade, onChoiceGrade, init
                 <div style={{ marginTop: '1rem' }}>
                     <AIAnswerBox
                         questionText={`[${sq.label}] ${promptText}`}
-                        modelAnswer={sq.answer}
+                        modelAnswer={modelAnswer}
                         limit={answerLimit}
+                        displayMaxChars={answerDisplayMaxChars}
                         onSave={onGrade}
                         initialAnswer={initialData?.answer}
                         initialResult={initialData?.result}
                         draftKey={buildPMDraftKey(answerFieldId)}
-                        inputVariant="genkoyoshi"
+                        inputVariant={answerInputVariant}
                         hideChart={true}
                     />
                 </div>

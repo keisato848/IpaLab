@@ -12,6 +12,7 @@ const limitPattern = /(\d{1,4})\s*(?:字|文字)\s*(?:以内|以下|まで)/g;
 const symbolAnswerPattern = /(記号で答えよ|解答群の中から|選び、?記号|全て選び、?記号|二つ選び、?記号)/;
 const inlineChoiceBodyPattern = /(解答群\s*[：:]|[ア-ン]\s*[\.．、:：])/;
 const broadPromptPattern = /について[，、]?\s*答えよ[。.]?$/;
+const shortAnswerNoLimitPattern = /(表\d|図\d|属性|四則演算|計算|式|数値|整数|名称|機能名|ファイル|項目|アルファベット\s*\d*\s*字|用いて答えよ|求めよ|答えよ[。.]?$)/;
 const underlineRefPattern = /下線\s*([①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳]|\d{1,2})/g;
 const underlineEvidencePattern = /<u\b|underline|text-decoration/i;
 const choiceKeys = ['choices', 'options', 'answerChoices'];
@@ -22,10 +23,14 @@ const args = new Map(
         return match ? [match[1], match[2] ?? 'true'] : [arg, 'true'];
     }),
 );
-const jsonOutput = args.get('json') === 'true';
-const failOnFindings = args.get('fail-on-findings') === 'true';
-const categoriesArg = args.get('categories');
-const excludeArg = args.get('exclude');
+function argValue(name, envName = name.replaceAll('-', '_')) {
+    return args.get(name) ?? process.env[`npm_config_${envName}`];
+}
+
+const jsonOutput = argValue('json') === 'true';
+const failOnFindings = argValue('fail-on-findings') === 'true';
+const categoriesArg = argValue('categories');
+const excludeArg = argValue('exclude');
 const includeCategories = categoriesArg
     ? new Set(categoriesArg.split(',').map((value) => value.trim()).filter(Boolean))
     : null;
@@ -161,6 +166,7 @@ function makeStats() {
         symbolNoInlineChoiceBody: 0,
         sharedBroadChoiceGroup: 0,
         broadPromptNoLimit: 0,
+        shortAnswerNoLimit: 0,
     };
 }
 
@@ -313,6 +319,25 @@ for (const dirent of fs.readdirSync(questionsRoot, { withFileTypes: true })) {
                         text: promptText.replace(/\s+/g, ' ').slice(0, 120),
                     });
                 }
+
+                if (
+                    suffix !== 'PM2'
+                    && !symbolAnswer
+                    && choices.length === 0
+                    && limits.length === 0
+                    && shortAnswerNoLimitPattern.test(promptText.trim())
+                ) {
+                    fileStats.shortAnswerNoLimit++;
+                    addExample(examples, 'shortAnswerNoLimit', {
+                        examId,
+                        file: normalizePath(filePath),
+                        qNo: question.qNo,
+                        subQNo: item.label,
+                        source: item.source,
+                        line: findLine(filePath, promptText),
+                        text: promptText.replace(/\s+/g, ' ').slice(0, 120),
+                    });
+                }
             }
         }
 
@@ -349,10 +374,10 @@ if (jsonOutput) {
     console.log(`files=${total.files} mainQuestions=${total.mainQuestions} answerFields=${total.answerFields}`);
     console.log(`missingTargetCategories=${missingTargetCategories.join(',') || 'none'}`);
     console.log('');
-    console.log('| Category | Files | Main | Fields | Underline refs | No underline evidence | Ref missing | Parent+children | Explanation-only parent | Multiple limits | Symbol no choices | Broad no limit |');
-    console.log('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
+    console.log('| Category | Files | Main | Fields | Underline refs | No underline evidence | Ref missing | Parent+children | Explanation-only parent | Multiple limits | Symbol no choices | Broad no limit | Short no limit |');
+    console.log('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
     for (const [category, stats] of [...byCategory.entries()].sort(([a], [b]) => a.localeCompare(b))) {
-        console.log(`| ${category} | ${stats.files} | ${stats.mainQuestions} | ${stats.answerFields} | ${stats.underlineRefs} | ${stats.underlineNoEvidence} | ${stats.underlineRefMissing} | ${stats.parentDirectWithChildren} | ${stats.explanationOnlyParentWithChildren} | ${stats.multipleLimits} | ${stats.symbolNoStructuralChoices} | ${stats.broadPromptNoLimit} |`);
+        console.log(`| ${category} | ${stats.files} | ${stats.mainQuestions} | ${stats.answerFields} | ${stats.underlineRefs} | ${stats.underlineNoEvidence} | ${stats.underlineRefMissing} | ${stats.parentDirectWithChildren} | ${stats.explanationOnlyParentWithChildren} | ${stats.multipleLimits} | ${stats.symbolNoStructuralChoices} | ${stats.broadPromptNoLimit} | ${stats.shortAnswerNoLimit} |`);
     }
     console.log('');
     for (const [key, values] of Object.entries(examples)) {
@@ -371,6 +396,7 @@ const findingCount = total.underlineNoEvidence
     + total.symbolNoStructuralChoices
     + total.sharedBroadChoiceGroup
     + total.broadPromptNoLimit
+    + total.shortAnswerNoLimit
     + missingTargetCategories.length;
 
 if (failOnFindings && findingCount > 0) {

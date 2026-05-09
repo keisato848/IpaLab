@@ -160,6 +160,8 @@ npm run audit:afternoon-data
 npm run audit:afternoon-data -- --json
 ```
 
+Windows 環境では npm が `--json` や `--categories=SA` を npm 設定として扱う場合があるため、監査スクリプトは `npm_config_json` / `npm_config_categories` / `npm_config_exclude` / `npm_config_fail_on_findings` も読み取る。
+
 監査対象は `packages/data/data/questions/*-(PM|PM1|PM2)` で、AP / SA / PM / SC / ST / NW / FE / DB / AU / SM / ES を標準の確認対象とする。ローカルに `*-PM*` データが存在しない区分は `missingTargetCategories` に出力し、DB / AU / SM のような未抽出区分は既存データ修正ではなく公式PDFからの新規抽出工程へ進める。
 
 監査では以下を検出する。
@@ -169,8 +171,9 @@ npm run audit:afternoon-data -- --json
 - 1設問に複数の字数条件が混在し、解答欄分割が必要な疑い
 - 記号回答なのに `choices` / `options` / `answerChoices` がなく、設問文にも解答群本文がない疑い
 - 広い `〜について答えよ` 形式で字数条件がない親見出し欄
+- PM / PM1 の短答・式・表中属性回答で字数条件がなく、UI上で800字原稿用紙欄に見える疑い
 
-`self-inspect` R27 は、親見出しを直接解答欄化しない UI 判定と `scripts/audit-afternoon-data-quality.mjs` の存在を検査する。データ修正 PR では、監査結果、公式PDF照合対象、抽出対象区分、未修正の残リスクを PR 本文または `docs/04_reports/` の報告書に記録する。
+`self-inspect` R27 は、親見出しを直接解答欄化しない UI 判定、PM / PM1 の字数制限なし短答を公式解答例の約1.2倍（10字単位切上げ、最小20字）の表示用原稿用紙欄へ分岐する UI 判定、`scripts/audit-afternoon-data-quality.mjs` の存在と `shortAnswerNoLimit` 監査ルールを検査する。表示用マス数は採点を止める文字数制限ではなく、明示字数制限がない設問では超過しても警告や採点ブロックを出さない。データ修正 PR では、監査結果、公式PDF照合対象、抽出対象区分、未修正の残リスクを PR 本文または `docs/04_reports/` の報告書に記録する。
 
 #### 7.2.1 Gemini OCR Stage B 対象限定実行
 
