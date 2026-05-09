@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
     buildPMAnswerFieldId,
     buildPMDraftKey,
+    estimatePMAnswerDisplayMaxChars,
     extractAnswerLimit,
     getPMChoiceOptions,
     isPMChoiceCorrect,
     isPMMultipleChoice,
+    shouldUsePMGenkoyoshiInput,
     shouldRenderPMSectionAnswerItem,
 } from '@/components/features/exam/pmAnswerUtils';
 
@@ -17,6 +19,14 @@ describe('pmAnswerUtils', () => {
 
     it('複数の異なる字数制限がある場合は単一上限として扱わない', () => {
         expect(extractAnswerLimit('設定項目を15字以内で答えよ。また理由を25字以内で答えよ。')).toBeUndefined();
+    });
+
+    it('PM1の字数制限なし短答は公式解答例から原稿用紙サイズを推定する', () => {
+        expect(estimatePMAnswerDisplayMaxChars('比例: 所要時間×製造指示数, 一定: 所要時間', 'PM1')).toBe(30);
+        expect(shouldUsePMGenkoyoshiInput('表1中の属性と四則演算子を用いて答えよ。', 'PM1')).toBe(false);
+        expect(shouldUsePMGenkoyoshiInput('表1中の属性と四則演算子を用いて答えよ。', 'PM1', '比例: 所要時間×製造指示数, 一定: 所要時間')).toBe(true);
+        expect(shouldUsePMGenkoyoshiInput('40字以内で答えよ。', 'PM1')).toBe(true);
+        expect(shouldUsePMGenkoyoshiInput('論述せよ。', 'PM2')).toBe(true);
     });
 
     it('午後答案の保存キーと記録IDを同じ粒度で生成する', () => {

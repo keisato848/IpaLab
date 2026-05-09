@@ -18,6 +18,21 @@ export function extractAnswerLimit(text?: string | null): number | undefined {
     return limits.size === 1 ? [...limits][0] : undefined;
 }
 
+export function estimatePMAnswerDisplayMaxChars(modelAnswer?: string | null, subCategory?: string | null): number | undefined {
+    if ((subCategory || '').toUpperCase() === 'PM2') return undefined;
+    if (!hasText(modelAnswer)) return undefined;
+
+    const estimated = Math.ceil(Array.from(modelAnswer.trim()).length * 1.2);
+    return Math.ceil(Math.max(20, estimated) / 10) * 10;
+}
+
+export function shouldUsePMGenkoyoshiInput(text?: string | null, subCategory?: string | null, modelAnswer?: string | null): boolean {
+    if ((subCategory || '').toUpperCase() === 'PM2') return true;
+    if (extractAnswerLimit(text) !== undefined) return true;
+
+    return estimatePMAnswerDisplayMaxChars(modelAnswer, subCategory) !== undefined;
+}
+
 export function hasPMDirectAnswerContent(item: any): boolean {
     return hasText(item?.answer) || hasText(item?.explanation) || hasText(item?.modelAnswer);
 }

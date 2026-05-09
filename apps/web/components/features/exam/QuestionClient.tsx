@@ -35,7 +35,7 @@ import ExamSummary from './ExamSummary';
 import AIAnswerBox from './AIAnswerBox';
 import SCPMExamView from './SCPMExamView';
 import type { PMChoiceGradeData } from './SCPMExamView';
-import { buildPMAnswerFieldId, buildPMDraftKey, extractAnswerLimit } from './pmAnswerUtils';
+import { buildPMAnswerFieldId, buildPMDraftKey, estimatePMAnswerDisplayMaxChars, extractAnswerLimit, shouldUsePMGenkoyoshiInput } from './pmAnswerUtils';
 
 interface QuestionClientProps {
     question: Question;
@@ -700,6 +700,19 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         () => normalizeMermaidCodeBlocks(currentSubQ?.text || ''),
         [currentSubQ?.text]
     );
+    const currentAnswerLimit = useMemo(
+        () => extractAnswerLimit(currentSubQ?.text),
+        [currentSubQ?.text]
+    );
+    const currentModelAnswer = currentSubQ?.answer || currentSubQ?.modelAnswer || '';
+    const currentAnswerDisplayMaxChars = useMemo(
+        () => currentAnswerLimit === undefined ? estimatePMAnswerDisplayMaxChars(currentModelAnswer, type) : undefined,
+        [currentAnswerLimit, currentModelAnswer, type]
+    );
+    const currentAnswerInputVariant = useMemo(
+        () => shouldUsePMGenkoyoshiInput(currentSubQ?.text, type, currentModelAnswer) ? 'genkoyoshi' : 'textarea',
+        [currentSubQ?.text, type, currentModelAnswer]
+    );
     const normalizedOptionTextById = useMemo(
         () => new Map((question.options || []).map(opt => [opt.id, normalizeMermaidCodeBlocks(opt.text)])),
         [question.options]
@@ -862,12 +875,13 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                 </div>
                                 <AIAnswerBox
                                     questionText={`${question.text}\n\n${currentSubQ.text}`}
-                                    modelAnswer=""
-                                    limit={extractAnswerLimit(currentSubQ.text)}
+                                    modelAnswer={currentModelAnswer}
+                                    limit={currentAnswerLimit}
+                                    displayMaxChars={currentAnswerDisplayMaxChars}
                                     initialAnswer={descriptiveHistory[getSubQId(question.id, currentSubQIndex)]?.answer}
                                     initialResult={descriptiveHistory[getSubQId(question.id, currentSubQIndex)]?.result}
                                     draftKey={buildPMDraftKey(getSubQId(question.id, currentSubQIndex))}
-                                    inputVariant="genkoyoshi"
+                                    inputVariant={currentAnswerInputVariant}
                                     onSave={(data) => handleSaveAIScore(data, currentSubQIndex)}
                                 />
                             </div>

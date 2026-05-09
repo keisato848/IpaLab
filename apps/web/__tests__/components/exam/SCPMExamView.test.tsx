@@ -7,7 +7,14 @@ vi.mock('next/dynamic', () => ({
 }));
 
 vi.mock('@/components/features/exam/AIAnswerBox', () => ({
-    default: () => <div data-testid="ai-answer-box" />,
+    default: (props: any) => (
+        <div
+            data-testid="ai-answer-box"
+            data-input-variant={props.inputVariant}
+            data-limit={props.limit ?? ''}
+            data-display-max-chars={props.displayMaxChars ?? ''}
+        />
+    ),
 }));
 
 const question = {
@@ -139,5 +146,72 @@ describe('SCPMExamView', () => {
 
         expect(onChoiceGrade).toHaveBeenCalledWith(expect.objectContaining({ answer: 'ア,ウ', isCorrect: true }), 0, 0);
         expect(screen.getByText('正解')).toBeInTheDocument();
+    });
+
+    it('PM1の字数制限なし短答は公式解答例の1.2倍程度の原稿用紙にする', () => {
+        render(<SCPMExamView question={{
+            ...question,
+            examId: 'SA-2024-Spring-PM1',
+            id: 'SA-2024-Spring-PM1-1',
+            subCategory: 'PM1',
+            questions: [
+                {
+                    id: 'q1',
+                    subQNo: '設問1',
+                    text: '設問1',
+                    subQuestions: [
+                        {
+                            label: '(2)',
+                            text: '製造データを作成する際，各工程の想定所要時間はどのように求めるか。時間計算区分が“比例”又は“一定”のそれぞれについて，表1中の属性と，必要に応じて四則演算子を用いて答えよ。',
+                            answer: '比例: 所要時間×製造指示数, 一定: 所要時間',
+                        },
+                    ],
+                },
+            ],
+        } as any} />);
+
+        expect(screen.getByTestId('ai-answer-box')).toHaveAttribute('data-input-variant', 'genkoyoshi');
+        expect(screen.getByTestId('ai-answer-box')).toHaveAttribute('data-limit', '');
+        expect(screen.getByTestId('ai-answer-box')).toHaveAttribute('data-display-max-chars', '30');
+    });
+
+    it('PM1の明示字数制限は原稿用紙入力を維持する', () => {
+        render(<SCPMExamView question={{
+            ...question,
+            subCategory: 'PM1',
+            questions: [
+                {
+                    id: 'q1',
+                    subQNo: '設問1',
+                    text: '設問1',
+                    subQuestions: [
+                        { label: '(1)', text: '理由を40字以内で答えよ。', answer: '理由' },
+                    ],
+                },
+            ],
+        } as any} />);
+
+        expect(screen.getByTestId('ai-answer-box')).toHaveAttribute('data-input-variant', 'genkoyoshi');
+        expect(screen.getByTestId('ai-answer-box')).toHaveAttribute('data-limit', '40');
+        expect(screen.getByTestId('ai-answer-box')).toHaveAttribute('data-display-max-chars', '');
+    });
+
+    it('PM2論述は字数制限なしでも原稿用紙入力を維持する', () => {
+        render(<SCPMExamView question={{
+            ...question,
+            subCategory: 'PM2',
+            questions: [
+                {
+                    id: 'q1',
+                    subQNo: '設問ア',
+                    text: '設問ア',
+                    answer: '論述例',
+                },
+            ],
+        } as any} />);
+
+        expect(screen.getByTestId('ai-answer-box')).toHaveAttribute('data-input-variant', 'genkoyoshi');
+        expect(screen.getByTestId('ai-answer-box')).toHaveAttribute('data-limit', '');
+        expect(screen.getByTestId('ai-answer-box')).toHaveAttribute('data-display-max-chars', '');
     });
 });

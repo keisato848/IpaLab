@@ -60,6 +60,7 @@ interface AIAnswerBoxProps {
     questionText: string;
     modelAnswer?: string; // Optional, might be hidden in some modes
     limit?: number;
+    displayMaxChars?: number;
     initialAnswer?: string;
     initialResult?: ScoreResult;
     onSave?: (data: { answer: string; result: ScoreResult }) => void;
@@ -79,6 +80,7 @@ export default function AIAnswerBox({
     questionText,
     modelAnswer,
     limit,
+    displayMaxChars,
     initialAnswer = '',
     initialResult,
     onSave,
@@ -96,7 +98,7 @@ export default function AIAnswerBox({
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const isOverLimit = typeof limit === 'number' && answer.length > limit;
     const useGenkoyoshiInput = inputVariant === 'genkoyoshi';
-    const genkoyoshiMaxChars = limit ?? 800;
+    const genkoyoshiMaxChars = limit ?? displayMaxChars ?? 800;
     const normalizedFeedback = useMemo(
         () => normalizeMermaidCodeBlocks(result?.feedback || ''),
         [result?.feedback]
