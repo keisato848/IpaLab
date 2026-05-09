@@ -4,6 +4,8 @@
 
 | 日付 | 変更内容 |
 |------|------|
+| 2026-05-09 | `/api/score` Gemini 直接呼び出しフォールバック（ローカル開発用）に `systemInstruction: SYSTEM_PROMPT` を追加し、プロキシ経由と採点品質を統一。`export const runtime = 'nodejs'` を追加し Edge Runtime での誤動作リスクを解消。テストの `beforeEach` で `AI_CHAT_FUNCTION_URL` を必ず削除して環境依存を排除。 |
+| 2026-05-09 | `/api/score` が East Asia から Gemini API を直接呼び出せない地域制限バグを修正。`AI_CHAT_FUNCTION_URL` が設定されている場合は US リージョンの Azure Function (`aiChat`) を経由するプロキシ方式に変更。ローカル開発は従来通り直接呼び出し。 |
 | 2026-05-08 | 午後選択式UIのラジオ/チェックボックスに選択肢記号と本文を含むアクセシブル名を付与 |
 | 2026-05-08 | 午後個別問題ページの `qNo` 解決を完全一致に限定し、疎な `qNo` を位置番号で別問題へ誤解決するフォールバックを廃止 |
 | 2026-05-08 | 子設問を持つ説明だけの親見出しを解答欄化しない判定を追加し、800字欄化の再発防止を追加 |
@@ -68,7 +70,10 @@ graph TD
 
     LegacyPM --> ScoreApi[/api/score]
     NewPM --> ScoreApi
-    ScoreApi --> Gemini[Gemini API]
+    ScoreApi --> ProxyJudge{AI_CHAT_FUNCTION_URL あり?}
+    ProxyJudge -- あり --> USFunc[aiChat Azure Function\nUS East 2]
+    ProxyJudge -- なし --> Gemini[Gemini API\nローカル開発のみ]
+    USFunc --> Gemini
 
     QuestionClient --> LearningRecordsApi[/api/learning-records]
     QuestionClient --> ExamProgressApi[/api/exam-progress]
@@ -126,15 +131,27 @@ sequenceDiagram
     participant User as ユーザー
     participant Box as AIAnswerBox
     participant API as /api/score
+    participant Func as aiChat Azure Function (US)
     participant Gemini as Gemini API
 
     User->>Box: 回答を入力し採点を実行
     Box->>API: question / userAnswer / modelAnswer を送信
-    API->>Gemini: CLKS プロンプトを送信
-    Gemini-->>API: JSON 文字列を返却
+    alt AI_CHAT_FUNCTION_URL が設定済み（本番・Staging）
+        API->>Func: systemPrompt / userMessage を送信
+        Func->>Gemini: CLKS プロンプトを送信
+        Gemini-->>Func: テキスト（JSON）を返却
+        Func-->>API: { text } を返却
+    else AI_CHAT_FUNCTION_URL 未設定（ローカル開発）
+        API->>Gemini: CLKS プロンプトを送信
+        Gemini-->>API: JSON 文字列を返却
+    end
     API-->>Box: score / radarChartData / feedback を返却
     Box-->>User: スコア・フィードバック・改善例を表示
 ```
+
+> **注意**: Gemini API は East Asia リージョンから直接呼び出せない。本番・Staging では
+> `AI_CHAT_FUNCTION_URL` に US リージョンの Azure Function URL を設定すること。
+> 参照: `apps/web/.env.template`
 
 ### 4.3 採点結果の保存
 
@@ -169,7 +186,8 @@ sequenceDiagram
 
 | サービス | 用途 |
 |------|------|
-| Gemini API | 記述回答の採点とフィードバック生成 |
+| Azure Function App (aiChat, US East 2) | `/api/score` からのプロキシ中継。East Asia からの Gemini 地域制限を回避するために **必須** |
+| Gemini API | 記述回答の採点とフィードバック生成（Azure Function App 経由で呼び出す） |
 | Azure Cosmos DB LearningRecords | 採点結果の保存 |
 | Azure Cosmos DB LearningSessions | 認証ユーザーの進捗更新 |
 | Azure Cosmos DB ExamProgress | 午後問題の最新状態保存 |
@@ -182,9 +200,12 @@ sequenceDiagram
 
 | 変数名 | 必須 | 用途 | 備考 |
 |------|------|------|------|
-| `GEMINI_API_KEY` | 必須 | `/api/score` から Gemini API を呼ぶ | 未設定時は 500 を返す |
+| `AI_CHAT_FUNCTION_URL` | **本番・Staging 必須** | `/api/score` → US Azure Function プロキシ | 未設定時は `GEMINI_API_KEY` 直接呼び出し（ローカル開発用フォールバック）。East Asia から Gemini を直接呼ぶと地域制限エラーになるため、本番では必須。例: `https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat` |
+| `GEMINI_API_KEY` | ローカル開発のみ必須 | `AI_CHAT_FUNCTION_URL` 未設定時のフォールバック | 本番では `AI_CHAT_FUNCTION_URL` を設定するため不要。未設定かつ `AI_CHAT_FUNCTION_URL` も未設定の場合は 500 を返す |
 | `COSMOS_DB_CONNECTION` | サーバー運用上必須 | 採点結果の保存・セッション更新 | 未設定時は DB 保存を無効化 |
 | `NEXT_PUBLIC_API_BASE` | 任意 | クライアント API 呼び出し | 未設定時は `/api` |
+
+> **East Asia 地域制限について**: Azure App Service (East Asia) から Gemini API を直接呼び出すと `User location is not supported` エラーになる。すべての Gemini 呼び出しは US East 2 リージョンの Azure Function App (`aiChat`) を経由させること。`AI_CHAT_FUNCTION_URL` が未設定の場合のみ Gemini 直接呼び出しにフォールバックする（ローカル開発専用）。
 
 ---
 

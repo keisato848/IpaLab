@@ -1,33 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize Gemini
-const apiKey = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(apiKey || '');
+export const runtime = 'nodejs';
 
-export async function POST(req: NextRequest) {
-    if (!apiKey) {
-        return NextResponse.json({ error: 'GEMINI_API_KEY is not set' }, { status: 500 });
-    }
+// 採点用システムプロンプト
+const SYSTEM_PROMPT =
+    'あなたは情報処理技術者試験（IPA）の採点スペシャリストです。JSONフォーマットで結果を出力してください。余計な前置きや説明は不要です。';
 
-    try {
-        const body = await req.json();
-        const { question, userAnswer, modelAnswer } = body;
-
-        if (!question || !userAnswer) {
-            return NextResponse.json({ error: 'Missing question or user answer' }, { status: 400 });
-        }
-
-        const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash",
-            generationConfig: {
-                responseMimeType: "application/json",
-            }
-        });
-
-        const prompt = `
-あなたは情報処理技術者試験（IPA）の採点スペシャリストです。
-以下の記述式回答を、厳格な「CLKS評価モデル」に基づいて採点し、JSON形式で出力してください。
+/**
+ * 採点用プロンプトを生成する
+ */
+function buildScoringPrompt(question: string, userAnswer: string, modelAnswer?: string): string {
+    return `以下の記述式回答を、厳格な「CLKS評価モデル」に基づいて採点し、JSON形式で出力してください。
 
 # CLKS評価モデル
 1. **C (Context - 設問適合性)**: 設問の意図、制約条件、背景事情を捉えているか。
@@ -54,25 +38,75 @@ export async function POST(req: NextRequest) {
   "feedback": "具体的な改善点を含むフィードバック（200文字以内）",
   "mermaidDiagram": "採点結果を改善へ導くMermaid記法（graph TD）の文字列。例: graph TD; A[現状] --> B(改善策)...",
   "improvedAnswer": "CLKSを満たした改善回答例"
+}`;
 }
-`;
 
-        const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
+/**
+ * US リージョンの AI Function App エンドポイント経由で採点を実行する。
+ *
+ * Gemini API は East Asia リージョンから直接呼び出せないため、
+ * AI_CHAT_FUNCTION_URL が設定されている場合は US Azure Function を経由する。
+ */
+const AI_CHAT_FUNCTION_URL = process.env.AI_CHAT_FUNCTION_URL;
 
-        // Parse JSON safely
+// ローカル開発用フォールバック
+const apiKey = process.env.GEMINI_API_KEY;
+
+export async function POST(req: NextRequest) {
+    try {
+        const body = await req.json();
+        const { question, userAnswer, modelAnswer } = body;
+
+        if (!question || !userAnswer) {
+            return NextResponse.json({ error: 'Missing question or user answer' }, { status: 400 });
+        }
+
+        const prompt = buildScoringPrompt(question, userAnswer, modelAnswer);
+        let responseText: string;
+
+        if (AI_CHAT_FUNCTION_URL) {
+            // 本番: US Azure Function 経由（East Asia から Gemini への地域制限を回避）
+            const res = await fetch(AI_CHAT_FUNCTION_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ systemPrompt: SYSTEM_PROMPT, userMessage: prompt }),
+            });
+            if (!res.ok) {
+                throw new Error(`AI proxy failed: ${res.status} ${await res.text().catch(() => '')}`);
+            }
+            const data = (await res.json()) as { text?: string; error?: string };
+            if (data.error) throw new Error(data.error);
+            responseText = data.text ?? '';
+        } else {
+            // ローカル開発用: Gemini API 直接呼び出し
+            if (!apiKey) {
+                return NextResponse.json({ error: 'GEMINI_API_KEY is not set' }, { status: 500 });
+            }
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const model = genAI.getGenerativeModel({
+                model: 'gemini-2.5-flash',
+                systemInstruction: SYSTEM_PROMPT,
+                generationConfig: {
+                    responseMimeType: 'application/json',
+                },
+            });
+            const result = await model.generateContent(prompt);
+            responseText = result.response.text();
+        }
+
+        // JSON パース（Markdown コードブロック除去を含む）
+        const cleaned = responseText.trim().replace(/^```(?:json)?\s*/i, '').replace(/```$/i, '').trim();
         let data;
         try {
-            data = JSON.parse(responseText);
+            data = JSON.parse(cleaned);
         } catch (e) {
-            console.error("JSON Parse Error:", responseText);
+            console.error('JSON Parse Error:', responseText);
             return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 500 });
         }
 
         return NextResponse.json(data);
-
     } catch (error: any) {
-        console.error("Scoring API Error:", error);
-        return NextResponse.json({ error: "Scoring failed" }, { status: 500 });
+        console.error('Scoring API Error:', error);
+        return NextResponse.json({ error: 'Scoring failed' }, { status: 500 });
     }
 }
