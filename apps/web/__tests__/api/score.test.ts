@@ -8,6 +8,8 @@ describe('/api/score', () => {
         vi.resetModules();
         vi.clearAllMocks();
         process.env = { ...originalEnv };
+        // 環境依存を排除: AI_CHAT_FUNCTION_URL は各テストで明示的に設定する
+        delete process.env.AI_CHAT_FUNCTION_URL;
     });
 
     afterEach(() => {

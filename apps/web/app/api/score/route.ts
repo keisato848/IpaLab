@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+export const runtime = 'nodejs';
+
 // 採点用システムプロンプト
 const SYSTEM_PROMPT =
     'あなたは情報処理技術者試験（IPA）の採点スペシャリストです。JSONフォーマットで結果を出力してください。余計な前置きや説明は不要です。';
@@ -83,6 +85,7 @@ export async function POST(req: NextRequest) {
             const genAI = new GoogleGenerativeAI(apiKey);
             const model = genAI.getGenerativeModel({
                 model: 'gemini-2.5-flash',
+                systemInstruction: SYSTEM_PROMPT,
                 generationConfig: {
                     responseMimeType: 'application/json',
                 },
