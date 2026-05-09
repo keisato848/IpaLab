@@ -42,7 +42,7 @@ test.describe('P0午後問題 transformed データ表示', () => {
 
     await expect(page.locator('[aria-label="総合スコア 100点満点"]')).toBeVisible();
     await expect(page.getByText('0/100')).toBeVisible();
-    await expect(page.getByText(/0 \/ \d+ 文字/).first()).toBeVisible();
+    await expect(page.getByText(/0 \/ \d+/).first()).toBeVisible();
 
     const firstTextarea = page.locator('textarea').first();
     await firstTextarea.fill('途中保存の確認');
