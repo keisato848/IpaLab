@@ -2,13 +2,13 @@
   "questions": [
     {
       "qNo": 1,
-      "theme": "Algorithm: Finding the Maximum Value",
-      "description": "The function `maximum` takes three distinct integers (x, y, z) as arguments and returns the maximum value among them. We need to fill in the condition for the initial `if` statement.\n\n```pseudocode\n○整数型:maximum(整数型:x,整数型:y,整数型:z)\nif ( [  ] )\n  return x\nelseif (y > z)\n  return y\nelse\n  return z\nendif\n```",
+      "theme": "アルゴリズム (最大値の判定)",
+      "description": "関数 maximum は、異なる三つの整数を引数で受け取り、そのうちの最大値を返す。\n\n## プログラム\n\n```pseudocode\n○整数型: maximum(整数型: x, 整数型: y, 整数型: z)\nif ( [  ] )\n  return x\nelseif (y ＞ z)\n  return y\nelse\n  return z\nendif\n```\n\n## 解答群\n\nア x ＞ y\nイ x ＞ y and x ＞ z\nウ x ＞ y and y ＞ z\nエ x ＞ z\nオ x ＞ z and z ＞ y\nカ z ＞ y",
       "questions": [
         {
           "subQNo": "問1",
-          "text": "Fill the blank condition.",
-          "explanation": "The function aims to return the maximum of x, y, and z.\n\n### 処理の流れ\n```mermaid\ngraph TD\n    A[maximum(x, y, z)] --> B{x > y AND x > z?};\n    B -- Yes --> C[Return x];\n    B -- No (x is not max) --> D{y > z?};\n    D -- Yes --> E[Return y];\n    D -- No (y <= z) --> F[Return z];\n```\n\n1.  The first block `if ( [ ] ) return x` should execute only if `x` is the maximum value. For `x` to be the maximum, it must be greater than both `y` AND `z`.\n2.  The required condition is `x > y and x > z`.\n3.  If this condition is false, `x` is not the maximum. The process proceeds to check `elseif (y > z)`.\n4.  If `x` is not the maximum, and `y > z`, then `y` must be the maximum, and `y` is returned.\n5.  Otherwise (`else`), `x` is not the maximum, and `y <= z`. Therefore, `z` must be the maximum, and `z` is returned.\n\nThis confirms the initial condition must be `x > y and x > z` (Option イ).",
+          "text": "プログラム中の [  ] に入れる正しい答えを、解答群の中から選べ。",
+          "explanation": "最初の if 文で x を返すのは、x が y より大きく、かつ z より大きい場合でなければならない。三つの整数は互いに異なるので、この条件を満たすとき x が最大値である。したがって [  ] には `x ＞ y and x ＞ z` が入る。",
           "answer": "イ"
         }
       ],
@@ -17,13 +17,13 @@
     },
     {
       "qNo": 2,
-      "theme": "Algorithm: Binary to Decimal Conversion",
-      "description": "The function `convDecimal` converts a string consisting of '0's and '1's (representing an unsigned binary number) into its integer value. It uses an external function `int(char)`, which returns 0 if the character is '0' and 1 if it is '1'. The conversion uses the standard weighted sum approach.\n\nExample: \"10010\" -> 18.\n\n```pseudocode\n○整数型:convDecimal(文字列型:binary)\n整数型:i, length, result ← 0\nlength ← binaryの文字数\nfor(iを1から length まで 1 ずつ増やす)\n  result ← [  ]\nendfor\nreturn result\n```",
+      "theme": "アルゴリズム (2進数文字列の10進変換)",
+      "description": "関数 convDecimal は、引数として与えられた、“0”と“1”だけから成る、1文字以上の文字列を、符号なしの2進数と解釈したときの整数値を返す。例えば、引数として“10010”を与えると18が返る。関数 convDecimal が利用する関数 int は、引数で与えられた文字が“0”なら整数値0を返し、“1”なら整数値1を返す。\n\n## プログラム\n\n```pseudocode\n○整数型: convDecimal(文字列型: binary)\n整数型: i, length, result ← 0\nlength ← binaryの文字数\nfor (i を 1 から length まで 1 ずつ増やす)\n  result ← [  ]\nendfor\nreturn result\n```\n\n## 解答群\n\nア result ＋ int(binary の (length － i ＋ 1)文字目の文字)\nイ result ＋ int(binary の i文字目の文字)\nウ result × 2 ＋ int(binary の (length － i ＋ 1)文字目の文字)\nエ result × 2 ＋ int(binary の i文字目の文字)",
       "questions": [
         {
           "subQNo": "問2",
-          "text": "Fill the blank expression.",
-          "explanation": "The algorithm converts a binary string by iterating through its characters from left to right (Most Significant Bit first). This uses Horner's method for base conversion: $R_{new} = R_{old} \times 2 + b_i$.\n\n### 処理の流れ\n```mermaid\ngraph TD\n    A[Start convDecimal] --> B[result = 0, L = length];\n    B --> C{For i = 1 (MSB) to L (LSB)};\n    C --> D[bit_val = int(binary[i])];\n    D --> E[result = result * 2 + bit_val];\n    E --> C;\n    C --> F[Return result];\n```\n\nIf the input is \"10010\" (L=5), the loop processes `binary[1]` ('1'), `binary[2]` ('0'), ..., `binary[5]` ('0').\n\n1.  i=1: result = $0 \times 2 + 1 = 1$\n2.  i=2: result = $1 \times 2 + 0 = 2$\n3.  i=3: result = $2 \times 2 + 0 = 4$\n4.  i=4: result = $4 \times 2 + 1 = 9$\n5.  i=5: result = $9 \times 2 + 0 = 18$\n\nThe operation inside the loop must be `result × 2 + int(binary の i文字目の文字)`.\n\nThis corresponds to Option エ.",
+          "text": "プログラム中の [  ] に入れる正しい答えを、解答群の中から選べ。",
+          "explanation": "2進数を左から1文字ずつ読む場合、これまでの値を2倍して次の桁の値を加える。例えば“10010”では、0から始めて `1`, `2`, `4`, `9`, `18` と更新される。したがって更新式は `result × 2 ＋ int(binary の i文字目の文字)` である。",
           "answer": "エ"
         }
       ],
@@ -32,13 +32,13 @@
     },
     {
       "qNo": 3,
-      "theme": "Algorithm: Graph Representation Conversion (Edge List to Adjacency Matrix)",
-      "description": "The function `edgesToMatrix` converts a list of edges (`edgeList`) and the number of vertices (`nodeNum`) into an adjacency matrix (`adjMatrix`) for an undirected graph. The matrix is initialized to zeros. Since the graph is undirected, an edge between vertex $u$ and vertex $v$ requires setting both $adjMatrix[u][v]$ and $adjMatrix[v][u]$ to 1. Vertex indexing starts at 1.\n\n```pseudocode\n○整数型の二次元配列: edgesToMatrix(整数型配列の配列: edgeList,\n整数型: nodeNum)\n整数型の二次元配列: adjMatrix ← {nodeNum行nodeNum列の 0}\n整数型:i, u, v\nfor(iを1から edgeListの要素数 まで 1 ずつ増やす)\n  u ← edgeList[i][1]\n  v ← edgeList[i][2]\n  [  ]\nendfor\nreturn adjMatrix\n```",
+      "theme": "アルゴリズム (辺の配列から隣接行列への変換)",
+      "description": "図1に示すグラフの頂点には、1から順に整数で番号が付けられている。グラフは無向グラフであり、各頂点間には高々一つの辺がある。一つの辺は両端の頂点の番号を要素にもつ要素数2の整数型の配列で表現できる。例えば、{1, 3} は頂点1と頂点3を端点とする辺を表す。グラフ全体は、グラフに含まれる辺を表す要素数2の配列を全て格納した配列で表現できる。図1のグラフは整数型配列の配列 {{1, 3}, {1, 4}, {3, 4}, {2, 4}, {4, 5}} と表現できる。\n\n## 図1 グラフの例\n\n```text\n1 -- 3\n|    |\\\n|    | \\\n2 -- 4 -- 5\n```\n\n隣接行列とは、グラフに含まれる頂点の個数と等しい行数及び列数の正方行列で、i行j列の成分は頂点iと頂点jを結ぶ辺があるときに1となり、それ以外は0となる。行列の対角成分は全て0で、無向グラフの場合は対称行列になる。\n\n## 図2 図1のグラフを表現する隣接行列\n\n```text\n0 0 1 1 0\n0 0 0 1 0\n1 0 0 1 0\n1 1 1 0 1\n0 0 0 1 0\n```\n\n## プログラム\n\n```pseudocode\n○整数型の二次元配列: edgesToMatrix(整数型配列の配列: edgeList,\n  整数型: nodeNum)\n整数型の二次元配列: adjMatrix ← {nodeNum行nodeNum列の 0}\n整数型: i, u, v\nfor (i を 1 から edgeListの要素数 まで 1 ずつ増やす)\n  u ← edgeList[i][1]\n  v ← edgeList[i][2]\n  [  ]\nendfor\nreturn adjMatrix\n```\n\n## 解答群\n\nア adjMatrix[u, u] ← 1\nイ adjMatrix[u, u] ← 1 / adjMatrix[v, v] ← 1\nウ adjMatrix[u, v] ← 1\nエ adjMatrix[u, v] ← 1 / adjMatrix[v, u] ← 1\nオ adjMatrix[v, u] ← 1\nカ adjMatrix[v, v] ← 1",
       "questions": [
         {
           "subQNo": "問3",
-          "text": "Fill the blank statement.",
-          "explanation": "The loop iterates through every edge, extracting the two endpoints, $u$ and $v$. Since the graph is undirected, the presence of an edge $(u, v)$ means there is a connection both ways. The adjacency matrix must reflect this symmetry.\n\n### 処理の流れ\n```mermaid\ngraph TD\n    A[Start edgesToMatrix] --> B[Initialize adjMatrix to 0];\n    B --> C{For each edge i}; \n    C --> D[u = edgeList[i][1], v = edgeList[i][2]];\n    D --> E[Set adjMatrix[u, v] = 1];\n    E --> F[Set adjMatrix[v, u] = 1];\n    F --> C;\n    C --> G[Return adjMatrix];\n```\n\nWe must set the values for both directions: `adjMatrix[u, v] ← 1` and `adjMatrix[v, u] ← 1`.\n\nThis corresponds to Option エ.",
+          "text": "プログラム中の [  ] に入れる正しい答えを、解答群の中から選べ。",
+          "explanation": "無向グラフでは、頂点 u から頂点 v への辺があるとき、頂点 v から頂点 u への辺も同じく存在する。したがって隣接行列では `adjMatrix[u, v]` と `adjMatrix[v, u]` の両方を1にする必要がある。",
           "answer": "エ"
         }
       ],
@@ -47,13 +47,13 @@
     },
     {
       "qNo": 4,
-      "theme": "Algorithm: Merging Sorted Arrays",
-      "description": "The function `merge` combines two ascendingly sorted integer arrays, `data1` and `data2`, into a single sorted array, `work`. Array indices start at 1. The program uses three main loops: the first performs the main merge operation, the second copies remaining elements from `data1`, and the third copies remaining elements from `data2`.\n\nWe call `merge({2, 3}, {1, 4})`.\n\n```pseudocode\n// ... setup and first two while loops ...\n\nwhile (j ≤ n2)\nwork[k] ← data2[j] /*** α ***/\nj←j+1\nk←k+1\nendwhile\n\nreturn work\n```\nWe need to determine how many times the line marked `/*** α ***/` is executed.",
+      "theme": "アルゴリズム (整列済み配列の併合)",
+      "description": "関数 merge は、昇順に整列された整数型の配列 data1 及び data2 を受け取り、これらを併合してできる昇順に整列された整数型の配列を返す。関数 merge を `merge({2, 3}, {1, 4})` として呼び出すと、`/*** α ***/` の行は [  ]。\n\n## プログラム\n\n```pseudocode\n○整数型の配列: merge(整数型の配列: data1, 整数型の配列: data2)\n整数型: n1 ← data1の要素数\n整数型: n2 ← data2の要素数\n整数型の配列: work ← {(n1 ＋ n2)個の 未定義の値}\n整数型: i ← 1\n整数型: j ← 1\n整数型: k ← 1\nwhile ((i ≦ n1) and (j ≦ n2))\n  if (data1[i] ≦ data2[j])\n    work[k] ← data1[i]\n    i ← i ＋ 1\n  else\n    work[k] ← data2[j]\n    j ← j ＋ 1\n  endif\n  k ← k ＋ 1\nendwhile\nwhile (i ≦ n1)\n  work[k] ← data1[i]\n  i ← i ＋ 1\n  k ← k ＋ 1\nendwhile\nwhile (j ≦ n2)\n  work[k] ← data2[j] /*** α ***/\n  j ← j ＋ 1\n  k ← k ＋ 1\nendwhile\nreturn work\n```\n\n## 解答群\n\nア 実行されない\nイ 1回実行される\nウ 2回実行される\nエ 3回実行される",
       "questions": [
         {
           "subQNo": "問4",
-          "text": "How many times is the line `/*** α ***/` executed when calling `merge({2, 3}, {1, 4})`?",
-          "explanation": "We trace the execution with $data1=\\{2, 3\\}$ ($n1=2$) and $data2=\\{1, 4\\}$ ($n2=2$). Initial pointers: $i=1, j=1, k=1$.\n\n### Trace of the first `while` loop (Merging)\n\n| Step | i | j | data1[i] | data2[j] | Condition (d1[i] <= d2[j]) | Action (work[k] ← ...) | Pointers after | work | \n|---|---|---|---|---|---|---|---|---|\n| Initial | 1 | 1 | 2 | 1 | False | work[1] ← d2[1] (1), j++ | i=1, j=2, k=2 | {1, ...} | \n| 1 | 1 | 2 | 2 | 4 | True | work[2] ← d1[1] (2), i++ | i=2, j=2, k=3 | {1, 2, ...} | \n| 2 | 2 | 2 | 3 | 4 | True | work[3] ← d1[2] (3), i++ | i=3, j=2, k=4 | {1, 2, 3, ...} | \n\nThe main loop terminates because $i=3$ ($i \not\\le n1$).\n\n### Trace of the second `while` loop (Copy remaining d1)\n\nCondition: `while (i ≤ n1)` (while $3 \\le 2$). This is False. The loop executes 0 times.\n\n### Trace of the third `while` loop (Copy remaining d2)\n\nCondition: `while (j ≤ n2)` (while $j \\le 2$).\n\n| Step | j | k | Condition (j ≤ 2) | Action (*** α ***) | Pointers after | \n|---|---|---|---|---|---|\n| 1 | 2 | 4 | True | work[4] ← d2[2] (4), j++, k++ | j=3, k=5 | \n| 2 | 3 | 5 | False | Loop terminates | | \n\nThe line `/*** α ***/` is executed 1 time.\n\nThis corresponds to Option イ.",
+          "text": "次の記述中の [  ] に入れる正しい答えを、解答群の中から選べ。",
+          "explanation": "data1={2,3}、data2={1,4} として併合処理を追う。最初に 1 が data2 から work に入り、次に 2 と 3 が data1 から入る。この時点で data1 の要素は尽き、data2 には 4 が一つ残る。最後の while で 4 をコピーするとき `/*** α ***/` の行が1回だけ実行される。",
           "answer": "イ"
         }
       ],
@@ -62,13 +62,13 @@
     },
     {
       "qNo": 5,
-      "theme": "Data Mining: Item Relatedness Calculation",
-      "description": "The program `putRelatedItem` calculates item relatedness $L_{xy}$ based on purchase data (`orders`). $L_{xy}$ is defined as:\n\n$$L_{xy} = \\frac{M_{xy} \\times \\text{Total Orders}}{K_x \\times K_y}$$\n\n$M_{xy}$: Number of orders containing both $x$ and $y$ (stored in `arrayM`).\n$K_x$: Number of orders containing $x$ (stored in `itemCount`).\n$K_y$: Number of orders containing $y$ (stored in `arrayK`).\nTotal Orders: Number of orders in the `orders` array.\n\nWe need to determine the correct variables for blanks `a`, `b`, and `c`.\n\n### Program Snippets\n\n**Snippet 1: Counting Mxy and Ky**\n```pseudocode\n// ... inside for (order in orders) loop ...\n\n// Kx (itemCount) is updated if X is present.\n\nfor(iを1からotherItemsの要素数まで1ずつ増やす) // i indexes candidate item Y = otherItems[i]\n  if (orderのいずれかの要素の値がotherItems[i]の値と等しい) // Y is present\n    if (orderのいずれかの要素の値がitemの値と等しい) // X is present\n      [ a ] の値を1増やす\n    endif\n    [ b ] の値を1増やす\n  endif\nendfor\n```\n\n**Snippet 2: Calculating Lxy**\n```pseudocode\nfor(iを1からotherItemsの要素数まで1ずつ増やす)\n  valueL ← (arrayM[i] × [ c ]) ÷ (itemCount × arrayK[i])\n// ... \n```",
+      "theme": "データ活用 (商品の関連度計算)",
+      "description": "一度の注文で購入された商品のリストを、注文ごとに記録した注文データがある。商品 x と商品 y とが同一の注文で購入されやすい傾向を示す関連度 Lxy を、次の式で計算する。\n\n`Lxy = Mxy × 全注文数 ÷ (Kx × Ky)`\n\nMxy は商品 x と商品 y とが同一の注文で購入された注文数、Kx は商品 x が購入された注文数、Ky は商品 y が購入された注文数を表す。手続 putRelatedItem は、大域変数 orders に格納された注文データを基に、引数で与えられた商品との関連度が最も大きい商品のうちの一つと、その関連度を出力する。\n\n## プログラム抜粋\n\n```pseudocode\nfor (orderにordersの要素を順に代入する)\n  if (orderのいずれかの要素の値がitemの値と等しい)\n    itemCountの値を1増やす\n  endif\n  for (iを1からotherItemsの要素数まで1ずつ増やす)\n    if (orderのいずれかの要素の値がotherItems[i]の値と等しい)\n      if (orderのいずれかの要素の値がitemの値と等しい)\n        [ a ] の値を1増やす\n      endif\n      [ b ] の値を1増やす\n    endif\n  endfor\nendfor\nfor (iを1からotherItemsの要素数まで1ずつ増やす)\n  valueL ← (arrayM[i] × [ c ]) ÷ (itemCount × arrayK[i])\nendfor\n```\n\n## 解答群\n\n| | a | b | c |\n|---|---|---|---|\n| ア | arrayK[i] | arrayM[i] | allItemsの要素数 |\n| イ | arrayK[i] | arrayM[i] | ordersの要素数 |\n| ウ | arrayK[i] | arrayM[i] | otherItemsの要素数 |\n| エ | arrayM[i] | arrayK[i] | allItemsの要素数 |\n| オ | arrayM[i] | arrayK[i] | ordersの要素数 |\n| カ | arrayM[i] | arrayK[i] | otherItemsの要素数 |",
       "questions": [
         {
           "subQNo": "問5",
-          "text": "Determine the correct combination of answers for a, b, and c.",
-          "explanation": "### 1. Determining [ a ] and [ b ] (Counts)\n\nWe analyze Snippet 1. The outer `for (order in orders)` iterates through all purchase records.\n\n*   `[ a ]` is incremented when both $X$ (`item`) and $Y$ (`otherItems[i]`) are present in the current `order`. Therefore, `[ a ]` tracks $M_{xy}$. $M_{xy}$ is stored in `arrayM[i]`. So, **a = arrayM[i]**.\n*   `[ b ]` is incremented whenever $Y$ (`otherItems[i]`) is present in the current `order`, regardless of $X$'s presence. Therefore, `[ b ]` tracks $K_y$. $K_y$ is stored in `arrayK[i]`. So, **b = arrayK[i]**.\n\n### 2. Determining [ c ] (Total Orders)\n\nWe analyze Snippet 2 using the formula $L_{xy} = (M_{xy} \times \\text{Total Orders}) / (K_x \times K_y)$.\n\nIn the pseudo-code:\n`valueL ← (arrayM[i] × [ c ]) ÷ (itemCount × arrayK[i])`\n\nBy comparing this to the formula, `[ c ]` must represent the Total Number of Orders. This value is given by the length of the global array `orders`.\n\nSo, **c = ordersの要素数**.\n\nMatching the results:\n*   a: arrayM[i]\n*   b: arrayK[i]\n*   c: ordersの要素数\n\nThis matches Option オ.",
+          "text": "プログラム中の [ a ] 〜 [ c ] に入れる正しい答えの組合せを、解答群の中から選べ。",
+          "explanation": "[ a ] は item と otherItems[i] が同一注文に含まれるときに増えるので Mxy を表す `arrayM[i]` である。[ b ] は otherItems[i] が注文に含まれるたびに増えるので Ky を表す `arrayK[i]` である。式 `Lxy = Mxy × 全注文数 ÷ (Kx × Ky)` と対応させると、[ c ] は全注文数、すなわち `ordersの要素数` である。",
           "answer": "オ"
         }
       ],
@@ -77,13 +77,13 @@
     },
     {
       "qNo": 6,
-      "theme": "Information Security: Telework Architecture and Risk Mitigation",
-      "description": "Company A uses a telework system where employees connect to internal PCs via Remote Desktop (RDP) from their private PCs (BYOD). Access to A's cloud services (SaaS) is currently restricted only to traffic originating from the A internal network.\n\nTo resolve network congestion caused by RDP tunneling cloud traffic through the internal network, A plans to allow direct connections from private PCs over the Internet to the cloud services, bypassing the internal network.\n\nThis change increases the risk of unauthorized access to A社のSaaS because the network access restriction is removed. The question asks for the most appropriate countermeasure to mitigate this specific risk.\n\n### A社のシステム環境 (抜粋)\n```mermaid\ngraph TD\n    P[私有 PC (Private PC)]\n    R[社内 PC (Internal PC)]\n    I[インターネット (Internet)]\n    N[A社 社内ネットワーク]\n    S[A社利用クラウドサービス (SaaS)]\n    \n    subgraph Current Configuration\n        P -- RDP --> I\n        I --> R\n        R --> N\n        N -- Allowed --> S\n        I -- Blocked/Restricted --> S\n    end\n    \n    subgraph Planned Configuration\n        P -- Direct Connection --> I\n        I -- New Direct Access --> S\n    end\n```",
+      "theme": "情報セキュリティ (テレワーク環境のリスク低減)",
+      "description": "A社は従業員450名の商社であり、昨年から働き方改革の一環として、在宅でのテレワークを推進している。従業員には一人に1台社内PCを貸与しており、テレワークでは私有PCの業務利用を許可している。社内PC及び私有PCには専用アプリを導入し、社内PCのデスクトップから私有PCに画面転送を行うリモートデスクトップ方式を採用している。\n\nA社利用クラウドサービスへのログインは、A社利用クラウドサービス側の設定によってA社の社内ネットワークからだけ可能になるように制限している。ログインには利用者ID及びパスワードを用いている。\n\nテレワークの定着が進むにつれて、社内PCからインターネットへの接続が極端に遅くなり、業務に支障をきたしているので改善できないかと従業員から問合せがあった。A社の社内ネットワークとインターネットとの間の通信量を調査したところ、テレワーク導入前に比べ、業務時間帯で顕著に増加していることが判明した。そのため、情報システム部では、テレワークでA社利用クラウドサービスに接続する場合には、A社の社内ネットワークも社内PCも介さずに直接接続することを可能にするネットワークの設定変更を実施することにした。\n\n設定変更に当たり、情報セキュリティ上の問題がないかをA社の情報セキュリティリーダーであるBさんが検討したところ、A社利用クラウドサービスへの不正アクセスのリスクが増加することが分かった。\n\n## 解答群\n\nア A社の社内ネットワークからA社利用クラウドサービスへの通信を監視する。\nイ A社の社内ネットワークとA社利用クラウドサービスとの間の通信速度を制限する。\nウ A社利用クラウドサービスにA社外から接続する際の認証に2要素認証を導入する。\nエ A社利用クラウドサービスのうち、A社利用グループウェアだけを直接接続の対象とする。\nオ 専用アプリの保存禁止機能を無効にする。",
       "questions": [
         {
           "subQNo": "設問",
-          "text": "Which of the following is the most appropriate countermeasure to mitigate the risk of unauthorized access to A社のSaaS due to the change in network configuration?",
-          "explanation": "The critical security change is removing the requirement that connections must originate from the secure internal network (N). Previously, the internal network boundary acted as a strong barrier against unauthorized external access.\n\nBy allowing direct connections from the public Internet (P -> I -> S), the authentication mechanism becomes the primary defense. Standard ID/Password authentication is often insufficient when exposed directly to the Internet.\n\n### Risk Mitigation Analysis\n\n```mermaid\nsequenceDiagram\n    participant U as Unauthorized User (Private PC)\n    participant S as A社利用クラウドサービス (SaaS)\n    \n    alt Current State (Secure)\n        U->>S: Access Attempt (Fails)\n        Note right of S: Blocked by IP Restriction\n    end\n    \n    alt New Configuration (Risk)\n        U->>S: Access Attempt (ID/PW Only)\n        S-->>U: Vulnerable to credential compromise\n    end\n    \n    alt Proposed Solution (Mitigation)\n        U->>S: Access Attempt (ID/PW + 2FA)\n        S-->>U: 2FA required for external connection\n    end\n```\n\nTo compensate for the removal of the network boundary protection, the identity authentication mechanism must be strengthened. Introducing Multi-Factor Authentication (MFA), such as Two-Factor Authentication (2要素認証), is the standard and most effective way to drastically reduce the risk of unauthorized access resulting from compromised passwords.\n\nOption ウ directly addresses this security deficiency.\n\n*   ア (Monitoring internal traffic) is irrelevant to external connections.\n*   イ (Limiting speed) addresses performance/congestion, not security risk.\n*   エ (Limiting scope) is a partial mitigation but fails to strengthen the authentication for the services that *are* enabled for direct access.\n*   オ (Disabling prevention features) increases data risk, moving in the wrong direction.\n\nTherefore, Option ウ is the most appropriate measure.",
+          "text": "次の対策のうち、情報システム部に依頼することにしたものはどれか。解答群のうち、最も適切なものを選べ。",
+          "explanation": "A社利用クラウドサービスへの接続を社外から直接可能にすると、従来の接続元制限による防御が弱まる。リスクを低減するには、利用者IDとパスワードだけに依存せず、社外からの接続時の認証を強化する必要がある。2要素認証を導入すれば、パスワードが漏えいした場合でも不正ログインの可能性を下げられる。",
           "answer": "ウ"
         }
       ],

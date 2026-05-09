@@ -11,7 +11,7 @@
           "id": "fig1",
           "label": "図1 D社のネットワーク構成",
           "type": "mermaid",
-          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((\"インターネット\")) --- FW[FW]\n\n    subgraph Server_Seg [サーバセグメント 192.168.1.0/24]\n        L2SW1[L2SW]\n        LDAP[LDAPサーバ] --- L2SW1\n        CRM[CRMサーバ] --- L2SW1\n    end\n\n    subgraph PC_Seg [PCセグメント 192.168.0.0/24]\n        L2SW2[L2SW]\n        PC[PC]\n        AdminPC[管理用PC]\n        PC --- L2SW2\n        AdminPC --- L2SW2\n    end\n\n    FW --- L2SW1\n    FW --- L2SW2\n\n    %% 注記等のテキスト表現\n    %% FW: ファイアウォール\n    %% L2SW: レイヤ2スイッチ\n    %% (イ) MAC: zz:zz:zz:bb:bb:01 / IP: 192.168.1.1\n    %% (ア) MAC: zz:zz:zz:bb:bb:02 / IP: 192.168.1.2 (CRMサーバ)\n    %% (オ) MAC: xx:xx:xx:aa:aa:01 / IP: 192.168.0.1 (FW)\n    %% (カ) MAC: xx:xx:xx:aa:aa:02 / IP: 192.168.0.2 (AdminPC)\n    %% (キ) MAC: xx:xx:xx:aa:aa:c8 / IP: 192.168.0.200 (PC)\n[/CODE_BLOCK]"
+          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    Internet((\"インターネット\")) --- FW[FW]\n\n    subgraph Server_Seg [サーバセグメント 192.168.1.0/24]\n        L2SW1[L2SW]\n        LDAP[LDAPサーバ] --- L2SW1\n        CRM[CRMサーバ] --- L2SW1\n    end\n\n    subgraph PC_Seg [PCセグメント 192.168.0.0/24]\n        L2SW2[L2SW]\n        PC[PC]\n        AdminPC[管理用PC]\n        PC --- L2SW2\n        AdminPC --- L2SW2\n    end\n\n    FW --- L2SW1\n    FW --- L2SW2\n\n    %% 注記等のテキスト表現\n    %% FW: ファイアウォール\n    %% L2SW: レイヤ2スイッチ\n    %% (ア) MAC: yy:yy:yy:bb:bb:fe / IP: 192.168.1.254 (FW サーバセグメント側)\n    %% (イ) MAC: zz:zz:zz:bb:bb:01 / IP: 192.168.1.1 (LDAPサーバ)\n    %% (ウ) MAC: zz:zz:zz:bb:bb:02 / IP: 192.168.1.2 (CRMサーバ)\n    %% (エ) MAC: yy:yy:yy:aa:aa:fe / IP: 192.168.0.254 (FW PCセグメント側)\n    %% (オ) MAC: xx:xx:xx:aa:aa:01 / IP: 192.168.0.1 (管理用PC)\n    %% (カ) MAC: xx:xx:xx:aa:aa:02 / IP: 192.168.0.2 (AさんのPC)\n    %% (キ) MAC: xx:xx:xx:aa:aa:c8 / IP: 192.168.0.200 (PC)\n[/CODE_BLOCK]"
         },
         {
           "id": "table1",
@@ -24,6 +24,12 @@
           "label": "図3 W氏が推測したサーバへの不正侵入手順（抜粋）",
           "type": "image",
           "content": "1. マルウェアに感染したAさんのPCを遠隔操作する。\n2. AさんのPC上でARPポイズニングを用いて、通信を盗聴する。\n3. AさんのPC上で通信を盗聴して、LDAPサーバのIPアドレスを特定する。\n4. AさんのPC上でLDAP通信を盗聴して、従業員の利用者IDとパスワードを収集する。\n5. AさんのPCからLDAPサーバ及びCRMサーバのSSHポートへのアクセスを試みるが、失敗する。\n6. AさんのPC上で通信を盗聴して、管理用PCのIPアドレスを特定する。\n7. AさんのPC上で通信を盗聴して、サーバ管理者であるY主任の利用者IDとパスワードを入手する。\n8. AさんのPC上で管理用PCのIPアドレスを詐称して、LDAPサーバ及びCRMサーバのSSHポートにアクセスし、Y主任のIDとパスワードでログインする。"
+        },
+        {
+          "id": "fig4",
+          "label": "図4 変更後のD社のネットワーク構成",
+          "type": "mermaid",
+          "content": "[CODE_BLOCK:mermaid]\ngraph LR\n    Internet((\"インターネット\")) --- FW[FW]\n    FW --- A[\"(A) サーバセグメント\"]\n    FW --- B[\"(B) サーバ管理セグメント\"]\n    FW --- C[\"(C) PCセグメント\"]\n    A --- LDAP[LDAPサーバ]\n    A --- CRM[CRMサーバ]\n    B --- AdminPC[管理用PC]\n    C --- PC[PC]\n[/CODE_BLOCK]"
         }
       ]
     },
@@ -38,7 +44,16 @@
             "references": [
               "fig1"
             ],
-            "answer": "a: カ, b: カ, c: オ"
+            "answer": "a: カ, b: オ, c: エ",
+            "answerChoices": [
+              "ア FW サーバセグメント側 MACアドレス yy:yy:yy:bb:bb:fe",
+              "イ LDAPサーバ MACアドレス zz:zz:zz:bb:bb:01",
+              "ウ CRMサーバ MACアドレス zz:zz:zz:bb:bb:02",
+              "エ FW PCセグメント側 MACアドレス yy:yy:yy:aa:aa:fe",
+              "オ 管理用PC MACアドレス xx:xx:xx:aa:aa:01",
+              "カ AさんのPC MACアドレス xx:xx:xx:aa:aa:02",
+              "キ PC MACアドレス xx:xx:xx:aa:aa:c8"
+            ]
           },
           {
             "label": "(2)",
@@ -46,7 +61,7 @@
             "references": [
               "table1"
             ],
-            "answer": "1"
+            "answer": "5"
           },
           {
             "label": "(3)",
@@ -55,7 +70,18 @@
               "fig1",
               "table1"
             ],
-            "answer": "イ"
+            "answer": "送信元: ケ, 宛先: カ, サービス: キ",
+            "answerChoices": [
+              "ア ARP",
+              "イ AさんのPC",
+              "ウ FW",
+              "エ HTTP over TLS",
+              "オ LDAP",
+              "カ LDAPサーバ",
+              "キ SSH",
+              "ク インターネット",
+              "ケ 管理用PC"
+            ]
           }
         ]
       },
@@ -82,8 +108,15 @@
           {
             "label": "(2)",
             "text": "本文中の下線④について、TCPコネクション確立開始時のSYNパケットとSYN-ACKパケットはそれぞれどのような経路をたどるか。図4中の経路を通る順に選び、(A)〜(C)の記号で答えよ。",
-            "references": [],
-            "answer": "SYNパケット: A, SYN-ACKパケット: A"
+            "references": [
+              "fig4"
+            ],
+            "answer": "SYNパケット: C→A, SYN-ACKパケット: A→B",
+            "answerChoices": [
+              "(A) サーバセグメントとFW間の経路",
+              "(B) サーバ管理セグメントとFW間の経路",
+              "(C) PCセグメントとFW間の経路"
+            ]
           }
         ]
       }

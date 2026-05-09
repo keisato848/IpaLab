@@ -13,6 +13,7 @@ const symbolAnswerPattern = /(記号で答えよ|解答群の中から|選び、
 const inlineChoiceBodyPattern = /(解答群\s*[：:]|[ア-ン]\s*[\.．、:：])/;
 const broadPromptPattern = /について[，、]?\s*答えよ[。.]?$/;
 const shortAnswerNoLimitPattern = /(表\d|図\d|属性|四則演算|計算|式|数値|整数|名称|機能名|ファイル|項目|アルファベット\s*\d*\s*字|用いて答えよ|求めよ|答えよ[。.]?$)/;
+const englishTextFragmentPattern = /\b(?:The function|Fill the blank|Which of the following|Determine the correct|This corresponds|Current Configuration|Planned Configuration|Risk Mitigation|Unauthorized|Private PC|Internal PC|By allowing|Therefore, Option|Diagram content for|Security Measures Review|Risk Assessment concerning|Web Application Program Development)\b/i;
 const underlineRefPattern = /下線\s*([①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳]|\d{1,2})/g;
 const underlineEvidencePattern = /<u\b|underline|text-decoration/i;
 const choiceKeys = ['choices', 'options', 'answerChoices'];
@@ -167,12 +168,36 @@ function makeStats() {
         sharedBroadChoiceGroup: 0,
         broadPromptNoLimit: 0,
         shortAnswerNoLimit: 0,
+        englishTextFragments: 0,
     };
 }
 
 function addExample(examples, key, value) {
     if (!examples[key]) examples[key] = [];
     if (examples[key].length < 8) examples[key].push(value);
+}
+
+function textFragments(question) {
+    const fragments = [
+        ['theme', question?.theme],
+        ['description', question?.description],
+        ['context.title', question?.context?.title],
+        ['context.background', question?.context?.background],
+    ];
+    for (const diagram of question?.context?.diagrams || []) {
+        const diagramName = diagram.id || diagram.label || 'unknown';
+        fragments.push([`diagram.${diagramName}.label`, diagram.label]);
+        fragments.push([`diagram.${diagramName}.content`, diagram.content]);
+    }
+    for (const section of sections(question)) {
+        fragments.push([`section.${section.subQNo || section.label || 'unknown'}.text`, section.text]);
+        fragments.push([`section.${section.subQNo || section.label || 'unknown'}.explanation`, section.explanation]);
+        for (const child of childItems(section)) {
+            fragments.push([`child.${child.label || child.subQNo || 'unknown'}.text`, child.text]);
+            fragments.push([`child.${child.label || child.subQNo || 'unknown'}.explanation`, child.explanation]);
+        }
+    }
+    return fragments;
 }
 
 if (!fs.existsSync(questionsRoot)) {
@@ -216,6 +241,20 @@ for (const dirent of fs.readdirSync(questionsRoot, { withFileTypes: true })) {
     for (const question of questions) {
         const contextText = JSON.stringify(question?.context || question?.description || question?.background || '');
         const questionChoiceSignatures = new Map();
+
+        for (const [location, value] of textFragments(question)) {
+            const fragment = text(value).trim();
+            if (!fragment || !englishTextFragmentPattern.test(fragment)) continue;
+            fileStats.englishTextFragments++;
+            addExample(examples, 'englishTextFragments', {
+                examId,
+                file: normalizePath(filePath),
+                qNo: question.qNo,
+                location,
+                line: findLine(filePath, fragment),
+                text: fragment.replace(/\s+/g, ' ').slice(0, 120),
+            });
+        }
 
         for (const section of sections(question)) {
             const children = childItems(section);
@@ -374,10 +413,10 @@ if (jsonOutput) {
     console.log(`files=${total.files} mainQuestions=${total.mainQuestions} answerFields=${total.answerFields}`);
     console.log(`missingTargetCategories=${missingTargetCategories.join(',') || 'none'}`);
     console.log('');
-    console.log('| Category | Files | Main | Fields | Underline refs | No underline evidence | Ref missing | Parent+children | Explanation-only parent | Multiple limits | Symbol no choices | Broad no limit | Short no limit |');
-    console.log('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
+    console.log('| Category | Files | Main | Fields | Underline refs | No underline evidence | Ref missing | Parent+children | Explanation-only parent | Multiple limits | Symbol no choices | Broad no limit | Short no limit | English fragments |');
+    console.log('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
     for (const [category, stats] of [...byCategory.entries()].sort(([a], [b]) => a.localeCompare(b))) {
-        console.log(`| ${category} | ${stats.files} | ${stats.mainQuestions} | ${stats.answerFields} | ${stats.underlineRefs} | ${stats.underlineNoEvidence} | ${stats.underlineRefMissing} | ${stats.parentDirectWithChildren} | ${stats.explanationOnlyParentWithChildren} | ${stats.multipleLimits} | ${stats.symbolNoStructuralChoices} | ${stats.broadPromptNoLimit} | ${stats.shortAnswerNoLimit} |`);
+        console.log(`| ${category} | ${stats.files} | ${stats.mainQuestions} | ${stats.answerFields} | ${stats.underlineRefs} | ${stats.underlineNoEvidence} | ${stats.underlineRefMissing} | ${stats.parentDirectWithChildren} | ${stats.explanationOnlyParentWithChildren} | ${stats.multipleLimits} | ${stats.symbolNoStructuralChoices} | ${stats.broadPromptNoLimit} | ${stats.shortAnswerNoLimit} | ${stats.englishTextFragments} |`);
     }
     console.log('');
     for (const [key, values] of Object.entries(examples)) {
@@ -397,6 +436,7 @@ const findingCount = total.underlineNoEvidence
     + total.sharedBroadChoiceGroup
     + total.broadPromptNoLimit
     + total.shortAnswerNoLimit
+    + total.englishTextFragments
     + missingTargetCategories.length;
 
 if (failOnFindings && findingCount > 0) {

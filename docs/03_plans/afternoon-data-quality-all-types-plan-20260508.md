@@ -46,6 +46,9 @@
 | 2026-05-09 | 受講者想定の午後回答 E2E fixture を追加し、テスト答案入力、下書き保存、採点結果表示、ゲスト履歴保存、再読み込み復元を検証するフローを追加 |
 | 2026-05-09 | 受講者想定E2Eで検出した `question.id` 欠落時の `undefined` 下書きキー・保存IDを、`examId-qNo` 基底ID生成へ修正 |
 | 2026-05-09 | E2E エビデンス報告書が過去画像全件を再掲しないよう、今回実行開始後に生成されたスクリーンショットだけへ絞り込み |
+| 2026-05-09 | FE-2024-Public-PM の英語混入データを公式PDFベースの日本語本文・選択肢・解説へ補正し、監査に `englishTextFragments` を追加 |
+| 2026-05-09 | AI抽出は Gemini API ではなく同一ローカルネットワーク上の Ollama `gemma4:31b` を標準とする方針へ更新 |
+| 2026-05-09 | SC-2017-Spring-PM1 qNo=1 の図1・図4関連設問について、公式解答PDFに基づき記号解答・項番・SYN/SYN-ACK経路を補正 |
 
 ## 1. 目的
 
@@ -90,6 +93,7 @@
 | 記号回答 | `choices` / `options` / `answerChoices` 欠落と、設問文内解答群欠落を検出する |
 | 広い設問 | `〜について答えよ` 形式で字数条件がなく、親見出し扱いが疑われる箇所を検出する |
 | 未抽出区分 | DB / AU / SM / ES など、ローカル午後データが存在しない区分を検出する |
+| 英語混入 | AI抽出結果由来の英語設問文・説明文が午後データへ混入していないかを検出する |
 
 ### 2.3 公式ソース監査の確認結果
 
@@ -131,7 +135,7 @@ DB / AU / SM / ES は、午後 `*-PM*` のローカルデータが存在しな�
 
 1. `exam-list.ts` と公式年度別HTMLで対象年度・季節・試験区分を確定する
 2. raw PDF を取得し、`audit:raw-pdfs` で PDF 実体を検証する
-3. Gemini OCR で `questions_raw.json` / `answers_raw.json` を生成する
+3. Ollama `gemma4:31b` で `questions_raw.json` / `answers_raw.json` を生成する
 4. 公式PDF画像で下線、図表、表、解答群、字数条件を spot check する
 5. `questions_transformed.json` を作成し、アプリ表示用の解答欄へ正規化する
 6. Cosmos 同期は dry-run とユーザー承認後に限定する
@@ -189,7 +193,7 @@ E2E は UI 変更または代表データ修正の完了時に実行する。実
 ### 6.1 ユーザー承認が必要な操作
 
 - DB / AU / SM / ES など未抽出区分の大量抽出開始
-- Gemini API を使う大量OCR
+- Ollama `gemma4:31b` 以外のAI抽出手段を使う大量OCR
 - Cosmos DB への dry-run 以外の apply
 - staging / production 反映
 - E2E フルスイート実行と証跡コミット範囲の確定

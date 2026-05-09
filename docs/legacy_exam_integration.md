@@ -61,25 +61,26 @@ npm run audit:raw-pdfs -w packages/data -- --categories=AP,PM,SC,FE,NW,DB,SA,ES,
 
 ### ステージ B: データの抽出 (抽出処理)
 
-Gemini API を使用して、PDFからテキストと構造データを抽出します。
+AIを使用してPDFからテキストと構造データを抽出する場合は、Gemini API ではなく Ollama の `gemma4:31b` を使用します。Ollama の接続先は `OLLAMA_BASE_URL` または `--base-url` で指定し、GitHub Copilot 側に設定済みの同一ローカルネットワーク上の接続先を使用します。
 
 ```bash
-npm run extract -w packages/data
+npm run extract:questions:ollama -w packages/data -- --model=gemma4:31b
+npm run extract:answers:ollama -w packages/data -- --model=gemma4:31b
 ```
-*   **注意**: この処理は、追加した試験の量に応じて**数分〜数十分**かかります。
+*   **注意**: この処理は、追加した試験の量とモデル応答時間に応じて**数分〜数十分以上**かかります。
 *   **Windows 注意**: `npx ts-node ...` を子プロセスから直接呼び出すと `spawnSync npx ENOENT` になる場合があります。抽出は必ず `npm run extract -w packages/data` または `packages/data` 直下で `npm run extract` から実行してください。
 *   **確認方法**: ログに `Saved raw Questions` / `Saved raw Answers` と表示されるのを待ちます。
 *   **重要**: この処理が完全に終了するまで、次のステージに進まないでください。
 
-Gemini のレート制限や検証目的で解答PDFだけをローカル抽出したい場合は、Ollama Vision 対応モデルを使う pilot を利用できます。この pilot は `answers_raw.json` の生成専用であり、`questions_raw.json` の抽出完了条件を置き換えるものではありません。
+解答PDFをローカル抽出する場合は、Ollama Vision 対応モデルを使う `extract:answers:ollama` を利用します。
 
 ```powershell
-npm run extract:answers:ollama -w packages/data -- --check
-npm run extract:answers:ollama -w packages/data -- --dry-run --limit=3
-npm run extract:answers:ollama -w packages/data -- --exam-id=AP-2024-Spring-AM
+npm run extract:answers:ollama -w packages/data -- --check --model=gemma4:31b
+npm run extract:answers:ollama -w packages/data -- --dry-run --limit=3 --model=gemma4:31b
+npm run extract:answers:ollama -w packages/data -- --exam-id=AP-2024-Spring-AM --model=gemma4:31b
 ```
 
-*   **前提**: ローカルの Ollama で `gemma4:26b` などの Vision 対応モデルが利用できること。
+*   **前提**: 同一ローカルネットワーク上の Ollama で `gemma4:31b` が利用できること。
 *   **PDF画像化ツール**: Poppler (`pdftoppm` / `pdftocairo`)、MuPDF (`mutool`)、ImageMagick + Ghostscript (`magick`)、または Ghostscript (`gswin64c` / `gs`) のいずれかが PATH から実行できること。
 *   **設定**: `OLLAMA_MODEL`、`OLLAMA_BASE_URL`、`OLLAMA_CATEGORIES`、`OLLAMA_EXAM_IDS`、`OLLAMA_PDF_RENDERER` で対象と実行環境を指定できます。
 *   **Windows 注意**: `--dry-run` や `--limit` は npm 側の設定として扱われる場合があります。`extract:answers:ollama` は `npm_config_*` も読むため、必ず npm script 経由で実行してください。
@@ -87,12 +88,12 @@ npm run extract:answers:ollama -w packages/data -- --exam-id=AP-2024-Spring-AM
 AM/AM2 の択一問題PDFをローカルで試験抽出する場合は、`extract:questions:ollama` を使用できます。スキャンPDFや2段組みPDFでは、ページを左右カラムに分割する `--split-columns` と、失敗チャンクをスキップして成功分を保存する `--allow-partial` を併用します。
 
 ```powershell
-npm run extract:questions:ollama -w packages/data -- --check --model=gemma4:e4b
-npm run extract:questions:ollama -w packages/data -- --model=gemma4:e4b --exam-id=DB-2016-Spring-AM2 --split-columns --allow-partial --debug-dir=../../temp-logs/ollama-debug --render-dpi=85 --num-predict=1024 --timeout-ms=420000
+npm run extract:questions:ollama -w packages/data -- --check --model=gemma4:31b
+npm run extract:questions:ollama -w packages/data -- --model=gemma4:31b --exam-id=DB-2016-Spring-AM2 --split-columns --allow-partial --debug-dir=../../temp-logs/ollama-debug --render-dpi=85 --num-predict=1024 --timeout-ms=420000
 ```
 
-*   **位置づけ**: `questions_raw.json` の Ollama 抽出は pilot です。Gemini 抽出処理は従来どおり正式系として残し、図表・解説・本文品質は手動レビューまたは Gemini 結果との比較で確認してください。
-*   **Gemma 推奨**: 2026-05-04 時点の検証では、`gemma4:e4b` + `--split-columns` が `DB-2016-Spring-AM2` のスキャンPDFで有効でした。`gemma4:26b` は高品質が期待できる一方、1ページ処理でも長時間化・タイムアウトする場合があります。
+*   **位置づけ**: `questions_raw.json` / `answers_raw.json` の AI 抽出は Ollama `gemma4:31b` を標準とし、抽出後は公式PDFとの手動レビューで本文・図表・解答の品質を確認してください。
+*   **Gemma 推奨**: `gemma4:31b` は高品質が期待できる一方、1ページ処理でも長時間化・タイムアウトする場合があります。必要に応じて `--chunk-pages`、`--render-dpi`、`--num-predict`、`--timeout-ms` を調整してください。
 *   **Qwen 注意**: `qwen3.5:9b` は Vision / thinking capability を持つものの、Ollama の `/api/generate` と `/api/chat` の両方で `response` / `message.content` が空になる事象を確認しました。`format: json` の有無、`options.think=false` の指定でも解消しません。`qwen3.6:27b` も同系統のリスクが高く、サイズ増加により速度面の不利もあるため、この問題が解消されるまで抽出用途では推奨しません。
 
 ### ステージ C: データのクレンジング
