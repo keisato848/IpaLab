@@ -52,7 +52,15 @@
             "label": "(1)",
             "text": "本文中の [ a ]，[ b ] に入れる適切な字句を解答群の中から選び，記号で答えよ。",
             "explanation": "Unicode制御文字 RLO (Right-to-Left Override) は、文字の表示順序を右から左へ逆転させます。これを利用して invoice.fdp.exe を invoice.exe.pdf と見せかける手法が有名です。また、メールの経路情報は Received ヘッダに記録されます。",
-            "answer": "a: RTL, b: Received"
+            "answerChoices": [
+              "ア BOM",
+              "イ Content-Type",
+              "ウ CRLF",
+              "エ Received",
+              "オ RLO",
+              "カ X-Mailer"
+            ],
+            "answer": "a: オ, b: エ"
           },
           {
             "label": "(2)",
