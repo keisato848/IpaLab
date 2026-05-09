@@ -850,10 +850,11 @@ if (Test-Path $azureWorkflow) {
         $pullRequestBlock -notmatch '(?m)^\s+types:' -or
         $pullRequestBlock -notmatch 'synchronize' -or
         $raw -notmatch '(?m)^concurrency:' -or
-        $raw -notmatch 'cancel-in-progress:\s*true') {
+        $raw -notmatch 'cancel-in-progress:\s*true' -or
+        $raw -notmatch 'context\.payload\.pull_request\?\.head\?\.sha') {
         Add-Finding -Rule 'R24b-staging-pr-update-deploy' -Severity 'High' `
             -File $azureWorkflow `
-            -Detail 'PR 追加修正が Staging に必ず反映されるよう、pull_request は paths で絞らず synchronize を含め、同一PRの古い実行を concurrency でキャンセルしてください'
+            -Detail 'PR 追加修正が Staging に必ず反映されるよう、pull_request は paths で絞らず synchronize を含め、同一PRの古い実行を concurrency でキャンセルし、PRコメントには head SHA を表示してください'
     }
 }
 
