@@ -198,6 +198,8 @@ sequenceDiagram
 2. なければ `questions_raw.json` を使う
 3. `Questions`、`Exams`、`Metrics`、`PlanJobs` の存在を事前保証する
 4. 試験フォルダ名から `examId`、`type`、`title` を導出する
+    - `Public` は `Fall` ではなく公開問題として扱い、`Exams.term` は `Public`、タイトルは `公開問題` 表記にする
+    - 2023年以降の FE は `AM` を `科目A`、`PM` を `科目B` としてタイトル化する
 5. `qNo` は正の整数または数値文字列のみを有効とし、欠損時に `99` へ丸めてはならない
 6. Form A / B / C の各形式を明示的に展開し、親問題番号を正規化できない場合はその試験フォルダの同期を失敗として扱う
 7. 1件でも同期失敗した試験フォルダがある場合、同期スクリプト全体を非0終了にし、古い Cosmos データを成功扱いで残さない
@@ -332,4 +334,5 @@ sequenceDiagram
 
 | 日付 | 変更内容 |
 |------|----------|
+| 2026-05-09 | `sync-db.ts` の公開問題/FE科目A・Bタイトル生成ルールを追記 |
 | 2026-05-01 | Cosmos 部分不整合時の page route filesystem fallback、同期時の `qNo` 正規化、不正な `qNo=99` 丸め禁止、self-inspect R11 を追記 |
