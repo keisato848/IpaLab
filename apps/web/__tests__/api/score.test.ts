@@ -15,8 +15,9 @@ describe('/api/score', () => {
     });
 
     describe('POST - バリデーション', () => {
-        it('GEMINI_API_KEYが未設定の場合は500を返す', async () => {
+        it('GEMINI_API_KEYもAI_CHAT_FUNCTION_URLも未設定の場合は500を返す', async () => {
             process.env.GEMINI_API_KEY = '';
+            delete process.env.AI_CHAT_FUNCTION_URL;
 
             // モックを設定
             vi.doMock('@google/generative-ai', () => ({
@@ -104,8 +105,9 @@ describe('/api/score', () => {
             expect(data.error).toBe('Missing question or user answer');
         });
 
-        it('正常にAI採点が実行できる', async () => {
+        it('正常にAI採点が実行できる（GEMINI直接呼び出し）', async () => {
             process.env.GEMINI_API_KEY = 'test-api-key';
+            delete process.env.AI_CHAT_FUNCTION_URL;
 
             const mockResponse = {
                 score: 75,
@@ -152,6 +154,80 @@ describe('/api/score', () => {
 
             expect(response.status).toBe(200);
             expect(data.score).toBe(75);
+        });
+
+        it('AI_CHAT_FUNCTION_URL 経由でのプロキシ採点が実行できる', async () => {
+            process.env.AI_CHAT_FUNCTION_URL = 'https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat';
+            delete process.env.GEMINI_API_KEY;
+
+            const mockResponse = {
+                score: 80,
+                radarChartData: [
+                    { subject: '設問適合性', A: 9, fullMark: 10 },
+                    { subject: '論理構成', A: 8, fullMark: 10 },
+                    { subject: '重要語句', A: 8, fullMark: 10 },
+                    { subject: '具体性', A: 7, fullMark: 10 },
+                ],
+                feedback: 'プロキシ経由テストフィードバック',
+                mermaidDiagram: 'graph TD; A --> B',
+                improvedAnswer: 'プロキシ改善回答',
+            };
+
+            // fetch をモック（US Function App へのリクエスト）
+            vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+                ok: true,
+                json: async () => ({ text: JSON.stringify(mockResponse) }),
+            }));
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: 'テスト問題',
+                    userAnswer: 'テスト回答',
+                }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(200);
+            expect(data.score).toBe(80);
+
+            vi.unstubAllGlobals();
+        });
+
+        it('AI_CHAT_FUNCTION_URL プロキシがエラーを返した場合は500を返す', async () => {
+            process.env.AI_CHAT_FUNCTION_URL = 'https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat';
+            delete process.env.GEMINI_API_KEY;
+
+            vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+                ok: false,
+                status: 502,
+                text: async () => 'Bad Gateway',
+            }));
+
+            const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: 'テスト問題',
+                    userAnswer: 'テスト回答',
+                }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(500);
+            expect(data.error).toBe('Scoring failed');
+
+            consoleError.mockRestore();
+            vi.unstubAllGlobals();
         });
 
         it('AIレスポンスがJSON形式でない場合は500を返す', async () => {

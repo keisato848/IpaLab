@@ -4,6 +4,7 @@
 
 | 日付 | 変更内容 |
 |------|------|
+| 2026-05-09 | `/api/score` が East Asia から Gemini API を直接呼び出せない地域制限バグを修正。`AI_CHAT_FUNCTION_URL` が設定されている場合は US リージョンの Azure Function (`aiChat`) を経由するプロキシ方式に変更。ローカル開発は従来通り直接呼び出し。 |
 | 2026-05-07 | ダークテーマで新形式午後画面の解答例ラベルが低コントラストになる問題を修正し、self-inspect検出ルールを追加 |
 | 2026-05-07 | 新形式午後画面の解答例解説をMarkdownとして描画し、同種デグレをself-inspectで検出するルールを追加 |
 | 2026-05-07 | 午後試験ヘッダーの不要な `IpaLab` リンクを削除し、午後記述欄を原稿用紙形式入力に変更 |
@@ -65,7 +66,10 @@ graph TD
 
     LegacyPM --> ScoreApi[/api/score]
     NewPM --> ScoreApi
-    ScoreApi --> Gemini[Gemini API]
+    ScoreApi --> ProxyJudge{AI_CHAT_FUNCTION_URL あり?}
+    ProxyJudge -- あり --> USFunc[aiChat Azure Function\nUS East 2]
+    ProxyJudge -- なし --> Gemini[Gemini API\nローカル開発のみ]
+    USFunc --> Gemini
 
     QuestionClient --> LearningRecordsApi[/api/learning-records]
     QuestionClient --> ExamProgressApi[/api/exam-progress]
@@ -113,15 +117,27 @@ sequenceDiagram
     participant User as ユーザー
     participant Box as AIAnswerBox
     participant API as /api/score
+    participant Func as aiChat Azure Function (US)
     participant Gemini as Gemini API
 
     User->>Box: 回答を入力し採点を実行
     Box->>API: question / userAnswer / modelAnswer を送信
-    API->>Gemini: CLKS プロンプトを送信
-    Gemini-->>API: JSON 文字列を返却
+    alt AI_CHAT_FUNCTION_URL が設定済み（本番・Staging）
+        API->>Func: systemPrompt / userMessage を送信
+        Func->>Gemini: CLKS プロンプトを送信
+        Gemini-->>Func: テキスト（JSON）を返却
+        Func-->>API: { text } を返却
+    else AI_CHAT_FUNCTION_URL 未設定（ローカル開発）
+        API->>Gemini: CLKS プロンプトを送信
+        Gemini-->>API: JSON 文字列を返却
+    end
     API-->>Box: score / radarChartData / feedback を返却
     Box-->>User: スコア・フィードバック・改善例を表示
 ```
+
+> **注意**: Gemini API は East Asia リージョンから直接呼び出せない。本番・Staging では
+> `AI_CHAT_FUNCTION_URL` に US リージョンの Azure Function URL を設定すること。
+> 参照: `apps/web/.env.template`
 
 ### 4.3 採点結果の保存
 
