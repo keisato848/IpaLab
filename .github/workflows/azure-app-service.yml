@@ -336,6 +336,8 @@ jobs:
       # Staging 固有の App Service 設定
       # COSMOS_DB_CONNECTION, AUTH_SECRET は Staging 専用シークレットを使用
       # AUTH_TRUST_HOST=true で NextAuth がホスト名を自動検出（NEXTAUTH_URL 不要）
+      # AI_CHAT_FUNCTION_URL: Gemini API の East Asia 地域制限を回避するために必須。
+      #   本番・Staging ともに同一の US リージョン Function App を経由する。
       - name: Configure Staging App Service settings
         if: steps.config-check.outputs.configured == 'true'
         run: |
@@ -354,7 +356,8 @@ jobs:
               COSMOS_DB_CONNECTION="${{ secrets.COSMOS_DB_CONNECTION }}" \
               TELEMETRY_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}" \
               STAGING_BYPASS_TOKEN="${{ secrets.STAGING_BYPASS_TOKEN }}" \
-              STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID="${{ secrets.STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID }}"
+              STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID="${{ secrets.STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID }}" \
+              AI_CHAT_FUNCTION_URL="https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat"
 
       - name: Deploy to Staging Web App
         if: steps.config-check.outputs.configured == 'true'
