@@ -283,6 +283,8 @@ async function main() {
             (f.startsWith('NW-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('DB-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('ES-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
+            (f.startsWith('AU-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
+            (f.startsWith('SM-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('SA-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('ST-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2')))
         )

@@ -69,8 +69,8 @@
 | NW | 既存データあり | `NW-2025-Spring-PM2` で下線・親見出しリスクあり |
 | FE | 既存データあり | 選択式中心。午後記述補正ではなく選択肢本文の復元が必要 |
 | DB | 最新年度パイロット済み | `DB-2025-Fall-PM1` を抽出・変換・正規化済み。過年度展開はパイロット結果を基準に段階実施 |
-| AU | 未抽出 | ローカル `questions` は0件、`raw_pdfs` も0件。公式ソース監査ではPDF URLを検出できるため、`exam-list.ts` 同期または公式URLからの取得が先行 |
-| SM | 未抽出 | ローカル `questions` は0件、`raw_pdfs` も0件。公式ソース監査ではPDF URLを検出できるため、`exam-list.ts` 同期または公式URLからの取得が先行 |
+| AU | 最新年度パイロット済み | `AU-2025-Fall-PM1` / `AU-2025-Fall-PM2` を公式PDFから抽出・変換・正規化済み。過年度展開は後続PRで段階実施 |
+| SM | 最新年度パイロット済み | `SM-2025-Spring-PM1` / `SM-2025-Spring-PM2` を公式PDFから抽出・変換・正規化済み。過年度展開は後続PRで段階実施 |
 | ES | 最新年度パイロット済み | `ES-2025-Fall-PM1` を抽出・変換・正規化済み。過年度展開はパイロット結果を基準に段階実施 |
 
 ### 2.2 監査基準
@@ -102,6 +102,10 @@ DB-2025-Fall-PM1 の初回 Gemini 抽出パイロットでは、問題側が大�
 追加データは `packages/data/data/questions/DB-2025-Fall-PM1/` に保存し、`questions_raw.json`、`answers_raw.json`、`questions_transformed.json` の3ファイルを追跡対象とする。初期変換失敗時のログは追跡対象に含めない。
 
 ES-2025-Fall-PM1 の抽出パイロットでは、問題PDFから qNo=1/2 の全2大問を取得した。初回の `answers_raw.json` は1件のみで、原因は `gemini_answer_ocr_prompt.md` が午前択一表を前提としていたことだった。プロンプトを午後記述式解答に対応させて再抽出した結果、公式解答33件を取得した。生成後は親見出し explanation を削除し、公式解答を子設問へ同期した。ES区分監査は `files=1`、`answerFields=19`、`broadPromptNoLimit=0`、`parentDirectWithChildren=0`、`multipleLimits=0`、`symbolNoStructuralChoices=0`、`underlineNoEvidence=0`、`underlineRefMissing=0` である。
+
+AU / SM の最新年度パイロットでは、`exam-list.ts` へ IPA 公式の問題PDF・解答PDF URLを登録し、`AU-2025-Fall-PM1`、`AU-2025-Fall-PM2`、`SM-2025-Spring-PM1`、`SM-2025-Spring-PM2` の `questions_raw.json`、`answers_raw.json`、`questions_transformed.json` を追加した。生成後は PM1 の公式解答をリーフ設問へ同期し、PM2 の出題趣旨は模範解答として同期しない。親見出しの `explanation` は削除した。午後監査では AU が2ファイル・5大問・21解答欄、SM が2ファイル・5大問・27解答欄となり、`parentDirectWithChildren`、`broadPromptNoLimit`、`multipleLimits` などの構造リスクは0件である。
+
+公式ソース監査で午後だけを確認する場合は、`--types=PM,PM1,PM2` を指定する。AM2 は今回の午後データ品質PRのスコープ外であり、AU/SM AM2 の未整備は後続スコープとして扱う。
 
 ## 3. 修正方針
 

@@ -29,7 +29,7 @@ IPA 過去問題データを GitOps 管理し、Cosmos DB `Questions` コンテ�
 
 ## スクリプト
 
-- `scripts/official-source-coverage-audit.mjs`: IPA 公式年度別 HTML から対象カテゴリの問題/解答 PDF を抽出し、To-Be / As-Is 差分を検出する。
+- `scripts/official-source-coverage-audit.mjs`: IPA 公式年度別 HTML から対象カテゴリ・対象試験種別の問題/解答 PDF を抽出し、To-Be / As-Is 差分を検出する。午後だけを確認する場合は `--types=PM,PM1,PM2` を指定する。
 - `scripts/local-exam-data-audit.mjs`: ローカル問題 JSON の形式、qNo 欠損、重複、空データ、IPA 公開一覧との差分を検出する。
 - `scripts/cosmos-questions-sync-plan.mjs`: Cosmos `Questions` とローカル静的データを qNo 単位で比較し、dry-run または承認付き apply を行う。
 
@@ -56,7 +56,7 @@ IPA 過去問題データを GitOps 管理し、Cosmos DB `Questions` コンテ�
 
 ## 検証ループ
 
-1. 公式ソース監査を実行し、対象カテゴリの To-Be / As-Is 差分を把握する。
+1. 公式ソース監査を実行し、対象カテゴリ・対象試験種別の To-Be / As-Is 差分を把握する。
 2. ローカル監査を実行し、blocking issue を修正する。
 3. Cosmos dry-run を実行し、削除・upsert 計画をレビューする。
 4. セキュリティレビューで secret 出力、過剰削除、未承認 apply がないことを確認する。

@@ -21,6 +21,10 @@
 | 2026-05-03 | PDF ダウンロード時の実体検証、`DOWNLOAD_CATEGORIES` による対象カテゴリ指定、`audit:raw-pdfs` による Stage A 完了ゲートを追加 |
 | 2026-05-02 | Cosmos `Questions` 再同期前のローカル監査、qNo 単位 dry-run、`qNo=99` 旧プレースホルダー削除計画、Agent Skill / Specialist / Security review の運用を追加 |
 | 2026-05-02 | IPA 公式年度別 HTML から対象カテゴリの問題/解答 PDF を抽出し、`exam-list.ts` とローカルデータの To-Be / As-Is 差分を確認する公式ソース監査を追加 |
+| 2026-05-09 | `AU-2025-Fall-PM1`、`AU-2025-Fall-PM2`、`SM-2025-Spring-PM1`、`SM-2025-Spring-PM2` を最新年度パイロットとして追加した。 |
+| 2026-05-09 | `exam-list.ts` には IPA 公式の問題 PDF と解答 PDF URL を登録し、Gemini/Ollama 抽出対象カテゴリへ AU / SM を追加した。 |
+| 2026-05-09 | 生成後は PM1 の `answers_raw.json` の公式解答を `questions_transformed.json` のリーフ設問へ同期し、PM2 は出題趣旨を模範解答として同期せず、子設問を持つ親設問の `explanation` を削除して親見出しの800字欄化を防止した。 |
+| 2026-05-09 | 全年度展開は抽出・表示確認の面積が大きいため後続 PR とし、本パイロットでは午後監査対象区分として AU / SM が存在し、構造監査を通過することを完了条件とする。 |
 
 ## 1. Overview
 This document outlines the design for the **Data Sync Tool** (`packages/data`), which is responsible for populating the Cosmos DB with exam master data.
@@ -125,6 +129,7 @@ packages/data/
 
 対象カテゴリは AP / PM / SC / FE / NW / DB / AU / SM / SA / ES / ST、年度範囲は 2016 年以降を標準とする。
 `official-source-coverage-audit.mjs` は IPA の年度別 HTML から `_qs.pdf` と `_ans.pdf` を抽出し、問題 PDF が存在する単位を To-Be として扱う。
+対象を午後問題だけに限定する場合は `--types=PM,PM1,PM2` を指定し、AM2 など別スコープの未整備を午後データ品質ゲートへ混在させない。
 公式解答 PDF が存在する場合は `exam-list.ts` の `answerUrl` と `packages/data/data/questions/{examId}/answers_raw.json` も検証対象に含める。
 差分は `representativeGaps` として As-Is / To-Be の形で出力し、本番同期 dry-run 前に説明する。
 
@@ -201,6 +206,13 @@ PM1は `answers_raw.json` の公式解答キーを設問内のリーフ解答欄
 変換後の集計は、`SA-2025-Spring-PM1` が3大問・11設問グループ・26解答欄、`SA-2025-Spring-PM2` が2大問・6設問グループ・6解答欄、`ST-2025-Spring-PM1` が3大問・10設問グループ・23解答欄、`ST-2025-Spring-PM2` が2大問・6設問グループ・6解答欄である。
 PM2論述の公式解答例欠落はP1残課題として扱い、データ補完時は公式講評・解答例などの根拠を確認してから更新する。
 E2Eでは各大問ページの解答欄数、空設問なし、Mermaid描画失敗なしを確認し、証跡は `docs/04_reports/E2E_Test_Evidence_Report_20260506.md` に保存する。
+
+2026-05-09 に `AU-2025-Fall-PM1`、`AU-2025-Fall-PM2`、`SM-2025-Spring-PM1`、`SM-2025-Spring-PM2` を最新年度パイロットとして追加した。
+`exam-list.ts` には IPA 公式の問題 PDF と解答 PDF URL を登録し、Gemini/Ollama 抽出対象カテゴリへ AU / SM を追加した。
+生成後は PM1 の `answers_raw.json` の公式解答を `questions_transformed.json` のリーフ設問へ同期した。
+PM2 の `answers_raw.json` は論述問題の出題趣旨であり模範解答ではないため、`answer` としては同期せず、論述入力欄と解説だけを保持する。
+子設問を持つ親設問の `explanation` は削除し、親見出しの800字欄化を防止した。
+全年度展開は抽出・表示確認の面積が大きいため後続 PR とし、本パイロットでは午後監査対象区分として AU / SM が存在し、構造監査を通過することを完了条件とする。
 
 同日に AM2 正答不整合の P0 対応として、`PM-2020-Fall-AM2`、`PM-2016-Spring-AM2`、`SA-2025-Spring-AM2`、`ST-2025-Spring-AM2` を補正した。
 `PM-2020-Fall-AM2` は公式解答PDFで問2がエであることを確認し、`answers_raw.json` の問2を `d` に修正した。

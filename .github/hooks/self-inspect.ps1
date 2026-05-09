@@ -671,8 +671,16 @@ foreach ($examId in $changedAfternoonExamIds) {
             $sectionCount += $sections.Count
             foreach ($section in $sections) {
                 $fields = @($section.subQuestions)
-                $answerFieldCount += $fields.Count
-                if ($fields.Count -eq 0) {
+                $hasDirectAnswerField = -not [string]::IsNullOrWhiteSpace([string]$section.answer) `
+                    -or -not [string]::IsNullOrWhiteSpace([string]$section.modelAnswer) `
+                    -or -not [string]::IsNullOrWhiteSpace([string]$section.explanation) `
+                    -or -not [string]::IsNullOrWhiteSpace([string]$section.text)
+
+                if ($fields.Count -gt 0) {
+                    $answerFieldCount += $fields.Count
+                } elseif ($hasDirectAnswerField) {
+                    $answerFieldCount += 1
+                } else {
                     $emptySections += "$($item.qNo):$($section.subQNo)"
                 }
             }

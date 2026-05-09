@@ -24,7 +24,7 @@ type AnswerTarget = {
     outputPath: string;
 };
 
-const DEFAULT_CATEGORIES = ['AP', 'PM', 'SC', 'FE', 'NW', 'DB', 'SA', 'ES', 'ST'];
+const DEFAULT_CATEGORIES = ['AP', 'PM', 'SC', 'FE', 'NW', 'DB', 'AU', 'SM', 'SA', 'ES', 'ST'];
 const DEFAULT_BASE_URL = 'http://127.0.0.1:11434';
 const DEFAULT_MODEL = 'gemma4:26b';
 const DEFAULT_DPI = 180;
