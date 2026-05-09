@@ -64,6 +64,9 @@ node temp-logs/list-sc-data-quality-issues.mjs > temp-logs/sc-data-quality-issue
 - SC-2017-Fall-PM1 は、RLO/Received の公式解答群を追加し、記号解答へ補正済みです。
 - SC-2017-Spring-PM2 は、本文内のネストされた解答群を `answerChoices` に構造化済みです。
 - SC-2022-Fall-PM1 / SC-2022-Fall-PM2 は、本文内に安全に確認できる選択肢を構造化済みです。
+- FE-2024-Public-PM は、英語で登録されていた問題文・解説を公式PDFベースの日本語本文、選択肢、解説へ補正済みです。
+- SC-2017-Spring-PM1 は、公式PDF/解答PDFで確認できた qNo=1 の図1・図4関連設問について、記号解答、フィルタリングルール項番、SYN/SYN-ACK経路を補正済みです。
+- AI抽出を使う場合は、Gemini API ではなく同一ローカルネットワーク上の Ollama `gemma4:31b` を利用してください。
 
 ## SC 残件
 
@@ -72,7 +75,7 @@ node temp-logs/list-sc-data-quality-issues.mjs > temp-logs/sc-data-quality-issue
 | examId | symbol | ref | total | 次の対応 |
 |---|---:|---:|---:|---|
 | SC-2017-Fall-PM2 | 0 | 1 | 1 | 下線⑪の本文参照を確認 |
-| SC-2017-Spring-PM1 | 6 | 1 | 6 | 公式PDF/解答例を見ながら、図1・図4・解答群の `answerChoices` を追加。未適用 |
+| SC-2017-Spring-PM1 | 6 | 1 | 6 | qNo=1 の図1・図4関連設問は補正済み。残る監査件数は再監査で確認 |
 | SC-2018-Fall-PM1 | 7 | 8 | 15 | 公式PDFをレンダリングして大きめに処理 |
 | SC-2018-Fall-PM2 | 4 | 2 | 5 | 公式PDFをレンダリングして処理 |
 | SC-2018-Spring-PM1 | 2 | 0 | 2 | 表中の記号選択肢を構造化 |
@@ -90,11 +93,11 @@ node temp-logs/list-sc-data-quality-issues.mjs > temp-logs/sc-data-quality-issue
 
 ## 次にやる作業
 
-1. `SC-2017-Spring-PM1` から再開してください。
+1. `SC-2017-Spring-PM1` は qNo=1 の確認済み補正から再開してください。
    - 問題PDF: `packages/data/data/raw_pdfs/SC-2017-Spring-PM1.pdf`
    - 解答PDF: `packages/data/data/raw_pdfs/SC-2017-Spring-PM1-Ans.pdf`
    - レンダリング済み一時画像: `temp-logs/sc2017springpm1-pages/`, `temp-logs/sc2017springpm1-ans-pages/` はローカル一時ファイルです。別端末では必要に応じて再生成してください。
-   - 途中で大きなパッチを当てようとしましたが、コンテキスト不一致で未適用です。`SC-2017-Spring-PM1/questions_transformed.json` は本引継ぎコミットには含めていません。
+   - qNo=1 の表3/表4、下線①、図4 SYN/SYN-ACK 経路は公式PDF/解答PDFに基づき補正済みです。残件は再監査結果を見て小さく継続してください。
 2. SC の残件は、公式PDFをPyMuPDFで画像化してから小さく修正してください。
 3. 各バッチ後に次を実行してください。
 
@@ -116,5 +119,6 @@ pwsh .github/hooks/self-inspect.ps1 -Mode start
 - `apps/web/next-env.d.ts` はローカルで変更されていますが、今回の作業とは無関係のためステージしないでください。
 - `audit_ausm.json`, `audit_full.json`, `temp-logs/` は調査生成物です。コミットしないでください。
 - SCの古い年度はスキャンPDFが多く、テキスト抽出だけでは不十分です。PyMuPDFで画像化して紙面確認してください。
+- AI抽出が必要な場合は Ollama `gemma4:31b` を使い、Gemini API は使用しないでください。
 - `SA-2016-Fall-PM1`, `PM-2018-Spring-PM1`, `ST-2023-Spring-PM1` は今回の監査上は主要指標0化済みですが、公式PDF確認の余地があるため、最終レビュー時に再確認してください。
 - E2Eを再実行した場合は、必ず `docs/04_reports/E2E_Test_Evidence_Report_YYYYMMDD.md` と `apps/web/e2e/evidence/` のスクリーンショットを更新・コミットしてください。

@@ -26,7 +26,7 @@ type AnswerTarget = {
 
 const DEFAULT_CATEGORIES = ['AP', 'PM', 'SC', 'FE', 'NW', 'DB', 'AU', 'SM', 'SA', 'ES', 'ST'];
 const DEFAULT_BASE_URL = 'http://127.0.0.1:11434';
-const DEFAULT_MODEL = 'gemma4:26b';
+const DEFAULT_MODEL = 'gemma4:31b';
 const DEFAULT_DPI = 180;
 const DEFAULT_MAX_PAGES = 8;
 const DEFAULT_TIMEOUT_MS = 600000;

@@ -3,13 +3,17 @@
     "compilerOptions": {
         "outDir": "./dist",
         "rootDir": "./src",
-        "module": "commonjs",
+        "module": "Node16",
         "target": "es2020",
+        "moduleResolution": "Node16",
         "lib": [
             "es2020",
             "dom"
         ],
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "types": [
+            "node"
+        ]
     },
     "include": [
         "src/**/*"

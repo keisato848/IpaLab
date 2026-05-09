@@ -58,7 +58,7 @@ type MorningQuestion = {
 
 const DEFAULT_CATEGORIES = ['AP', 'FE', 'PM', 'SC', 'NW', 'DB', 'AU', 'SM', 'SA', 'ES', 'ST'];
 const DEFAULT_BASE_URL = 'http://127.0.0.1:11434';
-const DEFAULT_MODEL = 'gemma4:26b';
+const DEFAULT_MODEL = 'gemma4:31b';
 const DEFAULT_DPI = 150;
 const DEFAULT_TIMEOUT_MS = 900000;
 const DEFAULT_CHUNK_PAGES = 2;
@@ -216,7 +216,7 @@ Options:
   --model=<name>           Ollama model. Default: ${DEFAULT_MODEL}.
   --base-url=<url>         Ollama base URL. Default: ${DEFAULT_BASE_URL}.
 
-This script targets AM/AM2 multiple-choice question PDFs. Gemini extraction scripts remain unchanged.`);
+This script targets AM/AM2 multiple-choice question PDFs. Use Ollama Gemma4:31B for AI extraction.`);
 }
 
 async function loadPdfJs() {

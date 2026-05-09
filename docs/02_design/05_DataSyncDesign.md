@@ -4,6 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-09 | AIを使う問題データ抽出は Gemini API ではなく、同一ローカルネットワーク上の Ollama `gemma4:31b` を標準とする運用へ更新 |
 | 2026-05-08 | 午後解答PDFの Gemini OCR プロンプトを午前択一表専用から記述式解答対応へ拡張し、self-inspect R32 を追加 |
 | 2026-05-08 | 全試験区分の午後データ品質監査 `audit:afternoon-data`、DB/AU/SM など未抽出区分の抽出必要性、親見出し800字欄化の再発防止を追加 |
 | 2026-05-06 | `PM-2020-Fall-AM2` / `PM-2016-Spring-AM2` / `SA-2025-Spring-AM2` / `ST-2025-Spring-AM2` の AM2 正答不整合補正と self-inspect R16 強化を追加 |
@@ -235,7 +236,7 @@ npm run -w packages/data extract:answers:ollama -- --dry-run --limit=3
 npm run -w packages/data extract:answers:ollama -- --exam-id=AP-2024-Spring-AM
 ```
 
-前提条件は、Ollama で Vision 対応モデル（既定値 `gemma4:26b`）が利用できること、および `pdfjs-dist` legacy build と `@napi-rs/canvas` による PDF 画像化がローカルで動作することである。
+前提条件は、Ollama で Vision 対応モデル（既定値 `gemma4:31b`）が利用できること、および `pdfjs-dist` legacy build と `@napi-rs/canvas` による PDF 画像化がローカルで動作することである。
 `--dry-run` や `--limit` が npm 側の設定として扱われる環境があるため、script は `npm_config_*` も読み取る。
 
 2026-05-05 に AM/AM2 解答PDFの前処理として、埋め込みテキストが存在する場合は `問 1 ウ` のような表記を直接パースし、`answers_raw.json` の key-value map に変換する経路を追加した。
@@ -253,14 +254,14 @@ AM2 問題本文抽出を行う場合は、生成済みの正答マップと照�
 
 #### 7.2.2 Ollama AM/AM2 問題PDF抽出 pilot
 
-AM/AM2 の択一問題PDFをローカルで試験抽出する場合は、`extract:questions:ollama` を使用できる。
-対象は午前系の `*-AM` / `*-AM2` に限定し、午後問題の正式抽出は Gemini 系の Stage B を継続する。
+AM/AM2 の択一問題PDFおよび午後問題PDFをローカルで抽出する場合は、`extract:questions:ollama` を標準経路として使用する。
+午後問題も Ollama `gemma4:31b` を既定モデルとし、Gemini 系 Stage B は既存成果物の比較確認や緊急退避用途に限定する。
 スキャンPDFでは埋め込みテキストが空になるため、ページ画像を Ollama Vision モデルへ渡す。
 2段組みPDFでは `--split-columns` で左右カラムを分割し、長時間処理では `--allow-partial` と `--debug-dir` で成功チャンクと生応答を残す。
 
 ```powershell
-npm run -w packages/data extract:questions:ollama -- --check --model=gemma4:e4b
-npm run -w packages/data extract:questions:ollama -- --model=gemma4:e4b --exam-id=DB-2016-Spring-AM2 --split-columns --allow-partial --debug-dir=../../temp-logs/ollama-debug --render-dpi=85 --num-predict=1024 --timeout-ms=420000
+npm run -w packages/data extract:questions:ollama -- --check --model=gemma4:31b
+npm run -w packages/data extract:questions:ollama -- --model=gemma4:31b --exam-id=DB-2016-Spring-AM2 --split-columns --allow-partial --debug-dir=../../temp-logs/ollama-debug --render-dpi=85 --num-predict=1024 --timeout-ms=420000
 ```
 
 2026-05-04 時点の検証では、`DB-2016-Spring-AM2` はスキャンPDFであり、`--text-only` は利用できない。
@@ -302,8 +303,8 @@ Q1-Q13 はページ3〜6の probe 成功分を採用前にページ画像で補�
 Qwen3.x 系モデルは当面使用しない。
 `qwen3.5:9b` では `/api/generate`、`/api/chat`、`format: json` の有無、`options.think=false` のいずれでも `response` / `message.content` が空になる事象を確認した。
 この問題はプロンプトや JSON 強制だけでは回避できず、`qwen3.6:27b` も同系統のリスクが高い。
-また 27B は `gemma4:26b` と同程度のサイズになり、処理時間・メモリ面でも `gemma4:e4b` より不利である。
-Ollama またはモデル側で response 空問題が解消されるまで、AM/AM2 問題PDF抽出の推奨モデルは `gemma4:e4b` とする。
+また 27B は 31B 級モデルと近いリソースを要求し、処理時間・メモリ面でも小型モデルより不利である。
+Ollama またはモデル側で response 空問題が解消されるまで、問題PDF抽出の標準モデルは `gemma4:31b` とする。
 
 ### 7.3 qNo=99 の扱い
 
