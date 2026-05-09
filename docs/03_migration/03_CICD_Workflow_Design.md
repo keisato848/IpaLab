@@ -351,6 +351,34 @@ az webapp deployment source sync --name app-pm-exam-dx-prod --resource-group rg-
 
 ---
 
+## 7. CodeQL Advanced スキャン制御
+
+### 7.1 方針
+
+CodeQL Advanced は **public リポジトリでのみ**実行する。
+private リポジトリでは GitHub Advanced Security ライセンスが必要なため、ジョブレベルの条件でスキップする。
+
+### 7.2 実装
+
+`.github/workflows/codeql.yml` の `analyze` ジョブに以下の条件を設定する:
+
+```yaml
+if: ${{ !github.event.repository.private }}
+```
+
+- `private == true`（現在）→ ジョブをスキップ、ワークフロー自体は `success` で終了
+- `private == false`（public に変更後）→ 自動的に再有効化される
+
+### 7.3 public 再公開時の確認手順
+
+リポジトリを public に変更した際は以下を確認すること:
+
+1. `.github/workflows/codeql.yml` の変更は不要（条件が自動的に評価される）
+2. GitHub Settings → Security → Code scanning が有効になっていること
+3. 初回スキャン結果を確認し、アラートがあれば対処する
+
+---
+
 **作成日**: 2026-02-04
-**更新日**: 2026-05-07
+**更新日**: 2026-05-09
 **ステータス**: 設計完了
