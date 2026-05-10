@@ -22,6 +22,10 @@ on:
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
+    # CodeQL Advanced は public リポジトリでのみ実行する。
+    # private リポジトリでは GitHub Advanced Security ライセンスが必要なためスキップ。
+    # リポジトリを public に変更した際は自動的に再有効化される。
+    if: ${{ !github.event.repository.private }}
     # Runner size impacts CodeQL analysis time. To learn more, please see:
     #   - https://gh.io/recommended-hardware-resources-for-running-codeql
     #   - https://gh.io/supported-runners-and-hardware-resources

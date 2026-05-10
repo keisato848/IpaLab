@@ -48,6 +48,7 @@ Project Manager と Solution Architect からの handoff に基づき、午後�
 
 ## Gotchas
 
-- East Asia から Gemini を直接呼ぶと地域制限で失敗する。
+- East Asia から Gemini を直接呼ぶと地域制限で失敗する。`/api/score` や新規 AI API は `AI_CHAT_FUNCTION_URL` チェックを必ず実装し、US Azure Function (`func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat`) 経由にすること。`llmClient.ts` と `gemini-chat.ts` の実装パターンを参照。
+- `apps/web/app/api/score/route.ts` は `AI_CHAT_FUNCTION_URL` があればプロキシ、なければ `GEMINI_API_KEY` で直接呼び出す二段構え。新規 AI API ルートも同じパターンを適用する。
 - AI 出力をそのまま信頼せず、Zod 等で構造検証する。
 - 採点 API の UI 変更は E2E evidence と設計書更新が必要になりやすい。
