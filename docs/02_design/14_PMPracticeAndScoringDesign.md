@@ -4,6 +4,7 @@
 
 | 日付 | 変更内容 |
 |------|------|
+| 2026-05-10 | `aiChat` Azure Function の `userMessage` 文字数制限を 8000 → 30000 文字に緩和。採点プロンプトが問題文・模範解答・回答を含むため制限超過で `400 Prompt too long` が返り `Scoring failed` になっていた。 |
 | 2026-05-09 | `/api/score` Gemini 直接呼び出しフォールバック（ローカル開発用）に `systemInstruction: SYSTEM_PROMPT` を追加し、プロキシ経由と採点品質を統一。`export const runtime = 'nodejs'` を追加し Edge Runtime での誤動作リスクを解消。テストの `beforeEach` で `AI_CHAT_FUNCTION_URL` を必ず削除して環境依存を排除。 |
 | 2026-05-09 | `/api/score` が East Asia から Gemini API を直接呼び出せない地域制限バグを修正。`AI_CHAT_FUNCTION_URL` が設定されている場合は US リージョンの Azure Function (`aiChat`) を経由するプロキシ方式に変更。ローカル開発は従来通り直接呼び出し。 |
 | 2026-05-07 | ダークテーマで新形式午後画面の解答例ラベルが低コントラストになる問題を修正し、self-inspect検出ルールを追加 |
@@ -173,7 +174,7 @@ sequenceDiagram
 
 | サービス | 用途 |
 |------|------|
-| Azure Function App (aiChat, US East 2) | `/api/score` からのプロキシ中継。East Asia からの Gemini 地域制限を回避するために **必須** |
+| Azure Function App (aiChat, US East 2) | `/api/score` からのプロキシ中継。East Asia からの Gemini 地域制限を回避するために **必須**。`userMessage` の上限は 30000 文字、`systemPrompt` の上限は 16000 文字 |
 | Gemini API | 記述回答の採点とフィードバック生成（Azure Function App 経由で呼び出す） |
 | Azure Cosmos DB LearningRecords | 採点結果の保存 |
 | Azure Cosmos DB LearningSessions | 認証ユーザーの進捗更新 |
