@@ -1118,10 +1118,11 @@ if (-not (Test-Path $afternoonDataAudit)) {
     if ($raw -notmatch 'shortAnswerNoLimit' -or
         $raw -notmatch 'shortAnswerNoLimitPattern' -or
         $raw -notmatch 'answerMissing' -or
-        $raw -notmatch 'explanationMissing') {
+        $raw -notmatch 'explanationMissing' -or
+        $raw -notmatch 'isQuestionLike') {
         Add-Finding -Rule 'R27-afternoon-data-quality-audit' -Severity 'Medium' `
             -File $afternoonDataAudit `
-            -Detail 'PM/PM1 の字数制限なし短答と午後 answer / explanation 欠落を監査できるルールを維持してください'
+            -Detail 'PM/PM1 の字数制限なし短答、午後 answer / explanation 欠落、単一大問オブジェクト形の午後JSONを監査できるルールを維持してください'
     }
 }
 

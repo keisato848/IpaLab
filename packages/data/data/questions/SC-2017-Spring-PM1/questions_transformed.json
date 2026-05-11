@@ -134,7 +134,7 @@
     "description": "",
     "context": {
       "title": "E社 サイトαのWebサイトセキュリティ対策",
-      "background": "E社は、会員制の飲食店情報提供サービス「サイトα」を運営している。サイトαでは、飲食店の検索、掲示板への投稿、会員情報変更などの機能を提供している。\n\n{{diagram:fig1}}\n\nある日、利用者L氏から「急にログアウトさせられ、その後ログインできなくなった。退会処理が完了していた」との問合せがあった。調査の結果、Webアプリケーションの脆弱性が悪用されたことが判明した。",
+      "background": "E社は、会員制の飲食店情報提供サービス「サイトα」を運営している。サイトαでは、飲食店の検索、掲示板への投稿、会員情報変更などの機能を提供している。\n\n{{diagram:fig1}}\n\nある日、利用者L氏から「急にログアウトさせられ、その後ログインできなくなった。退会処理が完了していた」との問合せがあった。調査の結果、Webアプリケーションの脆弱性が悪用されたことが判明した。脆弱性2では、<b>タグ中に②特定の属性を指定することによってスクリプトの実行が可能であることが分かった。",
       "diagrams": [
         {
           "id": "fig1",
@@ -194,8 +194,18 @@
             "label": "(1)",
             "text": "本文中の下線②に該当する属性を解答群の中から全て選び、記号で答えよ。",
             "references": [],
-            "answer": "イ, ウ, エ",
-            "explanation": "（自動補完）設問「本文中の下線②に該当する属性を解答群の中から全て選び、記号で答えよ。」について、問題文の条件に照らして「イ, ウ, エ」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
+            "answer": "カ, キ",
+            "answerChoices": [
+              "ア accesskey",
+              "イ class",
+              "ウ hidden",
+              "エ id",
+              "オ lang",
+              "カ onclick",
+              "キ onmouseover",
+              "ク title"
+            ],
+            "explanation": "公式解答では、下線②に該当する属性は、解答群の「カ onclick」と「キ onmouseover」です。いずれもイベントハンドラ属性としてスクリプトの実行につながります。"
           },
           {
             "label": "(2)",
@@ -227,7 +237,7 @@
           "id": "fig1",
           "label": "図1 導入を検討している方式のシーケンス",
           "type": "mermaid",
-          "content": "[CODE_BLOCK:mermaid]\nsequenceDiagram\n    participant Browser as 利用者端末のWebブラウザ (c)\n    participant SP as SP (a)\n    participant IdP as IdP (b)\n    participant LDAP as LDAPサーバ (d)\n\n    Browser->>SP: (1) サービス要求\n    SP->>Browser: (2) リダイレクト指示\n    Browser->>IdP: (3) ログイン画面要求\n    IdP-->>Browser: (4) ログイン画面応答\n    Browser->>IdP: (5) 認証要求\n    IdP->>LDAP: (6) 認証要求\n    LDAP-->>IdP: (7) 認証結果を応答\n    IdP-->>Browser: (8) SAML Responseの送信フォームを応答\n    Browser->>SP: (9) SAML Responseを送信\n    SP->>Browser: (10) サービス提供\n[/CODE_BLOCK]"
+          "content": "[CODE_BLOCK:mermaid]\nsequenceDiagram\n    participant Browser as 利用者端末のWebブラウザ (b)\n    participant SP as SP (a)\n    participant IdP as IdP (c)\n    participant LDAP as LDAPサーバ (d)\n\n    Browser->>SP: (1) サービス要求\n    SP->>Browser: (2) リダイレクト指示\n    Browser->>IdP: (3) ログイン画面要求\n    IdP-->>Browser: (4) ログイン画面応答\n    Browser->>IdP: (5) 認証要求\n    IdP->>LDAP: (6) 認証要求\n    LDAP-->>IdP: (7) 認証結果を応答\n    IdP-->>Browser: (8) SAML Responseの送信フォームを応答\n    Browser->>SP: (9) SAML Responseを送信\n    SP->>Browser: (10) サービス提供\n[/CODE_BLOCK]"
         }
       ]
     },
@@ -249,8 +259,14 @@
             "references": [
               "fig1"
             ],
-            "answer": "a: ウ, b: イ, c: エ, d: ア",
-            "explanation": "（自動補完）設問「図1中の[ a ]〜[ d ]に入れる適切な字句を解答群の中から選び、記号で答えよ。」について、問題文の条件に照らして「a: ウ, b: イ, c: エ, d: ア」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
+            "answer": "a: ウ, b: エ, c: ア, d: イ",
+            "answerChoices": [
+              "ア IdP",
+              "イ LDAPサーバ",
+              "ウ SP",
+              "エ 利用者端末のWebブラウザ"
+            ],
+            "explanation": "公式解答では、図1中の [ a ]〜[ d ] は「a: ウ SP, b: エ 利用者端末のWebブラウザ, c: ア IdP, d: イ LDAPサーバ」です。"
           },
           {
             "label": "(2)",
@@ -264,7 +280,14 @@
             "text": "表1中の[ g ]に入れる適切な字句を解答群の中から選び、記号で答えよ。",
             "references": [],
             "answer": "ウ",
-            "explanation": "（自動補完）設問「表1中の[ g ]に入れる適切な字句を解答群の中から選び、記号で答えよ。」について、問題文の条件に照らして「ウ」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
+            "answerChoices": [
+              "ア Cookie",
+              "イ HTML",
+              "ウ クエリ文字列",
+              "エ スキーム",
+              "オ リファラ"
+            ],
+            "explanation": "公式解答では、表1中の [ g ] に入る字句は、解答群の「ウ クエリ文字列」です。"
           },
           {
             "label": "(4)",
