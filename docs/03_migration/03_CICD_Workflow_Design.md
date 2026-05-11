@@ -376,6 +376,9 @@ Staging デプロイ時に `az webapp config appsettings set` で設定する環
 | `STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID` | バイパス対象アカウント | `STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID` シークレット |
 | `AI_CHAT_FUNCTION_URL` | Gemini プロキシ (US Function) | ワークフロー内に直接記載（公開エンドポイント） |
 
+本番デプロイジョブの `Configure App Service settings` でも、Staging と同じ `AI_CHAT_FUNCTION_URL` を設定する。
+本番・Staging のどちらか一方でも欠落すると、East Asia の App Service から Gemini API を直接呼び出す経路が復活し、`/api/score` が失敗する。
+
 ### 8.2 AI_CHAT_FUNCTION_URL の重要性
 
 `AI_CHAT_FUNCTION_URL` が未設定の場合、AI 採点機能 (`/api/score`) および

@@ -48,6 +48,7 @@
 #   R35. E2E証跡レポートが過去画像全件を再掲し、最新実行分だけに絞らないパターン
 #   R36. 午後問題データに英語の設問文・説明文が混入するパターン
 #   R37. sync-db が FE 公開問題を秋期/午後として Exams に登録するパターン
+#   R38. 本番/Staging の App Service 設定から AI_CHAT_FUNCTION_URL が欠落するパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -515,6 +516,27 @@ if (Test-Path $syncDbScript) {
         Add-Finding -Rule 'R37-sync-db-fe-subject-label' -Severity 'Medium' `
             -File $syncDbScript `
             -Detail '2023年以降の FE は AM=科目A / PM=科目B として Exams.title を生成してください'
+    }
+}
+
+# ---------------------------------------------------------------------------
+# R38: 本番/Staging の App Service 設定に AI_CHAT_FUNCTION_URL が含まれること
+#      (East Asia App Service から Gemini を直接呼び、/api/score が Scoring failed になる再発防止)
+# ---------------------------------------------------------------------------
+$azureWorkflowForR38 = Join-Path $RepoRoot '.github\workflows\azure-app-service.yml'
+if (Test-Path $azureWorkflowForR38) {
+    $raw = Get-Content -LiteralPath $azureWorkflowForR38 -Raw
+    $prodSettings = [regex]::Match($raw, '(?ms)- name: Configure App Service settings.*?(?=\r?\n\s*- name: Deploy to Azure Web App)').Value
+    $stagingSettings = [regex]::Match($raw, '(?ms)- name: Configure Staging App Service settings.*?(?=\r?\n\s*- name: Deploy to Staging Web App)').Value
+    if ($prodSettings -notmatch 'AI_CHAT_FUNCTION_URL="https://func-pm-exam-dx-ai-us\.azurewebsites\.net/api/ai/chat"') {
+        Add-Finding -Rule 'R38-prod-ai-chat-function-url' -Severity 'High' `
+            -File $azureWorkflowForR38 `
+            -Detail '本番 App Service 設定に AI_CHAT_FUNCTION_URL を含め、/api/score が East Asia から Gemini を直接呼ばないようにしてください'
+    }
+    if ($stagingSettings -notmatch 'AI_CHAT_FUNCTION_URL="https://func-pm-exam-dx-ai-us\.azurewebsites\.net/api/ai/chat"') {
+        Add-Finding -Rule 'R38-staging-ai-chat-function-url' -Severity 'High' `
+            -File $azureWorkflowForR38 `
+            -Detail 'Staging App Service 設定に AI_CHAT_FUNCTION_URL を含め、/api/score が East Asia から Gemini を直接呼ばないようにしてください'
     }
 }
 
@@ -1168,7 +1190,7 @@ Write-Host "## [self-inspect $tag] 自己点検レポート"
 Write-Host ""
 
 if ($findings.Count -eq 0) {
-    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16 / R17 / R18 / R19 / R20 / R21 / R22 / R23 / R24 / R24b / R25 / R26 / R27 / R28 / R29 / R30 / R31 / R32 / R33 / R34 / R35 / R36 / R37)"
+    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16 / R17 / R18 / R19 / R20 / R21 / R22 / R23 / R24 / R24b / R25 / R26 / R27 / R28 / R29 / R30 / R31 / R32 / R33 / R34 / R35 / R36 / R37 / R38)"
     exit 0
 }
 

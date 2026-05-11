@@ -23,16 +23,41 @@ vi.mock('@/auth', () => ({
 }));
 
 describe('/api/learning-records POST', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
         vi.clearAllMocks();
         vi.resetModules();
+        const { getServerSession } = await import('next-auth');
+        (getServerSession as any).mockResolvedValue({
+            user: { id: 'user-1', name: 'Test' }
+        });
     });
 
     describe('単一レコード挿入', () => {
+        it('未認証の場合は401を返す', async () => {
+            const { getServerSession } = await import('next-auth');
+            (getServerSession as any).mockResolvedValue(null);
+
+            const { POST } = await import('@/app/api/learning-records/route');
+            const request = new NextRequest('http://localhost:3000/api/learning-records', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: 'guest',
+                    questionId: 'q1',
+                    examId: 'AP-2024-Spring',
+                    category: 'セキュリティ'
+                })
+            });
+
+            const response = await POST(request);
+
+            expect(response.status).toBe(401);
+        });
+
         it('正常にレコードを作成する', async () => {
             const { getContainer } = await import('@/lib/cosmos');
             const mockRecord = {
-                userId: 'user-1',
+                userId: 'guest-user',
                 questionId: 'q1',
                 examId: 'AP-2024-Spring',
                 category: 'セキュリティ',
@@ -58,6 +83,36 @@ describe('/api/learning-records POST', () => {
             expect(response.status).toBe(201);
             expect(data.userId).toBe('user-1');
             expect(data.id).toBe(mockUUID);
+        });
+
+        it('Cosmos 409の場合は同期済みとして200を返す', async () => {
+            const { getContainer } = await import('@/lib/cosmos');
+
+            (getContainer as any).mockResolvedValue({
+                items: {
+                    create: async () => { throw { code: 409, message: 'Conflict' }; }
+                }
+            });
+
+            const { POST } = await import('@/app/api/learning-records/route');
+            const request = new NextRequest('http://localhost:3000/api/learning-records', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: 'record-1',
+                    userId: 'guest-user',
+                    questionId: 'q1',
+                    examId: 'AP-2024-Spring',
+                    category: 'セキュリティ'
+                })
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(200);
+            expect(data.id).toBe('record-1');
+            expect(data.userId).toBe('user-1');
         });
 
         it('idがない場合は自動生成する', async () => {
@@ -346,7 +401,37 @@ describe('/api/learning-records POST', () => {
 
             expect(response.status).toBe(201);
             expect(data.count).toBe(2);
+            expect(data.duplicateCount).toBe(0);
             expect(data.records).toHaveLength(2);
+        });
+
+        it('バルク挿入で重複のみの場合は200を返す', async () => {
+            const { getContainer } = await import('@/lib/cosmos');
+            const records = [
+                { id: 'r1', userId: 'guest', questionId: 'q1', examId: 'AP-2024', category: 'cat1' },
+                { id: 'r2', userId: 'guest', questionId: 'q2', examId: 'AP-2024', category: 'cat2' }
+            ];
+
+            (getContainer as any).mockResolvedValue({
+                items: {
+                    create: async () => { throw { code: 409, message: 'Conflict' }; }
+                }
+            });
+
+            const { POST } = await import('@/app/api/learning-records/route');
+            const request = new NextRequest('http://localhost:3000/api/learning-records', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(records)
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(200);
+            expect(data.count).toBe(2);
+            expect(data.duplicateCount).toBe(2);
+            expect(data.records.every((record: any) => record.userId === 'user-1')).toBe(true);
         });
 
         it('バルク挿入でisDescriptive分岐を処理する', async () => {

@@ -8,15 +8,15 @@ tools:
   - execute
 user-invocable: false
 handoffs:
-  - label: フロント実装へ
+  - label: Frontend Implementation フロント実装へ
     agent: frontend-learning-engineer
     prompt: 直前の設計に基づき、Next.js UI とクライアント状態の実装方針を具体化してください。
     send: true
-  - label: バックエンド実装へ
+  - label: Backend Implementation バックエンド実装へ
     agent: backend-data-engineer
     prompt: 直前の設計に基づき、API、Cosmos、試験データ、防壁ルールの実装方針を具体化してください。
     send: true
-  - label: DevOps 確認へ
+  - label: DevOps Review DevOps確認へ
     agent: devops-sre-engineer
     prompt: 直前の設計に基づき、Azure、CI/CD、デプロイ、監視への影響を確認してください。
     send: true
