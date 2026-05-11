@@ -55,8 +55,22 @@ function getExamFile(examId) {
     return null;
 }
 
+function isQuestionLike(value) {
+    return Boolean(
+        value
+        && typeof value === 'object'
+        && !Array.isArray(value)
+        && (
+            value.qNo !== undefined
+            || value.theme !== undefined
+            || value.context !== undefined
+        ),
+    );
+}
+
 function normalizeQuestions(data) {
     if (Array.isArray(data)) return data;
+    if (isQuestionLike(data)) return [data];
     if (Array.isArray(data?.questions)) return data.questions;
     if (data && typeof data === 'object') return [data];
     return [];
