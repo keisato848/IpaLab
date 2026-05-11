@@ -218,6 +218,8 @@ jobs:
             2>/dev/null || echo "Settings already removed or not found"
 
       # App Service 設定: Oryx バイパス + ポート + テレメトリ接続文字列
+      # AI_CHAT_FUNCTION_URL: Gemini API の East Asia 地域制限を回避するために必須。
+      #   本番・Staging ともに同一の US リージョン Function App を経由する。
       - name: Configure App Service settings
         run: |
           az webapp config appsettings set \
@@ -226,7 +228,8 @@ jobs:
             --settings \
               WEBSITE_RUN_FROM_PACKAGE=1 \
               WEBSITES_PORT=8080 \
-              TELEMETRY_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}"
+              TELEMETRY_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}" \
+              AI_CHAT_FUNCTION_URL="https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat"
 
       - name: Deploy to Azure Web App
         run: |

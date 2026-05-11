@@ -14,6 +14,8 @@ const safetySettings = [
 ];
 
 const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash"];
+const MAX_SYSTEM_PROMPT_CHARS = 16000;
+const MAX_USER_MESSAGE_CHARS = 32000;
 
 /**
  * AIアシスタントのチャット応答を生成する Azure Function。
@@ -39,8 +41,17 @@ export async function aiChat(request: HttpRequest, context: InvocationContext): 
         if (!systemPrompt || !userMessage || typeof systemPrompt !== "string" || typeof userMessage !== "string") {
             return { status: 400, jsonBody: { error: "Missing systemPrompt or userMessage" } };
         }
-        if (userMessage.length > 8000 || systemPrompt.length > 16000) {
-            return { status: 400, jsonBody: { error: "Prompt too long" } };
+        if (userMessage.length > MAX_USER_MESSAGE_CHARS || systemPrompt.length > MAX_SYSTEM_PROMPT_CHARS) {
+            return {
+                status: 400,
+                jsonBody: {
+                    error: "Prompt too long",
+                    limits: {
+                        systemPrompt: MAX_SYSTEM_PROMPT_CHARS,
+                        userMessage: MAX_USER_MESSAGE_CHARS,
+                    },
+                },
+            };
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);

@@ -8,11 +8,11 @@ tools:
   - execute
 user-invocable: false
 handoffs:
-  - label: 可観測性確認へ
+  - label: obs-check-可観測性確認へ
     agent: security-observability-engineer
     prompt: 直前の API/Cosmos 変更について、ログ、例外処理、Application Insights、セキュリティ影響を確認してください。
     send: true
-  - label: QA 検証へ
+  - label: qa-verify-QA検証へ
     agent: qa-evidence-engineer
     prompt: 直前の API/Cosmos/試験データ変更について、必要なユニットテストと E2E 回帰観点を整理してください。
     send: true

@@ -4,6 +4,7 @@
 
 | 日付 | 変更内容 |
 |------|------|
+| 2026-05-10 | `/api/score` が Azure App Service 上で `AI_CHAT_FUNCTION_URL` 未設定のまま Gemini 直接呼び出しへフォールバックしないよう、503 の設定エラーとして返す仕様に変更。本番ワークフローにも `AI_CHAT_FUNCTION_URL` を追加し、US Function (`aiChat`) の長文採点プロンプト上限を 32,000 文字へ拡張。 |
 | 2026-05-09 | `/api/score` Gemini 直接呼び出しフォールバック（ローカル開発用）に `systemInstruction: SYSTEM_PROMPT` を追加し、プロキシ経由と採点品質を統一。`export const runtime = 'nodejs'` を追加し Edge Runtime での誤動作リスクを解消。テストの `beforeEach` で `AI_CHAT_FUNCTION_URL` を必ず削除して環境依存を排除。 |
 | 2026-05-09 | `/api/score` が East Asia から Gemini API を直接呼び出せない地域制限バグを修正。`AI_CHAT_FUNCTION_URL` が設定されている場合は US リージョンの Azure Function (`aiChat`) を経由するプロキシ方式に変更。ローカル開発は従来通り直接呼び出し。 |
 | 2026-05-08 | 午後選択式UIのラジオ/チェックボックスに選択肢記号と本文を含むアクセシブル名を付与 |
@@ -151,6 +152,7 @@ sequenceDiagram
 
 > **注意**: Gemini API は East Asia リージョンから直接呼び出せない。本番・Staging では
 > `AI_CHAT_FUNCTION_URL` に US リージョンの Azure Function URL を設定すること。
+> Azure App Service 上で未設定の場合、`/api/score` はローカル開発用の Gemini 直接呼び出しへフォールバックせず、`503 { error: "AI proxy is not configured" }` を返す。
 > 参照: `apps/web/.env.template`
 
 ### 4.3 採点結果の保存
@@ -201,11 +203,11 @@ sequenceDiagram
 | 変数名 | 必須 | 用途 | 備考 |
 |------|------|------|------|
 | `AI_CHAT_FUNCTION_URL` | **本番・Staging 必須** | `/api/score` → US Azure Function プロキシ | 未設定時は `GEMINI_API_KEY` 直接呼び出し（ローカル開発用フォールバック）。East Asia から Gemini を直接呼ぶと地域制限エラーになるため、本番では必須。例: `https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat` |
-| `GEMINI_API_KEY` | ローカル開発のみ必須 | `AI_CHAT_FUNCTION_URL` 未設定時のフォールバック | 本番では `AI_CHAT_FUNCTION_URL` を設定するため不要。未設定かつ `AI_CHAT_FUNCTION_URL` も未設定の場合は 500 を返す |
+| `GEMINI_API_KEY` | ローカル開発のみ必須 | `AI_CHAT_FUNCTION_URL` 未設定時のフォールバック | Azure App Service 上では使用しない。未設定かつ `AI_CHAT_FUNCTION_URL` も未設定の場合は 500、Azure 上で `AI_CHAT_FUNCTION_URL` が未設定の場合は 503 を返す |
 | `COSMOS_DB_CONNECTION` | サーバー運用上必須 | 採点結果の保存・セッション更新 | 未設定時は DB 保存を無効化 |
 | `NEXT_PUBLIC_API_BASE` | 任意 | クライアント API 呼び出し | 未設定時は `/api` |
 
-> **East Asia 地域制限について**: Azure App Service (East Asia) から Gemini API を直接呼び出すと `User location is not supported` エラーになる。すべての Gemini 呼び出しは US East 2 リージョンの Azure Function App (`aiChat`) を経由させること。`AI_CHAT_FUNCTION_URL` が未設定の場合のみ Gemini 直接呼び出しにフォールバックする（ローカル開発専用）。
+> **East Asia 地域制限について**: Azure App Service (East Asia) から Gemini API を直接呼び出すと `User location is not supported` エラーになる。すべての Gemini 呼び出しは US East 2 リージョンの Azure Function App (`aiChat`) を経由させること。`AI_CHAT_FUNCTION_URL` が未設定の場合のみ Gemini 直接呼び出しにフォールバックする（ローカル開発専用）。`aiChat` は午後問題本文を含む採点プロンプトを受けられるよう、`userMessage` 最大 32,000 文字まで許容する。
 
 ---
 

@@ -12,7 +12,7 @@ handoffs:
     agent: qa-evidence-engineer
     prompt: 直前のフロントエンド変更について、必要なユニットテスト、E2E、スクリーンショット証跡を設計してください。
     send: true
-  - label: 可観測性確認へ
+  - label: Observability Check 可観測性確認へ
     agent: security-observability-engineer
     prompt: 直前の UI/API 変更について、ログ、エラーハンドリング、セキュリティ影響を確認してください。
     send: true
