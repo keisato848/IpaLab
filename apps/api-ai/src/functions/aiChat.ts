@@ -41,6 +41,8 @@ export async function aiChat(request: HttpRequest, context: InvocationContext): 
         if (!systemPrompt || !userMessage || typeof systemPrompt !== "string" || typeof userMessage !== "string") {
             return { status: 400, jsonBody: { error: "Missing systemPrompt or userMessage" } };
         }
+        // 採点プロンプトは問題文・模範解答・回答を含むため8000文字を超える場合がある。
+        // Gemini のコンテキスト制限を考慮し、現在の採点経路では上限を明示的に緩和する。
         if (userMessage.length > MAX_USER_MESSAGE_CHARS || systemPrompt.length > MAX_SYSTEM_PROMPT_CHARS) {
             return {
                 status: 400,

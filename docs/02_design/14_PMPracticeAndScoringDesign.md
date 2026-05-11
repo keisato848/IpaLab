@@ -188,7 +188,7 @@ sequenceDiagram
 
 | サービス | 用途 |
 |------|------|
-| Azure Function App (aiChat, US East 2) | `/api/score` からのプロキシ中継。East Asia からの Gemini 地域制限を回避するために **必須** |
+| Azure Function App (aiChat, US East 2) | `/api/score` からのプロキシ中継。East Asia からの Gemini 地域制限を回避するために **必須**。`userMessage` の上限は 32,000 文字、`systemPrompt` の上限は 16,000 文字 |
 | Gemini API | 記述回答の採点とフィードバック生成（Azure Function App 経由で呼び出す） |
 | Azure Cosmos DB LearningRecords | 採点結果の保存 |
 | Azure Cosmos DB LearningSessions | 認証ユーザーの進捗更新 |
