@@ -195,6 +195,12 @@
           "fig6"
         ],
         "answer": "（自動補完・公式解答未同期）この設問の公式解答例はローカルデータへ未同期です。問題文、本文、図表、表、解答群を確認し、設問で指定された条件に沿って回答してください。",
+        "answerChoices": [
+          "ア XX-XX-XX-23-46-4a",
+          "イ XX-XX-XX-f9-48-1b",
+          "ウ XX-XX-XX-fb-44-25",
+          "エ XX-XX-XX-ff-ff-ff"
+        ],
         "explanation": "### 設問3(1) 解説\nTさんは、ARPスプーフィングを行う前に、ネットワーク内の機器情報を取得したいと考えています。これは、IPアドレスとMACアドレスの対応情報を得る「プローブ」の機能（表5 項番1）に該当します。\n\n**正解**: 1\n\n### 設問3(2) 解説\nARPスプーフィング（中間者攻撃, MITM）をX-PC(192.168.15.50, MAC: ウ)で行い、標的PC(192.168.15.51, MAC: ア)とDNSサーバ(192.168.15.98, MAC: イ)間の通信を盗み見ます。\n\n**X-PCのARPテーブル（表7）**\nX-PCは中継機能（項番3）のために、ターゲットの真のMACアドレスを知っている必要があります。\n*   f (192.168.15.51, 標的PCのMAC) = ア\n*   g (192.168.15.98, DNSサーバのMAC) = イ\n\n**標的PCのARPテーブル（表8）**\n標的PCには、X-PCがARP応答を偽装して送ります。\n*   h (192.168.15.50, X-PCのMAC): 攻撃対象ではないため、通常のX-PC MACが記録されます。= ウ\n*   i (192.168.15.98, DNSサーバのMAC): X-PCがDNSサーバを騙るので、X-PC MACが記録されます。= ウ\n\n**正解**: f: ア, g: イ, h: ウ, i: ウ\n\n### 設問3(3) 解説\nパケットはL2SW-1を通過しています。ARPスプーフィングが成功しているため、パケットの宛先MACアドレスは途中でX-PCのMACアドレスに書き換えられます。\n\n*   **Packet 1 (TargetPC → DNS)**: TargetPC (IP: 15.51, MAC: ア) はDNS (15.98)へ送りますが、ARPテーブルにはDNS MACとしてX-PC MAC (ウ)が登録されているため、Destination MACはX-PC MACになります。\n    *   j (送信元 MAC) = ア (15.51のMAC)\n    *   k (宛先 MAC) = ウ (X-PCのMAC)\n*   **Packet 2 (X-PCがDNSへ転送)**: X-PCはパケットを受け取り（k=ウ）、本来の宛先であるDNSへ転送します。Source MACはX-PC MAC (ウ)、Destination MACはDNS MAC (イ)です。\n    *   l (送信元 MAC) = ウ (X-PCのMAC)\n    *   m (宛先 MAC) = イ (15.98のMAC)\n*   **Packet 3 (DNS → TargetPC)**: 監査ログ記載済み。DNS (MAC: イ)はTargetPC (15.51)へ送りますが、ARPテーブルにはTargetPC MACとしてX-PC MAC (ウ)が登録されているため、Destination MACはX-PC MAC (ウ)です。\n*   **Packet 4 (X-PCがTargetPCへ転送)**: X-PCはパケットを受け取り、本来の宛先であるTargetPCへ転送します。Source MACはX-PC MAC (ウ)、Destination MACはTargetPC MAC (ア)です。\n    *   n (送信元 MAC) = ウ (X-PCのMAC)\n    *   o (宛先 MAC) = ア (15.51のMAC)\n\n**正解**: j: ア, k: ウ, l: ウ, m: イ, n: ウ, o: ア",
         "subQuestions": null
       },
