@@ -54,6 +54,7 @@
 | 2026-05-11 | `SC-2021-Spring-PM1` qNo=1 の OAuth 図2・図3参照設問3件について、既存図表の公式由来ラベルを `answerChoices` に構造化し、SC記号選択肢残件を13件へ削減 |
 | 2026-05-11 | `SC-2022-Spring-PM2` / `SC-2022-Fall-PM2` の設問文内に明記された解答群3件を `answerChoices` に構造化し、SC記号選択肢残件を10件へ削減 |
 | 2026-05-11 | `SC-2018-Spring-PM1` / `SC-2019-Fall-PM2` の既存図表に明記された解答群3件を `answerChoices` に構造化し、SC記号選択肢残件を7件へ削減 |
+| 2026-05-11 | SC区分の残る記号回答7件を公式問題PDF・公式解答PDFで照合して `answerChoices` に構造化し、公式解答不一致3件を補正。`SC-2024-Spring-PM` の親子混在設問も分離し、最終監査で主要リスク指標を0件化 |
 
 ## 1. 目的
 
@@ -138,7 +139,7 @@
 
 また、`scripts/audit-afternoon-data-quality.mjs` は、`SC-2024-Spring-PM` / `SC-2024-Fall-PM` のような「トップレベルが単一大問オブジェクトで、その中に `questions` 配列を持つ」JSON形状を、設問配列ではなく大問1件として正規化するよう修正した。この監査ロジック修正により、トップレベル `context` を参照できず下線不足として検出される偽陽性を防止する。
 
-再監査では、午後問題ディレクトリ118件、大問253件、解答欄1,577件に対して、回答欠落0件、解説欠落0件、`underlineRefMissing=0` を確認した。`SC-2021-Spring-PM1` qNo=1 の図2・図3参照設問3件、`SC-2022-Spring-PM2` / `SC-2022-Fall-PM2` の設問文内解答群3件、及び `SC-2018-Spring-PM1` / `SC-2019-Fall-PM2` の既存図表解答群3件を追加構造化した後、`symbolNoStructuralChoices` は 7 件残っており、次バッチで公式PDF照合を継続する。
+再監査では、午後問題ディレクトリ118件、大問253件、解答欄1,577件に対して、回答欠落0件、解説欠落0件、`underlineRefMissing=0` を確認した。`SC-2021-Spring-PM1` qNo=1 の図2・図3参照設問3件、`SC-2022-Spring-PM2` / `SC-2022-Fall-PM2` の設問文内解答群3件、`SC-2018-Spring-PM1` / `SC-2019-Fall-PM2` の既存図表解答群3件、及び残る `SC-2018-Spring-PM2` / `SC-2019-Spring-PM2` / `SC-2020-Fall-PM2` / `SC-2021-Spring-PM2` の公式PDF解答群7件を追加構造化した。公式解答PDF照合で判明した `SC-2018-Spring-PM2` 設問4(2)、`SC-2019-Spring-PM2` 設問5(2)、`SC-2020-Fall-PM2` 設問3(1) の回答不一致も補正した。さらに `SC-2024-Spring-PM` の親設問回答と子設問が同居していた構造を分離し、最終監査で `answerMissing=0`、`explanationMissing=0`、`underlineRefMissing=0`、`parentDirectWithChildren=0`、`multipleLimits=0`、`symbolNoStructuralChoices=0`、`englishTextFragments=0` を確認した。
 
 ### 2.3 公式ソース監査の確認結果
 
@@ -253,6 +254,8 @@ E2E は UI 変更または代表データ修正の完了時に実行する。実
 
 ## 7. 現時点の残課題
 
+2026-05-11 時点の最終データ監査では、午後問題ディレクトリ118件、大問253件、解答欄1,577件について、回答欠落・解説欠落・下線参照欠落・親子混在・複数字数条件・記号回答の解答群未構造化・英語混入はいずれも0件である。以下はデータ欠落ではなく、ブラウザ表示 spot check や未抽出過年度の後続作業として扱う。
+
 - AP-2025-Spring-PM qNo=1 の表示 spot check（表2・解答群・下線根拠・設問3/4分割は公式PDFに基づき補正済み）
 - AP-2022-Fall-PM qNo=1 の表示 spot check（親見出し explanation 削除により余分な親解答欄リスクを補正済み）
 - SA-2024-Spring-PM1 qNo=2 の表示 spot check（下線①〜⑤の本文根拠と公式解答同期は補正済み）
@@ -277,10 +280,9 @@ E2E は UI 変更または代表データ修正の完了時に実行する。実
 - SA区分 PM1 の複数字数制限表示 spot check（受講者条件/講座開催タイミング、問題点/解決策などの項目別解答欄へ分割し、SA区分の multipleLimits を0件化）
 - SC区分 PM/PM1/PM2 の表示 spot check（親見出し explanation 削除と入れ子設問フラット化により broadPromptNoLimit / parentDirectWithChildren を区分内 0 件化）
 - SC-2018-Fall-PM1 / SC-2019-Spring-PM1 / SC-2022-Fall-PM1 の単独設問表示 spot check（空 subQuestions を公式解答付きの子設問に正規化し、self-inspect R17 を解消）
-- SC区分 PM/PM1/PM2 の選択式表示 spot check（本文または親設問本文に明示された解答群を `answerChoices` に構造化し、残る56件は公式PDF確認が必要な手動対象として維持）
+- SC区分 PM/PM1/PM2 の選択式表示 spot check（本文、図表、公式問題PDFに明示された解答群を `answerChoices` に構造化し、`symbolNoStructuralChoices` を0件化済み）
 - SC区分 PM1/PM2 の複数字数制限表示 spot check（CORS項目、調査内容/手法、手段/問題などの項目別解答欄へ分割し、SC区分の multipleLimits を0件化）
 - SA-2024-Spring-PM1 qNo=1 の表示 spot check（親見出しはUI抑止済み、公式解答同期済み）
-- SC-PM1/PM2 の下線・記号回答・図表参照の高リスク箇所の公式PDF照合
 - FE-2024-Public-PM の選択肢本文復元
 - DB/ES過年度・AU/SM公式PDF取得の段階抽出計画具体化
 - 受験者想定 E2E のシナリオ追加
