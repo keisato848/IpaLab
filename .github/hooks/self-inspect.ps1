@@ -1116,10 +1116,12 @@ if (-not (Test-Path $afternoonDataAudit)) {
 } else {
     $raw = Get-Content -LiteralPath $afternoonDataAudit -Raw
     if ($raw -notmatch 'shortAnswerNoLimit' -or
-        $raw -notmatch 'shortAnswerNoLimitPattern') {
+        $raw -notmatch 'shortAnswerNoLimitPattern' -or
+        $raw -notmatch 'answerMissing' -or
+        $raw -notmatch 'explanationMissing') {
         Add-Finding -Rule 'R27-afternoon-data-quality-audit' -Severity 'Medium' `
             -File $afternoonDataAudit `
-            -Detail 'PM/PM1 の字数制限なし短答を監査できる shortAnswerNoLimit ルールを維持してください'
+            -Detail 'PM/PM1 の字数制限なし短答と午後 answer / explanation 欠落を監査できるルールを維持してください'
     }
 }
 

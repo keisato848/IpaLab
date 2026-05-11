@@ -17,6 +17,8 @@ const englishTextFragmentPattern = /\b(?:The function|Fill the blank|Which of th
 const underlineRefPattern = /下線\s*([①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳]|\d{1,2})/g;
 const underlineEvidencePattern = /<u\b|underline|text-decoration/i;
 const choiceKeys = ['choices', 'options', 'answerChoices'];
+const answerFieldKeys = ['answer', 'modelAnswer', 'correctOption', 'correctAnswer', 'correct', 'expectedAnswer', 'answerExample', 'sampleAnswer'];
+const explanationFieldKeys = ['explanation', 'commentary', '解説'];
 
 const args = new Map(
     process.argv.slice(2).map((arg) => {
@@ -156,6 +158,8 @@ function makeStats() {
         files: 0,
         mainQuestions: 0,
         answerFields: 0,
+        answerMissing: 0,
+        explanationMissing: 0,
         underlineRefs: 0,
         underlineNoEvidence: 0,
         underlineRefMissing: 0,
@@ -280,6 +284,30 @@ for (const dirent of fs.readdirSync(questionsRoot, { withFileTypes: true })) {
                 const refs = getUnderlineRefs(promptText);
                 const symbolAnswer = symbolAnswerPattern.test(promptText);
                 fileStats.answerFields++;
+
+                if (!answerFieldKeys.some((key) => hasText(item.holder?.[key]))) {
+                    fileStats.answerMissing++;
+                    addExample(examples, 'answerMissing', {
+                        examId,
+                        file: normalizePath(filePath),
+                        qNo: question.qNo,
+                        subQNo: item.label,
+                        line: findLine(filePath, promptText),
+                        text: promptText.replace(/\s+/g, ' ').slice(0, 120),
+                    });
+                }
+
+                if (!explanationFieldKeys.some((key) => hasText(item.holder?.[key]))) {
+                    fileStats.explanationMissing++;
+                    addExample(examples, 'explanationMissing', {
+                        examId,
+                        file: normalizePath(filePath),
+                        qNo: question.qNo,
+                        subQNo: item.label,
+                        line: findLine(filePath, promptText),
+                        text: promptText.replace(/\s+/g, ' ').slice(0, 120),
+                    });
+                }
 
                 if (refs.length > 0) {
                     fileStats.underlineRefs++;
@@ -413,10 +441,10 @@ if (jsonOutput) {
     console.log(`files=${total.files} mainQuestions=${total.mainQuestions} answerFields=${total.answerFields}`);
     console.log(`missingTargetCategories=${missingTargetCategories.join(',') || 'none'}`);
     console.log('');
-    console.log('| Category | Files | Main | Fields | Underline refs | No underline evidence | Ref missing | Parent+children | Explanation-only parent | Multiple limits | Symbol no choices | Broad no limit | Short no limit | English fragments |');
-    console.log('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
+    console.log('| Category | Files | Main | Fields | Answer missing | Explanation missing | Underline refs | No underline evidence | Ref missing | Parent+children | Explanation-only parent | Multiple limits | Symbol no choices | Broad no limit | Short no limit | English fragments |');
+    console.log('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
     for (const [category, stats] of [...byCategory.entries()].sort(([a], [b]) => a.localeCompare(b))) {
-        console.log(`| ${category} | ${stats.files} | ${stats.mainQuestions} | ${stats.answerFields} | ${stats.underlineRefs} | ${stats.underlineNoEvidence} | ${stats.underlineRefMissing} | ${stats.parentDirectWithChildren} | ${stats.explanationOnlyParentWithChildren} | ${stats.multipleLimits} | ${stats.symbolNoStructuralChoices} | ${stats.broadPromptNoLimit} | ${stats.shortAnswerNoLimit} | ${stats.englishTextFragments} |`);
+        console.log(`| ${category} | ${stats.files} | ${stats.mainQuestions} | ${stats.answerFields} | ${stats.answerMissing} | ${stats.explanationMissing} | ${stats.underlineRefs} | ${stats.underlineNoEvidence} | ${stats.underlineRefMissing} | ${stats.parentDirectWithChildren} | ${stats.explanationOnlyParentWithChildren} | ${stats.multipleLimits} | ${stats.symbolNoStructuralChoices} | ${stats.broadPromptNoLimit} | ${stats.shortAnswerNoLimit} | ${stats.englishTextFragments} |`);
     }
     console.log('');
     for (const [key, values] of Object.entries(examples)) {
@@ -429,6 +457,8 @@ if (jsonOutput) {
 }
 
 const findingCount = total.underlineNoEvidence
+    + total.answerMissing
+    + total.explanationMissing
     + total.underlineRefMissing
     + total.explanationOnlyParentWithChildren
     + total.multipleLimits
