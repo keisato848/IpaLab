@@ -53,6 +53,7 @@
 | 2026-05-11 | SC区分の高優先残件を公式PDF照合で個別補正し、`underlineRefMissing` を0件化。`SC-2018-Fall-PM1` / `SC-2017-Spring-PM1` / `SC-2018-Fall-PM2` / `SC-2024-Spring-PM` / `SC-2024-Fall-PM` / `SC-2020-Fall-PM1` / `SC-2017-Fall-PM2` の公式解答・解答群・下線根拠を同期 |
 | 2026-05-11 | `SC-2021-Spring-PM1` qNo=1 の OAuth 図2・図3参照設問3件について、既存図表の公式由来ラベルを `answerChoices` に構造化し、SC記号選択肢残件を13件へ削減 |
 | 2026-05-11 | `SC-2022-Spring-PM2` / `SC-2022-Fall-PM2` の設問文内に明記された解答群3件を `answerChoices` に構造化し、SC記号選択肢残件を10件へ削減 |
+| 2026-05-11 | `SC-2018-Spring-PM1` / `SC-2019-Fall-PM2` の既存図表に明記された解答群3件を `answerChoices` に構造化し、SC記号選択肢残件を7件へ削減 |
 
 ## 1. 目的
 
@@ -137,7 +138,7 @@
 
 また、`scripts/audit-afternoon-data-quality.mjs` は、`SC-2024-Spring-PM` / `SC-2024-Fall-PM` のような「トップレベルが単一大問オブジェクトで、その中に `questions` 配列を持つ」JSON形状を、設問配列ではなく大問1件として正規化するよう修正した。この監査ロジック修正により、トップレベル `context` を参照できず下線不足として検出される偽陽性を防止する。
 
-再監査では、午後問題ディレクトリ118件、大問253件、解答欄1,577件に対して、回答欠落0件、解説欠落0件、`underlineRefMissing=0` を確認した。`SC-2021-Spring-PM1` qNo=1 の図2・図3参照設問3件、及び `SC-2022-Spring-PM2` / `SC-2022-Fall-PM2` の設問文内解答群3件を追加構造化した後、`symbolNoStructuralChoices` は 10 件残っており、次バッチで公式PDF照合を継続する。
+再監査では、午後問題ディレクトリ118件、大問253件、解答欄1,577件に対して、回答欠落0件、解説欠落0件、`underlineRefMissing=0` を確認した。`SC-2021-Spring-PM1` qNo=1 の図2・図3参照設問3件、`SC-2022-Spring-PM2` / `SC-2022-Fall-PM2` の設問文内解答群3件、及び `SC-2018-Spring-PM1` / `SC-2019-Fall-PM2` の既存図表解答群3件を追加構造化した後、`symbolNoStructuralChoices` は 7 件残っており、次バッチで公式PDF照合を継続する。
 
 ### 2.3 公式ソース監査の確認結果
 
