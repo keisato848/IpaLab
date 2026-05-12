@@ -8,11 +8,11 @@ tools:
   - execute
 user-invocable: false
 handoffs:
-  - label: DevOps へ運用反映
+  - label: DevOps - 運用反映
     agent: devops-sre-engineer
     prompt: 直前のセキュリティ/可観測性指摘を CI/CD、hooks、Azure 運用へ反映してください。
     send: true
-  - label: ドキュメント同期へ
+  - label: Documentation - ドキュメント同期
     agent: documentation-steward
     prompt: 直前のセキュリティ/可観測性判断を設計書、運用手順、変更履歴へ反映してください。
     send: true

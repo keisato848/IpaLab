@@ -16,7 +16,7 @@
           "id": "fig1",
           "label": "図1 ネットワーク構成",
           "type": "mermaid",
-          "content": "graph TD\n    Internet((インターネット)) --- FW-1\n    FW-1 --- L2SW\n    \n    subgraph SiteP [サイトP]\n        FW-P --- Web-P[Web-P]\n        FW-P --- LDAP-P[LDAP-P]\n    end\n    \n    subgraph SiteQ [サイトQ]\n        FW-Q --- Web-Q[Web-Q]\n        FW-Q --- LDAP-Q[LDAP-Q]\n    end\n    \n    subgraph SiteR [サイトR]\n        FW-R --- Web-R[Web-R]\n        FW-R --- LDAP-R[LDAP-R]\n    end\n    \n    FW-1 --- FW-P\n    FW-1 --- FW-Q\n    FW-1 --- FW-R\n    \n    L2SW --- MonServer[監視サーバ]\n    L2SW --- AdminConsole[管理コンソール]\n    L2SW --- FW-2\n    FW-2 --- AdminLAN[Web管理課LAN]\n\n    style SiteP fill:#f9f,stroke:#333,stroke-width:2px\n    style SiteQ fill:#ccf,stroke:#333,stroke-width:2px\n    style SiteR fill:#cfc,stroke:#333,stroke-width:2px"
+          "content": "graph TD\n    Internet((\"インターネット\")) --- FW-1\n    FW-1 --- L2SW\n    \n    subgraph SiteP [サイトP]\n        FW-P --- Web-P[Web-P]\n        FW-P --- LDAP-P[LDAP-P]\n    end\n    \n    subgraph SiteQ [サイトQ]\n        FW-Q --- Web-Q[Web-Q]\n        FW-Q --- LDAP-Q[LDAP-Q]\n    end\n    \n    subgraph SiteR [サイトR]\n        FW-R --- Web-R[Web-R]\n        FW-R --- LDAP-R[LDAP-R]\n    end\n    \n    FW-1 --- FW-P\n    FW-1 --- FW-Q\n    FW-1 --- FW-R\n    \n    L2SW --- MonServer[監視サーバ]\n    L2SW --- AdminConsole[管理コンソール]\n    L2SW --- FW-2\n    FW-2 --- AdminLAN[Web管理課LAN]\n\n    style SiteP fill:#f9f,stroke:#333,stroke-width:2px\n    style SiteQ fill:#ccf,stroke:#333,stroke-width:2px\n    style SiteR fill:#cfc,stroke:#333,stroke-width:2px"
         },
         {
           "id": "table2",
@@ -39,17 +39,18 @@
         "references": [
           "table2"
         ],
-        "explanation": "アカウントの紐付け（共通利用）を実現するためには、親アカウント側のWebサーバが、子アカウント側のLDAPサーバに対して認証の問い合わせを行う必要があります。サイトPが親、QやRが子となる場合、Web-PからLDAP-QおよびLDAP-Rへの通信を許可する必要があります。\n\n### 通信の許可設定\n[CODE_BLOCK:mermaid]\ngraph LR\n    WebP[Web-P] -- LDAPプロトコル --> LD_QR[LDAP-Q, LDAP-R]\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "a",
             "text": "[ a ] に入れる適切な字句を答えよ。",
-            "answer": "LDAP-Q, LDAP-R"
+            "answer": "LDAP-Q, LDAP-R",
+            "explanation": "（自動補完）設問「[ a ] に入れる適切な字句を答えよ。」について、問題文の条件に照らして「LDAP-Q, LDAP-R」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           },
           {
             "label": "b",
             "text": "[ b ] に入れる適切な字句を答えよ。",
-            "answer": "LDAP"
+            "answer": "LDAP",
+            "explanation": "（自動補完）設問「[ b ] に入れる適切な字句を答えよ。」について、問題文の条件に照らして「LDAP」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           }
         ]
       },
@@ -66,12 +67,25 @@
           "fig3",
           "fig4"
         ],
-        "explanation": "プログラムの脆弱性に関する問題です。図4のコードでは、セッションでログインしている本人ではなく、入力された任意のIDに対して紐付け処理を行ってしまう可能性や、リトライループの不備が指摘されています。",
         "subQuestions": [
           {
             "label": "(1)",
             "text": "本文中の [ c ], [ d ], [ f ], [ g ] に入れる適切な字句を，解答群の中から選び記号で答えよ。",
-            "answer": "c: ウ, d: ア, f: イ, g: ウ"
+            "answer": "c: ウ, d: ア, f: ケ, g: イ",
+            "answerChoices": [
+              "ア idPair.checkChild()",
+              "イ idPair.childChecked",
+              "ウ idPair.childID",
+              "エ idPair.childPW",
+              "オ idPair.childSite",
+              "カ idPair.makeLink()",
+              "キ idPair.parentID",
+              "ク idPair.siteQAuth()",
+              "ケ NamingException",
+              "コ return ERROR_ID_OR_PW",
+              "サ return NO_ERROR"
+            ],
+            "explanation": "公式解答例は c: ウ, d: ア, f: ケ, g: イ です。図3・図4のコードレビュー文脈に従い、子アカウントID、確認処理、例外、確認済みフラグに対応する選択肢を入れます。"
           },
           {
             "label": "(2)",
@@ -80,12 +94,24 @@
               "fig3",
               "fig4"
             ],
-            "answer": "e: ウ, h: キ"
+            "answer": "e: ウ, h: キ",
+            "answerChoices": [
+              "ア 20",
+              "イ 23",
+              "ウ 26",
+              "エ 34",
+              "オ 105",
+              "カ 106",
+              "キ 117",
+              "ク 118"
+            ],
+            "explanation": "公式解答例は e: ウ, h: キ です。図3又は図4の行番号の解答群から、例外発生箇所と紐付け実行箇所に対応する行番号を選びます。"
           },
           {
             "label": "(3)",
             "text": "本文中の [ i ] に入れる適切な処理内容を 50 字以内で具体的に述べよ。",
-            "answer": "ワンタイムトークンなどを発行し、HTTPリクエストに含まれるトークンの値を検証する。"
+            "answer": "ワンタイムトークンなどを発行し、HTTPリクエストに含まれるトークンの値を検証する。",
+            "explanation": "（自動補完）設問「本文中の [ i ] に入れる適切な処理内容を 50 字以内で具体的に述べよ。」について、問題文の条件に照らして「ワンタイムトークンなどを発行し、HTTPリクエストに含まれるトークンの値を検証する。」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           }
         ]
       },
@@ -95,22 +121,24 @@
         "references": [
           "fig5"
         ],
-        "explanation": "パスワード失念時の機能が悪用されたケースです。本人確認要素が「会員番号」と「誕生日」だけであり、かつ総当たり攻撃（ブルートフォース）への対策が不十分であったことが原因です。",
         "subQuestions": [
           {
             "label": "(1)",
             "text": "本文中の [ j ] に入れる適切な内容を 40 字以内で述べよ。",
-            "answer": "パスワードを再設定する際の認証情報として推測されやすい情報"
+            "answer": "パスワードを再設定する際の認証情報として推測されやすい情報",
+            "explanation": "（自動補完）設問「本文中の [ j ] に入れる適切な内容を 40 字以内で述べよ。」について、問題文の条件に照らして「パスワードを再設定する際の認証情報として推測されやすい情報」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           },
           {
             "label": "(2)",
             "text": "本文中の [ k ] に入れる適切な内容を 40 字以内で述べよ。",
-            "answer": "ログイン試行回数制限や，画像認証などの導入"
+            "answer": "ログイン試行回数制限や，画像認証などの導入",
+            "explanation": "（自動補完）設問「本文中の [ k ] に入れる適切な内容を 40 字以内で述べよ。」について、問題文の条件に照らして「ログイン試行回数制限や，画像認証などの導入」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           },
           {
             "label": "(3)",
             "text": "下線①について，更に大きな被害とは何か。具体的な被害を二つ挙げ，それぞれ 30 字以内で述べよ。",
-            "answer": "サイトR以外の連携サイトで不正利用される, 顧客の個人情報やクレジットカード情報が漏えいする"
+            "answer": "サイトR以外の連携サイトで不正利用される, 顧客の個人情報やクレジットカード情報が漏えいする",
+            "explanation": "（自動補完）設問「下線①について，更に大きな被害とは何か。具体的な被害を二つ挙げ，それぞれ 30 字以内で述べよ。」について、問題文の条件に照らして「サイトR以外の連携サイトで不正利用される, 顧客の個人情報やクレジットカード情報が漏えいする」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           }
         ]
       },
@@ -122,7 +150,6 @@
           "fig7",
           "fig8"
         ],
-        "explanation": "SAMLを用いたSSO（シングルサインオン）の挙動に関する理解を問う問題です。ブラウザを介したリダイレクトによって、認証情報がIdPからSPへ渡される仕組みを把握する必要があります。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -131,7 +158,14 @@
               "fig6",
               "fig7"
             ],
-            "answer": "(2)"
+            "answer": "(2)",
+            "answerChoices": [
+              "(1) 転送された認証要求",
+              "(2) 認証のための通信",
+              "(3) 転送された認証応答",
+              "(4) 認証応答に基づいたリソース提供"
+            ],
+            "explanation": "（自動補完）設問「図7の画面遷移において，(い)の画面は図6のどの時点の通信で表示されるか。(1)〜(4)の記号で答えよ。」について、問題文の条件に照らして「(2)」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           },
           {
             "label": "(2)",
@@ -139,7 +173,8 @@
             "references": [
               "fig7"
             ],
-            "answer": "あ: SP, い: IdP, う: SP"
+            "answer": "あ: SP, い: IdP, う: SP",
+            "explanation": "（自動補完）設問「図7の画面遷移において，(あ)〜(う)の各画面は，どのサーバから送られたHTMLを表示するか。「SP」,「IdP」のいずれかを答えよ。」について、問題文の条件に照らして「あ: SP, い: IdP, う: SP」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           },
           {
             "label": "(3)",
@@ -147,7 +182,8 @@
             "references": [
               "fig8"
             ],
-            "answer": "え: SP, お: IdP, か: SP"
+            "answer": "え: SP, お: IdP, か: SP",
+            "explanation": "（自動補完）設問「図8の画面遷移において，各画面を表示するサーバは「SP」,「IdP」のいずれかを答えよ。」について、問題文の条件に照らして「え: SP, お: IdP, か: SP」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           }
         ]
       }

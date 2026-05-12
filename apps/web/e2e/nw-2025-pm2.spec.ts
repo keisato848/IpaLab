@@ -22,7 +22,7 @@ test.describe('NW-2025-Spring-PM2 午後IIデータ表示', () => {
 
     await expect(page.getByRole('heading', { name: '社内ネットワークのIPv6対応' }).first()).toBeVisible({ timeout: 30_000 });
     await expect(page.getByRole('heading', { name: '設問一覧' })).toBeVisible();
-    await expect(page.getByText('全4問')).toBeVisible();
+    await expect(page.getByText('解答欄 32')).toBeVisible();
     await expect(page.locator('textarea')).toHaveCount(32);
     await expect(page.getByText('本文中の [ a ] に入れる適切な字句を答えよ。')).toBeVisible();
     await expect(page.getByText('表1中の [ ケ ] に入れる適切な字句を答えよ。')).toBeVisible();
@@ -37,7 +37,7 @@ test.describe('NW-2025-Spring-PM2 午後IIデータ表示', () => {
 
     await expect(page.getByRole('heading', { name: 'IoT システムの設計' }).first()).toBeVisible({ timeout: 30_000 });
     await expect(page.getByRole('heading', { name: '設問一覧' })).toBeVisible();
-    await expect(page.getByText('全4問')).toBeVisible();
+    await expect(page.getByText('解答欄 31')).toBeVisible();
     await expect(page.locator('textarea')).toHaveCount(31);
     await expect(page.getByText('本文中の [ l ] に入れる適切な字句を答えよ。')).toBeVisible();
     await expect(page.getByText('本文中の下線②について、サーバが送信したACKを、図5中の(i)〜(ix)で答えよ。')).toBeVisible();

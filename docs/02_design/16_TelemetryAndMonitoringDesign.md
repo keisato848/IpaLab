@@ -104,7 +104,7 @@ sequenceDiagram
 | Provider | `apps/web/components/providers/TelemetryProvider.tsx` | クライアント SDK 初期化と認証ユーザー文脈の反映 |
 | Instrumentation | `apps/web/instrumentation.ts` | Node 専用計測初期化の分岐 |
 | Instrumentation | `apps/web/instrumentation.node.ts` | Azure Monitor SDK 初期化 |
-| API | `apps/web/app/api/config/telemetry/route.ts` | 接続文字列を no-store で返す |
+| API | `apps/web/app/api/config/telemetry/route.ts` | ブラウザ用接続文字列を no-store で返す |
 | API | `apps/web/app/api/track/route.ts` | PageViews を CosmosDB に保存 |
 | Layout | `apps/web/app/(main)/layout.tsx` | ページビュー追跡を TelemetryProvider に委譲する宣言 |
 
@@ -125,8 +125,8 @@ sequenceDiagram
 
 | 変数名 | 必須 | 用途 | 備考 |
 |------|------|------|------|
-| `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` | 任意 | クライアント SDK の接続文字列 | script 埋込と API の両方で参照 |
-| `TELEMETRY_CONNECTION_STRING` | 任意 | Node 側 SDK の接続文字列 | AAD 認証付き送信に使用 |
+| `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` | 任意 | クライアント SDK の接続文字列 | 明示設定された場合のみブラウザ SDK を有効化 |
+| `TELEMETRY_CONNECTION_STRING` | 任意 | Node 側 SDK の接続文字列 | AAD 認証付き送信に使用。`/api/config/telemetry` では返さない |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | 任意 | Google Analytics 埋込 | 未設定時は無効 |
 | `OTEL_SERVICE_NAME` | 任意 | OpenTelemetry サービス名 | 未設定時は `pm-exam-dx-web` を自動設定 |
 
@@ -165,14 +165,15 @@ Node 側では `OTEL_SERVICE_NAME=pm-exam-dx-web` を既定値として使う。
 
 | エンドポイント | メソッド | 認証要否 | 用途 | 備考 |
 |------|------|------|------|------|
-| `/api/config/telemetry` | GET | 不要 | 接続文字列返却 | `Cache-Control: no-store` |
+| `/api/config/telemetry` | GET | 不要 | ブラウザ用接続文字列返却 | `Cache-Control: no-store` |
 | `/api/track` | POST | 不要 | PageViews 保存 | DB 障害時も `{ ok: true }` を返す |
 
 ### 9.1 `/api/config/telemetry`
 
 - `headers()` を呼んで動的レンダリングを強制する
-- `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` または `TELEMETRY_CONNECTION_STRING` を返す
-- 接続文字列は公開情報として扱う方針である
+- `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` のみを返す
+- `TELEMETRY_CONNECTION_STRING` は Node 側 Managed Identity 送信用であり、ブラウザには返さない
+- `DisableLocalAuth=true` の Application Insights へ JavaScript SDK は直接送信できないため、ブラウザ計測を有効化する場合は別途ブラウザ専用リソースまたは認証済みプロキシを設計する
 
 ### 9.2 `/api/track`
 
@@ -189,6 +190,7 @@ Node 側では `OTEL_SERVICE_NAME=pm-exam-dx-web` を既定値として使う。
 1. `app/layout.tsx` が `window.__APPINSIGHTS_CONNECTION_STRING__` を埋め込む
 2. `TelemetryProvider` は props または window グローバルから初期値を解決する
 3. 未解決時のみ `/api/config/telemetry` を fetch する
+4. `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` が未設定ならクライアント SDK は初期化しない
 
 ### 10.2 SDK の一度きり初期化
 

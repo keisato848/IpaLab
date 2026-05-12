@@ -23,11 +23,16 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'apps/web/**'
-      - 'packages/**'
-      - '.github/workflows/azure-app-service.yml'
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -213,6 +218,8 @@ jobs:
             2>/dev/null || echo "Settings already removed or not found"
 
       # App Service 設定: Oryx バイパス + ポート + テレメトリ接続文字列
+      # AI_CHAT_FUNCTION_URL: Gemini API の East Asia 地域制限を回避するために必須。
+      #   本番・Staging ともに同一の US リージョン Function App を経由する。
       - name: Configure App Service settings
         run: |
           az webapp config appsettings set \
@@ -221,7 +228,8 @@ jobs:
             --settings \
               WEBSITE_RUN_FROM_PACKAGE=1 \
               WEBSITES_PORT=8080 \
-              TELEMETRY_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}"
+              TELEMETRY_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}" \
+              AI_CHAT_FUNCTION_URL="https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat"
 
       - name: Deploy to Azure Web App
         run: |
@@ -381,7 +389,8 @@ jobs:
           script: |
             const appName = process.env.STAGING_APP_NAME;
             const stagingUrl = `https://${appName}.azurewebsites.net`;
-            const sha7 = '${{ github.sha }}'.substring(0, 7);
+            const headSha = context.payload.pull_request?.head?.sha || '${{ github.sha }}';
+            const sha7 = headSha.substring(0, 7);
             const branch = '${{ github.head_ref }}';
             const body = [
               '## ✅ Staging デプロイ完了',

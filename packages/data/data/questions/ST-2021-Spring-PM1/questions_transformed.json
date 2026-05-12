@@ -10,7 +10,7 @@
           "id": "fig1",
           "label": "図1 ビッグデータと AI を活用できるサービスプラットフォーム",
           "type": "mermaid",
-          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    subgraph SP [サービスプラットフォーム]\n        subgraph BD [ビッグデータ]\n            AD[分析データ<br/>需要予測<br/>最適走行ルート<br/>乗車時間予測<br/>目安料金予測]\n            VD[車両データ<br/>走行位置情報<br/>空車情報<br/>実車実績<br/>注文受付情報]\n            CD[顧客データ<br/>アカウント情報<br/>決済方法<br/>注文履歴<br/>予約注文情報]\n            ED[外部データ<br/>地図情報<br/>気象情報<br/>渋滞情報<br/>交通情報<br/>イベント情報]\n        end\n        AI((AIによる情報更新))\n        subgraph SG [サービス群]\n            S1[需要予測サービス]\n            S2[時間・料金予測サービス]\n            S3[空車検索サービス]\n            S4[位置情報提供サービス]\n            S5[予約・注文サービス]\n            S6[各種決済接続サービス]\n        end\n        BD <--> AI\n        AI <--> SG\n    end\n    \n    DA[車載アプリ] <--> SP\n    CA[配車アプリ] <--> SP\n    \n    style SP fill:#f9f9f9,stroke:#333,stroke-width:2px\n    style BD fill:#fff,stroke:#333\n    style SG fill:#fff,stroke:#333\n    style AI fill:#fff,stroke:#333,stroke-dasharray: 5 5\n[/CODE_BLOCK]"
+          "content": "[CODE_BLOCK:mermaid]\ngraph TD\n    subgraph SP [サービスプラットフォーム]\n        subgraph BD [ビッグデータ]\n            AD[分析データ<br/>需要予測<br/>最適走行ルート<br/>乗車時間予測<br/>目安料金予測]\n            VD[車両データ<br/>走行位置情報<br/>空車情報<br/>実車実績<br/>注文受付情報]\n            CD[顧客データ<br/>アカウント情報<br/>決済方法<br/>注文履歴<br/>予約注文情報]\n            ED[外部データ<br/>地図情報<br/>気象情報<br/>渋滞情報<br/>交通情報<br/>イベント情報]\n        end\n        AI((\"AIによる情報更新\"))\n        subgraph SG [サービス群]\n            S1[需要予測サービス]\n            S2[時間・料金予測サービス]\n            S3[空車検索サービス]\n            S4[位置情報提供サービス]\n            S5[予約・注文サービス]\n            S6[各種決済接続サービス]\n        end\n        BD <--> AI\n        AI <--> SG\n    end\n    \n    DA[車載アプリ] <--> SP\n    CA[配車アプリ] <--> SP\n    \n    style SP fill:#f9f9f9,stroke:#333,stroke-width:2px\n    style BD fill:#fff,stroke:#333\n    style SG fill:#fff,stroke:#333\n    style AI fill:#fff,stroke:#333,stroke-dasharray: 5 5\n[/CODE_BLOCK]"
         }
       ]
     },
@@ -18,12 +18,12 @@
       {
         "subQNo": "設問1",
         "text": "〔A社の新サービス〕について，A社が収益を伸ばすために，サービスプラットフォームを構築した目的を二つ，それぞれ 10 字以内で述べよ。",
-        "explanation": "冒頭の記述「収益を伸ばすために、顧客が乗車した状態...である実車率の向上、及び顧客の利便性の向上に取り組む目的で」から抽出します。\n\n### 回答のポイント\n- 一つ目：実車率の向上\n- 二つ目：利便性の向上"
+        "explanation": "冒頭の記述「収益を伸ばすために、顧客が乗車した状態...である実車率の向上、及び顧客の利便性の向上に取り組む目的で」から抽出します。\n\n### 回答のポイント\n- 一つ目：実車率の向上\n- 二つ目：利便性の向上",
+        "answer": "（自動補完・公式解答未同期）この設問の公式解答例はローカルデータへ未同期です。問題文、本文、図表、表、解答群を確認し、設問で指定された条件に沿って回答してください。"
       },
       {
         "subQNo": "設問2",
         "text": "〔車載アプリとサービスプラットフォームの連携〕について，(1)，(2)に答えよ。",
-        "explanation": "車載アプリの機能が、ドライバと顧客それぞれの不満をどう解決するかを読み取ります。\n\n### プロセスの可視化\n[CODE_BLOCK:mermaid]\ngraph LR\n    A[他空車位置の表示] --> B[空車の集中回避]\n    B --> C[効率的な顧客獲得]\n    D[走行ルートの表示] --> E[道順指示の不要化]\n    E --> F[顧客の負担軽減]\n[/CODE_BLOCK]",
         "subQuestions": [
           {
             "label": "(1)",
@@ -42,12 +42,12 @@
       {
         "subQNo": "設問3",
         "text": "〔配車アプリとサービスプラットフォームの連携〕について，A社は，AI が多くの外部データを活用することで，どのような改善を期待できると考えたか。30 字以内で述べよ。",
-        "explanation": "記述内の「予測と実績のかい離を分析するとともに...予測の精度を向上させていく」に基づきます。\n\n### データの流れ\n[CODE_BLOCK:mermaid]\ngraph TD\n    A[外部データ: 渋滞・天候等] --> B[AIによる分析]\n    C[蓄積ビッグデータ] --> B\n    B --> D{予測の精度向上}\n    D --> E[待ち時間/料金の正確化]\n[/CODE_BLOCK]"
+        "explanation": "記述内の「予測と実績のかい離を分析するとともに...予測の精度を向上させていく」に基づきます。\n\n### データの流れ\n[CODE_BLOCK:mermaid]\ngraph TD\n    A[外部データ: 渋滞・天候等] --> B[AIによる分析]\n    C[蓄積ビッグデータ] --> B\n    B --> D{予測の精度向上}\n    D --> E[待ち時間/料金の正確化]\n[/CODE_BLOCK]",
+        "answer": "（自動補完・公式解答未同期）この設問の公式解答例はローカルデータへ未同期です。問題文、本文、図表、表、解答群を確認し、設問で指定された条件に沿って回答してください。"
       },
       {
         "subQNo": "設問4",
         "text": "〔課題と対応策〕について，(1)，(2)に答えよ。",
-        "explanation": "提携戦略の狙いと、その波及効果についての設問です。",
         "subQuestions": [
           {
             "label": "(1)",

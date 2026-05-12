@@ -78,12 +78,13 @@ class CustomReporter implements Reporter {
     const evidenceFiles = fs.existsSync(evidenceDir)
       ? fs.readdirSync(evidenceDir)
           .filter((f) => f.endsWith('.png'))
+          .filter((f) => {
+            const filePath = path.join(evidenceDir, f);
+            const mtimeMs = fs.statSync(filePath).mtimeMs;
+            return mtimeMs >= this.startTime - 1000 && mtimeMs <= Date.now() + 1000;
+          })
           .sort()
       : [];
-
-    // 実行タイムスタンププレフィックスで直近実行分に絞る（今日分）
-    const todayPrefix = now.toISOString().slice(0, 10).replace(/-/g, '');
-    const todayEvidence = evidenceFiles.filter((f) => f.startsWith(todayPrefix.slice(0, 4)));
 
     // スイートでグループ化
     const suiteMap = new Map<string, TestRecord[]>();
@@ -143,13 +144,13 @@ class CustomReporter implements Reporter {
     lines.push(`## 4. スクリーンショットエビデンス`);
     lines.push(``);
 
-    if (todayEvidence.length === 0) {
+    if (evidenceFiles.length === 0) {
       lines.push(`> スクリーンショットなし（エビデンスファイルが見つかりませんでした）`);
       lines.push(``);
     } else {
       // テスト ID でグループ化して横並び表示
       const groups = new Map<string, string[]>();
-      for (const f of todayEvidence) {
+      for (const f of evidenceFiles) {
         const idM = f.match(/_([A-Z]-\d+)/);
         const key = idM ? idM[1] : 'その他';
         if (!groups.has(key)) groups.set(key, []);

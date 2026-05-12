@@ -268,8 +268,11 @@ async function main() {
             if (parts.length >= 3) {
                 examPrefix = parts[0];
                 yearStr = parts[1];
-                const seasonRaw = parts[2]; // Spring/Fall
-                seasonStr = seasonRaw === 'Spring' ? 'S' : 'F';
+                const seasonRaw = parts[2]; // Spring/Fall/Public
+                if (seasonRaw === 'Spring') seasonStr = 'S';
+                else if (seasonRaw === 'Fall') seasonStr = 'F';
+                else if (seasonRaw === 'Public') seasonStr = 'Public';
+                else seasonStr = seasonRaw;
                 if (parts.length >= 4) {
                     examTypeRaw = parts[3];
                 }
@@ -335,9 +338,12 @@ async function main() {
                 else if (examPrefix === 'ST') titlePrefix = "ITストラテジスト";
                 else if (examPrefix === 'IP') titlePrefix = "ITパスポート";
 
-                let termStr = seasonStr === 'S' ? "春期" : "秋期";
+                let termStr = seasonStr === 'S' ? "春期" : (seasonStr === 'F' ? "秋期" : "公開問題");
                 let typeLabel = "午前";
-                if (examPrefix === 'IP') typeLabel = "公開問題";
+                if (examPrefix === 'FE' && parseInt(yearStr) >= 2023) {
+                    if (type.startsWith('AM')) typeLabel = "科目A";
+                    else if (type.startsWith('PM')) typeLabel = "科目B";
+                } else if (examPrefix === 'IP') typeLabel = "公開問題";
                 else if (type === 'AM2') typeLabel = "午前II";
                 else if (type === 'PM') typeLabel = "午後";
                 else if (type === 'PM1') typeLabel = "午後I";
@@ -352,7 +358,7 @@ async function main() {
                     year: parseInt(yearStr),
                     term: seasonStr,
                     type: type,
-                    date: `${yearStr}-${seasonStr === 'S' ? '04' : '10'}-15`, // Approx date
+                    date: `${yearStr}-${seasonStr === 'S' ? '04' : (seasonStr === 'F' ? '10' : '01')}-15`, // Approx date
                     stats: {
                         total: type.includes('PM') ? questions.length : (type === 'AM2' ? questions.length : questions.length * 20),
                         completed: 0,

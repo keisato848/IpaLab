@@ -4,6 +4,9 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-09 | AIを使う問題データ抽出は Gemini API ではなく、同一ローカルネットワーク上の Ollama `gemma4:31b` を標準とする運用へ更新 |
+| 2026-05-08 | 午後解答PDFの Gemini OCR プロンプトを午前択一表専用から記述式解答対応へ拡張し、self-inspect R32 を追加 |
+| 2026-05-08 | 全試験区分の午後データ品質監査 `audit:afternoon-data`、DB/AU/SM など未抽出区分の抽出必要性、親見出し800字欄化の再発防止を追加 |
 | 2026-05-06 | `PM-2020-Fall-AM2` / `PM-2016-Spring-AM2` / `SA-2025-Spring-AM2` / `ST-2025-Spring-AM2` の AM2 正答不整合補正と self-inspect R16 強化を追加 |
 | 2026-05-06 | `SA-2025-Spring-PM1` / `SA-2025-Spring-PM2` / `ST-2025-Spring-PM1` / `ST-2025-Spring-PM2` の午後問題 transformed 追加実績を追加 |
 | 2026-05-06 | `NW-2025-Spring-PM2` の Gemini API による解説込み問題・解答PDF抽出実績を追加 |
@@ -19,6 +22,10 @@
 | 2026-05-03 | PDF ダウンロード時の実体検証、`DOWNLOAD_CATEGORIES` による対象カテゴリ指定、`audit:raw-pdfs` による Stage A 完了ゲートを追加 |
 | 2026-05-02 | Cosmos `Questions` 再同期前のローカル監査、qNo 単位 dry-run、`qNo=99` 旧プレースホルダー削除計画、Agent Skill / Specialist / Security review の運用を追加 |
 | 2026-05-02 | IPA 公式年度別 HTML から対象カテゴリの問題/解答 PDF を抽出し、`exam-list.ts` とローカルデータの To-Be / As-Is 差分を確認する公式ソース監査を追加 |
+| 2026-05-09 | `AU-2025-Fall-PM1`、`AU-2025-Fall-PM2`、`SM-2025-Spring-PM1`、`SM-2025-Spring-PM2` を最新年度パイロットとして追加した。 |
+| 2026-05-09 | `exam-list.ts` には IPA 公式の問題 PDF と解答 PDF URL を登録し、Gemini/Ollama 抽出対象カテゴリへ AU / SM を追加した。 |
+| 2026-05-09 | 生成後は PM1 の `answers_raw.json` の公式解答を `questions_transformed.json` のリーフ設問へ同期し、PM2 は出題趣旨を模範解答として同期せず、子設問を持つ親設問の `explanation` を削除して親見出しの800字欄化を防止した。 |
+| 2026-05-09 | 全年度展開は抽出・表示確認の面積が大きいため後続 PR とし、本パイロットでは午後監査対象区分として AU / SM が存在し、構造監査を通過することを完了条件とする。 |
 
 ## 1. Overview
 This document outlines the design for the **Data Sync Tool** (`packages/data`), which is responsible for populating the Cosmos DB with exam master data.
@@ -121,8 +128,9 @@ packages/data/
 
 ### 7.1 公式ソース To-Be 監査
 
-対象カテゴリは AP / PM / SC / FE / NW / DB / SA / ES / ST、年度範囲は 2016 年以降を標準とする。
+対象カテゴリは AP / PM / SC / FE / NW / DB / AU / SM / SA / ES / ST、年度範囲は 2016 年以降を標準とする。
 `official-source-coverage-audit.mjs` は IPA の年度別 HTML から `_qs.pdf` と `_ans.pdf` を抽出し、問題 PDF が存在する単位を To-Be として扱う。
+対象を午後問題だけに限定する場合は `--types=PM,PM1,PM2` を指定し、AM2 など別スコープの未整備を午後データ品質ゲートへ混在させない。
 公式解答 PDF が存在する場合は `exam-list.ts` の `answerUrl` と `packages/data/data/questions/{examId}/answers_raw.json` も検証対象に含める。
 差分は `representativeGaps` として As-Is / To-Be の形で出力し、本番同期 dry-run 前に説明する。
 
@@ -133,18 +141,42 @@ PDF ダウンロード後、Gemini OCR へ進む前に `packages/data/data/raw_p
 大規模整備では対象カテゴリを `DOWNLOAD_CATEGORIES` で明示し、監査も同じカテゴリで実行する。
 
 ```powershell
-$env:DOWNLOAD_CATEGORIES = "AP,PM,SC,FE,NW,DB,SA,ES,ST"
+$env:DOWNLOAD_CATEGORIES = "AP,PM,SC,FE,NW,DB,AU,SM,SA,ES,ST"
 npm run download -w packages/data
 Remove-Item Env:DOWNLOAD_CATEGORIES
 
-npm run -w packages/data audit:raw-pdfs -- --categories=AP,PM,SC,FE,NW,DB,SA,ES,ST
+npm run -w packages/data audit:raw-pdfs -- --categories=AP,PM,SC,FE,NW,DB,AU,SM,SA,ES,ST
 ```
 
 Stage A の完了条件は `status=RAW_PDF_AUDIT_OK`、`missingQuestionCount=0`、`missingAnswerCount=0`、`invalidPdfCount=0` とする。
 この条件を満たすまで `npm run extract -w packages/data` へ進まない。
 Windows 環境では `npx` を子プロセスから直接 spawn すると `spawnSync npx ENOENT` になる場合があるため、Gemini OCR は `npm run extract -w packages/data` から起動し、内部では `process.execPath` と `ts-node/register` で `gemini-extract.ts` を実行する。
 
-#### 7.2.0 Gemini OCR Stage B 対象限定実行
+#### 7.2.0 午後データ品質監査
+
+午後問題を修正・抽出・同期する前に、全区分を対象にローカルデータの構造不備を監査する。
+
+```powershell
+npm run audit:afternoon-data
+npm run audit:afternoon-data -- --json
+```
+
+Windows 環境では npm が `--json` や `--categories=SA` を npm 設定として扱う場合があるため、監査スクリプトは `npm_config_json` / `npm_config_categories` / `npm_config_exclude` / `npm_config_fail_on_findings` も読み取る。
+
+監査対象は `packages/data/data/questions/*-(PM|PM1|PM2)` で、AP / SA / PM / SC / ST / NW / FE / DB / AU / SM / ES を標準の確認対象とする。ローカルに `*-PM*` データが存在しない区分は `missingTargetCategories` に出力し、DB / AU / SM のような未抽出区分は既存データ修正ではなく公式PDFからの新規抽出工程へ進める。
+
+監査では以下を検出する。
+
+- 設問に `下線①` などの参照があるが、本文側に下線表現や参照番号が見当たらない疑い
+- 子設問を持つ親設問が `explanation` だけで直接解答欄化され、800字欄になる疑い
+- 1設問に複数の字数条件が混在し、解答欄分割が必要な疑い
+- 記号回答なのに `choices` / `options` / `answerChoices` がなく、設問文にも解答群本文がない疑い
+- 広い `〜について答えよ` 形式で字数条件がない親見出し欄
+- PM / PM1 の短答・式・表中属性回答で字数条件がなく、UI上で800字原稿用紙欄に見える疑い
+
+`self-inspect` R27 は、親見出しを直接解答欄化しない UI 判定、PM / PM1 の字数制限なし短答を公式解答例の約1.2倍（10字単位切上げ、最小20字）の表示用原稿用紙欄へ分岐する UI 判定、`scripts/audit-afternoon-data-quality.mjs` の存在と `shortAnswerNoLimit` 監査ルールを検査する。表示用マス数は採点を止める文字数制限ではなく、明示字数制限がない設問では超過しても警告や採点ブロックを出さない。データ修正 PR では、監査結果、公式PDF照合対象、抽出対象区分、未修正の残リスクを PR 本文または `docs/04_reports/` の報告書に記録する。
+
+#### 7.2.1 Gemini OCR Stage B 対象限定実行
 
 午後問題を Gemini API で抽出する場合、`gemini_pm_ocr_prompt.md` に従い、`questions_raw.json` には問題本文、図表の Mermaid 表現、設問、設問ごとの `explanation` を含める。
 全PDFを一括処理すると不要な再抽出やレート消費が発生するため、`gemini-extract.ts` は対象試験を限定できる。
@@ -158,7 +190,9 @@ node --require ts-node/register src/scraper/gemini-extract.ts --exam-id=NW-2025-
 `--exam-id=<examId>` は対象PDFを1試験に限定する。
 `--questions-only` は問題PDFだけ、`--answers-only` は解答PDFだけを処理する。
 `--force` は既存の `questions_raw.json` / `answers_raw.json` を上書きするため、対象ファイルを確認してから使用する。
-午後問題では出力が単一オブジェクトまたはオブジェクト配列になるため、午前問題のような `JSON array` 固定のプロンプト追記は行わず、午後問題では `JSON object` を要求する。
+午後問題PDFは、DB / ES / SC の PM1 のように複数のトップレベル大問を含む場合があるため、Gemini OCR では午後問題も `JSON array` を要求する。PDF内の各 `問` を1要素として出力し、単一大問PDFの場合だけ1要素配列にする。これにより、単一 `JSON object` 前提で大問1だけが抽出される欠落を防ぐ。
+
+午後の解答PDFは午前の択一表と異なり、`問`、`設問`、小問番号、空欄ラベル、記述式模範解答が混在する。`gemini_answer_ocr_prompt.md` は午前のア〜エを `a`〜`d` へ変換する一方で、午後では `問1-設問1-(1)` や `問2-設問3-(2)-(a)-j` のような階層キーを使い、値には公式解答の日本語本文を保持する。午後抽出後は `answers_raw.json` の項目数が1件など極端に少なくないことを確認し、`questions_transformed.json` のリーフ設問へ同期する。
 
 2026-05-06 に `NW-2025-Spring-PM2` を Gemini API で抽出し、`questions_raw.json` は2問、各問4設問、全設問で20文字超の `explanation` あり、Mermaidブロックありの構造を確認した。
 `answers_raw.json` は63項目、全値が非空文字列であることを確認した。
@@ -177,6 +211,13 @@ PM1は `answers_raw.json` の公式解答キーを設問内のリーフ解答欄
 PM2論述の公式解答例欠落はP1残課題として扱い、データ補完時は公式講評・解答例などの根拠を確認してから更新する。
 E2Eでは各大問ページの解答欄数、空設問なし、Mermaid描画失敗なしを確認し、証跡は `docs/04_reports/E2E_Test_Evidence_Report_20260506.md` に保存する。
 
+2026-05-09 に `AU-2025-Fall-PM1`、`AU-2025-Fall-PM2`、`SM-2025-Spring-PM1`、`SM-2025-Spring-PM2` を最新年度パイロットとして追加した。
+`exam-list.ts` には IPA 公式の問題 PDF と解答 PDF URL を登録し、Gemini/Ollama 抽出対象カテゴリへ AU / SM を追加した。
+生成後は PM1 の `answers_raw.json` の公式解答を `questions_transformed.json` のリーフ設問へ同期した。
+PM2 の `answers_raw.json` は論述問題の出題趣旨であり模範解答ではないため、`answer` としては同期せず、論述入力欄と解説だけを保持する。
+子設問を持つ親設問の `explanation` は削除し、親見出しの800字欄化を防止した。
+全年度展開は抽出・表示確認の面積が大きいため後続 PR とし、本パイロットでは午後監査対象区分として AU / SM が存在し、構造監査を通過することを完了条件とする。
+
 同日に AM2 正答不整合の P0 対応として、`PM-2020-Fall-AM2`、`PM-2016-Spring-AM2`、`SA-2025-Spring-AM2`、`ST-2025-Spring-AM2` を補正した。
 `PM-2020-Fall-AM2` は公式解答PDFで問2がエであることを確認し、`answers_raw.json` の問2を `d` に修正した。
 `PM-2016-Spring-AM2` は公式解答PDFで問2が注記扱いであることを確認し、問題側の `ALL_CORRECT` と一致するよう `answers_raw.json` に問2 `ALL_CORRECT` を追加した。
@@ -184,7 +225,7 @@ E2Eでは各大問ページの解答欄数、空設問なし、Mermaid描画失�
 再発防止として `.github/hooks/self-inspect.ps1` の R16 を強化し、`questions_raw.json` が配列形式または `{ questions: [...] }` 形式のどちらでも正規化し、`answers_raw.json` も key-value map、配列、`answers` ラッパーを照合対象にする。
 また、問題側に qNo が存在するのに解答mapへ対応する正答がない場合も R16 で検出する。
 
-#### 7.2.1 Ollama 解答PDF抽出 pilot
+#### 7.2.2 Ollama 解答PDF抽出 pilot
 
 Gemini のレート制限回避やローカル検証のため、解答PDFだけを `extract:answers:ollama` で抽出できる。
 この pilot は `answers_raw.json` の補完用であり、問題本文・図表・Mermaid 変換を含む `questions_raw.json` の正式抽出を代替しない。
@@ -195,7 +236,7 @@ npm run -w packages/data extract:answers:ollama -- --dry-run --limit=3
 npm run -w packages/data extract:answers:ollama -- --exam-id=AP-2024-Spring-AM
 ```
 
-前提条件は、Ollama で Vision 対応モデル（既定値 `gemma4:26b`）が利用できること、および `pdfjs-dist` legacy build と `@napi-rs/canvas` による PDF 画像化がローカルで動作することである。
+前提条件は、Ollama で Vision 対応モデル（既定値 `gemma4:31b`）が利用できること、および `pdfjs-dist` legacy build と `@napi-rs/canvas` による PDF 画像化がローカルで動作することである。
 `--dry-run` や `--limit` が npm 側の設定として扱われる環境があるため、script は `npm_config_*` も読み取る。
 
 2026-05-05 に AM/AM2 解答PDFの前処理として、埋め込みテキストが存在する場合は `問 1 ウ` のような表記を直接パースし、`answers_raw.json` の key-value map に変換する経路を追加した。
@@ -213,14 +254,14 @@ AM2 問題本文抽出を行う場合は、生成済みの正答マップと照�
 
 #### 7.2.2 Ollama AM/AM2 問題PDF抽出 pilot
 
-AM/AM2 の択一問題PDFをローカルで試験抽出する場合は、`extract:questions:ollama` を使用できる。
-対象は午前系の `*-AM` / `*-AM2` に限定し、午後問題の正式抽出は Gemini 系の Stage B を継続する。
+AM/AM2 の択一問題PDFおよび午後問題PDFをローカルで抽出する場合は、`extract:questions:ollama` を標準経路として使用する。
+午後問題も Ollama `gemma4:31b` を既定モデルとし、Gemini 系 Stage B は既存成果物の比較確認や緊急退避用途に限定する。
 スキャンPDFでは埋め込みテキストが空になるため、ページ画像を Ollama Vision モデルへ渡す。
 2段組みPDFでは `--split-columns` で左右カラムを分割し、長時間処理では `--allow-partial` と `--debug-dir` で成功チャンクと生応答を残す。
 
 ```powershell
-npm run -w packages/data extract:questions:ollama -- --check --model=gemma4:e4b
-npm run -w packages/data extract:questions:ollama -- --model=gemma4:e4b --exam-id=DB-2016-Spring-AM2 --split-columns --allow-partial --debug-dir=../../temp-logs/ollama-debug --render-dpi=85 --num-predict=1024 --timeout-ms=420000
+npm run -w packages/data extract:questions:ollama -- --check --model=gemma4:31b
+npm run -w packages/data extract:questions:ollama -- --model=gemma4:31b --exam-id=DB-2016-Spring-AM2 --split-columns --allow-partial --debug-dir=../../temp-logs/ollama-debug --render-dpi=85 --num-predict=1024 --timeout-ms=420000
 ```
 
 2026-05-04 時点の検証では、`DB-2016-Spring-AM2` はスキャンPDFであり、`--text-only` は利用できない。
@@ -262,8 +303,8 @@ Q1-Q13 はページ3〜6の probe 成功分を採用前にページ画像で補�
 Qwen3.x 系モデルは当面使用しない。
 `qwen3.5:9b` では `/api/generate`、`/api/chat`、`format: json` の有無、`options.think=false` のいずれでも `response` / `message.content` が空になる事象を確認した。
 この問題はプロンプトや JSON 強制だけでは回避できず、`qwen3.6:27b` も同系統のリスクが高い。
-また 27B は `gemma4:26b` と同程度のサイズになり、処理時間・メモリ面でも `gemma4:e4b` より不利である。
-Ollama またはモデル側で response 空問題が解消されるまで、AM/AM2 問題PDF抽出の推奨モデルは `gemma4:e4b` とする。
+また 27B は 31B 級モデルと近いリソースを要求し、処理時間・メモリ面でも小型モデルより不利である。
+Ollama またはモデル側で response 空問題が解消されるまで、問題PDF抽出の標準モデルは `gemma4:31b` とする。
 
 ### 7.3 qNo=99 の扱い
 

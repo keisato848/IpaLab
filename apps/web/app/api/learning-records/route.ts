@@ -85,9 +85,45 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session || !session.user?.id) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const body = await request.json();
         const container = await getContainer("LearningRecords");
         if (!container) throw new Error("Database not initialized");
+        const actualUserId = session.user.id;
+
+        const saveRecord = async (record: z.infer<typeof LearningRecordSchema>) => {
+            record.userId = actualUserId;
+
+            if (!record.id) record.id = crypto.randomUUID();
+            if (!record.answeredAt) record.answeredAt = new Date().toISOString();
+
+            if (record.isDescriptive && record.aiScore !== undefined) {
+                record.isCorrect = record.aiScore >= 60;
+            }
+
+            if (record.isCorrect === undefined) {
+                record.isCorrect = false;
+            }
+
+            if (record.isFlagged === undefined) {
+                record.isFlagged = false;
+            }
+
+            try {
+                const { resource } = await container.items.create(record);
+                return { resource, duplicated: false };
+            } catch (error: any) {
+                if (error?.code === 409) {
+                    console.warn("Learning record already exists, treating as synced:", record.id);
+                    return { resource: record, duplicated: true };
+                }
+                throw error;
+            }
+        };
 
         if (Array.isArray(body)) {
             // Bulk Insert
@@ -98,30 +134,18 @@ export async function POST(request: NextRequest) {
 
             const records = parseResults.data;
             const savedRecords = [];
+            let duplicateCount = 0;
 
             for (const record of records) {
-                // Ensure ID
-                if (!record.id) record.id = crypto.randomUUID();
-                if (!record.answeredAt) record.answeredAt = new Date().toISOString();
-
-                // Auto-determine isCorrect for descriptive
-                if (record.isDescriptive) {
-                    // Default logic: Score >= 60 is "Correct" (Passing)
-                    if (record.aiScore !== undefined) {
-                        record.isCorrect = record.aiScore >= 60;
-                    }
-                }
-
-                // Fallback for isCorrect if still undefined (should be provided for non-descriptive)
-                if (record.isCorrect === undefined) {
-                    record.isCorrect = false;
-                }
-
-                const { resource } = await container.items.create(record);
+                const { resource, duplicated } = await saveRecord(record);
                 savedRecords.push(resource);
+                if (duplicated) duplicateCount++;
             }
 
-            return NextResponse.json({ count: savedRecords.length, records: savedRecords }, { status: 201 });
+            return NextResponse.json(
+                { count: savedRecords.length, duplicateCount, records: savedRecords },
+                { status: duplicateCount === savedRecords.length ? 200 : 201 }
+            );
 
         } else {
             // Single Insert
@@ -131,35 +155,12 @@ export async function POST(request: NextRequest) {
             }
 
             const record = result.data;
-            if (!record.id) record.id = crypto.randomUUID();
-            if (!record.answeredAt) record.answeredAt = new Date().toISOString();
-
-            // Auto-determine isCorrect for descriptive
-            if (record.isDescriptive) {
-                if (record.aiScore !== undefined) {
-                    record.isCorrect = record.aiScore >= 60;
-                }
-            }
-
-            // Fallback for isCorrect
-            if (record.isCorrect === undefined) {
-                record.isCorrect = false;
-            }
-
-            // Session & Status Fields
-            if (record.sessionId) {
-                // Logic to validate session exists if needed, but for now just save it
-            }
-            if (record.isFlagged === undefined) {
-                record.isFlagged = false;
-            }
-
-            const { resource } = await container.items.create(record);
+            const { resource, duplicated } = await saveRecord(record);
 
             // [REMOVED] Cleanup Logic (Udemy-style history preservation)
             // We now keep all records linked to sessions.
 
-            return NextResponse.json(resource, { status: 201 });
+            return NextResponse.json(resource, { status: duplicated ? 200 : 201 });
         }
 
     } catch (error: any) {

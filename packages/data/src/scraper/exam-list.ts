@@ -398,4 +398,13 @@ export const EXAM_LIST = [
     // ES 2025 Fall
     { category: "ES", year: "2025", term: "Fall", type: "AM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_es_am2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_es_am2_ans.pdf" },
     { category: "ES", year: "2025", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_es_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_es_pm1_ans.pdf" },
-    { category: "ES", year: "2025", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_es_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_es_pm2_ans.pdf" },];
+    { category: "ES", year: "2025", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_es_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_es_pm2_ans.pdf" },
+
+    // AU (Systems Auditor) - latest pilot coverage
+    { category: "AU", year: "2025", term: "Fall", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_au_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_au_pm1_ans.pdf" },
+    { category: "AU", year: "2025", term: "Fall", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_au_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07a_au_pm2_ans.pdf" },
+
+    // SM (IT Service Manager) - latest pilot coverage
+    { category: "SM", year: "2025", term: "Spring", type: "PM1", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07h_sm_pm1_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07h_sm_pm1_ans.pdf" },
+    { category: "SM", year: "2025", term: "Spring", type: "PM2", url: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07h_sm_pm2_qs.pdf", answerUrl: "https://www.ipa.go.jp/shiken/mondai-kaiotu/nl10bi0000009lh8-att/2025r07h_sm_pm2_ans.pdf" },
+];

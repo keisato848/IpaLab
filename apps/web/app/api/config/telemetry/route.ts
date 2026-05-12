@@ -16,11 +16,9 @@ export async function GET() {
     const headersList = await headers();
     const host = headersList.get('host') || 'unknown';
     
-    // 環境変数を取得
-    // TELEMETRY_CONNECTION_STRING: IPA コードレスエージェントが認識しないカスタム名
-    const connectionString = process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING
-        || process.env.TELEMETRY_CONNECTION_STRING
-        || '';
+    // ブラウザ SDK は DisableLocalAuth=true の Application Insights へ直接送信できない。
+    // Node 側 Managed Identity 用の TELEMETRY_CONNECTION_STRING は公開しない。
+    const connectionString = process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING || '';
 
     return NextResponse.json({
         connectionString,

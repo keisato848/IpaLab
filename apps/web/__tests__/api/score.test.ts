@@ -49,6 +49,32 @@ describe('/api/score', () => {
             expect(data.error).toBe('GEMINI_API_KEY is not set');
         });
 
+        it('Azure実行環境でAI_CHAT_FUNCTION_URL未設定の場合は503を返す', async () => {
+            process.env.GEMINI_API_KEY = 'test-api-key';
+            process.env.WEBSITE_SITE_NAME = 'app-pm-exam-dx-staging';
+            delete process.env.AI_CHAT_FUNCTION_URL;
+
+            const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: 'テスト問題',
+                    userAnswer: 'テスト回答',
+                }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(503);
+            expect(data.error).toBe('AI proxy is not configured');
+
+            consoleError.mockRestore();
+        });
+
         it('questionが未指定の場合は400を返す', async () => {
             process.env.GEMINI_API_KEY = 'test-api-key';
 

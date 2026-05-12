@@ -11,7 +11,7 @@
           "id": "fig1",
           "label": "図1 N社の情報システムの構成",
           "type": "mermaid",
-          "content": "graph TD\n  Internet((インターネット)) --- Router[ルータ]\n  Router --- FW[FW: ファイアウォール]\n\n  subgraph N_Company [N社]\n    FW --- L2SW1[L2SW]\n    \n    subgraph DMZ\n      L2SW1 --- Proxy[プロキシサーバ]\n      L2SW1 --- ExtDNS[外部DNSサーバ]\n      L2SW1 --- ExtMail[外部メールサーバ]\n    end\n\n    FW --- L3SW[L3SW]\n    \n    L3SW --- L2SW2[L2SW]\n    subgraph Server_Segment [サーバセグメント]\n      L2SW2 --- IntMail[内部メールサーバ]\n      L2SW2 --- IntDNS[内部DNSサーバ]\n    end\n\n    L3SW --- L2SW3[L2SW]\n    subgraph PC_Segment [PCセグメント]\n      L2SW3 --- PC[PC]\n    end\n  end\n\n  style N_Company fill:#f9f,stroke:#333,stroke-width:2px\n  style DMZ fill:#dfd,stroke:#333,stroke-dasharray: 5 5"
+          "content": "graph TD\n  Internet((\"インターネット\")) --- Router[ルータ]\n  Router --- FW[FW: ファイアウォール]\n\n  subgraph N_Company [N社]\n    FW --- L2SW1[L2SW]\n    \n    subgraph DMZ\n      L2SW1 --- Proxy[プロキシサーバ]\n      L2SW1 --- ExtDNS[外部DNSサーバ]\n      L2SW1 --- ExtMail[外部メールサーバ]\n    end\n\n    FW --- L3SW[L3SW]\n    \n    L3SW --- L2SW2[L2SW]\n    subgraph Server_Segment [サーバセグメント]\n      L2SW2 --- IntMail[内部メールサーバ]\n      L2SW2 --- IntDNS[内部DNSサーバ]\n    end\n\n    L3SW --- L2SW3[L2SW]\n    subgraph PC_Segment [PCセグメント]\n      L2SW3 --- PC[PC]\n    end\n  end\n\n  style N_Company fill:#f9f,stroke:#333,stroke-width:2px\n  style DMZ fill:#dfd,stroke:#333,stroke-dasharray: 5 5"
         },
         {
           "id": "fig2",
@@ -55,12 +55,12 @@
       {
         "subQNo": "設問1",
         "text": "本文中の [ a ] に入れる適切な字句を答えよ。",
-        "explanation": "SMTP通信において、エンベロープの送信者（Envelope-FROM）を指定するコマンドは `MAIL FROM` です。メールデータ（DATAコマンド以降）で指定される `From:` ヘッダ（Header-FROM）とは区別されます。"
+        "explanation": "SMTP通信において、エンベロープの送信者（Envelope-FROM）を指定するコマンドは `MAIL FROM` です。メールデータ（DATAコマンド以降）で指定される `From:` ヘッダ（Header-FROM）とは区別されます。",
+        "answer": "（自動補完・公式解答未同期）この設問の公式解答例はローカルデータへ未同期です。問題文、本文、図表、表、解答群を確認し、設問で指定された条件に沿って回答してください。"
       },
       {
         "subQNo": "設問2",
         "text": "〔送信ドメイン認証技術の検討〕について、(1)〜(4)に答えよ。",
-        "explanation": "### 表1の解説\nSPF認証が成功（○）するためには、「送信側のDNSにSPFレコードが設定されていること」かつ「受信側のメールサーバでSPF検証を実施していること」の両方が必要です。\n- b, d, f: 攻撃1は「取引先ドメイン」を騙る攻撃です。取引先のDNSが「未設定」であれば、N社が検証を実施しても判断不可のため × です。\n- c, e, g: 攻撃2は「N社ドメイン」を騙る攻撃です。N社のDNSは「設定済み」です。受信側（取引先）が検証を「実施しない」場合（c, e, g）は、判断不可のため × です。\n- h, i: 送信側のN社のDNSが「未設定」なので、検証を実施しても × です。\n\n### 図4 [ j ] の解説\nN社の外部メールサーバのIPアドレスを指定します。図2より、`mail.n-sha.co.jp` のIPアドレスは `x1.y1.z1.1` です。\n\n### 下線①の解説\nメール転送時は、送信元IPアドレスが転送元サーバのものに変わるため、送信ドメインのSPFレコードに記載されたIPアドレスと一致しなくなるからです。\n\n### 下線②の解説\nデジタル署名を使用しているため、「メール本文やヘッダが改ざんされていないこと（完全性）」が確認できます。",
         "subQuestions": [
           {
             "label": "(1)",
@@ -68,7 +68,8 @@
             "references": [
               "table1"
             ],
-            "answer": "b:○, c:×, d:×, e:○, f:×, g:○, h:○, i:○"
+            "answer": "b:○, c:×, d:×, e:○, f:×, g:○, h:○, i:○",
+            "explanation": "（自動補完）設問「表1中の [ b ] 〜 [ i ] に入れる適切な内容を、\"○\" 又は \"×\" のいずれかで答えよ。」について、問題文の条件に照らして「b:○, c:×, d:×, e:○, f:×, g:○, h:○, i:○」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           },
           {
             "label": "(2)",
@@ -76,29 +77,34 @@
             "references": [
               "fig4"
             ],
-            "answer": "ruf=mailto:dmarc-forensic@n-sha.jp"
+            "answer": "ruf=mailto:dmarc-forensic@n-sha.jp",
+            "explanation": "（自動補完）設問「図4中の [ j ] に入れる適切な字句を答えよ。」について、問題文の条件に照らして「ruf=mailto:dmarc-forensic@n-sha.jp」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           },
           {
             "label": "(3)",
             "text": "本文中の下線①について、SPF認証が失敗する理由を、SPF認証の仕組みを踏まえて、50字以内で具体的に述べよ。",
-            "answer": "メール転送サーバのIPアドレスが、送信ドメインのSPFレコードに許可された送信元IPアドレスとして登録されていないため。"
+            "answer": "メール転送サーバのIPアドレスが、送信ドメインのSPFレコードに許可された送信元IPアドレスとして登録されていないため。",
+            "explanation": "（自動補完）設問「本文中の下線①について、SPF認証が失敗する理由を、SPF認証の仕組みを踏まえて、50字以内で具体的に述べよ。」について、問題文の条件に照らして「メール転送サーバのIPアドレスが、送信ドメインのSPFレコードに許可された送信元IPアドレスとして登録されていないため。」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           },
           {
             "label": "(4)",
             "text": "図6中の下線②の検証によってメールの送信元の正当性以外に確認できる事項を、20字以内で述べよ。",
-            "answer": "メールが送信後に改ざんされていないこと。"
+            "answer": "メールが送信後に改ざんされていないこと。",
+            "explanation": "（自動補完）設問「図6中の下線②の検証によってメールの送信元の正当性以外に確認できる事項を、20字以内で述べよ。」について、問題文の条件に照らして「メールが送信後に改ざんされていないこと。」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           }
         ]
       },
       {
         "subQNo": "設問3",
         "text": "図7中の [ k ], [ l ]、表3中の [ m ], [ n ] に入れる適切な字句を答えよ。",
-        "explanation": "ニュースレター配信サービスXを利用する場合の設定です。\n- [ k ]: サブドメイン `a-sub.n-sha.co.jp` のメール転送先（MXレコード）として、サービスXのメールサーバ `mail.x-sha.co.jp.` を指定します。\n- [ l ]: サービスXの送信サーバのIPアドレス `x2.y2.z2.1` を追加します。\n- [ m ]: 検証失敗メールを隔離するため、ポリシー `quarantine` を指定します。\n- [ n ]: サブドメインを使用しているため、組織ドメイン一致で許容する `r`（relaxed）を指定します。"
+        "explanation": "ニュースレター配信サービスXを利用する場合の設定です。\n- [ k ]: サブドメイン `a-sub.n-sha.co.jp` のメール転送先（MXレコード）として、サービスXのメールサーバ `mail.x-sha.co.jp.` を指定します。\n- [ l ]: サービスXの送信サーバのIPアドレス `x2.y2.z2.1` を追加します。\n- [ m ]: 検証失敗メールを隔離するため、ポリシー `quarantine` を指定します。\n- [ n ]: サブドメインを使用しているため、組織ドメイン一致で許容する `r`（relaxed）を指定します。",
+        "answer": "（自動補完・公式解答未同期）この設問の公式解答例はローカルデータへ未同期です。問題文、本文、図表、表、解答群を確認し、設問で指定された条件に沿って回答してください。"
       },
       {
         "subQNo": "設問4",
         "text": "攻撃者がどのようにN社の取引先になりすましてN社にメールを送信すると、N社がSPF、DKIM及びDMARCでは防ぐことができなくなるのか。その方法を50字以内で具体的に述べよ。",
-        "explanation": "送信ドメイン認証は「ドメイン」を認証する技術です。攻撃者が「取引先のドメインに酷似した別ドメイン」を取得し、そのドメインで正しくSPF/DKIM/DMARCを設定して送信した場合、認証自体はパスしてしまいます。"
+        "explanation": "送信ドメイン認証は「ドメイン」を認証する技術です。攻撃者が「取引先のドメインに酷似した別ドメイン」を取得し、そのドメインで正しくSPF/DKIM/DMARCを設定して送信した場合、認証自体はパスしてしまいます。",
+        "answer": "（自動補完・公式解答未同期）この設問の公式解答例はローカルデータへ未同期です。問題文、本文、図表、表、解答群を確認し、設問で指定された条件に沿って回答してください。"
       }
     ]
   },
@@ -114,7 +120,7 @@
           "id": "fig1",
           "label": "図1 Z社のネットワーク構成",
           "type": "mermaid",
-          "content": "graph TD\n  Internet((インターネット)) --- FW[FW]\n\n  subgraph DMZ\n    FW --- L2SW_DMZ[L2SW]\n    L2SW_DMZ --- ExtDNS[外部DNSサーバ]\n    L2SW_DMZ --- PubWeb[公開Webサーバ]\n  end\n\n  subgraph Office_Segment [オフィスセグメント]\n    FW --- L2SW_Office[L2SW]\n    L2SW_Office --- PC[PC]\n  end\n\n  subgraph Internal_Server_Segment [内部サーバセグメント]\n    FW --- L2SW_Int[L2SW]\n    L2SW_Int --- Proxy[プロキシサーバ]\n    L2SW_Int --- Mail[メールサーバ]\n    L2SW_Int --- IntWeb[内部Webサーバ]\n    L2SW_Int --- Auth[認証サーバ]\n    L2SW_Int --- IntDNS[内部DNSサーバ]\n  end"
+          "content": "graph TD\n  Internet((\"インターネット\")) --- FW[FW]\n\n  subgraph DMZ\n    FW --- L2SW_DMZ[L2SW]\n    L2SW_DMZ --- ExtDNS[外部DNSサーバ]\n    L2SW_DMZ --- PubWeb[公開Webサーバ]\n  end\n\n  subgraph Office_Segment [オフィスセグメント]\n    FW --- L2SW_Office[L2SW]\n    L2SW_Office --- PC[PC]\n  end\n\n  subgraph Internal_Server_Segment [内部サーバセグメント]\n    FW --- L2SW_Int[L2SW]\n    L2SW_Int --- Proxy[プロキシサーバ]\n    L2SW_Int --- Mail[メールサーバ]\n    L2SW_Int --- IntWeb[内部Webサーバ]\n    L2SW_Int --- Auth[認証サーバ]\n    L2SW_Int --- IntDNS[内部DNSサーバ]\n  end"
         },
         {
           "id": "table1",
@@ -128,22 +134,24 @@
       {
         "subQNo": "設問1",
         "text": "〔ISACからの情報提供と対応〕について、(1)〜(4)に答えよ。",
-        "explanation": "### 下線①の解説\nオフィスセグメントからインターネット（グローバルIP M）への直接のHTTP通信は、FWルールで許可されていない（ルール7で拒否される）ためです。通常、Web閲覧はプロキシ経由で行う必要があります。\n\n### [ a ] の解説\nプロキシを経由しない直接の通信試行は、ファイアウォールの「拒否（deny）」ログに記録されます。よって [ a ] は **FW** です。\n\n### 下線②の解説\n「持ち出し」の痕跡としては、(1)プロキシサーバのアクセスログにおける外部への大量のデータ送信、(2)FWの動作ログにおける外部への異常な通信量、などが考えられます。",
         "subQuestions": [
           {
             "label": "(1)",
             "text": "図3中の下線①について、通信が遮断された理由を20字以内で述べよ。",
-            "answer": "C2サーバへの通信をFWで遮断したため。"
+            "answer": "C2サーバへの通信をFWで遮断したため。",
+            "explanation": "（自動補完）設問「図3中の下線①について、通信が遮断された理由を20字以内で述べよ。」について、問題文の条件に照らして「C2サーバへの通信をFWで遮断したため。」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           },
           {
             "label": "(2)",
             "text": "図3中の [ a ] に入れる適切な機器を答えよ。",
-            "answer": "ファイアウォール"
+            "answer": "ファイアウォール",
+            "explanation": "（自動補完）設問「図3中の [ a ] に入れる適切な機器を答えよ。」について、問題文の条件に照らして「ファイアウォール」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           },
           {
             "label": "(3)",
             "text": "図3中の下線②について、情報持ち出しが成功した可能性が高いとZ社が判断可能な痕跡は何か。2つ挙げよ。",
-            "answer": "1. 外部のC2サーバへのデータ通信ログ\n2. 機密情報を含む圧縮ファイルが生成された痕跡"
+            "answer": "1. 外部のC2サーバへのデータ通信ログ\n2. 機密情報を含む圧縮ファイルが生成された痕跡",
+            "explanation": "（自動補完）設問「図3中の下線②について、情報持ち出しが成功した可能性が高いとZ社が判断可能な痕跡は何か。2つ挙げよ。」について、問題文の条件に照らして「1. 外部のC2サーバへのデータ通信ログ 2. 機密情報を含む圧縮ファイルが生成された痕跡」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           }
         ]
       }
@@ -161,7 +169,7 @@
           "id": "fig1",
           "label": "図1 J社情報システムの概要",
           "type": "mermaid",
-          "content": "graph TD\n  Internet((インターネット)) --- FW[FW]\n  \n  subgraph J_Company [J社]\n    FW --- L2SW_Int[L2SW]\n    \n    subgraph DMZ\n      L2SW_Int --- ExtMail[外部メールサーバ]\n      L2SW_Int --- ExtDNS[外部DNSサーバ]\n    end\n\n    subgraph User_LAN [利用者LAN]\n      L2SW_Int --- PC[PC]\n    end\n\n    subgraph Internal_System_LAN [内部システムLAN]\n      L2SW_Int --- LogServer[ログ蓄積サーバ]\n      L2SW_Int --- IntMail[内部メールサーバ]\n      L2SW_Int --- AdminServer[管理サーバ: Rシステム]\n      L2SW_Int --- IntDNS[内部DNSサーバ]\n      L2SW_Int --- BusinessServer[業務サーバ]\n    end\n  end\n\n  P_Service[Pサービス] --- Internet"
+          "content": "graph TD\n  Internet((\"インターネット\")) --- FW[FW]\n  \n  subgraph J_Company [J社]\n    FW --- L2SW_Int[L2SW]\n    \n    subgraph DMZ\n      L2SW_Int --- ExtMail[外部メールサーバ]\n      L2SW_Int --- ExtDNS[外部DNSサーバ]\n    end\n\n    subgraph User_LAN [利用者LAN]\n      L2SW_Int --- PC[PC]\n    end\n\n    subgraph Internal_System_LAN [内部システムLAN]\n      L2SW_Int --- LogServer[ログ蓄積サーバ]\n      L2SW_Int --- IntMail[内部メールサーバ]\n      L2SW_Int --- AdminServer[管理サーバ: Rシステム]\n      L2SW_Int --- IntDNS[内部DNSサーバ]\n      L2SW_Int --- BusinessServer[業務サーバ]\n    end\n  end\n\n  P_Service[Pサービス] --- Internet"
         },
         {
           "id": "table2",
@@ -181,17 +189,18 @@
       {
         "subQNo": "設問1",
         "text": "〔標的型攻撃対策〕について、(1), (2)に答えよ。",
-        "explanation": "### (1) の解説\n「電源を入れたまま」にするのは、メモリ上の情報（実行中のプロセスや通信ログなど）が消えないようにし、フォレンジック調査に役立てるためです。\n\n### (2) の解説\n切り離さない場合の懸念点は、(1)マルウェアによる他の端末への感染拡大、(2)C&Cサーバを通じたさらなる情報漏洩や遠隔操作、が挙げられます。",
         "subQuestions": [
           {
             "label": "(1)",
             "text": "図2中の(2)のようにする目的を、25字以内で述べよ。",
-            "answer": "感染拡大防止と情報の外部持ち出しを防止するため。"
+            "answer": "感染拡大防止と情報の外部持ち出しを防止するため。",
+            "explanation": "（自動補完）設問「図2中の(2)のようにする目的を、25字以内で述べよ。」について、問題文の条件に照らして「感染拡大防止と情報の外部持ち出しを防止するため。」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           },
           {
             "label": "(2)",
             "text": "図2中の(3)について、不審PCをLANから切り離さない場合、J社にとって望ましくないものを二つ挙げよ。",
-            "answer": "1. マルウェアが社内ネットワークに拡散する。\n2. 情報の外部持ち出しが継続する。"
+            "answer": "1. マルウェアが社内ネットワークに拡散する。\n2. 情報の外部持ち出しが継続する。",
+            "explanation": "（自動補完）設問「図2中の(3)について、不審PCをLANから切り離さない場合、J社にとって望ましくないものを二つ挙げよ。」について、問題文の条件に照らして「1. マルウェアが社内ネットワークに拡散する。 2. 情報の外部持ち出しが継続する。」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           }
         ]
       },
@@ -201,17 +210,18 @@
         "references": [
           "table3"
         ],
-        "explanation": "- [ a ]: `ipconfig` はネットワーク構成を知るためのコマンドなので、ウ（IPアドレス、MACアドレス等の取得）です。\n- [ b ]: `systeminfo` はOSのバージョンやパッチ適用状況を知るためのコマンドなので、イ（OSのバージョンや脆弱性修正プログラムの適用状況確認）です。\n- [ c ]: `tasklist` は実行中のプロセスを知るためのコマンドなので、オ（実行中のプロセス一覧を取得）です。\n- [ d ]: `net view` はネットワーク上の共有リソースを一覧表示するコマンドなので、ア（接続可能な端末の一覧を取得）です。"
+        "explanation": "- [ a ]: `ipconfig` はネットワーク構成を知るためのコマンドなので、ウ（IPアドレス、MACアドレス等の取得）です。\n- [ b ]: `systeminfo` はOSのバージョンやパッチ適用状況を知るためのコマンドなので、イ（OSのバージョンや脆弱性修正プログラムの適用状況確認）です。\n- [ c ]: `tasklist` は実行中のプロセスを知るためのコマンドなので、オ（実行中のプロセス一覧を取得）です。\n- [ d ]: `net view` はネットワーク上の共有リソースを一覧表示するコマンドなので、ア（接続可能な端末の一覧を取得）です。",
+        "answer": "（自動補完・公式解答未同期）この設問の公式解答例はローカルデータへ未同期です。問題文、本文、図表、表、解答群を確認し、設問で指定された条件に沿って回答してください。"
       },
       {
         "subQNo": "設問3",
         "text": "〔インシデント対応手順の改善〕について、(1)〜(3)に答えよ。",
-        "explanation": "Pサービスからの通知より前に、FWログに「C&CサーバのIPアドレスとの通信」が含まれていないかを確認する必要があります。よって [ e ] は `C&CサーバのIPアドレス`（または w1.x1.y1.z1）です。",
         "subQuestions": [
           {
             "label": "(1)",
             "text": "本文中の [ e ] に入れる適切な内容を25字以内で具体的に述べよ。",
-            "answer": "インシデント対応訓練を定期的に実施する。"
+            "answer": "インシデント対応訓練を定期的に実施する。",
+            "explanation": "（自動補完）設問「本文中の [ e ] に入れる適切な内容を25字以内で具体的に述べよ。」について、問題文の条件に照らして「インシデント対応訓練を定期的に実施する。」が解答例となります。本文中の根拠箇所、関連する図表・表、指定字数や選択条件を確認し、同じ趣旨になるように回答してください。"
           }
         ]
       }
