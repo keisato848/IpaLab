@@ -4,9 +4,12 @@
 
 | 日付 | 変更内容 |
 |------|------|
-| 2026-05-10 | `aiChat` Azure Function の `userMessage` 文字数制限を 8000 → 30000 文字に緩和。採点プロンプトが問題文・模範解答・回答を含むため制限超過で `400 Prompt too long` が返り `Scoring failed` になっていた。 |
+| 2026-05-10 | `/api/score` が Azure App Service 上で `AI_CHAT_FUNCTION_URL` 未設定のまま Gemini 直接呼び出しへフォールバックしないよう、503 の設定エラーとして返す仕様に変更。本番ワークフローにも `AI_CHAT_FUNCTION_URL` を追加し、US Function (`aiChat`) の長文採点プロンプト上限を 32,000 文字へ拡張。 |
 | 2026-05-09 | `/api/score` Gemini 直接呼び出しフォールバック（ローカル開発用）に `systemInstruction: SYSTEM_PROMPT` を追加し、プロキシ経由と採点品質を統一。`export const runtime = 'nodejs'` を追加し Edge Runtime での誤動作リスクを解消。テストの `beforeEach` で `AI_CHAT_FUNCTION_URL` を必ず削除して環境依存を排除。 |
 | 2026-05-09 | `/api/score` が East Asia から Gemini API を直接呼び出せない地域制限バグを修正。`AI_CHAT_FUNCTION_URL` が設定されている場合は US リージョンの Azure Function (`aiChat`) を経由するプロキシ方式に変更。ローカル開発は従来通り直接呼び出し。 |
+| 2026-05-08 | 午後選択式UIのラジオ/チェックボックスに選択肢記号と本文を含むアクセシブル名を付与 |
+| 2026-05-08 | 午後個別問題ページの `qNo` 解決を完全一致に限定し、疎な `qNo` を位置番号で別問題へ誤解決するフォールバックを廃止 |
+| 2026-05-08 | 子設問を持つ説明だけの親見出しを解答欄化しない判定を追加し、800字欄化の再発防止を追加 |
 | 2026-05-07 | ダークテーマで新形式午後画面の解答例ラベルが低コントラストになる問題を修正し、self-inspect検出ルールを追加 |
 | 2026-05-07 | 新形式午後画面の解答例解説をMarkdownとして描画し、同種デグレをself-inspectで検出するルールを追加 |
 | 2026-05-07 | 午後試験ヘッダーの不要な `IpaLab` リンクを削除し、午後記述欄を原稿用紙形式入力に変更 |
@@ -112,6 +115,16 @@ sequenceDiagram
 4. 新形式午後画面では、必要に応じて問題文ペインも「問題文を隠す / 表示」で開閉できる
 5. サイドナビの開閉状態は localStorage に保存し、再読み込み後も維持する
 
+### 4.1.2 新形式午後画面の解答欄生成
+
+`SCPMExamView` は `questions` / `subQuestions` から解答欄を生成する。子設問を持つ親設問は、親自身に `answer` または `modelAnswer` が明示されている場合だけ直接解答欄化する。
+
+`explanation` だけを持つ親設問は、設問グループ見出しまたは解説メタデータとして扱い、800字の原稿用紙欄を生成しない。これにより `A社の製造データの作成について答えよ。` のような親見出しが、子設問とは別の余分な入力欄として表示されることを防ぐ。
+
+記述式のリーフ設問は従来どおり `AIAnswerBox` の `genkoyoshi` 入力を使用し、字数制限が1つだけ抽出できる場合はその上限を表示する。複数字数条件を含む設問はデータ側で解答欄を分割し、記号回答は公式PDFに基づく解答群を構造化した上で選択式UIへ渡す。
+
+`answerChoices` / `choices` / `options` を持つリーフ設問は選択式UIへ分岐する。択一選択はラジオボタンで選択時に採点し、複数選択はチェックボックスで選択後に採点する。各選択肢の入力要素には、`イ DNS` のように選択肢記号と本文を含むアクセシブル名を付与し、スクリーンリーダーやE2Eテストから選択肢を一意に識別できるようにする。採点結果は午前問題と同じく `LearningRecord.selectedOptionId` と `isCorrect` に保存し、ゲスト履歴・セッション進捗・試験進捗の更新対象に含める。
+
 ### 4.2 AI 採点
 
 ```mermaid
@@ -139,6 +152,7 @@ sequenceDiagram
 
 > **注意**: Gemini API は East Asia リージョンから直接呼び出せない。本番・Staging では
 > `AI_CHAT_FUNCTION_URL` に US リージョンの Azure Function URL を設定すること。
+> Azure App Service 上で未設定の場合、`/api/score` はローカル開発用の Gemini 直接呼び出しへフォールバックせず、`503 { error: "AI proxy is not configured" }` を返す。
 > 参照: `apps/web/.env.template`
 
 ### 4.3 採点結果の保存
@@ -174,7 +188,7 @@ sequenceDiagram
 
 | サービス | 用途 |
 |------|------|
-| Azure Function App (aiChat, US East 2) | `/api/score` からのプロキシ中継。East Asia からの Gemini 地域制限を回避するために **必須**。`userMessage` の上限は 30000 文字、`systemPrompt` の上限は 16000 文字 |
+| Azure Function App (aiChat, US East 2) | `/api/score` からのプロキシ中継。East Asia からの Gemini 地域制限を回避するために **必須**。`userMessage` の上限は 32,000 文字、`systemPrompt` の上限は 16,000 文字 |
 | Gemini API | 記述回答の採点とフィードバック生成（Azure Function App 経由で呼び出す） |
 | Azure Cosmos DB LearningRecords | 採点結果の保存 |
 | Azure Cosmos DB LearningSessions | 認証ユーザーの進捗更新 |
@@ -189,11 +203,11 @@ sequenceDiagram
 | 変数名 | 必須 | 用途 | 備考 |
 |------|------|------|------|
 | `AI_CHAT_FUNCTION_URL` | **本番・Staging 必須** | `/api/score` → US Azure Function プロキシ | 未設定時は `GEMINI_API_KEY` 直接呼び出し（ローカル開発用フォールバック）。East Asia から Gemini を直接呼ぶと地域制限エラーになるため、本番では必須。例: `https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat` |
-| `GEMINI_API_KEY` | ローカル開発のみ必須 | `AI_CHAT_FUNCTION_URL` 未設定時のフォールバック | 本番では `AI_CHAT_FUNCTION_URL` を設定するため不要。未設定かつ `AI_CHAT_FUNCTION_URL` も未設定の場合は 500 を返す |
+| `GEMINI_API_KEY` | ローカル開発のみ必須 | `AI_CHAT_FUNCTION_URL` 未設定時のフォールバック | Azure App Service 上では使用しない。未設定かつ `AI_CHAT_FUNCTION_URL` も未設定の場合は 500、Azure 上で `AI_CHAT_FUNCTION_URL` が未設定の場合は 503 を返す |
 | `COSMOS_DB_CONNECTION` | サーバー運用上必須 | 採点結果の保存・セッション更新 | 未設定時は DB 保存を無効化 |
 | `NEXT_PUBLIC_API_BASE` | 任意 | クライアント API 呼び出し | 未設定時は `/api` |
 
-> **East Asia 地域制限について**: Azure App Service (East Asia) から Gemini API を直接呼び出すと `User location is not supported` エラーになる。すべての Gemini 呼び出しは US East 2 リージョンの Azure Function App (`aiChat`) を経由させること。`AI_CHAT_FUNCTION_URL` が未設定の場合のみ Gemini 直接呼び出しにフォールバックする（ローカル開発専用）。
+> **East Asia 地域制限について**: Azure App Service (East Asia) から Gemini API を直接呼び出すと `User location is not supported` エラーになる。すべての Gemini 呼び出しは US East 2 リージョンの Azure Function App (`aiChat`) を経由させること。`AI_CHAT_FUNCTION_URL` が未設定の場合のみ Gemini 直接呼び出しにフォールバックする（ローカル開発専用）。`aiChat` は午後問題本文を含む採点プロンプトを受けられるよう、`userMessage` 最大 32,000 文字まで許容する。
 
 ---
 
@@ -240,7 +254,15 @@ sequenceDiagram
 | `answer` | 入力中の答案 |
 | `savedAt` | ISO 8601 形式の保存日時 |
 
-`answerFieldId` は `question.id-{idx}` または `question.id-{idx}-{subIdx}` とし、採点結果の `LearningRecord.questionId` と同じ粒度にそろえる。
+`answerFieldId` は `examId-qNo-{idx}` または `examId-qNo-{idx}-{subIdx}` を優先し、`examId` / `qNo` がない場合だけ `question.id-{idx}` を使う。下書き保存キーと採点結果の `LearningRecord.questionId` は同じ粒度にそろえる。
+
+### 8.5 受講者想定 E2E テストデータ
+
+午後問題の受講者操作は、リポジトリ管理された fixture を使って検証する。代表ケースは `apps/web/e2e/fixtures/pm-answer-flow.json` に定義し、対象ページ、入力欄インデックス、期待する `answerFieldId`、下書き保存キー、入力答案、採点結果を固定する。
+
+`apps/web/e2e/pm-answer-flow.spec.ts` はこの fixture を読み込み、実際の画面で答案を入力し、下書き保存、AI 採点ボタン操作、採点結果表示、ゲスト履歴 `ipalab_guest_history` への保存、再読み込み後の答案復元を確認する。採点 API は外部 AI の非決定性を避けるため Playwright の route mock で fixture の採点結果を返すが、UI 上は通常の `/api/score` 呼び出しとして検証する。
+
+この検証は、データ修正 PR で午後問題の構造や回答欄生成を変更したときに、受講者が「入力できる」「保存できる」「採点結果を見られる」状態を壊していないことを確認するための基準とする。
 
 ---
 
@@ -279,12 +301,12 @@ sequenceDiagram
 10. 解答ペインヘッダーのトグルで、問題文左ペインを非表示にして解答欄を全幅表示できる
 11. 非表示中も同じトグルで問題文左ペインを再表示できる
 
-### 10.3 問題番号フォールバック
+### 10.3 問題番号の厳密解決
 
 1. 試験入口画面は `questions` の実在 `qNo` を昇順に並べ、最初の問題番号・次の未回答番号・再開リンクを生成する
 2. 個別問題ページはまず要求 `qNo` の完全一致を探す
-3. 完全一致がない場合、正規化済み `qNo` 昇順の `qNo - 1` 番目の問題を位置番号として返す
-4. これにより、`qNo=1,3` や `qNo=3` のような疎な午後データでも、入口や直接 URL で「データが見つかりません」にならない
+3. 完全一致がない場合、`qNo - 1` 番目などの位置番号フォールバックは行わず「問題が見つかりません」として扱う
+4. 疎な `qNo` を補正したい場合は URL 側で別問題へ寄せず、データ抽出・変換工程で公式PDF上の大問番号と `qNo` を一致させる
 
 ### 10.4 採点前下書き保存
 
@@ -402,7 +424,7 @@ sequenceDiagram
 | UI | 新形式午後画面で問題文左ペインを閉じると解答ペインが全幅になり、再表示できること |
 | UI | 変換済み午後画面のヘッダーと「終了して一覧へ」ボタンに CSS Modules のスタイルが適用されること |
 | UI | `subQuestions` が空の午後データでも、設問直下またはネスト配下の解答情報から入力欄が表示されること |
-| UI | 疎な `qNo` の午後データでも、入口・再開・直接 URL から実在問題へ遷移できること |
+| UI | 疎な `qNo` の午後データで要求番号と異なる問題へ位置番号フォールバックしないこと |
 | Unit | Mermaid サニタイズが日本語 subgraph、named subgraph、日本語 ER 図、二重括弧ノードを描画可能な構文へ正規化すること |
 
 ---

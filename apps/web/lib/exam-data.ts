@@ -47,22 +47,6 @@ export function findQuestionByNo(questions: Question[], qNo: number): Question |
     return questions.find(question => resolveQuestionNo(question.qNo) === qNo);
 }
 
-export function findQuestionByNoOrPosition(questions: Question[], qNo: number): Question | undefined {
-    const exact = findQuestionByNo(questions, qNo);
-    if (exact) return exact;
-
-    if (!Number.isInteger(qNo) || qNo < 1) {
-        return undefined;
-    }
-
-    const sortedQuestions = questions
-        .map(question => ({ question, resolvedNo: resolveQuestionNo(question.qNo) }))
-        .filter((item): item is { question: Question; resolvedNo: number } => item.resolvedNo !== null)
-        .sort((left, right) => left.resolvedNo - right.resolvedNo);
-
-    return sortedQuestions[qNo - 1]?.question;
-}
-
 export function hasSuspiciousPlaceholderQuestions(examId: string, questions: Question[]): boolean {
     const isAfternoonExam = /-(PM|PM1|PM2)$/.test(examId);
     if (!isAfternoonExam || questions.length === 0) {

@@ -7,7 +7,7 @@ const repoRoot = process.cwd();
 const ipaBaseUrl = 'https://www.ipa.go.jp';
 const questionsRoot = path.join(repoRoot, 'packages', 'data', 'data', 'questions');
 const examListPath = path.join(repoRoot, 'packages', 'data', 'src', 'scraper', 'exam-list.ts');
-const defaultTargetCategories = ['AP', 'PM', 'SC', 'FE', 'NW', 'DB', 'SA', 'ES', 'ST'];
+const defaultTargetCategories = ['AP', 'PM', 'SC', 'FE', 'NW', 'DB', 'AU', 'SM', 'SA', 'ES', 'ST'];
 const supportedTypes = ['AM', 'AM1', 'AM2', 'PM', 'PM1', 'PM2'];
 
 const args = process.argv.slice(2);
@@ -17,6 +17,10 @@ const toYear = Number.parseInt(getArgValue('--to-year', String(new Date().getFul
 const targetCategories = getArgValue('--categories', defaultTargetCategories.join(','))
   .split(',')
   .map((category) => category.trim().toUpperCase())
+  .filter(Boolean);
+const targetTypes = getArgValue('--types', supportedTypes.join(','))
+  .split(',')
+  .map((type) => type.trim().toUpperCase())
   .filter(Boolean);
 const includeLocalOnly = !hasFlag('--no-local-only');
 
@@ -73,8 +77,11 @@ function parseExamId(examId) {
   };
 }
 
-function isTarget(category, year) {
-  return targetCategories.includes(category) && year >= fromYear && year <= toYear;
+function isTarget(category, year, type = null) {
+  return targetCategories.includes(category)
+    && year >= fromYear
+    && year <= toYear
+    && (!type || targetTypes.includes(type));
 }
 
 function loadExamListRecords() {
@@ -144,7 +151,7 @@ function parseOfficialPdf(url, sourcePageUrl) {
     const category = standard.groups.category.toUpperCase();
     const term = termFromCode(standard.groups.termCode);
     const type = standard.groups.type.toUpperCase();
-    if (!term || !supportedTypes.includes(type) || !isTarget(category, year)) return null;
+    if (!term || !supportedTypes.includes(type) || !isTarget(category, year, type)) return null;
     return {
       examId: `${category}-${year}-${term}-${type}`,
       category,
@@ -162,7 +169,7 @@ function parseOfficialPdf(url, sourcePageUrl) {
     const year = Number.parseInt(fePublic.groups.year, 10);
     const category = 'FE';
     const type = fePublic.groups.subject === 'a' ? 'AM' : 'PM';
-    if (!isTarget(category, year)) return null;
+    if (!isTarget(category, year, type)) return null;
     return {
       examId: `${category}-${year}-Public-${type}`,
       category,
@@ -336,6 +343,7 @@ const stats = {
   fromYear,
   toYear,
   targetCategories,
+  targetTypes,
   officialSourcePageCount: officialCollection.sourcePageCount,
   officialQuestionExamCount: officialRecords.length,
   officialAnswerExamCount: officialRecords.filter((record) => record.answerUrl).length,
@@ -350,11 +358,11 @@ const stats = {
 };
 
 for (const record of examListRecords.values()) {
-  if (isTarget(record.category, record.year)) stats.examListTargetCount += 1;
+  if (isTarget(record.category, record.year, record.type)) stats.examListTargetCount += 1;
 }
 for (const examId of localExamIds) {
   const parsed = parseExamId(examId);
-  if (parsed && isTarget(parsed.category, parsed.year)) stats.localTargetCount += 1;
+  if (parsed && isTarget(parsed.category, parsed.year, parsed.type)) stats.localTargetCount += 1;
 }
 
 for (const record of officialRecords) {
@@ -385,7 +393,7 @@ if (includeLocalOnly) {
   const officialSet = new Set(officialRecords.map((record) => record.examId));
   for (const examId of localExamIds) {
     const parsed = parseExamId(examId);
-    if (!parsed || !isTarget(parsed.category, parsed.year) || officialSet.has(examId)) continue;
+    if (!parsed || !isTarget(parsed.category, parsed.year, parsed.type) || officialSet.has(examId)) continue;
     stats.localOnlyTargetCount += 1;
     issues.push({ severity: 'info', rule: 'LOCAL_TARGET_NOT_IN_OFFICIAL_SOURCE', examId, detail: 'local target data was not detected by the official PDF audit' });
   }
@@ -410,6 +418,7 @@ if (jsonOutput) {
 } else {
   console.log(`status=${result.status}`);
   console.log(`targetCategories=${targetCategories.join(',')}`);
+  console.log(`targetTypes=${targetTypes.join(',')}`);
   console.log(`yearRange=${fromYear}-${toYear}`);
   console.log(`officialSourcePageCount=${stats.officialSourcePageCount}`);
   console.log(`officialQuestionExamCount=${stats.officialQuestionExamCount}`);

@@ -1,0 +1,23 @@
+{
+  "id": "F-01",
+  "description": "SA-2024 PM1 問1 設問1(2) の受講者想定入力・採点・保存フロー",
+  "pagePath": "/exam/SA-2024-Spring-PM1/PM1/1?mode=practice",
+  "answerInputIndex": 1,
+  "questionTextIncludes": "四則演算子",
+  "answerFieldId": "SA-2024-Spring-PM1-1-0-1",
+  "draftKey": "ipalab_pm_answer_draft_v1:SA-2024-Spring-PM1-1-0-1",
+  "displayMaxChars": 30,
+  "answer": "比例は所要時間×製造指示数、一定は所要時間とするのが適切。",
+  "scoreResult": {
+    "score": 82,
+    "radarChartData": [
+      { "subject": "設問適合性", "A": 8, "fullMark": 10 },
+      { "subject": "論理構成", "A": 8, "fullMark": 10 },
+      { "subject": "重要語句", "A": 9, "fullMark": 10 },
+      { "subject": "具体性", "A": 7, "fullMark": 10 }
+    ],
+    "feedback": "テスト採点: 比例と一定の計算区分を区別して回答できています。",
+    "mermaidDiagram": "graph TD; A[答案入力] --> B[採点結果表示] --> C[ゲスト履歴保存]",
+    "improvedAnswer": "比例は所要時間×製造指示数で求め，一定は所要時間で求める。"
+  }
+}

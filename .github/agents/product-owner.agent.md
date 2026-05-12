@@ -7,11 +7,11 @@ tools:
   - edit
 user-invocable: false
 handoffs:
-  - label: 設計へ進む
+  - label: design1
     agent: solution-architect
     prompt: 直前に整理したプロダクト要求と受け入れ基準をもとに、実装設計と影響範囲を作成してください。
     send: true
-  - label: 文書化する
+  - label: doc1
     agent: documentation-steward
     prompt: 直前に整理した要求、受け入れ基準、未解決事項を正本文書へ反映してください。
     send: true

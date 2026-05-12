@@ -66,13 +66,13 @@
 
 ### 4.2 データ抽出機能 (ETL)
 - **入力**: PDFファイル
-- **処理**: Google Gemini API (Flash/Proモデル) を使用したOCRと構造化。解答PDFに限り、検証用のローカルOllama Vision pilotで抽出できる。
+- **処理**: AIを使用する抽出では Google Gemini API ではなく、同一ローカルネットワーク上の Ollama `gemma4:31b` を使用してOCRと構造化を行う。
 - **出力**: `questions_raw.json`, `answers_raw.json`
 - **要件**:
     - 図表を含む複雑なレイアウトの認識。
     - APIレート制限への対応（リトライ、キーローテーション）。
-  - Ollama pilot は `answers_raw.json` 専用であり、PDFを画像化するローカルレンダラ（Poppler、MuPDF、ImageMagick + Ghostscript、Ghostscriptのいずれか）を前提とする。
-  - Ollama pilot は `questions_raw.json` の抽出完了条件を代替しない。問題本文と図表の抽出は引き続き Stage B の正式抽出処理で完了判定する。
+  - Ollama 抽出は `questions_raw.json` と `answers_raw.json` の両方で使用でき、PDFを画像化するローカルレンダラ（Poppler、MuPDF、ImageMagick + Ghostscript、Ghostscriptのいずれか）を前提とする。
+  - 抽出後は公式PDFと照合し、本文、図表、選択肢、解答例の品質を手動レビューする。
 
 ### 4.3 クレンジング機能
 - **入力**: Raw JSONファイル

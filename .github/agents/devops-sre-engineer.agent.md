@@ -9,11 +9,11 @@ tools:
   - web
 user-invocable: false
 handoffs:
-  - label: セキュリティ確認へ
+  - label: s1-セキュリティ確認へ
     agent: security-observability-engineer
     prompt: 直前の DevOps/Azure/CI 変更について、シークレット、権限、監視、禁止操作の観点でレビューしてください。
     send: true
-  - label: QA 回帰へ
+  - label: qa1-QA 回帰へ
     agent: qa-evidence-engineer
     prompt: 直前の CI/CD またはデプロイ変更について、必要な回帰テストと evidence を整理してください。
     send: true

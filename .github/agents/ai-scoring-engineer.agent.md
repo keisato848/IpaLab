@@ -8,11 +8,11 @@ tools:
   - execute
 user-invocable: false
 handoffs:
-  - label: バックエンド確認へ
+  - label: backend-check バックエンド確認へ
     agent: backend-data-engineer
     prompt: 直前の AI 採点変更について、API 契約、Cosmos 保存、試験データ取得の整合性を確認してください。
     send: true
-  - label: QA 評価へ
+  - label: qa-review QA 評価へ
     agent: qa-evidence-engineer
     prompt: 直前の AI 採点変更について、ユニットテスト、SSE 回帰、UI 証跡、評価観点を作成してください。
     send: true

@@ -273,6 +273,8 @@ apps/web/e2e/reporters/custom-report.ts（Playwright Reporter）
 docs/04_reports/E2E_Test_Evidence_Report_{YYYYMMDD}.md を生成
 ```
 
+スクリーンショットエビデンスは、レポーターの実行開始時刻以降に `apps/web/e2e/evidence/` へ生成された画像だけを対象にする。日付や年プレフィックスだけで過去画像を再掲しない。
+
 ### 8.3 custom-report 5 セクション構成
 
 | # | セクション | 内容 |
@@ -288,6 +290,7 @@ docs/04_reports/E2E_Test_Evidence_Report_{YYYYMMDD}.md を生成
 - [ ] 未記入プレースホルダー（`{...}`）が存在しない
 - [ ] 5 セクションすべてが揃っている
 - [ ] 画像リンクが `../../apps/web/e2e/evidence/` 形式を使用している
+- [ ] スクリーンショットエビデンスは今回実行分だけに絞られている
 - [ ] すべての E2E 実行後に報告書が生成されている
 - [ ] `SKIP_EVIDENCE` が一切使用されていない
 

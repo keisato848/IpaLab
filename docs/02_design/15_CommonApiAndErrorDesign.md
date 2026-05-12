@@ -114,9 +114,10 @@ sequenceDiagram
 | `NEXT_PUBLIC_API_BASE` | 任意 | `lib/api.ts` の fetch 先ベース URL | ブラウザ未設定時は `/api` |
 | `COSMOS_DB_CONNECTION` | サーバー運用上必須 | 全 CosmosDB API の接続先 | 未設定時は DB 無効化 |
 | `NEXTAUTH_SECRET` / `AUTH_SECRET` | 認証 API で必要 | セッション署名 | NextAuth 設定 |
-| `GEMINI_API_KEY` | `/api/score` で必須 | 記述採点 | 未設定時 500 |
+| `AI_CHAT_FUNCTION_URL` | 本番・Staging 必須 | `/api/score` と AI 採点 API の US Function プロキシ | Azure App Service 上で未設定の場合、`/api/score` は 503 を返す |
+| `GEMINI_API_KEY` | ローカル開発のみ必須 | `AI_CHAT_FUNCTION_URL` 未設定時の直接呼び出し | Azure App Service 上では直接呼び出しへフォールバックしない |
 | `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` | 任意 | クライアント計測初期化 | 公開値として扱う |
-| `TELEMETRY_CONNECTION_STRING` | 任意 | Node 側計測 | Managed Identity と併用 |
+| `TELEMETRY_CONNECTION_STRING` | 任意 | Node 側計測 | Managed Identity と併用。ブラウザには返さない |
 
 ---
 
@@ -155,12 +156,12 @@ sequenceDiagram
 | `/api/exam-progress` | GET | 不要 | `ExamProgress` | 400, 500 |
 | `/api/exam-progress` | POST | 不要 | `ExamProgress` | 400, 500 |
 | `/api/learning-records` | GET | 必須 | `LearningRecord[]` | 401, 500 |
-| `/api/learning-records` | POST | 現状は不要 | 単体 record または bulk 保存結果 | 400, 500 |
+| `/api/learning-records` | POST | 必須 | 単体 record または bulk 保存結果。重複 ID は同期済みとして 200 | 400, 401, 500 |
 | `/api/session` | GET | 必須 | `LearningSessionInfo[]` | 401, 500 |
 | `/api/session` | PATCH | 必須 | `LearningSessionInfo` | 400, 401, 403, 404, 500 |
 | `/api/session/create` | POST | 現状は不要 | `LearningSessionInfo` | 400, 500 |
-| `/api/score` | POST | 不要 | `ScoreResult` | 400, 500 |
-| `/api/config/telemetry` | GET | 不要 | `{ connectionString }` | 200 固定運用 |
+| `/api/score` | POST | 不要 | `ScoreResult` | 400, 500, 503 |
+| `/api/config/telemetry` | GET | 不要 | `{ connectionString }` | `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` のみ返却。`TELEMETRY_CONNECTION_STRING` は返さない |
 | `/api/track` | POST | 不要 | `{ ok: true }` | 400, 実質 200 フォールバック |
 
 ---

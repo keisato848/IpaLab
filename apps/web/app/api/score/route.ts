@@ -41,16 +41,13 @@ function buildScoringPrompt(question: string, userAnswer: string, modelAnswer?: 
 }`;
 }
 
-/**
- * US リージョンの AI Function App エンドポイント経由で採点を実行する。
- *
- * Gemini API は East Asia リージョンから直接呼び出せないため、
- * AI_CHAT_FUNCTION_URL が設定されている場合は US Azure Function を経由する。
- */
-const AI_CHAT_FUNCTION_URL = process.env.AI_CHAT_FUNCTION_URL;
+function getAiChatFunctionUrl(): string {
+    return process.env.AI_CHAT_FUNCTION_URL?.trim() || '';
+}
 
-// ローカル開発用フォールバック
-const apiKey = process.env.GEMINI_API_KEY;
+function isAzureHostedRuntime(): boolean {
+    return Boolean(process.env.WEBSITE_SITE_NAME || process.env.WEBSITE_INSTANCE_ID);
+}
 
 export async function POST(req: NextRequest) {
     try {
@@ -64,9 +61,11 @@ export async function POST(req: NextRequest) {
         const prompt = buildScoringPrompt(question, userAnswer, modelAnswer);
         let responseText: string;
 
-        if (AI_CHAT_FUNCTION_URL) {
+        const aiChatFunctionUrl = getAiChatFunctionUrl();
+
+        if (aiChatFunctionUrl) {
             // 本番: US Azure Function 経由（East Asia から Gemini への地域制限を回避）
-            const res = await fetch(AI_CHAT_FUNCTION_URL, {
+            const res = await fetch(aiChatFunctionUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ systemPrompt: SYSTEM_PROMPT, userMessage: prompt }),
@@ -78,7 +77,13 @@ export async function POST(req: NextRequest) {
             if (data.error) throw new Error(data.error);
             responseText = data.text ?? '';
         } else {
+            if (isAzureHostedRuntime()) {
+                console.error('AI_CHAT_FUNCTION_URL is not set in Azure hosted runtime');
+                return NextResponse.json({ error: 'AI proxy is not configured' }, { status: 503 });
+            }
+
             // ローカル開発用: Gemini API 直接呼び出し
+            const apiKey = process.env.GEMINI_API_KEY;
             if (!apiKey) {
                 return NextResponse.json({ error: 'GEMINI_API_KEY is not set' }, { status: 500 });
             }

@@ -40,15 +40,14 @@ Linux App Service + Node.js 環境では、Azure の IPA コードレスエー�
 
 - `instrumentation.ts`（Next.js Instrumentation Hook）で `applicationinsights` v3 の `useAzureMonitor()` API を使用
 - 接続文字列は `process.env.TELEMETRY_CONNECTION_STRING` から読み取り
-- ブラウザ側は `@microsoft/applicationinsights-web` を `TelemetryProvider.tsx` で初期化
-- Microsoft Learn 推奨の `enableAutoRouteTracking: true` を使用し、App Router の画面遷移ごとに `AppPageViews` を自動送信
-- 認証済みユーザーは `setAuthenticatedUserContext(session.user.id)` で関連付ける
-- 接続文字列は `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` を優先し、未設定時は `/api/config/telemetry` からランタイム取得
+- ブラウザ側は `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` が明示設定された場合のみ `@microsoft/applicationinsights-web` を `TelemetryProvider.tsx` で初期化
+- `DisableLocalAuth=true` の Application Insights へ JavaScript SDK は直接送信できないため、`TELEMETRY_CONNECTION_STRING` は `/api/config/telemetry` から返さない
+- ブラウザ計測を有効化する場合は、local auth 有効のブラウザ専用 Application Insights または認証済みサーバープロキシを別途設計する
 
 ### 利用状況分析での参照
 
 - 管理画面の利用状況分析では、`AppRequests` テーブルを Azure Monitor Logs API 経由で KQL 集計する
-- クライアントサイド JS SDK 導入後は `AppPageViews` が送信される
+- クライアントサイド JS SDK は既定では無効化し、サーバー側の `AppRequests` を主たる利用状況データとする
 - ただし既存の 30 日履歴との連続性を保つため、現時点の管理画面集計は `AppRequests` を継続利用する
 - 問い合わせ先リソース ID は `TELEMETRY_RESOURCE_ID` に設定する
 - サイト訪問者数は `UserAuthenticatedId` / `UserId` / `SessionId` / `OperationId` を用いたユニーク訪問者数として扱う（現状は `OperationId` のみ有効）

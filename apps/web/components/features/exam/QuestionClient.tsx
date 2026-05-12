@@ -34,7 +34,8 @@ const Mermaid = dynamic(() => import('@/components/ui/Mermaid'), { ssr: false })
 import ExamSummary from './ExamSummary';
 import AIAnswerBox from './AIAnswerBox';
 import SCPMExamView from './SCPMExamView';
-import { buildPMAnswerFieldId, buildPMDraftKey, extractAnswerLimit } from './pmAnswerUtils';
+import type { PMChoiceGradeData } from './SCPMExamView';
+import { buildPMAnswerFieldId, buildPMDraftKey, estimatePMAnswerDisplayMaxChars, extractAnswerLimit, resolvePMQuestionBaseId, shouldUsePMGenkoyoshiInput } from './pmAnswerUtils';
 
 interface QuestionClientProps {
     question: Question;
@@ -52,6 +53,9 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const router = useRouter();
     const { data: session } = useSession();
     const { showExamStats, toggleShowExamStats } = useTheme();
+    const typeSuffix = type === 'AM1' ? 'AM' : type;
+    const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
+    const examLabel = getExamLabel(examId);
 
     // Local state for settings popup
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -113,7 +117,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 if (!userId) return;
 
                 // 1. Fetch History (Logs)
-                const records = await getLearningRecords(userId, question.examId);
+                const records = await getLearningRecords(userId, examId);
                 // ... (existing historyMap logic) ...
                 const historyMap: Record<string, { answer: string; result: any }> = {};
                 records.forEach(r => {
@@ -133,7 +137,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 setDescriptiveHistory(historyMap);
 
                 // 2. Fetch Progress (Bookmarks)
-                const progress = await getExamProgress(userId, question.examId);
+                const progress = await getExamProgress(userId, examId);
                 if (progress && progress.bookmarks.includes(question.id)) {
                     setIsBookmarked(true);
                 } else {
@@ -161,7 +165,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             }
         }
         fetchHistoryAndProgress();
-    }, [question.id, session?.user?.id, question.examId, sessionId]);
+    }, [question.id, session?.user?.id, examId, sessionId]);
 
     // Handle Bookmark Toggle
     const toggleBookmark = async () => {
@@ -172,7 +176,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         setIsBookmarked(newState); // Optimistic Update
 
         try {
-            const current = await getExamProgress(userId, question.examId);
+            const current = await getExamProgress(userId, examId);
             let newBookmarks = current?.bookmarks || [];
 
             if (newState) {
@@ -181,7 +185,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 newBookmarks = newBookmarks.filter(id => id !== question.id);
             }
 
-            await saveExamProgress(userId, question.examId, { bookmarks: newBookmarks });
+            await saveExamProgress(userId, examId, { bookmarks: newBookmarks });
         } catch (e) {
             console.error("Failed to save bookmark", e);
             setIsBookmarked(!newState); // Revert
@@ -206,7 +210,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 id: uuidv4(),
                 userId: session?.user?.id || guestManager.getGuestId() || 'anonymous',
                 questionId: question.id,
-                examId: question.examId,
+                examId,
                 category: question.category,
                 subCategory: question.subCategory,
                 isCorrect: false, // Default if just flagging
@@ -249,7 +253,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 }
 
                 // 2. Cumulative Stats for this Exam (All records for this examId)
-                const eRecords = await getLearningRecords(userId, question.examId);
+                const eRecords = await getLearningRecords(userId, examId);
 
                 // Skip overwriting stats if a save occurred during this fetch (race condition protection)
                 if (fetchVersion !== statsVersionRef.current) return;
@@ -273,7 +277,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             }
         }
         fetchStats();
-    }, [question.id, question.examId, question.correctOption, isReview, session, sessionId]);
+    }, [question.id, examId, question.correctOption, isReview, session, sessionId]);
 
     useEffect(() => {
         if (!isReview || !sessionId) return;
@@ -314,14 +318,16 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         return buildPMAnswerFieldId(baseId, idx, subIdx);
     };
 
+    const questionBaseId = resolvePMQuestionBaseId({ ...question, examId, qNo: question.qNo ?? qNo });
+
     const handleSaveAIScore = async (data: { answer: string; result: any }, subQIdx: number, subSubIdx?: number) => {
-        const qId = getSubQId(question.id, subQIdx, subSubIdx);
+        const qId = getSubQId(questionBaseId, subQIdx, subSubIdx);
         const isCorrect = (data.result.score || 0) >= 60;
         const record: LearningRecord = {
             id: uuidv4(),
             userId: session?.user?.id || guestManager.getGuestId() || 'anonymous',
             questionId: qId,
-            examId: question.examId,
+            examId,
             category: question.category,
             subCategory: question.subCategory,
             isDescriptive: true,
@@ -357,7 +363,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 // Save record and progress
                 const savePromises: Promise<any>[] = [
                     saveLearningRecord(record),
-                    saveExamProgress(session.user.id, question.examId, {
+                    saveExamProgress(session.user.id, examId, {
                         statusUpdate: { questionId: qId, isCorrect }
                     })
                 ];
@@ -398,7 +404,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     correctAnswer: data.result.modelAnswer || '',
                     explanation: data.result.feedback || '',
                     isCorrect,
-                    examId: question.examId,
+                    examId,
                     isDescriptive: true,
                 },
             }));
@@ -411,6 +417,89 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
         } catch (e) {
             console.error("Failed to save AI score", e);
+        }
+    };
+
+    const handleSavePMChoiceScore = async (data: PMChoiceGradeData, subQIdx: number, subSubIdx?: number) => {
+        const qId = getSubQId(questionBaseId, subQIdx, subSubIdx);
+        const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+        const record: LearningRecord = {
+            id: uuidv4(),
+            userId: session?.user?.id || guestManager.getGuestId() || 'anonymous',
+            questionId: qId,
+            examId,
+            category: question.category,
+            subCategory: question.subCategory,
+            isCorrect: data.isCorrect,
+            sessionId: sessionId || undefined,
+            selectedOptionId: data.answer,
+            answeredAt: new Date().toISOString(),
+            timeTakenSeconds: timeTaken,
+        };
+
+        const nextCurrentSessionStats = sessionId ? incrementStats(currentSessionStats, data.isCorrect) : currentSessionStats;
+
+        statsVersionRef.current += 1;
+        setSessionStats(prev => incrementStats(prev, data.isCorrect));
+        if (sessionId) {
+            setCurrentSessionStats(prev => incrementStats(prev, data.isCorrect));
+        }
+        setExamStats(prev => {
+            const currentTotal = prev?.total || 0;
+            const currentCorrect = prev?.correct || 0;
+            return {
+                total: currentTotal + 1,
+                correct: currentCorrect + (data.isCorrect ? 1 : 0)
+            };
+        });
+
+        try {
+            if (session?.user?.id) {
+                const savePromises: Promise<any>[] = [
+                    saveLearningRecord(record),
+                    saveExamProgress(session.user.id, examId, {
+                        statusUpdate: { questionId: qId, isCorrect: data.isCorrect }
+                    })
+                ];
+
+                if (sessionId) {
+                    savePromises.push(
+                        updateSessionProgress(sessionId, {
+                            answeredCount: nextCurrentSessionStats.total,
+                            correctCount: nextCurrentSessionStats.correct,
+                            lastQuestionNo: parseInt(qNo),
+                        })
+                    );
+                }
+
+                await Promise.all(savePromises);
+            } else {
+                if (!guestManager.hasShownWarning()) {
+                    setShowGuestWarning(true);
+                    guestManager.markWarningShown();
+                }
+                guestManager.saveHistory(record);
+            }
+
+            window.dispatchEvent(new CustomEvent('ai-assistant-context', {
+                detail: {
+                    questionId: qId,
+                    questionText: data.questionText,
+                    userAnswer: data.answer,
+                    correctAnswer: data.correctAnswer,
+                    explanation: data.explanation || '',
+                    isCorrect: data.isCorrect,
+                    examId,
+                    isDescriptive: false,
+                },
+            }));
+
+            setAllExamRecords(prev => {
+                const filtered = prev.filter(r => r.questionId !== qId);
+                return [...filtered, record];
+            });
+        } catch (e) {
+            console.error('Failed to save PM choice score', e);
         }
     };
 
@@ -433,7 +522,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     correctAnswer: correctText,
                     explanation: question.explanation || '',
                     isCorrect,
-                    examId: question.examId,
+                    examId,
                     isDescriptive: false,
                 },
             }));
@@ -448,7 +537,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             id: uuidv4(),
             userId: session?.user?.id || guestManager.getGuestId() || 'anonymous',
             questionId: question.id,
-            examId: question.examId,
+            examId,
             category: question.category,
             subCategory: question.subCategory,
             isCorrect,
@@ -481,7 +570,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 // Parallel Save: Log & Snapshot & Session Progress
                 const savePromises: Promise<any>[] = [
                     saveLearningRecord(record),
-                    saveExamProgress(session.user.id, question.examId, {
+                    saveExamProgress(session.user.id, examId, {
                         statusUpdate: { questionId: question.id, isCorrect }
                     })
                 ];
@@ -572,11 +661,6 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
         }
     };
 
-    // Construct Exam ID safely
-    const typeSuffix = type === 'AM1' ? 'AM' : type;
-    const examId = year.endsWith(`-${typeSuffix}`) ? year : `${year}-${typeSuffix}`;
-    const examLabel = getExamLabel(examId);
-
     // AM2（午前II）は全問四択なので、optionsがある場合はPM扱いしない
     const hasOptions = question.options && question.options.length > 0;
     const isPM = question.isPM || type.includes('PM') || (type === 'AM2' && !hasOptions && (question.subQuestions && question.subQuestions.length > 0));
@@ -615,6 +699,19 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
     const normalizedCurrentSubQText = useMemo(
         () => normalizeMermaidCodeBlocks(currentSubQ?.text || ''),
         [currentSubQ?.text]
+    );
+    const currentAnswerLimit = useMemo(
+        () => extractAnswerLimit(currentSubQ?.text),
+        [currentSubQ?.text]
+    );
+    const currentModelAnswer = currentSubQ?.answer || currentSubQ?.modelAnswer || '';
+    const currentAnswerDisplayMaxChars = useMemo(
+        () => currentAnswerLimit === undefined ? estimatePMAnswerDisplayMaxChars(currentModelAnswer, type) : undefined,
+        [currentAnswerLimit, currentModelAnswer, type]
+    );
+    const currentAnswerInputVariant = useMemo(
+        () => shouldUsePMGenkoyoshiInput(currentSubQ?.text, type, currentModelAnswer) ? 'genkoyoshi' : 'textarea',
+        [currentSubQ?.text, type, currentModelAnswer]
     );
     const normalizedOptionTextById = useMemo(
         () => new Map((question.options || []).map(opt => [opt.id, normalizeMermaidCodeBlocks(opt.text)])),
@@ -705,12 +802,13 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
                 <div className={styles.pmExamContent}>
                     <SCPMExamView
-                        question={question}
+                        question={{ ...question, examId, qNo: question.qNo ?? Number(qNo) }}
                         onAnswerSubmit={(subQIdx, answer) => {
                             // This might be for simple text input updates if needed, 
                             // but AIAnswerBox handles its own state mostly.
                         }}
                         onGrade={(data, subQIdx, subSubIdx) => handleSaveAIScore(data, subQIdx as number, subSubIdx)}
+                        onChoiceGrade={(data, subQIdx, subSubIdx) => handleSavePMChoiceScore(data, subQIdx as number, subSubIdx)}
                         descriptiveHistory={descriptiveHistory}
                     />
                 </div>
@@ -777,12 +875,13 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                 </div>
                                 <AIAnswerBox
                                     questionText={`${question.text}\n\n${currentSubQ.text}`}
-                                    modelAnswer=""
-                                    limit={extractAnswerLimit(currentSubQ.text)}
+                                    modelAnswer={currentModelAnswer}
+                                    limit={currentAnswerLimit}
+                                    displayMaxChars={currentAnswerDisplayMaxChars}
                                     initialAnswer={descriptiveHistory[getSubQId(question.id, currentSubQIndex)]?.answer}
                                     initialResult={descriptiveHistory[getSubQId(question.id, currentSubQIndex)]?.result}
                                     draftKey={buildPMDraftKey(getSubQId(question.id, currentSubQIndex))}
-                                    inputVariant="genkoyoshi"
+                                    inputVariant={currentAnswerInputVariant}
                                     onSave={(data) => handleSaveAIScore(data, currentSubQIndex)}
                                 />
                             </div>

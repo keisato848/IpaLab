@@ -128,7 +128,7 @@ async function extractQuestions(examId: string, rawDir: string, outDir: string, 
     }
 
     let promptText = await fs.readFile(promptPath, 'utf-8');
-    const outputKind = isAfternoon ? 'JSON object' : 'JSON array';
+    const outputKind = 'JSON array';
     promptText += `\n\nIMPORTANT: Output ONLY the ${outputKind}. Do not wrap in markdown code blocks.`;
 
     // Retry loop for KEY ROTATION
@@ -283,6 +283,8 @@ async function main() {
             (f.startsWith('NW-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('DB-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('ES-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
+            (f.startsWith('AU-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
+            (f.startsWith('SM-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('SA-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2'))) ||
             (f.startsWith('ST-') && (f.includes('-AM2') || f.includes('-PM1') || f.includes('-PM2')))
         )
