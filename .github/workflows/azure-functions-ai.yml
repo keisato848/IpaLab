@@ -77,6 +77,17 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Configure aiChat authentication secret
+        run: |
+          if [ -z "${{ secrets.AI_CHAT_FUNCTION_SECRET }}" ]; then
+            echo "::error::AI_CHAT_FUNCTION_SECRET secret is required for signed aiChat proxy calls."
+            exit 1
+          fi
+          az functionapp config appsettings set \
+            --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --settings AI_CHAT_FUNCTION_SECRET="${{ secrets.AI_CHAT_FUNCTION_SECRET }}"
+
       - name: Deploy to Azure Functions
         uses: Azure/functions-action@v1
         with:

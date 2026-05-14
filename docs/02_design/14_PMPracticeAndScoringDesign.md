@@ -4,6 +4,7 @@
 
 | 日付 | 変更内容 |
 |------|------|
+| 2026-05-14 | `aiChat` 呼び出しを `AI_CHAT_FUNCTION_SECRET` による HMAC 署名付きリクエストへ変更し、未署名・不正署名を Gemini API 到達前に拒否する仕様を追加。 |
 | 2026-05-10 | `/api/score` が Azure App Service 上で `AI_CHAT_FUNCTION_URL` 未設定のまま Gemini 直接呼び出しへフォールバックしないよう、503 の設定エラーとして返す仕様に変更。本番ワークフローにも `AI_CHAT_FUNCTION_URL` を追加し、US Function (`aiChat`) の長文採点プロンプト上限を 32,000 文字へ拡張。 |
 | 2026-05-09 | `/api/score` Gemini 直接呼び出しフォールバック（ローカル開発用）に `systemInstruction: SYSTEM_PROMPT` を追加し、プロキシ経由と採点品質を統一。`export const runtime = 'nodejs'` を追加し Edge Runtime での誤動作リスクを解消。テストの `beforeEach` で `AI_CHAT_FUNCTION_URL` を必ず削除して環境依存を排除。 |
 | 2026-05-09 | `/api/score` が East Asia から Gemini API を直接呼び出せない地域制限バグを修正。`AI_CHAT_FUNCTION_URL` が設定されている場合は US リージョンの Azure Function (`aiChat`) を経由するプロキシ方式に変更。ローカル開発は従来通り直接呼び出し。 |
@@ -138,7 +139,8 @@ sequenceDiagram
     User->>Box: 回答を入力し採点を実行
     Box->>API: question / userAnswer / modelAnswer を送信
     alt AI_CHAT_FUNCTION_URL が設定済み（本番・Staging）
-        API->>Func: systemPrompt / userMessage を送信
+        API->>Func: 署名付き systemPrompt / userMessage を送信
+        Func->>Func: HMAC 署名・タイムスタンプ検証
         Func->>Gemini: CLKS プロンプトを送信
         Gemini-->>Func: テキスト（JSON）を返却
         Func-->>API: { text } を返却
@@ -203,11 +205,14 @@ sequenceDiagram
 | 変数名 | 必須 | 用途 | 備考 |
 |------|------|------|------|
 | `AI_CHAT_FUNCTION_URL` | **本番・Staging 必須** | `/api/score` → US Azure Function プロキシ | 未設定時は `GEMINI_API_KEY` 直接呼び出し（ローカル開発用フォールバック）。East Asia から Gemini を直接呼ぶと地域制限エラーになるため、本番では必須。例: `https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat` |
+| `AI_CHAT_FUNCTION_SECRET` | **本番・Staging 必須** | `aiChat` 署名付きプロキシ呼び出し | Web App と AI Function App に同一値を設定する。`x-ai-chat-timestamp` と `x-ai-chat-signature` の HMAC-SHA256 検証に使用 |
 | `GEMINI_API_KEY` | ローカル開発のみ必須 | `AI_CHAT_FUNCTION_URL` 未設定時のフォールバック | Azure App Service 上では使用しない。未設定かつ `AI_CHAT_FUNCTION_URL` も未設定の場合は 500、Azure 上で `AI_CHAT_FUNCTION_URL` が未設定の場合は 503 を返す |
 | `COSMOS_DB_CONNECTION` | サーバー運用上必須 | 採点結果の保存・セッション更新 | 未設定時は DB 保存を無効化 |
 | `NEXT_PUBLIC_API_BASE` | 任意 | クライアント API 呼び出し | 未設定時は `/api` |
 
 > **East Asia 地域制限について**: Azure App Service (East Asia) から Gemini API を直接呼び出すと `User location is not supported` エラーになる。すべての Gemini 呼び出しは US East 2 リージョンの Azure Function App (`aiChat`) を経由させること。`AI_CHAT_FUNCTION_URL` が未設定の場合のみ Gemini 直接呼び出しにフォールバックする（ローカル開発専用）。`aiChat` は午後問題本文を含む採点プロンプトを受けられるよう、`userMessage` 最大 32,000 文字まで許容する。
+
+> **aiChat 署名認証について**: `AI_CHAT_FUNCTION_URL` を使う経路は `AI_CHAT_FUNCTION_SECRET` で `<timestamp>.<rawBody>` に HMAC-SHA256 署名を付与する。Function 側はヘッダー欠落を 401、不正署名・期限切れを 403 として拒否し、Gemini API には到達させない。ローカル開発では `AI_CHAT_FUNCTION_URL` を未設定にして直接 Gemini を呼ぶか、Web とローカル Function に同一の `AI_CHAT_FUNCTION_SECRET` を設定してプロキシ経路を検証する。
 
 ---
 
