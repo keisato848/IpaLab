@@ -107,6 +107,7 @@ PR の `pull_request` トリガーは `opened` / `synchronize` / `reopened` / `r
 | `AUTH_GITHUB_SECRET` | GitHub OAuth シークレット | 本番・Staging共通 |
 | `AUTH_GOOGLE_ID` | Google OAuth クライアントID | 本番・Staging共通 |
 | `AUTH_GOOGLE_SECRET` | Google OAuth シークレット | 本番・Staging共通 |
+| `AI_CHAT_FUNCTION_SECRET` | `aiChat` HMAC 署名用共有シークレット | 本番・Staging・AI Function共通 |
 | `AZURE_STAGING_WEBAPP_NAME` | `app-pm-exam-dx-staging` | **Staging専用** |
 | `COSMOS_DB_CONNECTION_STAGING` | Staging CosmosDB接続文字列 | **Staging専用** |
 | `NEXTAUTH_SECRET_STAGING` | Staging用 NextAuth シークレット | **Staging専用** |
@@ -154,6 +155,8 @@ App Service の環境変数は **GitHub Actions ワークフロー内で `az web
 | `AUTH_GOOGLE_SECRET` | Google OAuth | App Service 設定（ポータル）|
 | `TELEMETRY_CONNECTION_STRING` | App Insights（IPAコードレス回避用名）| CI/CD |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Google Analytics 4 | App Service 設定（ポータル）|
+| `AI_CHAT_FUNCTION_URL` | US East 2 の `aiChat` エンドポイント | CI/CD |
+| `AI_CHAT_FUNCTION_SECRET` | `aiChat` 呼び出し署名用共有シークレット | GitHub Secret から CI/CD で設定 |
 
 > **IPA コードレスエージェント無効化**: Linux App Service の IPA は `APPLICATIONINSIGHTS_*` / `APPINSIGHTS_*` プレフィックスや `*_EXTENSION_VERSION` 設定の存在を検出して自動有効化する。手動 SDK の OpenTelemetry セットアップと競合するため、CI/CD デプロイ時に完全削除し `TELEMETRY_CONNECTION_STRING` という独自名で渡す。
 
@@ -167,6 +170,7 @@ Staging 固有の設定はワークフローの `deploy-staging` ジョブで自
 | `AZURE_STAGING_WEBAPP_NAME` | `app-pm-exam-dx-staging` |
 | `COSMOS_DB_CONNECTION_STAGING` | pm-exam-dx-staging-db の接続文字列 |
 | `NEXTAUTH_SECRET_STAGING` | `openssl rand -base64 32` で生成 |
+| `AI_CHAT_FUNCTION_SECRET` | Web App と AI Function App で共有する `aiChat` HMAC 署名用シークレット |
 
 ## 6. トラブルシューティング
 
@@ -234,6 +238,9 @@ export async function GET(req: NextRequest) {
 
 | 日付 | 変更内容 | 担当 |
 |------|---------|------|
+| 2026/05/14 | **aiChat 署名認証設定の追加** | エージェント |
+| | - `AI_CHAT_FUNCTION_SECRET` を GitHub Secrets / App Service / AI Function App の必須設定として追加 | |
+| | - 未署名・不正署名リクエストを Gemini API 到達前に拒否する運用を追記 | |
 | 2026/05/07 | **GitHub Actions artifact 取得方式の修正** | エージェント |
 | | - `gh run download` を `actions/download-artifact@v6` に置換 | |
 | | - checkout 不在ジョブでの `fatal: not a git repository` 再発防止を明記 | |
@@ -400,7 +407,10 @@ Azure Portal > Function Apps > `func-pm-exam-dx-ai-us` > 設定 > 環境変数
 | 変数名 | 用途 | 必須 |
 |--------|------|------|
 | `GEMINI_API_KEY` | Google AI Studio APIキー | ✅ |
+| `AI_CHAT_FUNCTION_SECRET` | `aiChat` HMAC 署名検証用。Web App 側と同一値 | ✅ |
 | `COSMOS_DB_CONNECTION` | CosmosDB接続文字列（メトリクス用） | ✅ |
+
+`AI_CHAT_FUNCTION_SECRET` は GitHub Actions Secret と Azure Function App / App Service の App Settings に同一値を設定する。`aiChat` は `x-ai-chat-timestamp` と `x-ai-chat-signature` を検証し、ヘッダー欠落は 401、不正署名や期限切れは 403 で拒否する。未認証リクエストは Gemini API へ到達しない。
 
 ## 10. 参考資料
 

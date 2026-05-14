@@ -115,6 +115,7 @@ sequenceDiagram
 | `COSMOS_DB_CONNECTION` | サーバー運用上必須 | 全 CosmosDB API の接続先 | 未設定時は DB 無効化 |
 | `NEXTAUTH_SECRET` / `AUTH_SECRET` | 認証 API で必要 | セッション署名 | NextAuth 設定 |
 | `AI_CHAT_FUNCTION_URL` | 本番・Staging 必須 | `/api/score` と AI 採点 API の US Function プロキシ | Azure App Service 上で未設定の場合、`/api/score` は 503 を返す |
+| `AI_CHAT_FUNCTION_SECRET` | 本番・Staging 必須 | `aiChat` への HMAC 署名生成・検証 | Web App と AI Function App の両方に同一値を設定する。未設定時は Azure 上で処理を拒否する |
 | `GEMINI_API_KEY` | ローカル開発のみ必須 | `AI_CHAT_FUNCTION_URL` 未設定時の直接呼び出し | Azure App Service 上では直接呼び出しへフォールバックしない |
 | `NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING` | 任意 | クライアント計測初期化 | 公開値として扱う |
 | `TELEMETRY_CONNECTION_STRING` | 任意 | Node 側計測 | Managed Identity と併用。ブラウザには返さない |
@@ -225,7 +226,18 @@ sequenceDiagram
 - `/api/session/create`
 - `/api/learning-records POST`
 
-### 12.3 認可上の不整合
+### 12.3 aiChat 内部プロキシ認証
+
+`/api/score`、午後採点 v2、AI アシスタントが US East 2 の `aiChat` を呼び出す場合は、`AI_CHAT_FUNCTION_SECRET` でリクエスト本文と Unix 秒タイムスタンプに HMAC-SHA256 署名を付与する。
+
+| ヘッダー | 内容 |
+|------|------|
+| `x-ai-chat-timestamp` | 署名対象に含める Unix 秒。Function 側で 5 分以内の時刻だけ受け付ける |
+| `x-ai-chat-signature` | `sha256=<hex>` 形式。署名対象は `<timestamp>.<rawBody>` |
+
+AI Function App 側は Gemini API キー確認や Gemini 呼び出しより前に署名を検証する。ヘッダー欠落は 401、不正署名・期限切れは 403、Azure 実行環境で `AI_CHAT_FUNCTION_SECRET` が未設定の場合は 500 を返し、いずれも Gemini API へ到達させない。ローカル Function 実行では `AI_CHAT_FUNCTION_SECRET` 未設定時のみ警告ログを出して unsigned request を許可し、ローカル検証を阻害しない。
+
+### 12.4 認可上の不整合
 
 - 一部の読込 API は厳格だが、書込 API は body の `userId` を信頼している
 - セッション作成と記録保存で認可方針が揃っていない
@@ -260,6 +272,7 @@ sequenceDiagram
 共通 API の観測点は以下である。
 
 - Route Handler 内の `console.error`
+- `aiChat` の署名検証失敗ログ (`AI chat authorization failed: ...`)
 - `track POST` による PageViews 保存
 - Application Insights 設定の読込
 
@@ -272,6 +285,7 @@ sequenceDiagram
 | 種別 | 観点 |
 |------|------|
 | API | 主要 Route Handler が 400 / 401 / 404 / 500 を返し分けること |
+| Security | `aiChat` が署名ヘッダー欠落を 401、不正署名を 403 とし、Gemini 呼び出し前に拒否すること |
 | Unit | `lib/api.ts` がエラー時に関数ごとの期待値を返すこと |
 | Integration | `session PATCH` が owner 以外を拒否すること |
 | Integration | `learning-records GET` が query の `userId` を無視すること |

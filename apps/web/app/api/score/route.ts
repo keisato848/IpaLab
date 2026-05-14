@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { createAiChatAuthHeaders } from '@/lib/ai-chat-auth';
 
 export const runtime = 'nodejs';
 
@@ -65,10 +66,19 @@ export async function POST(req: NextRequest) {
 
         if (aiChatFunctionUrl) {
             // 本番: US Azure Function 経由（East Asia から Gemini への地域制限を回避）
+            const requestBody = JSON.stringify({ systemPrompt: SYSTEM_PROMPT, userMessage: prompt });
+            let authHeaders: Record<string, string>;
+            try {
+                authHeaders = createAiChatAuthHeaders(requestBody);
+            } catch (error) {
+                console.error('AI_CHAT_FUNCTION_SECRET is not set for AI proxy request');
+                return NextResponse.json({ error: 'AI proxy authentication is not configured' }, { status: 503 });
+            }
+
             const res = await fetch(aiChatFunctionUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ systemPrompt: SYSTEM_PROMPT, userMessage: prompt }),
+                headers: { 'Content-Type': 'application/json', ...authHeaders },
+                body: requestBody,
             });
             if (!res.ok) {
                 throw new Error(`AI proxy failed: ${res.status} ${await res.text().catch(() => '')}`);

@@ -222,6 +222,10 @@ jobs:
       #   本番・Staging ともに同一の US リージョン Function App を経由する。
       - name: Configure App Service settings
         run: |
+          if [ -z "${{ secrets.AI_CHAT_FUNCTION_SECRET }}" ]; then
+            echo "::error::AI_CHAT_FUNCTION_SECRET secret is required for signed aiChat proxy calls."
+            exit 1
+          fi
           az webapp config appsettings set \
             --name ${{ env.AZURE_WEBAPP_NAME }} \
             --resource-group rg-pm-exam-dx-prod \
@@ -229,6 +233,7 @@ jobs:
               WEBSITE_RUN_FROM_PACKAGE=1 \
               WEBSITES_PORT=8080 \
               TELEMETRY_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}" \
+              AI_CHAT_FUNCTION_SECRET="${{ secrets.AI_CHAT_FUNCTION_SECRET }}" \
               AI_CHAT_FUNCTION_URL="https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat"
 
       - name: Deploy to Azure Web App
@@ -344,6 +349,10 @@ jobs:
       - name: Configure Staging App Service settings
         if: steps.config-check.outputs.configured == 'true'
         run: |
+          if [ -z "${{ secrets.AI_CHAT_FUNCTION_SECRET }}" ]; then
+            echo "::error::AI_CHAT_FUNCTION_SECRET secret is required for signed aiChat proxy calls."
+            exit 1
+          fi
           az webapp config appsettings set \
             --name "$STAGING_APP_NAME" \
             --resource-group "$STAGING_RG" \
@@ -360,6 +369,7 @@ jobs:
               TELEMETRY_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}" \
               STAGING_BYPASS_TOKEN="${{ secrets.STAGING_BYPASS_TOKEN }}" \
               STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID="${{ secrets.STAGING_BYPASS_TARGET_GITHUB_ACCOUNT_ID }}" \
+              AI_CHAT_FUNCTION_SECRET="${{ secrets.AI_CHAT_FUNCTION_SECRET }}" \
               AI_CHAT_FUNCTION_URL="https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat"
 
       - name: Deploy to Staging Web App

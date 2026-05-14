@@ -85,6 +85,7 @@ Next.js の API Routes (`/app/api/**`) は自動的に Managed Functions とし�
 | 関数名   | トリガー    | ルート       | 用途                     |
 | :------- | :---------- | :----------- | :----------------------- |
 | `aiPlan` | HTTP (POST) | `/api/ai/plan` | AI学習プラン生成         |
+| `aiChat` | HTTP (POST) | `/api/ai/chat` | 採点・AIアシスタント向け Gemini プロキシ |
 
 ### 3.5 使用モデル
 
@@ -100,9 +101,12 @@ Next.js の API Routes (`/app/api/**`) は自動的に Managed Functions とし�
 | キー                   | 設定値・参照先                        | 用途                       |
 | :--------------------- | :------------------------------------ | :------------------------- |
 | `GEMINI_API_KEY`       | Google AI Studio APIキー              | Gemini API認証             |
+| `AI_CHAT_FUNCTION_SECRET` | Web App と共有する HMAC シークレット | `aiChat` 署名検証          |
 | `COSMOS_DB_CONNECTION` | CosmosDB接続文字列                    | メトリクス保存用           |
 | `FUNCTIONS_WORKER_RUNTIME` | `node`                            | ランタイム指定             |
 | `FUNCTIONS_EXTENSION_VERSION` | `~4`                           | Functions V4               |
+
+`aiChat` は `x-ai-chat-timestamp` と `x-ai-chat-signature` を検証し、Gemini API 呼び出し前に未署名・不正署名のリクエストを拒否する。Azure 実行環境で `AI_CHAT_FUNCTION_SECRET` が未設定の場合は fail closed とし、500 を返す。ローカル Function 実行では同変数が未設定の場合に限り警告ログ付きで unsigned request を許可する。
 
 ### 3.7 デプロイ手順
 
@@ -119,6 +123,8 @@ func azure functionapp publish func-pm-exam-dx-ai-us --build remote
 Functions in func-pm-exam-dx-ai-us:
     aiPlan - [httpTrigger]
         Invoke url: https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/plan
+  aiChat - [httpTrigger]
+    Invoke url: https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat
 ```
 
 ### 3.8 トラブルシューティング

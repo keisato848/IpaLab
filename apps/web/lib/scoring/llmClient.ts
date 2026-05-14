@@ -9,6 +9,7 @@
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { createAiChatAuthHeaders } from '@/lib/ai-chat-auth';
 
 const AI_CHAT_FUNCTION_URL = process.env.AI_CHAT_FUNCTION_URL;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -28,10 +29,11 @@ export interface PerspectiveLlmRawResult {
 export async function callPerspectiveLlmDefault(prompt: string): Promise<PerspectiveLlmRawResult> {
   let text: string;
   if (AI_CHAT_FUNCTION_URL) {
+    const requestBody = JSON.stringify({ systemPrompt: SYSTEM_PROMPT_DEFAULT, userMessage: prompt });
     const res = await fetch(AI_CHAT_FUNCTION_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ systemPrompt: SYSTEM_PROMPT_DEFAULT, userMessage: prompt }),
+      headers: { 'Content-Type': 'application/json', ...createAiChatAuthHeaders(requestBody) },
+      body: requestBody,
     });
     if (!res.ok) throw new Error(`LLM proxy failed: ${res.status} ${await res.text().catch(() => '')}`);
     const data = (await res.json()) as { text?: string; error?: string };
