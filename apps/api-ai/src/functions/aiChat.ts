@@ -1,5 +1,6 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { verifyAiChatRequest } from "../security/aiChatAuth";
 
 interface ChatRequest {
     systemPrompt: string;
@@ -30,12 +31,22 @@ export async function aiChat(request: HttpRequest, context: InvocationContext): 
     context.log("AI Chat request received");
 
     try {
+        const verifiedRequest = await verifyAiChatRequest(request, context);
+        if (!verifiedRequest.ok) {
+            return verifiedRequest.response;
+        }
+
         const apiKey = process.env.GEMINI_API_KEY || "";
         if (!apiKey) {
             return { status: 500, jsonBody: { error: "API Key not configured" } };
         }
 
-        const body: ChatRequest = (await request.json()) as ChatRequest;
+        let body: ChatRequest;
+        try {
+            body = JSON.parse(verifiedRequest.rawBody) as ChatRequest;
+        } catch {
+            return { status: 400, jsonBody: { error: "Invalid JSON body" } };
+        }
         const { systemPrompt, userMessage } = body || ({} as ChatRequest);
 
         if (!systemPrompt || !userMessage || typeof systemPrompt !== "string" || typeof userMessage !== "string") {
