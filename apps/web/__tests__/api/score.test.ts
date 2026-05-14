@@ -10,6 +10,7 @@ describe('/api/score', () => {
         process.env = { ...originalEnv };
         // 環境依存を排除: AI_CHAT_FUNCTION_URL は各テストで明示的に設定する
         delete process.env.AI_CHAT_FUNCTION_URL;
+        delete process.env.AI_CHAT_FUNCTION_SECRET;
     });
 
     afterEach(() => {
@@ -186,6 +187,7 @@ describe('/api/score', () => {
 
         it('AI_CHAT_FUNCTION_URL 経由でのプロキシ採点が実行できる', async () => {
             process.env.AI_CHAT_FUNCTION_URL = 'https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat';
+            process.env.AI_CHAT_FUNCTION_SECRET = 'test-shared-secret';
             delete process.env.GEMINI_API_KEY;
 
             const mockResponse = {
@@ -202,10 +204,11 @@ describe('/api/score', () => {
             };
 
             // fetch をモック（US Function App へのリクエスト）
-            vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+            const fetchMock = vi.fn().mockResolvedValue({
                 ok: true,
                 json: async () => ({ text: JSON.stringify(mockResponse) }),
-            }));
+            });
+            vi.stubGlobal('fetch', fetchMock);
 
             const { POST } = await import('@/app/api/score/route');
             const request = new NextRequest('http://localhost:3000/api/score', {
@@ -222,12 +225,50 @@ describe('/api/score', () => {
 
             expect(response.status).toBe(200);
             expect(data.score).toBe(80);
+            expect(fetchMock).toHaveBeenCalledTimes(1);
+            const [, init] = fetchMock.mock.calls[0];
+            expect(init.headers).toMatchObject({
+                'Content-Type': 'application/json',
+                'x-ai-chat-timestamp': expect.any(String),
+                'x-ai-chat-signature': expect.stringMatching(/^sha256=[a-f0-9]{64}$/),
+            });
 
+            vi.unstubAllGlobals();
+        });
+
+        it('AI_CHAT_FUNCTION_SECRET 未設定でプロキシ採点を拒否する', async () => {
+            process.env.AI_CHAT_FUNCTION_URL = 'https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat';
+            delete process.env.AI_CHAT_FUNCTION_SECRET;
+            delete process.env.GEMINI_API_KEY;
+
+            const fetchMock = vi.fn();
+            vi.stubGlobal('fetch', fetchMock);
+            const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: 'テスト問題',
+                    userAnswer: 'テスト回答',
+                }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(503);
+            expect(data.error).toBe('AI proxy authentication is not configured');
+            expect(fetchMock).not.toHaveBeenCalled();
+
+            consoleError.mockRestore();
             vi.unstubAllGlobals();
         });
 
         it('AI_CHAT_FUNCTION_URL プロキシがエラーを返した場合は500を返す', async () => {
             process.env.AI_CHAT_FUNCTION_URL = 'https://func-pm-exam-dx-ai-us.azurewebsites.net/api/ai/chat';
+            process.env.AI_CHAT_FUNCTION_SECRET = 'test-shared-secret';
             delete process.env.GEMINI_API_KEY;
 
             vi.stubGlobal('fetch', vi.fn().mockResolvedValue({

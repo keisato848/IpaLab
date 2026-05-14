@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+import { createAiChatAuthHeaders } from '@/lib/ai-chat-auth';
 
 const apiKey = process.env.GEMINI_API_KEY;
 
@@ -61,10 +62,11 @@ async function* proxyChatResponse(
     systemPrompt: string,
     userMessage: string,
 ): AsyncGenerator<string> {
+    const requestBody = JSON.stringify({ systemPrompt, userMessage });
     const response = await fetch(AI_CHAT_FUNCTION_URL as string, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ systemPrompt, userMessage }),
+        headers: { 'Content-Type': 'application/json', ...createAiChatAuthHeaders(requestBody) },
+        body: requestBody,
     });
 
     if (!response.ok) {

@@ -130,6 +130,8 @@ NEXTAUTH_SECRET=<secret>
 GOOGLE_ID=<oauth_client_id>
 GOOGLE_SECRET=<oauth_client_secret>
 AZURE_COSMOS_CONNECTION_STRING=<cosmos_connection>
+AI_CHAT_FUNCTION_URL=<local_or_azure_ai_chat_url>
+AI_CHAT_FUNCTION_SECRET=<shared_hmac_secret_for_ai_chat>
 ```
 
 #### API Functions
@@ -146,8 +148,11 @@ COSMOS_DB_CONNECTION=<cosmos_connection>
 AzureWebJobsStorage=UseDevelopmentStorage=true
 FUNCTIONS_WORKER_RUNTIME=node
 GEMINI_API_KEY=<google_ai_api_key>
+AI_CHAT_FUNCTION_SECRET=<shared_hmac_secret_for_ai_chat>
 COSMOS_DB_CONNECTION=<cosmos_connection>
 ```
+
+`AI_CHAT_FUNCTION_SECRET` は Web App と AI Functions の双方に同一値を設定する。Web 側は `aiChat` 呼び出し時に `x-ai-chat-timestamp` と `x-ai-chat-signature` を生成し、AI Functions 側は Gemini API 呼び出し前に検証する。ローカル開発では `AI_CHAT_FUNCTION_URL` 未設定なら従来どおり `GEMINI_API_KEY` 直接呼び出しを使う。ローカル Function を経由する場合は Web と Function の両方に同じ `AI_CHAT_FUNCTION_SECRET` を設定する。
 
 ### 4.2 ビルド設定
 
@@ -210,6 +215,8 @@ read / edit / search / execute / agent / web / todo
 - **2026-05-02**: tracked 設定ファイルの secret material 禁止方針を追加
   - `local.settings.json` / `.env.template` は空値またはプレースホルダーのみとし、実値は未追跡環境から注入する方針を明記
   - `self-inspect` R12 による tracked 設定ファイルの secret material 検出を追記
+- **2026-05-14**: `aiChat` HMAC 署名用の `AI_CHAT_FUNCTION_SECRET` を追加
+  - Web App と AI Function App の双方で同一シークレットを使用し、署名付きプロキシ呼び出しだけを許可する方針を明記
 - **2026-04-30**: GitHub Actions の日本語フィールド同期 workflow 設計を追記
   - `PROJECT_PAT` 未提供時は同期をスキップし、PR の品質ゲートをブロックしない方針を明記
 - **2026-04-29**: Copilot Agent カスタマイズ設定セクションを追加
