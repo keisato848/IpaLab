@@ -146,6 +146,8 @@ deploy_temp/
 backup_settings.json
 logs_*.json
 tmpclaude*
+langfuse/docker-compose.yml
+otel-collector/generated/
 
 # Azure 調査用一時ファイル
 appservice-logs/
@@ -178,6 +180,10 @@ install_log.txt
 
 # 環境変数バックアップ
 *.env.local.bak
+
+# Copilot Chat OTel / Langfuse ローカル監視
+langfuse/docker-compose.yml
+*.otel.jsonl
 
 # Playwright E2E テスト出力
 apps/web/playwright-report/

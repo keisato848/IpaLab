@@ -200,7 +200,33 @@ GitHub Copilot エージェントのカスタマイズ設定は以下のパス�
 | オーケストレーター | `AGENTS.md` | タスク分類・ルーティング定義 |
 | E2E レポーター | `apps/web/e2e/reporters/custom-report.ts` | エビデンス報告書自動生成 |
 
-### 5.1 tool aliases 制約
+### 5.1 Copilot Chat OTel / Langfuse ローカル監視
+
+開発時の Copilot Chat トレースをローカル Langfuse で確認するため、以下の構成を持つ。
+
+| 種別 | 配置パス | 用途 |
+|------|---------|------|
+| Dev Container | `.devcontainer/devcontainer.json` | Langfuse compose と workspace compose をマージして起動する |
+| Dev Container | `.devcontainer/docker-compose.yml` | OTel Collector を起動し、workspace コンテナへ OTEL / COPILOT_OTEL 環境変数を注入する |
+| Dev Container | `.devcontainer/Dockerfile` | Node.js 24、検証用 CLI、セッション証跡用 Chromium を含む開発コンテナを定義する |
+| VS Code 設定 | `.vscode/settings.json` | 手動起動時の Copilot Chat OTel 送信先を `localhost:4318` の Collector に設定する |
+| Collector | `otel-collector/generated/config.yml` | `scripts/setup-copilot-otel.mjs` が生成する Collector 転送設定。git 管理対象外 |
+| セットアップ | `scripts/setup-copilot-otel.mjs` | 公式 Langfuse compose、`.env`、Collector 設定の生成を行う |
+| セットアップ | `scripts/setup-copilot-otel.sh` | Node.js 版セットアップを呼ぶ互換ラッパー |
+| 起動 | `scripts/run-copilot-otel-compose.mjs` | Docker Desktop / Rancher Desktop / Podman などの Compose 互換 CLI を検出し、Langfuse と Collector を操作する |
+| 起動 | `scripts/start-copilot-otel-session.mjs` | Langfuse 起動確認、VS Code でのダッシュボード表示、セッションレポート生成を行う |
+| 証跡 | `scripts/capture-copilot-otel-session.mjs` | Langfuse ダッシュボードのスクリーンショットと Markdown レポートを生成する |
+| 検証 | `scripts/verify-copilot-otel.mjs` | Langfuse / OTel Collector / OTEL 環境変数を確認する |
+| 検証 | `scripts/verify-copilot-otel.sh` | bash で同等の確認を行う互換スクリプト |
+| テンプレート | `.env.otel.example` | `.env` に生成される Langfuse / OTEL 設定の参考値 |
+
+生成物である `langfuse/docker-compose.yml`、`otel-collector/generated/config.yml`、実値を含む `.env` は git 管理対象外とする。`OTEL_EXPORTER_OTLP_HEADERS` と `OTEL_LANGFUSE_AUTH_HEADER` は Langfuse の OTLP Basic 認証値であり、VS Code settings ではなく環境変数として注入する。
+
+Copilot Chat は `http://localhost:4318`（手動起動）または `http://otel-collector:4318`（devcontainer）へ送信する。Collector はローカル Langfuse に転送し、`.env` に `OTEL_REMOTE_EXPORTER_OTLP_ENDPOINT` が設定されている場合のみリモート OTLP にも追加転送する。コンテナランタイムは Docker Desktop 固有に限定せず、Dev Containers 拡張が接続できる Docker 互換 API、または `docker compose` / `nerdctl compose` / `podman compose` などの Compose 互換 CLI を前提とする。
+
+`github.copilot.chat.otel.captureContent` と `COPILOT_OTEL_CAPTURE_CONTENT` はプロンプト、応答、ツール引数を含む詳細トレースを記録するため、ローカルまたは信頼済み環境でのみ有効化する。
+
+### 5.2 tool aliases 制約
 
 `.agent.md` の `tools` フィールドには **公式 GitHub エイリアスのみ** 記載すること。
 
@@ -212,6 +238,9 @@ read / edit / search / execute / agent / web / todo
 
 ## 変更履歴
 
+- **2026-05-14**: Copilot Chat OTel / Langfuse ローカル監視構成を追加
+  - `.devcontainer/`、`.vscode/settings.json`、`scripts/setup-copilot-otel.mjs`、`scripts/verify-copilot-otel.mjs`、bash 互換スクリプト、`.env.otel.example` の役割を明記
+  - `OTEL_EXPORTER_OTLP_HEADERS` は未追跡 `.env` から環境変数として注入する方針を追記
 - **2026-05-02**: tracked 設定ファイルの secret material 禁止方針を追加
   - `local.settings.json` / `.env.template` は空値またはプレースホルダーのみとし、実値は未追跡環境から注入する方針を明記
   - `self-inspect` R12 による tracked 設定ファイルの secret material 検出を追記

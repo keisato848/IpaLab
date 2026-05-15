@@ -1,0 +1,37 @@
+{
+  "name": "shikakuno-copilot-otel",
+  "dockerComposeFile": [
+    "../langfuse/docker-compose.yml",
+    "docker-compose.yml"
+  ],
+  "service": "workspace",
+  "workspaceFolder": "/workspace",
+  "initializeCommand": "node scripts/setup-copilot-otel.mjs",
+  "postStartCommand": "node scripts/start-copilot-otel-session.mjs",
+  "forwardPorts": [3000, 4318],
+  "portsAttributes": {
+    "3000": {
+      "label": "Langfuse UI",
+      "onAutoForward": "notify"
+    },
+    "4318": {
+      "label": "OTLP HTTP Collector",
+      "onAutoForward": "silent"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "ms-azuretools.vscode-azurefunctions"
+      ],
+      "settings": {
+        "github.copilot.chat.otel.enabled": true,
+        "github.copilot.chat.otel.exporterType": "otlp-http",
+        "github.copilot.chat.otel.otlpEndpoint": "http://otel-collector:4318",
+        "github.copilot.chat.otel.captureContent": true
+      }
+    }
+  }
+}
