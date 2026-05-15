@@ -30,10 +30,11 @@ docs/
 │   ├── 13_AMPracticeDesign.md # 午前演習（一覧・出題・保存・結果）の詳細設計
 │   ├── 14_PMPracticeAndScoringDesign.md # 午後演習・AI採点・集計表示の詳細設計
 │   ├── 15_CommonApiAndErrorDesign.md # 共通 API 契約・HTTP ステータス・エラー応答の整理
-│   ├── 16_TelemetryAndMonitoringDesign.md # Application Insights / PageViews / 監視設計
+│   ├── 16_TelemetryAndMonitoringDesign.md # Application Insights / PageViews / Copilot OTel / 監視設計
 │   ├── 17_DataLoadingAndSyncBoundaryDesign.md # packages/data と apps/web のデータ境界設計
 │   ├── 18_AiAssistantDesign.md   # AIアシスタントウィジェット（チャット・障害報告）の詳細設計
-│   └── 23_CopilotAgentCustomizationDesign.md # Copilot Agent カスタマイズ設計（Custom Agents/Hooks/MCP/E2E報告書）
+│   ├── 23_CopilotAgentCustomizationDesign.md # Copilot Agent カスタマイズ設計（Custom Agents/Hooks/MCP/E2E報告書）
+│   └── 24_CopilotOtelLangfuseRunbook.md # Copilot OTel / Langfuse 監視・証跡手順書
 ├── 03_plans/                    # [Execution Plan Level] 整備計画・作業分割・再開用メモ
 │   ├── detailed-design-systematization-plan.md # 機能詳細設計を体系化するための実行計画
 │   ├── ai-assistant-implementation-plan.md # AIアシスタント機能の実装計画（8フェーズ）
@@ -72,6 +73,7 @@ docs/
 - `16_TelemetryAndMonitoringDesign.md`
 - `17_DataLoadingAndSyncBoundaryDesign.md`
 - `18_AiAssistantDesign.md`
+- `24_CopilotOtelLangfuseRunbook.md`
 
 補足:
 - `ai-planner-design.md` は現状 `docs/` 直下にあるが、内容上は Implementation Level として扱う。

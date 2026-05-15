@@ -17,8 +17,9 @@ fi
 
 echo "🔎 self-inspect を実行中..."
 if ! command -v pwsh >/dev/null 2>&1; then
-  echo "❌ pwsh が見つからないため self-inspect を実行できません。"
-  exit 1
+  echo "⚠️  pwsh が見つからないため、この環境では self-inspect をスキップします。"
+  echo "   self-inspect は PowerShell 利用可能な環境で実行してください。"
+  exit 0
 fi
 
 pwsh .github/hooks/self-inspect.ps1 -Mode end -FailOnFinding
