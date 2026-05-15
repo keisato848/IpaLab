@@ -194,3 +194,22 @@ apps/web/e2e/test-results/
 # Repository Agent Skills
 # .github/skills/ は Harness スキル定義として追跡対象にする
 
+# Local-only Copilot skills (do not commit)
+.github/skills/algorithmic-art/
+.github/skills/brand-guidelines/
+.github/skills/canvas-design/
+.github/skills/claude-api/
+.github/skills/doc-coauthoring/
+.github/skills/docx/
+.github/skills/frontend-design/
+.github/skills/internal-comms/
+.github/skills/mcp-builder/
+.github/skills/pdf/
+.github/skills/pptx/
+.github/skills/skill-creator/
+.github/skills/slack-gif-creator/
+.github/skills/theme-factory/
+.github/skills/web-artifacts-builder/
+.github/skills/webapp-testing/
+.github/skills/xlsx/
+
