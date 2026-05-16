@@ -3,6 +3,7 @@ import * as https from 'https';
 
 const CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION || "";
 const DATABASE_NAME = "pm-exam-dx-db";
+const LOCAL_EMULATOR_HOSTS = ['localhost', '127.0.0.1', 'host.docker.internal', 'gateway.docker.internal'];
 const CONTAINER_PARTITION_KEYS: Record<string, string> = {
     Questions: "/examId",
     Users: "/id",
@@ -24,6 +25,14 @@ const CONTAINER_PARTITION_KEYS: Record<string, string> = {
 // Singleton instance
 let client: CosmosClient | undefined;
 
+const isLocalEmulatorConnectionString = (connectionString: string) =>
+    LOCAL_EMULATOR_HOSTS.some(host => connectionString.includes(host));
+
+const normalizeLocalEmulatorConnectionString = (connectionString: string) =>
+    connectionString.includes('localhost')
+        ? connectionString.replace('localhost', '127.0.0.1')
+        : connectionString;
+
 // Lazy initialization function
 const getClient = async (): Promise<CosmosClient | undefined> => {
     if (client) {
@@ -38,13 +47,8 @@ const getClient = async (): Promise<CosmosClient | undefined> => {
     }
 
     try {
-        let connStr = CONNECTION_STRING;
-        const isLocalEmulator = connStr.includes("localhost") || connStr.includes("127.0.0.1");
-        
-        // Fix for local emulator
-        if (connStr.includes("localhost")) {
-            connStr = connStr.replace("localhost", "127.0.0.1");
-        }
+        const isLocalEmulator = isLocalEmulatorConnectionString(CONNECTION_STRING);
+        const connStr = normalizeLocalEmulatorConnectionString(CONNECTION_STRING);
 
         // ローカルエミュレータの場合のみTLS検証を無効化
         // 本番環境（Azure CosmosDB）では適切な証明書が使用される

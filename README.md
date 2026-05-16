@@ -149,8 +149,22 @@ Web アプリケーションには API キーやデータベース接続情報�
     ```
 3.  `.env.local` を編集し、以下の変数を設定してください。
     - **認証 (NextAuth.js)**: `AUTH_SECRET`, `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET` 等
-    - **データベース (Azure Cosmos DB)**: `COSMOS_DB_ENDPOINT`, `COSMOS_DB_KEY`
+    - **データベース (Azure Cosmos DB)**: `COSMOS_DB_CONNECTION`
     - **AI (Google Gemini)**: `GEMINI_API_KEY`
+
+### 3.1 ローカル Cosmos DB Emulator
+
+Azure 接続文字列を使わずに API/DB 結合を確認する場合は、公式 Linux 版 Cosmos DB Emulator を起動します。
+
+```bash
+# プロジェクトルートで実行
+npm run cosmos:emulator
+
+# Emulator readiness、DB/コンテナ作成、write/read/delete を確認
+npm run cosmos:verify-local
+```
+
+Cosmos Data Explorer は `https://localhost:1234`、ホスト OS からの SDK 接続先は `https://127.0.0.1:8081` です。devcontainer / Docker コンテナ内からホスト上の Emulator を使う場合は `https://host.docker.internal:8081` を使ってください。`npm run cosmos:verify-local` は `8080/ready` が使えない環境でも `8081` gateway 到達を fallback として扱います。停止する場合は `npm run cosmos:emulator:down` を実行します。`apps/web/.env.local` に `COSMOS_DB_CONNECTION` が未設定でも、検証スクリプトは到達可能なローカル host に合わせて公式エミュレータ既定接続文字列を生成します。クラウド Cosmos DB の接続文字列を検出した場合、誤操作防止のため検証スクリプトは中止します。
 
 ### 4. 開発サーバーの起動
 
