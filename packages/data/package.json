@@ -19,6 +19,7 @@
         "sync": "npx ts-node src/syncer/index.ts",
         "sync-db": "npx ts-node src/scripts/sync-db.ts",
         "clean-records": "npx ts-node src/scripts/sync-db.ts clean",
+        "cosmos:verify-local": "ts-node src/scripts/verify-local-cosmos.ts",
         "verify-coverage": "npx ts-node src/scripts/verify-data-coverage.ts",
         "cleanse": "ts-node src/scripts/cleanse-pm-data.ts",
         "extract": "ts-node src/scripts/run-extract.ts",

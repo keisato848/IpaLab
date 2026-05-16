@@ -5,6 +5,7 @@ import * as glob from 'glob';
 import { CosmosClient } from '@azure/cosmos';
 import * as dotenv from 'dotenv';
 import * as https from 'https';
+import { isLocalEmulatorConnection } from '../utils/cosmos-client';
 
 // Load env vars
 // Try loading from web/api local.settings.json or .env.local
@@ -77,7 +78,7 @@ async function cleanLearningRecords() {
         process.exit(1);
     }
 
-    const isLocal = CONNECTION_STRING.includes('localhost') || CONNECTION_STRING.includes('127.0.0.1');
+    const isLocal = isLocalEmulatorConnection(CONNECTION_STRING);
     let finalConnectionString = CONNECTION_STRING;
     let clientOptions: any = {};
 
@@ -191,7 +192,7 @@ async function main() {
     }
 
     // Determine if we are using Local Emulator
-    const isLocal = CONNECTION_STRING.includes('localhost') || CONNECTION_STRING.includes('127.0.0.1');
+    const isLocal = isLocalEmulatorConnection(CONNECTION_STRING);
     let finalConnectionString = CONNECTION_STRING;
     let clientOptions: any = {};
 

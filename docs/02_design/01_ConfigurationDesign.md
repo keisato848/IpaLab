@@ -19,6 +19,8 @@
   - `test`: `turbo run test`
   - `test:unit`: `turbo run test:run --filter=web`
   - `test:e2e`: `cd apps/web && npx playwright test`
+  - `cosmos:emulator`: Linux 版 Azure Cosmos DB Emulator を Compose 互換 CLI で起動
+  - `cosmos:verify-local`: ローカル Emulator の readiness、DB/コンテナ、write/read/delete を検証
   - `format`: `prettier --write "**/*.{ts,tsx,md}"`
   - `prepare`: `husky`
 
@@ -129,10 +131,12 @@ NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=<secret>
 GOOGLE_ID=<oauth_client_id>
 GOOGLE_SECRET=<oauth_client_secret>
-AZURE_COSMOS_CONNECTION_STRING=<cosmos_connection>
+COSMOS_DB_CONNECTION=<cosmos_connection>
 AI_CHAT_FUNCTION_URL=<local_or_azure_ai_chat_url>
 AI_CHAT_FUNCTION_SECRET=<shared_hmac_secret_for_ai_chat>
 ```
+
+ローカル Cosmos DB Emulator を使う場合は、`npm run cosmos:emulator` で `mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview` を HTTPS mode で起動し、`npm run cosmos:verify-local` で `pm-exam-dx-db` と主要コンテナを初期化する。devcontainer / Docker コンテナ内からホスト OS 上の Emulator を使う場合は `host.docker.internal:8081` を利用し、検証スクリプトは `localhost` / `127.0.0.1` / `host.docker.internal` / `gateway.docker.internal` をローカル接続として扱う。クラウド Cosmos DB への誤実行は引き続き拒否する。
 
 #### API Functions
 
@@ -241,6 +245,9 @@ read / edit / search / execute / agent / web / todo
 - **2026-05-14**: Copilot Chat OTel / Langfuse ローカル監視構成を追加
   - `.devcontainer/`、`.vscode/settings.json`、`scripts/setup-copilot-otel.mjs`、`scripts/verify-copilot-otel.mjs`、bash 互換スクリプト、`.env.otel.example` の役割を明記
   - `OTEL_EXPORTER_OTLP_HEADERS` は未追跡 `.env` から環境変数として注入する方針を追記
+- **2026-05-16**: Cosmos DB ローカル検証環境を追加
+  - `cosmos-emulator/docker-compose.yml`、`scripts/run-cosmos-emulator.mjs`、`packages/data/src/scripts/verify-local-cosmos.ts` による Emulator 起動・初期化・疎通確認を追加
+  - `COSMOS_DB_CONNECTION` を Web 環境変数として明記し、クラウド接続文字列への誤実行防止方針を追記
 - **2026-05-02**: tracked 設定ファイルの secret material 禁止方針を追加
   - `local.settings.json` / `.env.template` は空値またはプレースホルダーのみとし、実値は未追跡環境から注入する方針を明記
   - `self-inspect` R12 による tracked 設定ファイルの secret material 検出を追記
