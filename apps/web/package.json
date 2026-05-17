@@ -10,7 +10,7 @@
         "start:standalone": "node server.js",
         "lint": "eslint app components hooks lib --ext .js,.jsx,.ts,.tsx",
         "test": "vitest",
-        "test:run": "vitest run",
+        "test:run": "node scripts/run-vitest-batches.mjs",
         "test:coverage": "vitest run --coverage",
         "test:e2e": "npx playwright test",
         "test:e2e:ui": "npx playwright test --ui"
