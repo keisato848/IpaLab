@@ -84,12 +84,14 @@
 
 ### 3.1 Web (`apps/web`)
 
-- **Framework**: Next.js 16.2.1 (App Router)
+- **Framework**: Next.js 16.2.4 (App Router)
 - **Node.js**: v20 (LTS)
 - **Build**: Standalone モード無効（Azure SWA 最適化）
 - **Styling**: CSS Modules (`*.module.css`)
 - **Testing**:
   - Unit: Vitest + @testing-library/react
+  - `test:run` は `scripts/run-vitest-batches.mjs` でテストファイルを 4 件ずつ分割実行する
+  - Unit 実行時は `vitest.config.ts` の `pool: 'threads'` と `maxWorkers: 4` で worker 起動数を抑制し、devcontainer / pre-push での worker 起動タイムアウトを防止する
   - E2E: Playwright
 - **Lint**: `eslint app components hooks lib --ext .js,.jsx,.ts,.tsx` で `packages/config/eslint-preset` を使用
 - **TSConfig**: `packages/config/tsconfig.base.json` を extends
@@ -174,11 +176,15 @@ COSMOS_DB_CONNECTION=<cosmos_connection>
 1. `node scripts/guard-exam-data-fallback.mjs`
    - 午後試験データ fallback の本番防壁を検証します。
 2. `pwsh .github/hooks/self-inspect.ps1 -Mode end -FailOnFinding`
-  - 過去インシデントに基づく再発防止ルール R1〜R12 を検証します。
+  - 過去インシデントに基づく再発防止ルール R1〜R42 を検証します。
 
 `self-inspect` の R8 は、`apps/`、`packages/`、`.github/hooks/`、`.github/workflows/`、`.husky/`、主要なルート設定ファイルに実装変更があるにもかかわらず `docs/` 配下の更新がない場合に検出します。検出時はコミットを中止し、該当する設計書・手順書の更新を `document-agent` の担当作業として促します。
 
 `self-inspect` の R12 は、tracked 設定ファイルに Cosmos / Storage 接続文字列の `AccountKey` 実値、Google API キー形式の実値、秘密鍵ヘッダーが混入していないかを値非表示で検出します。
+
+`self-inspect` の R40 / R41 は、devcontainer からホスト OS 上の Cosmos Emulator を扱える接続判定と、接続文字列未設定時に Web 側で `@azure/cosmos` SDK をトップレベル実体 import しないことを検出します。
+
+`self-inspect` の R42 は、Web unit test が `scripts/run-vitest-batches.mjs` 経由の少数ファイルバッチ実行から直接 `vitest run` へ戻っていないかを検出します。
 
 テスト実行は `pre-push` に集約し、コミット時の待ち時間を抑えつつ、push 前にユニットテストを必ず通す構成とします。
 
