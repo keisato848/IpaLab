@@ -1,4 +1,4 @@
-import { CosmosClient, Container } from '@azure/cosmos';
+import type { Container, CosmosClient } from '@azure/cosmos';
 import * as https from 'https';
 
 const CONNECTION_STRING = process.env.COSMOS_DB_CONNECTION || "";
@@ -49,6 +49,7 @@ const getClient = async (): Promise<CosmosClient | undefined> => {
     try {
         const isLocalEmulator = isLocalEmulatorConnectionString(CONNECTION_STRING);
         const connStr = normalizeLocalEmulatorConnectionString(CONNECTION_STRING);
+        const { CosmosClient } = await import('@azure/cosmos');
 
         // ローカルエミュレータの場合のみTLS検証を無効化
         // 本番環境（Azure CosmosDB）では適切な証明書が使用される
