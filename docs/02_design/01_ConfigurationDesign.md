@@ -87,9 +87,9 @@
 - **Build**: Standalone モード無効（Azure SWA 最適化）
 - **Styling**: CSS Modules (`*.module.css`)
 - **Testing**:
-  - Unit: Vitest + @testing-library/react
-  - `test:run` は `scripts/run-vitest-batches.mjs` でテストファイルを 4 件ずつ分割実行する
-  - Unit 実行時は `vitest.config.ts` の `pool: 'threads'` と `maxWorkers: 4` で worker 起動数を抑制し、devcontainer / pre-push での worker 起動タイムアウトを防止する
+  - Unit: Vitest + @testing-library/react + happy-dom
+  - `test:run` は `scripts/run-vitest-batches.mjs` でテストファイルを 4 件ずつ分割実行し、失敗した batch は 1 ファイルずつ再実行する
+  - Unit 実行時は `vitest.config.ts` の `environment: 'happy-dom'`、`pool: 'threads'`、`maxWorkers: 4` で DOM 初期化と worker 起動数を抑制し、devcontainer / pre-push での worker 起動タイムアウトを防止する
   - E2E: Playwright
 - **Lint**: `eslint app components hooks lib --ext .js,.jsx,.ts,.tsx` で `packages/config/eslint-preset` を使用
 - **TSConfig**: `packages/config/tsconfig.base.json` を extends
@@ -180,7 +180,7 @@ COSMOS_DB_CONNECTION=<cosmos_connection>
 
 `self-inspect` の R40 / R41 は、devcontainer からホスト OS 上の Cosmos Emulator を扱える接続判定と、接続文字列未設定時に Web 側で `@azure/cosmos` SDK をトップレベル実体 import しないことを検出します。
 
-`self-inspect` の R42 は、Web unit test が `scripts/run-vitest-batches.mjs` 経由の少数ファイルバッチ実行から直接 `vitest run` へ戻っていないかを検出します。
+`self-inspect` の R42 は、Web unit test が `happy-dom` と `scripts/run-vitest-batches.mjs` 経由の少数ファイルバッチ実行から、重い `jsdom` 環境や直接 `vitest run` へ戻っていないかを検出します。
 
 テスト実行は `pre-push` に集約し、コミット時の待ち時間を抑えつつ、push 前にユニットテストを必ず通す構成とします。
 
