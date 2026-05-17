@@ -26,6 +26,12 @@ Object.defineProperty(window, 'localStorage', {
     value: localStorageMock,
 });
 
+Object.defineProperty(window, 'alert', {
+    value: () => {},
+    writable: true,
+    configurable: true,
+});
+
 // Mock crypto.randomUUID
 Object.defineProperty(window, 'crypto', {
     value: {
