@@ -9,7 +9,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const composePath = resolve(root, 'langfuse/docker-compose.yml');
 const collectorConfigPath = resolve(root, 'otel-collector/generated/config.yml');
 const envPath = resolve(root, '.env');
-const composeUrl = 'https://raw.githubusercontent.com/langfuse/langfuse/main/docker-compose.yml';
+const langfuseComposeRef = 'v3.99.0';
+const composeUrl = `https://raw.githubusercontent.com/langfuse/langfuse/${langfuseComposeRef}/docker-compose.yml`;
 
 function randomBase64() {
   return randomBytes(32).toString('base64');
@@ -128,7 +129,7 @@ mkdirSync(dirname(composePath), { recursive: true });
 mkdirSync(dirname(collectorConfigPath), { recursive: true });
 
 if (!existsSync(composePath) || statSync(composePath).size === 0) {
-  console.log('[setup] 公式 Langfuse docker-compose.yml を取得します。');
+  console.log(`[setup] 公式 Langfuse docker-compose.yml (${langfuseComposeRef}) を取得します。`);
   await downloadFile(composeUrl, composePath);
 } else {
   console.log('[setup] langfuse/docker-compose.yml は既に存在するため取得を省略します。');

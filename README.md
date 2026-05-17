@@ -234,7 +234,7 @@ OTEL_REMOTE_AUTH_HEADER=Bearer xxxxx
 ```bash
 node scripts/setup-copilot-otel.mjs
 npm run otel:compose
-export $(grep OTEL_EXPORTER_OTLP_HEADERS .env)
+export OTEL_EXPORTER_OTLP_HEADERS="$(sed -n 's/^OTEL_EXPORTER_OTLP_HEADERS=//p' .env)"
 code .
 npm run otel:start-session
 ```

@@ -187,7 +187,7 @@ project: copilot-otel
 | trace が作られているか | Traces 一覧 | Copilot Chat から Collector 経由で Langfuse へ届いている |
 | span の親子関係 | Trace detail | 会話、ツール呼び出し、内部処理の流れを追える |
 | duration | Span detail | 遅い処理や待ち時間の大きい箇所を見つける |
-| input / output | Span detail | `captureContent=true` の場合のみ内容を確認できる |
+| input / output | Span detail | `captureContent` を opt-in で `true` にした場合のみ内容を確認できる |
 | error / status | Span detail | Collector 転送や Copilot 側エラーの兆候を確認する |
 | metadata | Span detail | service name、endpoint、実行環境の手掛かりを確認する |
 
@@ -281,7 +281,7 @@ npm run otel:compose -- logs otel-collector
 
 - `.env` はコミットしない
 - `OTEL_REMOTE_AUTH_HEADER` をログや PR に貼らない
-- リモート転送先が外部サービスの場合、`captureContent=true` のまま会話内容を送ってよいか事前に確認する
+- リモート転送先が外部サービスの場合、`captureContent` を有効化して会話内容を送ってよいか事前に確認する
 
 ---
 
@@ -301,8 +301,8 @@ npm run otel:compose -- logs otel-collector
 
 ## 10. セキュリティ運用
 
-- `github.copilot.chat.otel.captureContent=true` と `COPILOT_OTEL_CAPTURE_CONTENT=true` は、プロンプト、応答、ツール引数を trace に含める
-- シークレット、個人情報、本番データ、顧客データを含む会話では有効化しない
+- `github.copilot.chat.otel.captureContent` と `COPILOT_OTEL_CAPTURE_CONTENT` は tracked 設定では既定 `false` とし、必要な検証セッションだけ opt-in で `true` にする
+- `captureContent=true` はプロンプト、応答、ツール引数を trace に含めるため、シークレット、個人情報、本番データ、顧客データを含む会話では有効化しない
 - `.env`、Remote OTLP の認証ヘッダー、Langfuse の secret key はコミットしない
 - セッションレポートやスクリーンショットを共有する前に、画面内に秘密情報が含まれていないか確認する
 - 外部 Remote OTLP へ転送する場合は、会話内容の送信可否を事前に合意する

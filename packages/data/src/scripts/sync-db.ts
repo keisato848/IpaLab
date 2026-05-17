@@ -86,6 +86,8 @@ async function cleanLearningRecords() {
         console.log("Detected Local Cosmos DB Emulator.");
         if (CONNECTION_STRING.includes('localhost')) {
             finalConnectionString = CONNECTION_STRING.replace('localhost', '127.0.0.1');
+        } else if (CONNECTION_STRING.includes('host.docker.internal')) {
+            finalConnectionString = CONNECTION_STRING;
         }
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
         clientOptions = {
@@ -200,6 +202,8 @@ async function main() {
         console.log("Detected Local Cosmos DB Emulator.");
         if (CONNECTION_STRING.includes('localhost')) {
             finalConnectionString = CONNECTION_STRING.replace('localhost', '127.0.0.1');
+        } else if (CONNECTION_STRING.includes('host.docker.internal')) {
+            finalConnectionString = CONNECTION_STRING;
         }
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
         clientOptions = {

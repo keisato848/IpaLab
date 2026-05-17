@@ -27,7 +27,7 @@ services:
       OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
       OTEL_SERVICE_NAME: "copilot-chat"
       COPILOT_OTEL_ENABLED: "true"
-      COPILOT_OTEL_CAPTURE_CONTENT: "true"
+      COPILOT_OTEL_CAPTURE_CONTENT: "false"
     volumes:
       - ..:/workspace:cached
     command: sleep infinity
