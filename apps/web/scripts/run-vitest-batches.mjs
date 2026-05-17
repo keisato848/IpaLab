@@ -48,35 +48,55 @@ if (testFiles.length === 0) {
 
 const totalBatches = Math.ceil(testFiles.length / batchSize);
 
-for (let offset = 0; offset < testFiles.length; offset += batchSize) {
-    const batch = testFiles.slice(offset, offset + batchSize);
-    const batchNo = offset / batchSize + 1;
-    const workersForBatch = Math.min(maxWorkers, batch.length);
-
+function runVitest(files, label, workers) {
     console.log(
-        `\n[vitest-batches] Batch ${batchNo}/${totalBatches}: ${batch.length} file(s), pool=${pool}, maxWorkers=${workersForBatch}`
+        `\n[vitest-batches] ${label}: ${files.length} file(s), pool=${pool}, maxWorkers=${workers}`
     );
 
     const result = spawnSync(
         vitestBin,
-        ['run', ...batch, `--pool=${pool}`, `--maxWorkers=${workersForBatch}`],
+        ['run', ...files, `--pool=${pool}`, `--maxWorkers=${workers}`],
         {
             cwd: webRoot,
             env: {
                 ...process.env,
-                VITEST_MAX_WORKERS: String(workersForBatch),
+                VITEST_MAX_WORKERS: String(workers),
             },
             stdio: 'inherit',
         }
     );
 
     if (result.error) {
-        console.error(`[vitest-batches] Failed to run batch ${batchNo}:`, result.error);
-        process.exit(1);
+        console.error(`[vitest-batches] Failed to run ${label}:`, result.error);
+        return { ok: false, status: 1 };
     }
 
-    if (result.status !== 0) {
-        process.exit(result.status ?? 1);
+    return { ok: result.status === 0, status: result.status ?? 1 };
+}
+
+for (let offset = 0; offset < testFiles.length; offset += batchSize) {
+    const batch = testFiles.slice(offset, offset + batchSize);
+    const batchNo = offset / batchSize + 1;
+    const workersForBatch = Math.min(maxWorkers, batch.length);
+
+    const result = runVitest(batch, `Batch ${batchNo}/${totalBatches}`, workersForBatch);
+    if (result.ok) {
+        continue;
+    }
+
+    if (batch.length === 1) {
+        process.exit(result.status);
+    }
+
+    console.warn(
+        `[vitest-batches] Batch ${batchNo}/${totalBatches} failed; retrying files individually with maxWorkers=1.`
+    );
+
+    for (const file of batch) {
+        const retry = runVitest([file], `Batch ${batchNo}/${totalBatches} retry: ${file}`, 1);
+        if (!retry.ok) {
+            process.exit(retry.status);
+        }
     }
 }
 
