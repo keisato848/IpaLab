@@ -11,6 +11,7 @@
 - `/api/config/telemetry` による接続文字列配布
 - `/api/track` による PageViews 保存
 - Google Analytics の埋込
+- Copilot Chat OTel を OTel Collector 経由でローカル Langfuse と任意のリモート OTLP に送る開発時監視
 
 ---
 
@@ -24,12 +25,25 @@
 - `apps/web/instrumentation.node.ts`
 - `apps/web/app/api/config/telemetry/route.ts`
 - `apps/web/app/api/track/route.ts`
+- `.vscode/settings.json`
+- `.devcontainer/devcontainer.json`
+- `.devcontainer/docker-compose.yml`
+- `otel-collector/README.md`
+- `scripts/setup-copilot-otel.mjs`
+- `scripts/setup-copilot-otel.sh`
+- `scripts/start-copilot-otel-session.mjs`
+- `scripts/capture-copilot-otel-session.mjs`
+- `scripts/verify-copilot-otel.mjs`
+- `scripts/verify-copilot-otel.sh`
+- `langfuse/README.md`
+- `docs/04_reports/otel-sessions/`
 
 ### 対象外
 
 - 管理画面の利用状況分析ロジック
 - Azure Monitor のポータル設定
 - E2E レポートや CI ログ収集
+- 本番アプリケーションのトレースを Langfuse へ送る構成
 
 ---
 
@@ -54,6 +68,11 @@ graph TD
 
     Browser --> TrackApi[/api/track]
     TrackApi --> PageViews[(CosmosDB PageViews)]
+
+    Copilot[VS Code Copilot Chat] --> OTel[OTLP HTTP :4318]
+    OTel --> Collector[OTel Collector]
+    Collector --> Langfuse[Local Langfuse]
+    Collector -. optional .-> RemoteOTLP[Remote OTLP]
 ```
 
 ---
@@ -118,6 +137,7 @@ sequenceDiagram
 | Managed Identity | Node 計測の送信認証 |
 | Azure Cosmos DB PageViews | 独自 PageView データ保存 |
 | Google Analytics | マーケティング用ページ計測 |
+| Langfuse | 開発時の Copilot Chat OTel トレース閲覧 |
 
 ---
 
@@ -129,6 +149,16 @@ sequenceDiagram
 | `TELEMETRY_CONNECTION_STRING` | 任意 | Node 側 SDK の接続文字列 | AAD 認証付き送信に使用。`/api/config/telemetry` では返さない |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | 任意 | Google Analytics 埋込 | 未設定時は無効 |
 | `OTEL_SERVICE_NAME` | 任意 | OpenTelemetry サービス名 | 未設定時は `pm-exam-dx-web` を自動設定 |
+| `COPILOT_OTEL_ENABLED` | 任意 | Copilot Chat OTel の有効化 | devcontainer では `true` を注入 |
+| `COPILOT_OTEL_CAPTURE_CONTENT` | 任意 | Copilot Chat のプロンプト・応答・ツール引数の記録 | ローカルまたは信頼済み環境のみで使用 |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | 任意 | Copilot Chat OTLP HTTP 送信先 | 手動起動は `http://localhost:4318`、devcontainer は `http://otel-collector:4318` |
+| `OTEL_EXPORTER_OTLP_PROTOCOL` | 任意 | OTLP プロトコル | `http/protobuf` |
+| `OTEL_EXPORTER_OTLP_HEADERS` | 任意 | Langfuse OTLP Basic 認証ヘッダー | `.env` に生成し、実値はコミットしない |
+| `OTEL_LANGFUSE_AUTH_HEADER` | 任意 | Collector がローカル Langfuse へ転送する際の `Authorization` 値 | `Basic ...` の値のみ。`.env` に生成する |
+| `OTEL_REMOTE_EXPORTER_OTLP_ENDPOINT` | 任意 | Collector から追加転送するリモート OTLP endpoint | 未設定時はリモート転送しない |
+| `OTEL_REMOTE_AUTH_HEADER` | 任意 | リモート OTLP へ送信する `Authorization` 値 | 実値はコミットしない |
+| `COPILOT_OTEL_DASHBOARD_URL` | 任意 | 起動時に VS Code で開く Langfuse URL | 既定値は `http://localhost:3000` |
+| `COPILOT_OTEL_AUTO_OPEN` | 任意 | 起動時のダッシュボード自動表示を制御 | `false` の場合は開かない |
 
 ---
 
@@ -275,6 +305,52 @@ Node 側では `OTEL_SERVICE_NAME=pm-exam-dx-web` を既定値として使う。
 - `/api/track` のエラーログ
 - ブラウザ SDK の自動 route tracking
 
+### 14.4 Copilot Chat OTel / Langfuse ローカル監視
+
+開発時のエージェント挙動を確認するため、Copilot Chat の OpenTelemetry 出力をローカル Langfuse に送信できる構成を持つ。
+
+仕組み、ダッシュボードの見方、セットアップ、起動、検証、トラブルシュート、リモート転送、セッション証跡生成の詳細手順は `docs/02_design/24_CopilotOtelLangfuseRunbook.md` を正本とする。
+
+| ファイル | 責務 |
+|------|------|
+| `.vscode/settings.json` | 手動起動時の Copilot Chat OTel 設定。送信先は `localhost:4318` の Collector |
+| `.devcontainer/devcontainer.json` | devcontainer 起動時に Langfuse compose と workspace compose をマージする |
+| `.devcontainer/docker-compose.yml` | OTel Collector を起動し、workspace コンテナへ OTEL / COPILOT_OTEL 環境変数を注入する |
+| `otel-collector/generated/config.yml` | Collector の転送設定。`scripts/setup-copilot-otel.mjs` が生成する |
+| `scripts/setup-copilot-otel.mjs` | タグ固定した公式 Langfuse compose の取得、ローカル `.env` 生成、Collector 設定生成を行う |
+| `scripts/setup-copilot-otel.sh` | bash で同等の初期化を行う互換スクリプト |
+| `scripts/run-copilot-otel-compose.mjs` | Docker Desktop / Rancher Desktop / Podman などの Compose 互換 CLI を検出し、Langfuse と Collector を操作する |
+| `scripts/start-copilot-otel-session.mjs` | 起動時に Langfuse health を待ち、VS Code でダッシュボードを開き、セッションレポートを生成する |
+| `scripts/capture-copilot-otel-session.mjs` | Langfuse ダッシュボードのスクリーンショットと Markdown レポートを生成する |
+| `scripts/verify-copilot-otel.mjs` | Langfuse health と Copilot OTel 環境変数を確認する |
+| `scripts/verify-copilot-otel.sh` | bash で同等の確認を行う互換スクリプト |
+| `.env.otel.example` | `.env` 生成内容のテンプレート |
+
+手動起動時は以下の流れで使用する。
+
+```bash
+node scripts/setup-copilot-otel.mjs
+npm run otel:compose
+export OTEL_EXPORTER_OTLP_HEADERS="$(sed -n 's/^OTEL_EXPORTER_OTLP_HEADERS=//p' .env)"
+code .
+npm run otel:start-session
+```
+
+`npm run otel:compose` は `docker compose`、`docker-compose`、`nerdctl compose`、`podman compose` の順に Compose 互換 CLI を検出する。Rancher Desktop の containerd モードなどで明示する場合は、`COPILOT_OTEL_COMPOSE_COMMAND="nerdctl compose" npm run otel:compose` を使用する。
+
+Windows の PowerShell から VS Code を起動する場合は、以下で `OTEL_EXPORTER_OTLP_HEADERS` を現在のシェルへ注入してから `code .` を実行する。
+
+```powershell
+$env:OTEL_EXPORTER_OTLP_HEADERS = (Select-String -Path .env -Pattern '^OTEL_EXPORTER_OTLP_HEADERS=').Line -replace '^OTEL_EXPORTER_OTLP_HEADERS=', ''
+code .
+```
+
+devcontainer の既定起動は workspace コンテナ単体とし、`langfuse/docker-compose.yml`、`otel-collector/generated/config.yml`、未追跡 `.env`、ホスト側 Node.js の有無に依存させない。Langfuse と OTel Collector は `npm run otel:setup` と `npm run otel:compose` で opt-in 起動し、`npm run otel:start-session` が Langfuse health を待ってから VS Code で `http://localhost:3000` を開き、`docs/04_reports/otel-sessions/` にセッションレポートを生成する。Copilot Chat の送信先は手動起動した `http://localhost:4318` の Collector を使う。ランタイムは Docker Desktop 固有に限定せず、Compose 互換 CLI を前提とする。
+
+リモート OTLP にも転送する場合は、未追跡 `.env` に `OTEL_REMOTE_EXPORTER_OTLP_ENDPOINT` と必要に応じて `OTEL_REMOTE_AUTH_HEADER` を設定する。`scripts/setup-copilot-otel.mjs` はこの値を見て `otel-collector/generated/config.yml` の exporter を生成する。未設定時はローカル Langfuse への転送のみ行う。
+
+`github.copilot.chat.otel.captureContent` および `COPILOT_OTEL_CAPTURE_CONTENT` は tracked 設定では既定 `false` とし、プロンプト、応答、ツール引数などの内容をトレースに含める必要がある検証セッションでのみ opt-in で `true` にする。シークレット、個人情報、本番データを含む会話では使用しない。
+
 ---
 
 ## 15. テスト観点
@@ -286,6 +362,14 @@ Node 側では `OTEL_SERVICE_NAME=pm-exam-dx-web` を既定値として使う。
 | API | `/api/config/telemetry` が no-store で接続文字列を返すこと |
 | API | `/api/track` が入力不足で 400 を返すこと |
 | API | `/api/track` が DB 障害時も `{ ok: true }` を返すこと |
+| DevOps | `node --check scripts/setup-copilot-otel.mjs` と `node --check scripts/verify-copilot-otel.mjs` が通ること |
+| DevOps | `node --check scripts/start-copilot-otel-session.mjs` と `node --check scripts/capture-copilot-otel-session.mjs` が通ること |
+| DevOps | `node --check scripts/run-copilot-otel-compose.mjs` が通ること |
+| DevOps | `bash -n scripts/setup-copilot-otel.sh scripts/verify-copilot-otel.sh` が通ること |
+| DevOps | `scripts/setup-copilot-otel.mjs` で `langfuse/docker-compose.yml`、未追跡 `.env`、`otel-collector/generated/config.yml` が生成できること |
+| DevOps | devcontainer の既定起動が未生成の Langfuse compose、未追跡 `.env`、ホスト側 Node.js に依存しないこと |
+| Docs | `docs/02_design/24_CopilotOtelLangfuseRunbook.md` に Phase 0-3、影響領域、検証観点、E2E 証跡要否、運用手順が記載されていること |
+| Evidence | `npm run otel:report` または `npm run otel:start-session` により `docs/04_reports/otel-sessions/` に Markdown とスクリーンショットが生成されること |
 
 ---
 
@@ -319,5 +403,6 @@ Node 側では `OTEL_SERVICE_NAME=pm-exam-dx-web` を既定値として使う。
 1. `15_CommonApiAndErrorDesign.md`
 2. `09_AdminAndFeatureFlagsDesign.md`
 3. `12_DashboardAndLearningHistoryDesign.md`
+4. `24_CopilotOtelLangfuseRunbook.md`
 
 監視設計は、共通 API 契約と管理画面側の分析要件に接続する。

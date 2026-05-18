@@ -1,0 +1,30 @@
+{
+  "name": "shikakuno-dev",
+  "dockerComposeFile": [
+    "docker-compose.yml"
+  ],
+  "service": "workspace",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Next.js dev server",
+      "onAutoForward": "notify"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "ms-azuretools.vscode-azurefunctions"
+      ],
+      "settings": {
+        "github.copilot.chat.otel.enabled": false,
+        "github.copilot.chat.otel.exporterType": "otlp-http",
+        "github.copilot.chat.otel.otlpEndpoint": "http://localhost:4318",
+        "github.copilot.chat.otel.captureContent": false
+      }
+    }
+  }
+}

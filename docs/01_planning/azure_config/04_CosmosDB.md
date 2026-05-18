@@ -58,6 +58,8 @@ Y1 Consumption Plan のため VNet 統合が使用できず、IP フィルタで
 `packages/data` の同期スクリプト実行時は、一時的に IP を追加し、作業後に削除します。  
 詳細は `docs/azure-sync-guide.md` を参照。
 
+Azure 接続文字列を使わない開発時の API/DB 結合確認には、Linux 版 Azure Cosmos DB Emulator を使用する。リポジトリルートの `npm run cosmos:emulator` は `cosmos-emulator/docker-compose.yml` を通じて Emulator を HTTPS mode で起動し、`npm run cosmos:verify-local` は `pm-exam-dx-db`、主要コンテナ、`Metrics` コンテナでの write/read/delete を検証する。devcontainer / Docker コンテナ内からホスト OS 上の Emulator を使う場合は `host.docker.internal:8081` をローカル接続として扱う。検証スクリプトはローカル host だけを許可し、本番・Staging Cosmos DB への誤実行を防ぐ。
+
 ### Bicep テンプレート
 
 ネットワーク構成は `infra/azure/network.bicep` で IaC 管理。  

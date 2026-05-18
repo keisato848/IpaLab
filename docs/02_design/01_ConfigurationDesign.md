@@ -19,6 +19,8 @@
   - `test`: `turbo run test`
   - `test:unit`: `turbo run test:run --filter=web`
   - `test:e2e`: `cd apps/web && npx playwright test`
+  - `cosmos:emulator`: Linux 版 Azure Cosmos DB Emulator を Compose 互換 CLI で起動
+  - `cosmos:verify-local`: ローカル Emulator の readiness、DB/コンテナ、write/read/delete を検証
   - `format`: `prettier --write "**/*.{ts,tsx,md}"`
   - `prepare`: `husky`
 
@@ -82,12 +84,14 @@
 
 ### 3.1 Web (`apps/web`)
 
-- **Framework**: Next.js 16.2.1 (App Router)
+- **Framework**: Next.js 16.2.4 (App Router)
 - **Node.js**: v20 (LTS)
 - **Build**: Standalone モード無効（Azure SWA 最適化）
 - **Styling**: CSS Modules (`*.module.css`)
 - **Testing**:
-  - Unit: Vitest + @testing-library/react
+  - Unit: Vitest + @testing-library/react + happy-dom
+  - `test:run` は `scripts/run-vitest-batches.mjs` でテストファイルを 4 件ずつ分割実行し、失敗した batch は 1 ファイルずつ再実行する
+  - Unit 実行時は `vitest.config.ts` の `environment: 'happy-dom'`、`pool: 'threads'`、`maxWorkers: 4` で DOM 初期化と worker 起動数を抑制し、devcontainer / pre-push での worker 起動タイムアウトを防止する
   - E2E: Playwright
 - **Lint**: `eslint app components hooks lib --ext .js,.jsx,.ts,.tsx` で `packages/config/eslint-preset` を使用
 - **TSConfig**: `packages/config/tsconfig.base.json` を extends
@@ -129,10 +133,12 @@ NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=<secret>
 GOOGLE_ID=<oauth_client_id>
 GOOGLE_SECRET=<oauth_client_secret>
-AZURE_COSMOS_CONNECTION_STRING=<cosmos_connection>
+COSMOS_DB_CONNECTION=<cosmos_connection>
 AI_CHAT_FUNCTION_URL=<local_or_azure_ai_chat_url>
 AI_CHAT_FUNCTION_SECRET=<shared_hmac_secret_for_ai_chat>
 ```
+
+ローカル Cosmos DB Emulator を使う場合は、`npm run cosmos:emulator` で `mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview` を HTTPS mode で起動し、`npm run cosmos:verify-local` で `pm-exam-dx-db` と主要コンテナを初期化する。devcontainer / Docker コンテナ内からホスト OS 上の Emulator を使う場合は `host.docker.internal:8081` を利用し、検証スクリプトは `localhost` / `127.0.0.1` / `host.docker.internal` / `gateway.docker.internal` をローカル接続として扱う。クラウド Cosmos DB への誤実行は引き続き拒否する。
 
 #### API Functions
 
@@ -162,6 +168,7 @@ COSMOS_DB_CONNECTION=<cosmos_connection>
 - **Husky**:
   - `pre-commit`: 静的ガードを実行し、午後試験データ fallback 防壁と `self-inspect` を確認する
   - `pre-push`: `npm run test:unit` によりユニットテストを実行する
+  - Dev Container は `self-inspect` 実行に必要な PowerShell (`pwsh`) を含める
 
 ### 4.3 ローカルガードとドキュメント同期
 
@@ -170,11 +177,19 @@ COSMOS_DB_CONNECTION=<cosmos_connection>
 1. `node scripts/guard-exam-data-fallback.mjs`
    - 午後試験データ fallback の本番防壁を検証します。
 2. `pwsh .github/hooks/self-inspect.ps1 -Mode end -FailOnFinding`
-  - 過去インシデントに基づく再発防止ルール R1〜R12 を検証します。
+  - 過去インシデントに基づく再発防止ルール R1〜R43 を検証します。
+
+`pwsh` が無い環境では `self-inspect` を省略せず、コミットを失敗させます。devcontainer では `.devcontainer/Dockerfile` で PowerShell を導入し、ローカルと CI のどちらでも同じ静的ガードを実行できる構成とします。
 
 `self-inspect` の R8 は、`apps/`、`packages/`、`.github/hooks/`、`.github/workflows/`、`.husky/`、主要なルート設定ファイルに実装変更があるにもかかわらず `docs/` 配下の更新がない場合に検出します。検出時はコミットを中止し、該当する設計書・手順書の更新を `document-agent` の担当作業として促します。
 
 `self-inspect` の R12 は、tracked 設定ファイルに Cosmos / Storage 接続文字列の `AccountKey` 実値、Google API キー形式の実値、秘密鍵ヘッダーが混入していないかを値非表示で検出します。
+
+`self-inspect` の R40 / R41 は、devcontainer からホスト OS 上の Cosmos Emulator を扱える接続判定と、接続文字列未設定時に Web 側で `@azure/cosmos` SDK をトップレベル実体 import しないことを検出します。
+
+`self-inspect` の R42 は、Web unit test が `happy-dom` と `scripts/run-vitest-batches.mjs` 経由の少数ファイルバッチ実行から、重い `jsdom` 環境や直接 `vitest run` へ戻っていないかを検出します。
+
+`self-inspect` の R43 は、Copilot OTel の tracked 設定で `captureContent` が既定有効になっていないか、README の OTLP ヘッダー注入が空白を壊さないか、Langfuse compose の取得元がタグ固定されているか、`pwsh` 不在時に self-inspect をスキップしないかを検出します。
 
 テスト実行は `pre-push` に集約し、コミット時の待ち時間を抑えつつ、push 前にユニットテストを必ず通す構成とします。
 
@@ -200,7 +215,33 @@ GitHub Copilot エージェントのカスタマイズ設定は以下のパス�
 | オーケストレーター | `AGENTS.md` | タスク分類・ルーティング定義 |
 | E2E レポーター | `apps/web/e2e/reporters/custom-report.ts` | エビデンス報告書自動生成 |
 
-### 5.1 tool aliases 制約
+### 5.1 Copilot Chat OTel / Langfuse ローカル監視
+
+開発時の Copilot Chat トレースをローカル Langfuse で確認するため、以下の構成を持つ。
+
+| 種別 | 配置パス | 用途 |
+|------|---------|------|
+| Dev Container | `.devcontainer/devcontainer.json` | workspace コンテナ単体を起動する。Langfuse / OTel は初回起動のブロッカーにしない |
+| Dev Container | `.devcontainer/docker-compose.yml` | workspace コンテナのみを定義する。OTel Collector は手動起動スタックで扱う |
+| Dev Container | `.devcontainer/Dockerfile` | Node.js 24、検証用 CLI、セッション証跡用 Chromium を含む開発コンテナを定義する |
+| VS Code 設定 | `.vscode/settings.json` | 手動起動時の Copilot Chat OTel 送信先を `localhost:4318` の Collector に設定する |
+| Collector | `otel-collector/generated/config.yml` | `scripts/setup-copilot-otel.mjs` が生成する Collector 転送設定。git 管理対象外 |
+| セットアップ | `scripts/setup-copilot-otel.mjs` | タグ固定した公式 Langfuse compose、`.env`、Collector 設定の生成を行う |
+| セットアップ | `scripts/setup-copilot-otel.sh` | Node.js 版セットアップを呼ぶ互換ラッパー |
+| 起動 | `scripts/run-copilot-otel-compose.mjs` | Docker Desktop / Rancher Desktop / Podman などの Compose 互換 CLI を検出し、Langfuse と Collector を操作する |
+| 起動 | `scripts/start-copilot-otel-session.mjs` | Langfuse 起動確認、VS Code でのダッシュボード表示、セッションレポート生成を行う |
+| 証跡 | `scripts/capture-copilot-otel-session.mjs` | Langfuse ダッシュボードのスクリーンショットと Markdown レポートを生成する |
+| 検証 | `scripts/verify-copilot-otel.mjs` | Langfuse / OTel Collector / OTEL 環境変数を確認する |
+| 検証 | `scripts/verify-copilot-otel.sh` | bash で同等の確認を行う互換スクリプト |
+| テンプレート | `.env.otel.example` | `.env` に生成される Langfuse / OTEL 設定の参考値 |
+
+生成物である `langfuse/docker-compose.yml`、`otel-collector/generated/config.yml`、実値を含む `.env` は git 管理対象外とする。`OTEL_EXPORTER_OTLP_HEADERS` と `OTEL_LANGFUSE_AUTH_HEADER` は Langfuse の OTLP Basic 認証値であり、VS Code settings ではなく環境変数として注入する。
+
+Copilot Chat は手動起動した Collector の `http://localhost:4318` へ送信する。Collector はローカル Langfuse に転送し、`.env` に `OTEL_REMOTE_EXPORTER_OTLP_ENDPOINT` が設定されている場合のみリモート OTLP にも追加転送する。コンテナランタイムは Docker Desktop 固有に限定せず、`docker compose` / `nerdctl compose` / `podman compose` などの Compose 互換 CLI を前提とする。devcontainer の既定起動は `langfuse/docker-compose.yml`、`otel-collector/generated/config.yml`、`.env` が未生成でも成功する構成とし、監視スタックは `npm run otel:compose` で opt-in 起動する。
+
+`github.copilot.chat.otel.captureContent` と `COPILOT_OTEL_CAPTURE_CONTENT` は既定では `false` とし、プロンプト、応答、ツール引数を含む詳細トレースが必要な検証セッションでのみ opt-in で有効化する。シークレット、個人情報、本番データを含む会話では有効化しない。
+
+### 5.2 tool aliases 制約
 
 `.agent.md` の `tools` フィールドには **公式 GitHub エイリアスのみ** 記載すること。
 
@@ -212,6 +253,18 @@ read / edit / search / execute / agent / web / todo
 
 ## 変更履歴
 
+- **2026-05-14**: Copilot Chat OTel / Langfuse ローカル監視構成を追加
+  - `.devcontainer/`、`.vscode/settings.json`、`scripts/setup-copilot-otel.mjs`、`scripts/verify-copilot-otel.mjs`、bash 互換スクリプト、`.env.otel.example` の役割を明記
+  - `OTEL_EXPORTER_OTLP_HEADERS` は未追跡 `.env` から環境変数として注入する方針を追記
+- **2026-05-16**: Cosmos DB ローカル検証環境を追加
+  - `cosmos-emulator/docker-compose.yml`、`scripts/run-cosmos-emulator.mjs`、`packages/data/src/scripts/verify-local-cosmos.ts` による Emulator 起動・初期化・疎通確認を追加
+  - `COSMOS_DB_CONNECTION` を Web 環境変数として明記し、クラウド接続文字列への誤実行防止方針を追記
+- **2026-05-17**: Copilot OTel ローカル監視の安全な既定値を追加
+  - `captureContent` を tracked 設定では既定無効にし、必要時のみ opt-in する方針へ更新
+  - Langfuse compose の取得元をタグ固定し、devcontainer に PowerShell を含めて `self-inspect` を必須実行する方針を追記
+- **2026-05-18**: devcontainer の既定起動を OTel 生成物から分離
+  - `langfuse/docker-compose.yml`、未追跡 `.env`、ホスト側 Node セットアップが無くても workspace コンテナを起動できる方針へ更新
+  - Langfuse / OTel Collector は `npm run otel:compose` による opt-in 起動に整理
 - **2026-05-02**: tracked 設定ファイルの secret material 禁止方針を追加
   - `local.settings.json` / `.env.template` は空値またはプレースホルダーのみとし、実値は未追跡環境から注入する方針を明記
   - `self-inspect` R12 による tracked 設定ファイルの secret material 検出を追記

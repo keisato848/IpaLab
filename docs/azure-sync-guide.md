@@ -11,6 +11,23 @@
 
 同期スクリプトは `COSMOS_DB_CONNECTION` 環境変数を参照します。
 
+**ローカルエミュレータで検証する場合:**
+
+公式 Linux 版 Cosmos DB Emulator をリポジトリルートから起動し、DB/コンテナ作成と疎通確認を行います。
+
+```bash
+npm run cosmos:emulator
+npm run cosmos:verify-local
+```
+
+`npm run cosmos:verify-local` は `http://localhost:8080/ready` を優先し、未公開の場合は `https://<local-host>:8081` gateway 到達を fallback として扱います。devcontainer / Docker コンテナ内では `host.docker.internal:8081` を自動検出対象に含めます。検証では `pm-exam-dx-db` と主要コンテナを作成し、`Metrics` コンテナで write/read/delete を確認します。`COSMOS_DB_CONNECTION` が未設定の場合は到達可能なローカル host に合わせて公式エミュレータ既定の接続文字列を生成します。クラウド Cosmos DB の接続文字列を検出した場合は誤操作防止のため中止します。
+
+停止する場合は以下を実行します。
+
+```bash
+npm run cosmos:emulator:down
+```
+
 **本番（クラウド）環境へ反映する場合:**
 
 `.env` または `.env.local` ファイル（`apps/web` または `packages/data` 直下）に以下を設定します。
@@ -51,7 +68,7 @@ npm run sync
 ## 確認方法
 
 1. Azure Portal の **Data Explorer** を開きます。
-2. `IpaLabDb` (または設定したDB名) > `Questions` コンテナを選択します。
+2. `pm-exam-dx-db` > `Questions` コンテナを選択します。
 
 ## デプロイ後の環境設定 (Azure Static Web Apps)
 

@@ -17,7 +17,9 @@ fi
 
 echo "🔎 self-inspect を実行中..."
 if ! command -v pwsh >/dev/null 2>&1; then
-  echo "❌ pwsh が見つからないため self-inspect を実行できません。"
+  echo "❌ pwsh が見つからないため、必須の self-inspect を実行できません。"
+  echo "   PowerShell (pwsh) をインストールしてから再度コミットしてください。"
+  echo "   例: https://learn.microsoft.com/powershell/scripting/install/installing-powershell"
   exit 1
 fi
 

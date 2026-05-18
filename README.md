@@ -11,6 +11,7 @@
 - [システム構成](#-システム構成)
 - [プロジェクト構造](#-プロジェクト構造)
 - [セットアップ](#-セットアップ)
+- [Copilot OTel ローカル監視](#-copilot-otel-ローカル監視)
 - [利用可能なスクリプト](#-利用可能なスクリプト)
 
 ## ✨ 主な機能
@@ -148,8 +149,22 @@ Web アプリケーションには API キーやデータベース接続情報�
     ```
 3.  `.env.local` を編集し、以下の変数を設定してください。
     - **認証 (NextAuth.js)**: `AUTH_SECRET`, `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET` 等
-    - **データベース (Azure Cosmos DB)**: `COSMOS_DB_ENDPOINT`, `COSMOS_DB_KEY`
+    - **データベース (Azure Cosmos DB)**: `COSMOS_DB_CONNECTION`
     - **AI (Google Gemini)**: `GEMINI_API_KEY`
+
+### 3.1 ローカル Cosmos DB Emulator
+
+Azure 接続文字列を使わずに API/DB 結合を確認する場合は、公式 Linux 版 Cosmos DB Emulator を起動します。
+
+```bash
+# プロジェクトルートで実行
+npm run cosmos:emulator
+
+# Emulator readiness、DB/コンテナ作成、write/read/delete を確認
+npm run cosmos:verify-local
+```
+
+Cosmos Data Explorer は `https://localhost:1234`、ホスト OS からの SDK 接続先は `https://127.0.0.1:8081` です。devcontainer / Docker コンテナ内からホスト上の Emulator を使う場合は `https://host.docker.internal:8081` を使ってください。`npm run cosmos:verify-local` は `8080/ready` が使えない環境でも `8081` gateway 到達を fallback として扱います。停止する場合は `npm run cosmos:emulator:down` を実行します。`apps/web/.env.local` に `COSMOS_DB_CONNECTION` が未設定でも、検証スクリプトは到達可能なローカル host に合わせて公式エミュレータ既定接続文字列を生成します。クラウド Cosmos DB の接続文字列を検出した場合、誤操作防止のため検証スクリプトは中止します。
 
 ### 4. 開発サーバーの起動
 
@@ -194,6 +209,51 @@ Next.js 開発サーバーが起動し、通常は `http://localhost:3000` で�
 
 `apps/web` のビルド時（`npm run build` または `npm run dev`）に、`packages/data/data/questions` 配下のデータが自動的に `apps/web/data/questions` にコピーされ、アプリケーションから利用可能になります。開発者が手動でファイルをコピーする必要はありません。
 
+## 🔭 Copilot OTel ローカル監視
+
+Copilot Chat の OpenTelemetry 出力を OTel Collector 経由でローカル Langfuse に送る開発時監視構成を用意しています。会話内容やツール引数を含む詳細トレースを取得するため、ローカルまたは信頼済み環境でのみ使用してください。
+
+devcontainer で開く場合は、初期化時に Langfuse compose、OTel Collector 設定、未追跡 `.env` が準備されます。コンテナ起動後は `scripts/start-copilot-otel-session.mjs` が Langfuse の起動を待ち、VS Code から `http://localhost:3000` のダッシュボードを開き、`docs/04_reports/otel-sessions/` にセッションレポートを生成します。Docker Desktop 固有の前提は置かず、Docker 互換 API または Compose 互換 CLI を提供する Rancher Desktop などのコンテナランタイムでも利用できます。
+
+OTel の送信経路は以下です。
+
+```text
+Copilot Chat → OTel Collector (:4318) → Local Langfuse (:3000)
+                                      ↘ optional remote OTLP
+```
+
+リモート OTLP にも転送する場合は、未追跡 `.env` に以下を設定してから監視スタックを起動してください。
+
+```env
+OTEL_REMOTE_EXPORTER_OTLP_ENDPOINT=https://otel.example.com/v1/traces
+OTEL_REMOTE_AUTH_HEADER=Bearer xxxxx
+```
+
+Dev Container の既定起動は workspace コンテナ単体で行い、Langfuse / OTel Collector は起動ブロッカーにしません。監視スタックを使う場合は以下を実行します。
+
+```bash
+node scripts/setup-copilot-otel.mjs
+npm run otel:compose
+export OTEL_EXPORTER_OTLP_HEADERS="$(sed -n 's/^OTEL_EXPORTER_OTLP_HEADERS=//p' .env)"
+code .
+npm run otel:start-session
+```
+
+`npm run otel:compose` は `docker compose`、`docker-compose`、`nerdctl compose`、`podman compose` の順に Compose 互換 CLI を検出します。Rancher Desktop の containerd モードなどで明示したい場合は、次のように指定できます。
+
+```bash
+COPILOT_OTEL_COMPOSE_COMMAND="nerdctl compose" npm run otel:compose
+```
+
+PowerShell から VS Code を起動する場合は、`.env` の OTLP 認証ヘッダーを環境変数に入れてから `code .` を実行します。
+
+```powershell
+$env:OTEL_EXPORTER_OTLP_HEADERS = (Select-String -Path .env -Pattern '^OTEL_EXPORTER_OTLP_HEADERS=').Line -replace '^OTEL_EXPORTER_OTLP_HEADERS=', ''
+code .
+```
+
+仕組み、ダッシュボードの見方、起動・検証・トラブルシュート手順は [docs/02_design/24_CopilotOtelLangfuseRunbook.md](docs/02_design/24_CopilotOtelLangfuseRunbook.md) を参照してください。監視設計全体は [docs/02_design/16_TelemetryAndMonitoringDesign.md](docs/02_design/16_TelemetryAndMonitoringDesign.md) に記載しています。
+
 ## 📜 利用可能なスクリプト
 
 プロジェクトルートから以下のコマンドを実行できます。
@@ -203,5 +263,10 @@ Next.js 開発サーバーが起動し、通常は `http://localhost:3000` で�
 - `npm run test`: テストを実行します。
 - `npm run test:unit`: Webアプリのユニットテスト（Vitest）を実行します。
 - `npm run test:e2e`: E2Eテスト（Playwright）を実行します。
+- `npm run otel:setup`: Langfuse compose、`.env`、OTel Collector 設定を生成します。
+- `npm run otel:compose`: Compose 互換 CLI を検出し、Langfuse / OTel Collector スタックを起動または操作します。
+- `npm run otel:start-session`: Langfuse 起動確認、ダッシュボード表示、セッションレポート生成を実行します。
+- `npm run otel:verify`: Langfuse / OTel Collector / OTel 環境変数を確認します。
+- `npm run otel:report`: 現在の Langfuse ダッシュボード状態をセッションレポートとして保存します。
 - `npm run lint`: コードの静的解析を実行します。
 - `npm run format`: Prettier を使用してコードをフォーマットします。
