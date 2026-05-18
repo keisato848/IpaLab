@@ -1,36 +1,10 @@
 # devcontainer 用 workspace サービス。
-# ../langfuse/docker-compose.yml とマージされ、workspace から langfuse-web を名前解決できる。
+# Langfuse / OTel Collector は npm run otel:compose で必要時のみ手動起動する。
 services:
-  otel-collector:
-    image: docker.io/otel/opentelemetry-collector-contrib:0.123.0
-    restart: unless-stopped
-    command:
-      - --config=/etc/otelcol-contrib/config.yml
-    env_file:
-      - ../.env
-    volumes:
-      - ../otel-collector/generated/config.yml:/etc/otelcol-contrib/config.yml:ro
-    ports:
-      - 127.0.0.1:4317:4317
-      - 127.0.0.1:4318:4318
-    depends_on:
-      - langfuse-web
-
   workspace:
     build:
       context: ../.devcontainer
       dockerfile: Dockerfile
-    env_file:
-      - ../.env
-    environment:
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
-      OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
-      OTEL_SERVICE_NAME: "copilot-chat"
-      COPILOT_OTEL_ENABLED: "true"
-      COPILOT_OTEL_CAPTURE_CONTENT: "false"
     volumes:
       - ..:/workspace:cached
     command: sleep infinity
-    depends_on:
-      - otel-collector
-      - langfuse-web

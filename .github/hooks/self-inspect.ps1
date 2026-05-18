@@ -54,6 +54,7 @@
 #   R41. 接続文字列なしでも Web 側 Cosmos SDK をトップレベル import してテスト/起動が重くなるパターン
 #   R42. Web unit test がバッチ実行を経由せず worker 起動タイムアウトを再発させるパターン
 #   R43. Copilot OTel の captureContent が tracked 設定で既定有効になるパターン
+#   R44. devcontainer 起動が生成物 Langfuse compose やホスト側 Node セットアップに依存するパターン
 #
 # 引数:
 #   -Mode start|end   どちらのフェーズで呼ばれたか (出力タグの違いだけ)
@@ -1355,13 +1356,41 @@ if (Test-Path $devcontainerDockerfile) {
     }
 }
 
+# ---------------------------------------------------------------------------
+# R44: devcontainer の既定起動は未生成 OTel / Langfuse 資材に依存しないこと
+#      (初回起動で langfuse/docker-compose.yml や .env が無くても workspace を起動できる)
+# ---------------------------------------------------------------------------
+$devcontainerJson = Join-Path $RepoRoot '.devcontainer\devcontainer.json'
+if (Test-Path $devcontainerJson) {
+    $raw = Get-Content -LiteralPath $devcontainerJson -Raw
+    if ($raw -match '\.\./langfuse/docker-compose\.yml' -or
+        $raw -match '"initializeCommand"\s*:\s*"[^"]*setup-copilot-otel' -or
+        $raw -match '"postStartCommand"\s*:\s*"[^"]*start-copilot-otel-session') {
+        Add-Finding -Rule 'R44-devcontainer-otel-optional' -Severity 'High' `
+            -File $devcontainerJson `
+            -Detail 'devcontainer の既定起動は生成物の Langfuse compose、.env、ホスト側 Node セットアップに依存させず、OTel は npm run otel:compose で opt-in 起動してください'
+    }
+}
+
+$devcontainerCompose = Join-Path $RepoRoot '.devcontainer\docker-compose.yml'
+if (Test-Path $devcontainerCompose) {
+    $raw = Get-Content -LiteralPath $devcontainerCompose -Raw
+    if ($raw -match '(^|\r?\n)\s*otel-collector\s*:' -or
+        $raw -match 'langfuse-web' -or
+        $raw -match 'env_file\s*:\s*\r?\n\s*-\s*\.\./\.env') {
+        Add-Finding -Rule 'R44-devcontainer-otel-optional' -Severity 'High' `
+            -File $devcontainerCompose `
+            -Detail 'devcontainer の workspace compose は未追跡 .env や Langfuse/OTel サービスを必須依存にせず、初回起動をブロックしない構成にしてください'
+    }
+}
+
 $tag = if ($Mode -eq 'start') { 'SESSION-START' } else { 'SESSION-END' }
 Write-Host ""
 Write-Host "## [self-inspect $tag] 自己点検レポート"
 Write-Host ""
 
 if ($findings.Count -eq 0) {
-    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16 / R17 / R18 / R19 / R20 / R21 / R22 / R23 / R24 / R24b / R25 / R26 / R27 / R28 / R29 / R30 / R31 / R32 / R33 / R34 / R35 / R36 / R37 / R38 / R39 / R40 / R41 / R42 / R43)"
+    Write-Host "✅ 検出された不整合はありません (R1 / R2 / R3 / R4 / R5 / R6 / R7 / R8 / R9 / R10 / R11 / R12 / R13 / R14 / R15 / R16 / R17 / R18 / R19 / R20 / R21 / R22 / R23 / R24 / R24b / R25 / R26 / R27 / R28 / R29 / R30 / R31 / R32 / R33 / R34 / R35 / R36 / R37 / R38 / R39 / R40 / R41 / R42 / R43 / R44)"
     exit 0
 }
 
@@ -1375,7 +1404,7 @@ foreach ($f in $findings) {
 }
 
 Write-Host ""
-Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から接続文字列・API キー実値を除去 / R13 → download.ts で content-type と %PDF- ヘッダーを検証し、壊れた既存 PDF は再取得する / R14 → npx 直接 spawn ではなく process.execPath + ts-node/register を使う / R15 → npm_config_* と node --require ts-node/register で npm run 引数を安定化する / R16 → AM/AM2 の answers_raw.json と questions_raw.json の qNo・correctOption・選択肢を同期する / R17 → PM/PM1/PM2 は questions_transformed.json と subQuestions 解答欄を同期する / R18 → Mermaid のリンクラベルは -->|label| または ---|label| に正規化し、非ASCIIの円形節点ラベルは引用する / R19 → 新形式午後ヘッダーは CSS Modules を使う / R20 → AIAnswerBox の draftKey・文字数制限を維持する / R21 → 新形式午後の総合スコアは平均を /100、件数は解答欄数で表示する / R22 → section.answer・section.questions・空 subQuestions も解答欄化する / R23 → 日本語 ER 図・subgraph は sanitizeMermaid で描画可能に正規化する / R24 → GitHub Actions の artifact 取得は actions/download-artifact@v6 を使う / R24b → PRの追加修正はpull_request synchronizeでStaging再デプロイし、古い実行をconcurrencyでキャンセルする / R25 → SCPMExamView の解答例解説は ReactMarkdown で描画する / R26 → 解答例ラベルは不透明アンバー背景 + 濃色文字で視認性を保つ / R27 → 子設問を持つ説明だけの親見出しは解答欄化せず、午後データ監査を全区分で実行する / R28 → 午後問題は qNo 完全一致だけで解決し、位置番号フォールバックを再導入しない / R29 → answerChoices を持つ午後小問は radio/checkbox 選択式UIで採点・記録する / R30 → 午後OCRは複数大問PDF向けに JSON array を要求する / R31 → 午後変換はGeminiキーをローテーションする / R32 → 解答OCRは午後記述式の模範解答を抽出する / R33 → 受講者想定E2Eはfixture答案を入力し採点・保存まで検証する / R34 → 午後回答欄IDはresolvePMQuestionBaseIdで生成する / R35 → E2E証跡レポートは今回実行分の画像だけを掲載する / R36 → 午後問題データの英語混入は公式PDFベースの日本語本文へ補正する / R37 → FE公開問題は公開問題・科目A/BとしてExamsへ同期する / R38 → App Service 設定に AI_CHAT_FUNCTION_URL を含める / R39 → App Service と AI Function の両方に AI_CHAT_FUNCTION_SECRET を含める / R40 → devcontainer からの Cosmos Emulator は host.docker.internal もローカル接続として扱う / R41 → Web 側 CosmosClient は接続文字列確認後に動的 import する / R42 → Web unit test は happy-dom と scripts/run-vitest-batches.mjs 経由で少数ファイルずつ実行する / R43 → Copilot OTel の captureContent は tracked 設定で既定無効にし、compose 取得元と self-inspect 実行環境を固定する"
+Write-Host "ヒント: R1 → ensureContainer に置換 / R2 → catch 直下に console.error 追加 / R3 → CSS 宣言を @media 外に移動 / R4 → @media 内の grid-column override を削除 / R6 → error を弱点判定から除外 / R7 → 公式小問スコアを優先 / R8 → document-agent が docs/ を更新 / R9 → セッション進捗保存は currentSessionStats を使用 / R10 → Mermaid CODE_BLOCK マーカーを sanitizeMermaid で除去 / R11 → qNo 欠損を 99 にせず同期失敗として扱う / R12 → tracked 設定から接続文字列・API キー実値を除去 / R13 → download.ts で content-type と %PDF- ヘッダーを検証し、壊れた既存 PDF は再取得する / R14 → npx 直接 spawn ではなく process.execPath + ts-node/register を使う / R15 → npm_config_* と node --require ts-node/register で npm run 引数を安定化する / R16 → AM/AM2 の answers_raw.json と questions_raw.json の qNo・correctOption・選択肢を同期する / R17 → PM/PM1/PM2 は questions_transformed.json と subQuestions 解答欄を同期する / R18 → Mermaid のリンクラベルは -->|label| または ---|label| に正規化し、非ASCIIの円形節点ラベルは引用する / R19 → 新形式午後ヘッダーは CSS Modules を使う / R20 → AIAnswerBox の draftKey・文字数制限を維持する / R21 → 新形式午後の総合スコアは平均を /100、件数は解答欄数で表示する / R22 → section.answer・section.questions・空 subQuestions も解答欄化する / R23 → 日本語 ER 図・subgraph は sanitizeMermaid で描画可能に正規化する / R24 → GitHub Actions の artifact 取得は actions/download-artifact@v6 を使う / R24b → PRの追加修正はpull_request synchronizeでStaging再デプロイし、古い実行をconcurrencyでキャンセルする / R25 → SCPMExamView の解答例解説は ReactMarkdown で描画する / R26 → 解答例ラベルは不透明アンバー背景 + 濃色文字で視認性を保つ / R27 → 子設問を持つ説明だけの親見出しは解答欄化せず、午後データ監査を全区分で実行する / R28 → 午後問題は qNo 完全一致だけで解決し、位置番号フォールバックを再導入しない / R29 → answerChoices を持つ午後小問は radio/checkbox 選択式UIで採点・記録する / R30 → 午後OCRは複数大問PDF向けに JSON array を要求する / R31 → 午後変換はGeminiキーをローテーションする / R32 → 解答OCRは午後記述式の模範解答を抽出する / R33 → 受講者想定E2Eはfixture答案を入力し採点・保存まで検証する / R34 → 午後回答欄IDはresolvePMQuestionBaseIdで生成する / R35 → E2E証跡レポートは今回実行分の画像だけを掲載する / R36 → 午後問題データの英語混入は公式PDFベースの日本語本文へ補正する / R37 → FE公開問題は公開問題・科目A/BとしてExamsへ同期する / R38 → App Service 設定に AI_CHAT_FUNCTION_URL を含める / R39 → App Service と AI Function の両方に AI_CHAT_FUNCTION_SECRET を含める / R40 → devcontainer からの Cosmos Emulator は host.docker.internal もローカル接続として扱う / R41 → Web 側 CosmosClient は接続文字列確認後に動的 import する / R42 → Web unit test は happy-dom と scripts/run-vitest-batches.mjs 経由で少数ファイルずつ実行する / R43 → Copilot OTel の captureContent は tracked 設定で既定無効にし、compose 取得元と self-inspect 実行環境を固定する / R44 → devcontainer の既定起動は Langfuse/OTel 生成物に依存させず、監視スタックは opt-in 起動にする"
 
 if ($FailOnFinding) { exit 1 }
 exit 0

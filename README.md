@@ -222,14 +222,14 @@ Copilot Chat → OTel Collector (:4318) → Local Langfuse (:3000)
                                       ↘ optional remote OTLP
 ```
 
-リモート OTLP にも転送する場合は、未追跡 `.env` に以下を設定して Dev Container を再ビルドしてください。
+リモート OTLP にも転送する場合は、未追跡 `.env` に以下を設定してから監視スタックを起動してください。
 
 ```env
 OTEL_REMOTE_EXPORTER_OTLP_ENDPOINT=https://otel.example.com/v1/traces
 OTEL_REMOTE_AUTH_HEADER=Bearer xxxxx
 ```
 
-手動起動する場合は以下を実行します。
+Dev Container の既定起動は workspace コンテナ単体で行い、Langfuse / OTel Collector は起動ブロッカーにしません。監視スタックを使う場合は以下を実行します。
 
 ```bash
 node scripts/setup-copilot-otel.mjs

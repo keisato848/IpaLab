@@ -345,7 +345,7 @@ $env:OTEL_EXPORTER_OTLP_HEADERS = (Select-String -Path .env -Pattern '^OTEL_EXPO
 code .
 ```
 
-devcontainer 起動時は `initializeCommand` が `scripts/setup-copilot-otel.mjs` を実行し、Langfuse compose と Collector 設定を準備する。`postStartCommand` は `scripts/start-copilot-otel-session.mjs` を実行し、Langfuse health を待ってから VS Code で `http://localhost:3000` を開き、`docs/04_reports/otel-sessions/` にセッションレポートを生成する。Copilot Chat の送信先は compose ネットワーク上の `http://otel-collector:4318` を使う。ランタイムは Docker Desktop 固有に限定せず、Dev Containers 拡張が接続できる Docker 互換 API、または手動起動時の Compose 互換 CLI を前提とする。
+devcontainer の既定起動は workspace コンテナ単体とし、`langfuse/docker-compose.yml`、`otel-collector/generated/config.yml`、未追跡 `.env`、ホスト側 Node.js の有無に依存させない。Langfuse と OTel Collector は `npm run otel:setup` と `npm run otel:compose` で opt-in 起動し、`npm run otel:start-session` が Langfuse health を待ってから VS Code で `http://localhost:3000` を開き、`docs/04_reports/otel-sessions/` にセッションレポートを生成する。Copilot Chat の送信先は手動起動した `http://localhost:4318` の Collector を使う。ランタイムは Docker Desktop 固有に限定せず、Compose 互換 CLI を前提とする。
 
 リモート OTLP にも転送する場合は、未追跡 `.env` に `OTEL_REMOTE_EXPORTER_OTLP_ENDPOINT` と必要に応じて `OTEL_REMOTE_AUTH_HEADER` を設定する。`scripts/setup-copilot-otel.mjs` はこの値を見て `otel-collector/generated/config.yml` の exporter を生成する。未設定時はローカル Langfuse への転送のみ行う。
 
@@ -367,6 +367,7 @@ devcontainer 起動時は `initializeCommand` が `scripts/setup-copilot-otel.mj
 | DevOps | `node --check scripts/run-copilot-otel-compose.mjs` が通ること |
 | DevOps | `bash -n scripts/setup-copilot-otel.sh scripts/verify-copilot-otel.sh` が通ること |
 | DevOps | `scripts/setup-copilot-otel.mjs` で `langfuse/docker-compose.yml`、未追跡 `.env`、`otel-collector/generated/config.yml` が生成できること |
+| DevOps | devcontainer の既定起動が未生成の Langfuse compose、未追跡 `.env`、ホスト側 Node.js に依存しないこと |
 | Docs | `docs/02_design/24_CopilotOtelLangfuseRunbook.md` に Phase 0-3、影響領域、検証観点、E2E 証跡要否、運用手順が記載されていること |
 | Evidence | `npm run otel:report` または `npm run otel:start-session` により `docs/04_reports/otel-sessions/` に Markdown とスクリーンショットが生成されること |
 
