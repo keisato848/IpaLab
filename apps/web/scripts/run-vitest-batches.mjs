@@ -16,6 +16,7 @@ const vitestBin = path.join(
     '.bin',
     process.platform === 'win32' ? 'vitest.cmd' : 'vitest'
 );
+const useShell = process.platform === 'win32';
 
 const batchSize = Math.max(1, Number.parseInt(process.env.VITEST_BATCH_SIZE ?? '4', 10));
 const maxWorkers = Math.max(1, Number.parseInt(process.env.VITEST_MAX_WORKERS ?? '4', 10));
@@ -62,6 +63,7 @@ function runVitest(files, label, workers) {
                 ...process.env,
                 VITEST_MAX_WORKERS: String(workers),
             },
+            shell: useShell,
             stdio: 'inherit',
         }
     );
