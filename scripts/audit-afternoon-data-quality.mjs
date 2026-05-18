@@ -19,6 +19,7 @@ const underlineEvidencePattern = /<u\b|underline|text-decoration/i;
 const choiceKeys = ['choices', 'options', 'answerChoices'];
 const answerFieldKeys = ['answer', 'modelAnswer', 'correctOption', 'correctAnswer', 'correct', 'expectedAnswer', 'answerExample', 'sampleAnswer'];
 const explanationFieldKeys = ['explanation', 'commentary', '解説'];
+const maxBlockingFindingsInOutput = 50;
 const blockingFindingRules = [
     'answerMissing',
     'explanationMissing',
@@ -83,6 +84,14 @@ function readAllowlist(filePath) {
             console.error(`invalid allowlist entry in ${normalizePath(filePath)}: rule and reason are required`);
             process.exit(1);
         }
+        const hasStableScope = entry.rule === 'missingTargetCategory'
+            ? hasAllowlistValue(entry.category)
+            : hasAllowlistValue(entry.examId) || hasAllowlistValue(entry.file);
+        if (!hasStableScope) {
+            const requiredScope = entry.rule === 'missingTargetCategory' ? 'category' : 'examId or file';
+            console.error(`invalid allowlist entry in ${normalizePath(filePath)}: ${requiredScope} is required for ${entry.rule}`);
+            process.exit(1);
+        }
     }
     return entries;
 }
@@ -122,6 +131,10 @@ function text(value) {
 
 function hasText(value) {
     return text(value).trim().length > 0;
+}
+
+function hasAllowlistValue(value) {
+    return value !== undefined && value !== null && String(value).trim().length > 0;
 }
 
 function childItems(section) {
@@ -552,7 +565,9 @@ const result = {
     blocking: {
         rules: blockingFindingRules,
         allowlist: allowlistPath ? normalizePath(allowlistPath) : null,
-        unapprovedFindings: unapprovedBlockingFindings,
+        unapprovedFindingLimit: maxBlockingFindingsInOutput,
+        unapprovedFindingsTruncated: Math.max(0, unapprovedBlockingFindings.length - maxBlockingFindingsInOutput),
+        unapprovedFindings: unapprovedBlockingFindings.slice(0, maxBlockingFindingsInOutput),
     },
     total,
     byCategory: Object.fromEntries([...byCategory.entries()].sort(([a], [b]) => a.localeCompare(b))),

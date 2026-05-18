@@ -194,7 +194,7 @@ CI では `npm run audit:afternoon-data:ci` を実行し、`scripts/audit-aftern
 
 `underlineNoEvidence`、`shortAnswerNoLimit`、`sharedBroadChoiceGroup` は既存データの調査・改善用 finding として JSON には出力するが、直ちに CI を失敗させる blocking finding には含めない。
 
-例外が必要な場合は、公式PDF照合済みであること、恒久対応の Issue / PR があること、期限または見直し条件があることを PR 本文に記録する。機械的な例外は `scripts/audit-afternoon-data-quality.allowlist.json` または `--allowlist=<path>` で次の形式にする。`rule` と `reason` は必須で、`examId`、`file`、`qNo`、`subQNo`、`category` は必要な粒度で指定する。
+例外が必要な場合は、公式PDF照合済みであること、恒久対応の Issue / PR があること、期限または見直し条件があることを PR 本文に記録する。機械的な例外は `scripts/audit-afternoon-data-quality.allowlist.json` または `--allowlist=<path>` で次の形式にする。`rule` と `reason` は必須で、通常の finding は `examId` または `file` も必須とする。`missingTargetCategory` だけは `category` を必須とする。`qNo`、`subQNo` は必要に応じて追加し、`rule` と `reason` だけで全件許可する allowlist は禁止する。
 
 ```json
 {
