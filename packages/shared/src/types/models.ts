@@ -26,15 +26,39 @@ export const OptionSchema = z.object({
     text: z.string(),
 });
 
+export const OfficialSourcePageSchema = z.union([
+    z.number().int().positive(),
+    z.string().min(1),
+]);
+
+export const OfficialSourceMetadataSchema = z.object({
+    sourceUrl: z.string().url(),
+    sourcePage: OfficialSourcePageSchema.optional(),
+    sourcePages: z.array(OfficialSourcePageSchema).min(1).optional(),
+    verifiedAt: z.string().datetime(),
+    verificationMethod: z.string().min(1),
+    verifiedBy: z.string().optional(),
+    note: z.string().optional(),
+}).refine(
+    (source) => source.sourcePage !== undefined || source.sourcePages !== undefined,
+    { message: 'sourcePage or sourcePages is required', path: ['sourcePage'] },
+);
+
+export type OfficialSourceMetadata = z.infer<typeof OfficialSourceMetadataSchema>;
+
+const SubQuestionLeafSchema = z.object({
+    label: z.string(), // "(1)"
+    text: z.string(),
+    point: z.number().optional(), // Added for Scoring
+    officialSource: OfficialSourceMetadataSchema.optional(),
+});
+
 export const SubQuestionSchema = z.object({
     subQNo: z.string(), // "設問1"
     text: z.string(),
-    subQuestions: z.array(z.object({
-        label: z.string(), // "(1)"
-        text: z.string(),
-        point: z.number().optional(), // Added for Scoring
-    })).optional(),
+    subQuestions: z.array(SubQuestionLeafSchema).optional(),
     choices: z.record(z.string()).optional(),
+    officialSource: OfficialSourceMetadataSchema.optional(),
 });
 
 export const QuestionSchema = z.object({
@@ -50,6 +74,7 @@ export const QuestionSchema = z.object({
     explanation: z.string().optional(), // Markdown
     transcription: z.string().optional(), // 音声読み上げ用テキスト(Future)
     createdAt: z.string().datetime().optional(),
+    officialSource: OfficialSourceMetadataSchema.optional(),
 
     // PM specific
     isPM: z.boolean().optional(),

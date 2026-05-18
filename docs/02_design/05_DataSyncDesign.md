@@ -4,6 +4,7 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-18 | 公式PDF出典メタデータ `officialSource` と照合済み/未照合監査の運用を追加 |
 | 2026-05-18 | 午後データ品質監査を Repository Guards の CI 必須ゲートへ追加し、blocking finding と例外管理ルールを定義 |
 | 2026-05-09 | AIを使う問題データ抽出は Gemini API ではなく、同一ローカルネットワーク上の Ollama `gemma4:31b` を標準とする運用へ更新 |
 | 2026-05-08 | 午後解答PDFの Gemini OCR プロンプトを午前択一表専用から記述式解答対応へ拡張し、self-inspect R32 を追加 |
@@ -160,6 +161,7 @@ Windows 環境では `npx` を子プロセスから直接 spawn すると `spawn
 ```powershell
 npm run audit:afternoon-data
 npm run audit:afternoon-data -- --json
+npm run audit:afternoon-source
 npm run audit:afternoon-data:ci
 ```
 
@@ -209,6 +211,41 @@ CI では `npm run audit:afternoon-data:ci` を実行し、`scripts/audit-aftern
   ]
 }
 ```
+
+##### 7.2.0.1 公式PDF出典メタデータと照合証跡
+
+新規抽出・補正データでは、公式PDFまたは公式HTMLとの照合結果を問題データ内に保持する。付与先は、根拠の粒度に応じて大問、設問、解答欄のいずれかの `officialSource` とする。下位要素に個別の `officialSource` がない場合、監査では上位要素の `officialSource` を継承した照合済み扱いにする。
+
+`officialSource` は次のフィールドを必須とする。
+
+- `sourceUrl`: IPA公式PDFまたは公式HTMLのURL
+- `sourcePage` または `sourcePages`: PDFページ番号またはページ範囲。紙面上の表記差がある場合は文字列も許可する
+- `verifiedAt`: ISO 8601形式の照合日時
+- `verificationMethod`: `official-pdf-manual`、`official-pdf-ocr-review` など、照合方法を表す文字列
+
+例:
+
+```json
+{
+  "officialSource": {
+    "sourceUrl": "https://www.ipa.go.jp/shiken/mondai-kaiotu/2025r07.html",
+    "sourcePages": [3, 4],
+    "verifiedAt": "2026-05-18T00:00:00Z",
+    "verificationMethod": "official-pdf-manual",
+    "verifiedBy": "data-management-specialist",
+    "note": "問題PDFと解答PDFを照合済み"
+  }
+}
+```
+
+照合済み・未照合の一覧は、午後データ監査の `officialSource` セクションで確認する。
+
+```powershell
+npm run audit:afternoon-source
+npm run audit:afternoon-data -- --json --source-report=full
+```
+
+`source-report=summary` は未照合・不完全な項目を最大50件だけ出力し、`source-report=full` は全件を出力する。既存データへ一括付与するまでは、`officialSourceMissing` と `officialSourceIncomplete` は blocking finding に含めず、段階的な照合作業の棚卸しとして扱う。ただし、今後追加・補正する午後データでは、PR本文に公式PDF照合対象と `officialSource` 付与有無を記録する。
 
 #### 7.2.1 Gemini OCR Stage B 対象限定実行
 

@@ -20,6 +20,9 @@ const choiceKeys = ['choices', 'options', 'answerChoices'];
 const answerFieldKeys = ['answer', 'modelAnswer', 'correctOption', 'correctAnswer', 'correct', 'expectedAnswer', 'answerExample', 'sampleAnswer'];
 const explanationFieldKeys = ['explanation', 'commentary', '解説'];
 const maxBlockingFindingsInOutput = 50;
+const maxOfficialSourceItemsInOutput = 50;
+const officialSourceKeys = ['officialSource', 'sourceMetadata'];
+const officialSourceRequiredFields = ['sourceUrl', 'sourcePage/sourcePages', 'verifiedAt', 'verificationMethod'];
 const blockingFindingRules = [
     'answerMissing',
     'explanationMissing',
@@ -49,6 +52,7 @@ const failMode = argValue('fail-on') || (failOnBlocking ? 'blocking' : failOnFin
 const categoriesArg = argValue('categories');
 const excludeArg = argValue('exclude');
 const allowlistArg = argValue('allowlist');
+const sourceReportMode = argValue('source-report') || 'summary';
 const includeCategories = categoriesArg
     ? new Set(categoriesArg.split(',').map((value) => value.trim()).filter(Boolean))
     : null;
@@ -56,6 +60,11 @@ const excludeCategories = new Set((excludeArg || '').split(',').map((value) => v
 
 if (!['none', 'all', 'blocking'].includes(failMode)) {
     console.error(`invalid --fail-on value: ${failMode} (expected: none, all, blocking)`);
+    process.exit(1);
+}
+
+if (!['summary', 'full', 'off'].includes(sourceReportMode)) {
+    console.error(`invalid --source-report value: ${sourceReportMode} (expected: summary, full, off)`);
     process.exit(1);
 }
 
@@ -240,6 +249,10 @@ function makeStats() {
         broadPromptNoLimit: 0,
         shortAnswerNoLimit: 0,
         englishTextFragments: 0,
+        officialSourceItems: 0,
+        officialSourceVerified: 0,
+        officialSourceMissing: 0,
+        officialSourceIncomplete: 0,
     };
 }
 
@@ -250,6 +263,41 @@ function addExample(examples, key, value) {
 
 function addBlockingFinding(findings, rule, value) {
     findings.push({ rule, ...value });
+}
+
+function getOfficialSource(...objects) {
+    for (const object of objects) {
+        if (!object || typeof object !== 'object' || Array.isArray(object)) continue;
+        for (const key of officialSourceKeys) {
+            const source = object[key];
+            if (source && typeof source === 'object' && !Array.isArray(source)) return source;
+        }
+        if (
+            hasText(object.sourceUrl)
+            || hasAllowlistValue(object.sourcePage)
+            || (Array.isArray(object.sourcePages) && object.sourcePages.length > 0)
+            || hasText(object.verifiedAt)
+            || hasText(object.verificationMethod)
+        ) {
+            return object;
+        }
+    }
+    return null;
+}
+
+function hasSourcePage(source) {
+    return hasAllowlistValue(source?.sourcePage)
+        || (Array.isArray(source?.sourcePages) && source.sourcePages.some((page) => hasAllowlistValue(page)));
+}
+
+function missingOfficialSourceFields(source) {
+    if (!source) return officialSourceRequiredFields;
+    const missing = [];
+    if (!hasText(source.sourceUrl)) missing.push('sourceUrl');
+    if (!hasSourcePage(source)) missing.push('sourcePage/sourcePages');
+    if (!hasText(source.verifiedAt) || Number.isNaN(Date.parse(source.verifiedAt))) missing.push('verifiedAt');
+    if (!hasText(source.verificationMethod)) missing.push('verificationMethod');
+    return missing;
 }
 
 function valuesMatch(expected, actual) {
@@ -299,6 +347,7 @@ const byCategory = new Map();
 const bySuffix = new Map();
 const examples = {};
 const blockingFindings = [];
+const officialSourceFindings = [];
 const categoryExamCounts = new Map();
 let total = makeStats();
 
@@ -375,6 +424,39 @@ for (const dirent of fs.readdirSync(questionsRoot, { withFileTypes: true })) {
                 const refs = getUnderlineRefs(promptText);
                 const symbolAnswer = symbolAnswerPattern.test(promptText);
                 fileStats.answerFields++;
+
+                const officialSource = getOfficialSource(item.holder, section, question);
+                const officialSourceFindingBase = {
+                    examId,
+                    file: normalizePath(filePath),
+                    qNo: question.qNo,
+                    subQNo: item.label,
+                    source: item.source,
+                    line: findLine(filePath, promptText),
+                    text: promptText.replace(/\s+/g, ' ').slice(0, 120),
+                };
+                fileStats.officialSourceItems++;
+                if (!officialSource) {
+                    fileStats.officialSourceMissing++;
+                    const finding = { rule: 'officialSourceMissing', ...officialSourceFindingBase };
+                    addExample(examples, 'officialSourceMissing', finding);
+                    officialSourceFindings.push(finding);
+                } else {
+                    const missingFields = missingOfficialSourceFields(officialSource);
+                    if (missingFields.length > 0) {
+                        fileStats.officialSourceIncomplete++;
+                        const finding = {
+                            rule: 'officialSourceIncomplete',
+                            ...officialSourceFindingBase,
+                            missingFields,
+                            sourceUrl: text(officialSource.sourceUrl),
+                        };
+                        addExample(examples, 'officialSourceIncomplete', finding);
+                        officialSourceFindings.push(finding);
+                    } else {
+                        fileStats.officialSourceVerified++;
+                    }
+                }
 
                 if (!answerFieldKeys.some((key) => hasText(item.holder?.[key]))) {
                     fileStats.answerMissing++;
@@ -534,6 +616,8 @@ const allowlistPath = allowlistArg ? resolveRepoPath(allowlistArg) : fs.existsSy
 const allowlistEntries = readAllowlist(allowlistPath);
 const allowlistedBlockingFindings = blockingFindings.filter((finding) => allowlistEntries.some((entry) => isAllowlisted(finding, entry)));
 const unapprovedBlockingFindings = blockingFindings.filter((finding) => !allowlistEntries.some((entry) => isAllowlisted(finding, entry)));
+const officialSourceOutputLimit = sourceReportMode === 'full' ? officialSourceFindings.length : maxOfficialSourceItemsInOutput;
+const officialSourceOutputItems = sourceReportMode === 'off' ? [] : officialSourceFindings.slice(0, officialSourceOutputLimit);
 const allFindingCount = total.underlineNoEvidence
     + total.answerMissing
     + total.explanationMissing
@@ -569,6 +653,16 @@ const result = {
         unapprovedFindingsTruncated: Math.max(0, unapprovedBlockingFindings.length - maxBlockingFindingsInOutput),
         unapprovedFindings: unapprovedBlockingFindings.slice(0, maxBlockingFindingsInOutput),
     },
+    officialSource: {
+        requiredFields: officialSourceRequiredFields,
+        reportMode: sourceReportMode,
+        unverifiedItemCount: officialSourceFindings.length,
+        unverifiedItemLimit: sourceReportMode === 'full' ? null : maxOfficialSourceItemsInOutput,
+        unverifiedItemsTruncated: sourceReportMode === 'off'
+            ? officialSourceFindings.length
+            : Math.max(0, officialSourceFindings.length - officialSourceOutputItems.length),
+        unverifiedItems: officialSourceOutputItems,
+    },
     total,
     byCategory: Object.fromEntries([...byCategory.entries()].sort(([a], [b]) => a.localeCompare(b))),
     bySuffix: Object.fromEntries([...bySuffix.entries()].sort(([a], [b]) => a.localeCompare(b))),
@@ -583,12 +677,13 @@ if (jsonOutput) {
     console.log(`files=${total.files} mainQuestions=${total.mainQuestions} answerFields=${total.answerFields}`);
     console.log(`missingTargetCategories=${missingTargetCategories.join(',') || 'none'}`);
     console.log(`findings=${allFindingCount} blocking=${blockingFindings.length} unapprovedBlocking=${unapprovedBlockingFindings.length} failMode=${failMode}`);
+    console.log(`officialSource verified=${total.officialSourceVerified}/${total.officialSourceItems} missing=${total.officialSourceMissing} incomplete=${total.officialSourceIncomplete} sourceReport=${sourceReportMode}`);
     console.log(`allowlist=${allowlistPath ? normalizePath(allowlistPath) : 'none'}`);
     console.log('');
-    console.log('| Category | Files | Main | Fields | Answer missing | Explanation missing | Underline refs | No underline evidence | Ref missing | Parent+children | Explanation-only parent | Multiple limits | Symbol no choices | Broad no limit | Short no limit | English fragments |');
-    console.log('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
+    console.log('| Category | Files | Main | Fields | Answer missing | Explanation missing | Underline refs | No underline evidence | Ref missing | Parent+children | Explanation-only parent | Multiple limits | Symbol no choices | Broad no limit | Short no limit | English fragments | Source verified | Source missing | Source incomplete |');
+    console.log('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
     for (const [category, stats] of [...byCategory.entries()].sort(([a], [b]) => a.localeCompare(b))) {
-        console.log(`| ${category} | ${stats.files} | ${stats.mainQuestions} | ${stats.answerFields} | ${stats.answerMissing} | ${stats.explanationMissing} | ${stats.underlineRefs} | ${stats.underlineNoEvidence} | ${stats.underlineRefMissing} | ${stats.parentDirectWithChildren} | ${stats.explanationOnlyParentWithChildren} | ${stats.multipleLimits} | ${stats.symbolNoStructuralChoices} | ${stats.broadPromptNoLimit} | ${stats.shortAnswerNoLimit} | ${stats.englishTextFragments} |`);
+        console.log(`| ${category} | ${stats.files} | ${stats.mainQuestions} | ${stats.answerFields} | ${stats.answerMissing} | ${stats.explanationMissing} | ${stats.underlineRefs} | ${stats.underlineNoEvidence} | ${stats.underlineRefMissing} | ${stats.parentDirectWithChildren} | ${stats.explanationOnlyParentWithChildren} | ${stats.multipleLimits} | ${stats.symbolNoStructuralChoices} | ${stats.broadPromptNoLimit} | ${stats.shortAnswerNoLimit} | ${stats.englishTextFragments} | ${stats.officialSourceVerified} | ${stats.officialSourceMissing} | ${stats.officialSourceIncomplete} |`);
     }
     console.log('');
     for (const [key, values] of Object.entries(examples)) {
