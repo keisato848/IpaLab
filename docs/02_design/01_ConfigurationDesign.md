@@ -221,8 +221,8 @@ GitHub Copilot エージェントのカスタマイズ設定は以下のパス�
 
 | 種別 | 配置パス | 用途 |
 |------|---------|------|
-| Dev Container | `.devcontainer/devcontainer.json` | Langfuse compose と workspace compose をマージして起動する |
-| Dev Container | `.devcontainer/docker-compose.yml` | OTel Collector を起動し、workspace コンテナへ OTEL / COPILOT_OTEL 環境変数を注入する |
+| Dev Container | `.devcontainer/devcontainer.json` | workspace コンテナ単体を起動する。Langfuse / OTel は初回起動のブロッカーにしない |
+| Dev Container | `.devcontainer/docker-compose.yml` | workspace コンテナのみを定義する。OTel Collector は手動起動スタックで扱う |
 | Dev Container | `.devcontainer/Dockerfile` | Node.js 24、検証用 CLI、セッション証跡用 Chromium を含む開発コンテナを定義する |
 | VS Code 設定 | `.vscode/settings.json` | 手動起動時の Copilot Chat OTel 送信先を `localhost:4318` の Collector に設定する |
 | Collector | `otel-collector/generated/config.yml` | `scripts/setup-copilot-otel.mjs` が生成する Collector 転送設定。git 管理対象外 |
@@ -237,7 +237,7 @@ GitHub Copilot エージェントのカスタマイズ設定は以下のパス�
 
 生成物である `langfuse/docker-compose.yml`、`otel-collector/generated/config.yml`、実値を含む `.env` は git 管理対象外とする。`OTEL_EXPORTER_OTLP_HEADERS` と `OTEL_LANGFUSE_AUTH_HEADER` は Langfuse の OTLP Basic 認証値であり、VS Code settings ではなく環境変数として注入する。
 
-Copilot Chat は `http://localhost:4318`（手動起動）または `http://otel-collector:4318`（devcontainer）へ送信する。Collector はローカル Langfuse に転送し、`.env` に `OTEL_REMOTE_EXPORTER_OTLP_ENDPOINT` が設定されている場合のみリモート OTLP にも追加転送する。コンテナランタイムは Docker Desktop 固有に限定せず、Dev Containers 拡張が接続できる Docker 互換 API、または `docker compose` / `nerdctl compose` / `podman compose` などの Compose 互換 CLI を前提とする。
+Copilot Chat は手動起動した Collector の `http://localhost:4318` へ送信する。Collector はローカル Langfuse に転送し、`.env` に `OTEL_REMOTE_EXPORTER_OTLP_ENDPOINT` が設定されている場合のみリモート OTLP にも追加転送する。コンテナランタイムは Docker Desktop 固有に限定せず、`docker compose` / `nerdctl compose` / `podman compose` などの Compose 互換 CLI を前提とする。devcontainer の既定起動は `langfuse/docker-compose.yml`、`otel-collector/generated/config.yml`、`.env` が未生成でも成功する構成とし、監視スタックは `npm run otel:compose` で opt-in 起動する。
 
 `github.copilot.chat.otel.captureContent` と `COPILOT_OTEL_CAPTURE_CONTENT` は既定では `false` とし、プロンプト、応答、ツール引数を含む詳細トレースが必要な検証セッションでのみ opt-in で有効化する。シークレット、個人情報、本番データを含む会話では有効化しない。
 
@@ -262,6 +262,9 @@ read / edit / search / execute / agent / web / todo
 - **2026-05-17**: Copilot OTel ローカル監視の安全な既定値を追加
   - `captureContent` を tracked 設定では既定無効にし、必要時のみ opt-in する方針へ更新
   - Langfuse compose の取得元をタグ固定し、devcontainer に PowerShell を含めて `self-inspect` を必須実行する方針を追記
+- **2026-05-18**: devcontainer の既定起動を OTel 生成物から分離
+  - `langfuse/docker-compose.yml`、未追跡 `.env`、ホスト側 Node セットアップが無くても workspace コンテナを起動できる方針へ更新
+  - Langfuse / OTel Collector は `npm run otel:compose` による opt-in 起動に整理
 - **2026-05-02**: tracked 設定ファイルの secret material 禁止方針を追加
   - `local.settings.json` / `.env.template` は空値またはプレースホルダーのみとし、実値は未追跡環境から注入する方針を明記
   - `self-inspect` R12 による tracked 設定ファイルの secret material 検出を追記

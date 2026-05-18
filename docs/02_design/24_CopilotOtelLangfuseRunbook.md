@@ -110,11 +110,13 @@ COPILOT_OTEL_COMPOSE_COMMAND="nerdctl compose" npm run otel:compose
 
 VS Code でリポジトリを Dev Container として開く。
 
-起動時に以下が自動実行される。
+devcontainer の既定起動は workspace コンテナ単体で行う。`langfuse/docker-compose.yml`、`otel-collector/generated/config.yml`、未追跡 `.env` が無い初回環境でも起動をブロックしない。
 
-1. `scripts/setup-copilot-otel.mjs` が Langfuse compose、`.env`、Collector 設定を準備する
-2. compose が Langfuse と OTel Collector を起動する
-3. `scripts/start-copilot-otel-session.mjs` が Langfuse health を待つ
+監視スタックを使う場合は、コンテナ起動後または Dev Container を使わないローカル環境で以下を手動実行する。
+
+1. `npm run otel:setup` で Langfuse compose、`.env`、Collector 設定を準備する
+2. `npm run otel:compose` で Langfuse と OTel Collector を起動する
+3. `npm run otel:start-session` で Langfuse health を待つ
 4. `http://localhost:3000` の Langfuse UI を開く
 5. `docs/04_reports/otel-sessions/` にセッションレポートを生成する
 
