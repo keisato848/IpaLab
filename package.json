@@ -20,6 +20,7 @@
     "test:unit": "turbo run test:run --filter=web",
     "test:e2e": "cd apps/web && npx playwright test",
     "audit:afternoon-data": "node scripts/audit-afternoon-data-quality.mjs",
+    "audit:afternoon-data:ci": "node scripts/audit-afternoon-data-quality.mjs --json --fail-on=blocking",
     "complete:afternoon-data": "node scripts/complete-afternoon-missing-fields.mjs",
     "guard:exam-data": "node scripts/guard-exam-data-fallback.mjs",
     "guard:exam-data:test": "node scripts/__tests__/guard-exam-data-fallback.test.mjs",

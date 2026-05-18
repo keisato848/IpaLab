@@ -21,6 +21,18 @@ jobs:
       - name: Run guard
         run: node scripts/guard-exam-data-fallback.mjs
 
+  afternoon-data-quality-audit:
+    # 午後問題データの欠落・構造不備を、standalone bundle 検証とは独立した必須ゲートとして検出する
+    name: Afternoon Data Quality Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Run afternoon data audit
+        run: npm run audit:afternoon-data:ci
+
   standalone-bundle-data-check:
     # standalone build に packages/data の問題JSONが実際に同梱されているかを検証
     name: Standalone Bundle Data Check
