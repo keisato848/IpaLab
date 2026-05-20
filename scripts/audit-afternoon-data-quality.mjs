@@ -93,10 +93,7 @@ function readAllowlist(filePath) {
             console.error(`invalid allowlist entry in ${normalizePath(filePath)}: rule and reason are required`);
             process.exit(1);
         }
-        const hasStableScope = entry.rule === 'missingTargetCategory'
-            ? hasAllowlistValue(entry.category)
-            : hasAllowlistValue(entry.examId) || hasAllowlistValue(entry.file);
-        if (!hasStableScope) {
+        if (!hasAllowlistScope(entry)) {
             const requiredScope = entry.rule === 'missingTargetCategory' ? 'category' : 'examId or file';
             console.error(`invalid allowlist entry in ${normalizePath(filePath)}: ${requiredScope} is required for ${entry.rule}`);
             process.exit(1);
@@ -144,6 +141,12 @@ function hasText(value) {
 
 function hasAllowlistValue(value) {
     return value !== undefined && value !== null && String(value).trim().length > 0;
+}
+
+function hasAllowlistScope(entry) {
+    return entry?.rule === 'missingTargetCategory'
+        ? hasAllowlistValue(entry.category)
+        : hasAllowlistValue(entry?.examId) || hasAllowlistValue(entry?.file);
 }
 
 function childItems(section) {
@@ -261,8 +264,19 @@ function addExample(examples, key, value) {
     if (examples[key].length < 8) examples[key].push(value);
 }
 
-function addBlockingFinding(findings, rule, value) {
-    findings.push({ rule, ...value });
+function addBlockingFinding(rule, value) {
+    const finding = { rule, ...value };
+    blockingFindingCount++;
+
+    if (allowlistEntries.some((entry) => isAllowlisted(finding, entry))) {
+        allowlistedBlockingFindingCount++;
+        return;
+    }
+
+    unapprovedBlockingFindingCount++;
+    if (unapprovedBlockingFindings.length < maxBlockingFindingsInOutput) {
+        unapprovedBlockingFindings.push(finding);
+    }
 }
 
 function getOfficialSource(...objects) {
@@ -307,7 +321,8 @@ function valuesMatch(expected, actual) {
 }
 
 function isAllowlisted(finding, entry) {
-    return valuesMatch(entry.rule, finding.rule)
+    return hasAllowlistScope(entry)
+        && valuesMatch(entry.rule, finding.rule)
         && valuesMatch(entry.examId, finding.examId)
         && valuesMatch(entry.file, finding.file)
         && valuesMatch(entry.category, finding.category)
@@ -346,9 +361,15 @@ if (!fs.existsSync(questionsRoot)) {
 const byCategory = new Map();
 const bySuffix = new Map();
 const examples = {};
-const blockingFindings = [];
+const defaultAllowlistPath = path.join(repoRoot, 'scripts', 'audit-afternoon-data-quality.allowlist.json');
+const allowlistPath = allowlistArg ? resolveRepoPath(allowlistArg) : fs.existsSync(defaultAllowlistPath) ? defaultAllowlistPath : null;
+const allowlistEntries = readAllowlist(allowlistPath);
+const unapprovedBlockingFindings = [];
 const officialSourceFindings = [];
 const categoryExamCounts = new Map();
+let blockingFindingCount = 0;
+let allowlistedBlockingFindingCount = 0;
+let unapprovedBlockingFindingCount = 0;
 let total = makeStats();
 
 function addStats(target, delta) {
@@ -395,7 +416,7 @@ for (const dirent of fs.readdirSync(questionsRoot, { withFileTypes: true })) {
                 text: fragment.replace(/\s+/g, ' ').slice(0, 120),
             };
             addExample(examples, 'englishTextFragments', finding);
-            addBlockingFinding(blockingFindings, 'englishTextFragments', finding);
+            addBlockingFinding('englishTextFragments', finding);
         }
 
         for (const section of sections(question)) {
@@ -411,7 +432,7 @@ for (const dirent of fs.readdirSync(questionsRoot, { withFileTypes: true })) {
                     text: text(section.text).replace(/\s+/g, ' ').slice(0, 120),
                 };
                 addExample(examples, 'parentDirectWithChildren', finding);
-                addBlockingFinding(blockingFindings, 'parentDirectWithChildren', finding);
+                addBlockingFinding('parentDirectWithChildren', finding);
                 if (!hasText(section.answer) && !hasText(section.modelAnswer)) {
                     fileStats.explanationOnlyParentWithChildren++;
                 }
@@ -469,7 +490,7 @@ for (const dirent of fs.readdirSync(questionsRoot, { withFileTypes: true })) {
                         text: promptText.replace(/\s+/g, ' ').slice(0, 120),
                     };
                     addExample(examples, 'answerMissing', finding);
-                    addBlockingFinding(blockingFindings, 'answerMissing', finding);
+                    addBlockingFinding('answerMissing', finding);
                 }
 
                 if (!explanationFieldKeys.some((key) => hasText(item.holder?.[key]))) {
@@ -483,7 +504,7 @@ for (const dirent of fs.readdirSync(questionsRoot, { withFileTypes: true })) {
                         text: promptText.replace(/\s+/g, ' ').slice(0, 120),
                     };
                     addExample(examples, 'explanationMissing', finding);
-                    addBlockingFinding(blockingFindings, 'explanationMissing', finding);
+                    addBlockingFinding('explanationMissing', finding);
                 }
 
                 if (refs.length > 0) {
@@ -513,7 +534,7 @@ for (const dirent of fs.readdirSync(questionsRoot, { withFileTypes: true })) {
                             text: promptText.replace(/\s+/g, ' ').slice(0, 120),
                         };
                         addExample(examples, 'underlineRefMissing', finding);
-                        addBlockingFinding(blockingFindings, 'underlineRefMissing', finding);
+                        addBlockingFinding('underlineRefMissing', finding);
                     }
                 }
 
@@ -529,7 +550,7 @@ for (const dirent of fs.readdirSync(questionsRoot, { withFileTypes: true })) {
                         text: promptText.replace(/\s+/g, ' ').slice(0, 120),
                     };
                     addExample(examples, 'multipleLimits', finding);
-                    addBlockingFinding(blockingFindings, 'multipleLimits', finding);
+                    addBlockingFinding('multipleLimits', finding);
                 }
 
                 if (symbolAnswer) {
@@ -545,7 +566,7 @@ for (const dirent of fs.readdirSync(questionsRoot, { withFileTypes: true })) {
                             text: promptText.replace(/\s+/g, ' ').slice(0, 120),
                         };
                         addExample(examples, 'symbolNoStructuralChoices', finding);
-                        addBlockingFinding(blockingFindings, 'symbolNoStructuralChoices', finding);
+                        addBlockingFinding('symbolNoStructuralChoices', finding);
                     }
                     if (!inlineChoiceBodyPattern.test(promptText)) {
                         fileStats.symbolNoInlineChoiceBody++;
@@ -569,7 +590,7 @@ for (const dirent of fs.readdirSync(questionsRoot, { withFileTypes: true })) {
                         text: promptText.replace(/\s+/g, ' ').slice(0, 120),
                     };
                     addExample(examples, 'broadPromptNoLimit', finding);
-                    addBlockingFinding(blockingFindings, 'broadPromptNoLimit', finding);
+                    addBlockingFinding('broadPromptNoLimit', finding);
                 }
 
                 if (
@@ -608,14 +629,9 @@ const expectedTargetCategories = (includeCategories ? [...includeCategories] : d
     .filter((category) => !excludeCategories.has(category));
 const missingTargetCategories = expectedTargetCategories.filter((category) => !categoryExamCounts.has(category));
 for (const category of missingTargetCategories) {
-    addBlockingFinding(blockingFindings, 'missingTargetCategory', { category });
+    addBlockingFinding('missingTargetCategory', { category });
 }
 
-const defaultAllowlistPath = path.join(repoRoot, 'scripts', 'audit-afternoon-data-quality.allowlist.json');
-const allowlistPath = allowlistArg ? resolveRepoPath(allowlistArg) : fs.existsSync(defaultAllowlistPath) ? defaultAllowlistPath : null;
-const allowlistEntries = readAllowlist(allowlistPath);
-const allowlistedBlockingFindings = blockingFindings.filter((finding) => allowlistEntries.some((entry) => isAllowlisted(finding, entry)));
-const unapprovedBlockingFindings = blockingFindings.filter((finding) => !allowlistEntries.some((entry) => isAllowlisted(finding, entry)));
 const officialSourceOutputLimit = sourceReportMode === 'full' ? officialSourceFindings.length : maxOfficialSourceItemsInOutput;
 const officialSourceOutputItems = sourceReportMode === 'off' ? [] : officialSourceFindings.slice(0, officialSourceOutputLimit);
 const allFindingCount = total.underlineNoEvidence
@@ -641,17 +657,17 @@ const result = {
     },
     findingCount: {
         all: allFindingCount,
-        blocking: blockingFindings.length,
-        allowlistedBlocking: allowlistedBlockingFindings.length,
-        unapprovedBlocking: unapprovedBlockingFindings.length,
+        blocking: blockingFindingCount,
+        allowlistedBlocking: allowlistedBlockingFindingCount,
+        unapprovedBlocking: unapprovedBlockingFindingCount,
         failMode,
     },
     blocking: {
         rules: blockingFindingRules,
         allowlist: allowlistPath ? normalizePath(allowlistPath) : null,
         unapprovedFindingLimit: maxBlockingFindingsInOutput,
-        unapprovedFindingsTruncated: Math.max(0, unapprovedBlockingFindings.length - maxBlockingFindingsInOutput),
-        unapprovedFindings: unapprovedBlockingFindings.slice(0, maxBlockingFindingsInOutput),
+        unapprovedFindingsTruncated: Math.max(0, unapprovedBlockingFindingCount - unapprovedBlockingFindings.length),
+        unapprovedFindings: unapprovedBlockingFindings,
     },
     officialSource: {
         requiredFields: officialSourceRequiredFields,
@@ -676,7 +692,7 @@ if (jsonOutput) {
     console.log(`status=${result.status}`);
     console.log(`files=${total.files} mainQuestions=${total.mainQuestions} answerFields=${total.answerFields}`);
     console.log(`missingTargetCategories=${missingTargetCategories.join(',') || 'none'}`);
-    console.log(`findings=${allFindingCount} blocking=${blockingFindings.length} unapprovedBlocking=${unapprovedBlockingFindings.length} failMode=${failMode}`);
+    console.log(`findings=${allFindingCount} blocking=${blockingFindingCount} unapprovedBlocking=${unapprovedBlockingFindingCount} failMode=${failMode}`);
     console.log(`officialSource verified=${total.officialSourceVerified}/${total.officialSourceItems} missing=${total.officialSourceMissing} incomplete=${total.officialSourceIncomplete} sourceReport=${sourceReportMode}`);
     console.log(`allowlist=${allowlistPath ? normalizePath(allowlistPath) : 'none'}`);
     console.log('');
@@ -695,7 +711,7 @@ if (jsonOutput) {
     }
 }
 
-const failingFindingCount = failMode === 'all' ? allFindingCount : failMode === 'blocking' ? unapprovedBlockingFindings.length : 0;
+const failingFindingCount = failMode === 'all' ? allFindingCount : failMode === 'blocking' ? unapprovedBlockingFindingCount : 0;
 if (failingFindingCount > 0) {
     if (!jsonOutput) {
         console.error(`afternoon data quality audit failed: failMode=${failMode} findings=${failingFindingCount}`);
