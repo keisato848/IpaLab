@@ -65,6 +65,7 @@ function runVitest(files, label, workers) {
             },
             shell: useShell,
             stdio: 'inherit',
+            shell: process.platform === 'win32',
         }
     );
 
