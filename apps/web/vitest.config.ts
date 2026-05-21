@@ -5,10 +5,12 @@ import path from 'path';
 export default defineConfig({
     plugins: [react()],
     test: {
-        environment: 'jsdom',
+        environment: 'happy-dom',
         globals: true,
         setupFiles: ['./vitest.setup.ts'],
         testTimeout: 30000, // API の動的インポート（CosmosDB SDK 等）が重い場合の対応
+        pool: 'threads',
+        maxWorkers: 4, // devcontainer / pre-push で worker 起動タイムアウトを避ける
         include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
         exclude: ['node_modules', '.next', 'e2e'],
         coverage: {

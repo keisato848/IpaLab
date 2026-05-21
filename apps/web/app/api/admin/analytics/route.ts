@@ -284,7 +284,7 @@ async function getDauMauStats(sinceISO: string) {
                     WHERE c.answeredAt >= @since AND IS_DEFINED(c.userId)`,
             parameters: [{ name: '@since', value: mauSinceISO }],
         }).fetchAll();
-        const mau = mauRaw.filter(r => r.userId).length;
+        const mau = mauRaw.filter((r: { userId?: string }) => r.userId).length;
 
         return { dau, mau };
     } catch (err) {

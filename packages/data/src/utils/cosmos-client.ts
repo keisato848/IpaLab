@@ -10,6 +10,8 @@
 import { CosmosClient, CosmosClientOptions } from '@azure/cosmos';
 import * as https from 'https';
 
+const LOCAL_EMULATOR_HOSTS = ['localhost', '127.0.0.1', 'host.docker.internal', 'gateway.docker.internal'];
+
 export interface CreateCosmosClientOptions {
     connectionString: string;
     allowInsecureLocalConnection?: boolean;
@@ -18,7 +20,7 @@ export interface CreateCosmosClientOptions {
 /**
  * CosmosDBクライアントを作成します
  * 
- * ローカルエミュレータ (localhost/127.0.0.1) 接続時のみ、
+ * ローカルエミュレータ (localhost/127.0.0.1/host.docker.internal) 接続時のみ、
  * 自己署名証明書を許可するためTLS検証を無効化します。
  * 
  * @param options - 接続オプション
@@ -35,7 +37,7 @@ export function createCosmosClient(options: CreateCosmosClientOptions): CosmosCl
         throw new Error('CosmosDB接続文字列が設定されていません');
     }
     
-    const isLocalEmulator = connectionString.includes('localhost') || connectionString.includes('127.0.0.1');
+    const isLocalEmulator = isLocalEmulatorConnection(connectionString);
     
     const clientOptions: CosmosClientOptions = {
         connectionString,
@@ -62,5 +64,5 @@ export function createCosmosClient(options: CreateCosmosClientOptions): CosmosCl
  * 接続文字列がローカルエミュレータかどうかを判定
  */
 export function isLocalEmulatorConnection(connectionString: string): boolean {
-    return connectionString.includes('localhost') || connectionString.includes('127.0.0.1');
+    return LOCAL_EMULATOR_HOSTS.some(host => connectionString.includes(host));
 }

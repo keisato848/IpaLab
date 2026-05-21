@@ -4,6 +4,8 @@
 
 | 日付 | 内容 |
 |------|------|
+| 2026-05-18 | 公式PDF出典メタデータ `officialSource` と照合済み/未照合監査の運用を追加 |
+| 2026-05-18 | 午後データ品質監査を Repository Guards の CI 必須ゲートへ追加し、blocking finding と例外管理ルールを定義 |
 | 2026-05-09 | AIを使う問題データ抽出は Gemini API ではなく、同一ローカルネットワーク上の Ollama `gemma4:31b` を標準とする運用へ更新 |
 | 2026-05-08 | 午後解答PDFの Gemini OCR プロンプトを午前択一表専用から記述式解答対応へ拡張し、self-inspect R32 を追加 |
 | 2026-05-08 | 全試験区分の午後データ品質監査 `audit:afternoon-data`、DB/AU/SM など未抽出区分の抽出必要性、親見出し800字欄化の再発防止を追加 |
@@ -159,6 +161,8 @@ Windows 環境では `npx` を子プロセスから直接 spawn すると `spawn
 ```powershell
 npm run audit:afternoon-data
 npm run audit:afternoon-data -- --json
+npm run audit:afternoon-source
+npm run audit:afternoon-data:ci
 ```
 
 Windows 環境では npm が `--json` や `--categories=SA` を npm 設定として扱う場合があるため、監査スクリプトは `npm_config_json` / `npm_config_categories` / `npm_config_exclude` / `npm_config_fail_on_findings` も読み取る。
@@ -175,6 +179,73 @@ Windows 環境では npm が `--json` や `--categories=SA` を npm 設定とし
 - PM / PM1 の短答・式・表中属性回答で字数条件がなく、UI上で800字原稿用紙欄に見える疑い
 
 `self-inspect` R27 は、親見出しを直接解答欄化しない UI 判定、PM / PM1 の字数制限なし短答を公式解答例の約1.2倍（10字単位切上げ、最小20字）の表示用原稿用紙欄へ分岐する UI 判定、`scripts/audit-afternoon-data-quality.mjs` の存在と `shortAnswerNoLimit` 監査ルールを検査する。表示用マス数は採点を止める文字数制限ではなく、明示字数制限がない設問では超過しても警告や採点ブロックを出さない。データ修正 PR では、監査結果、公式PDF照合対象、抽出対象区分、未修正の残リスクを PR 本文または `docs/04_reports/` の報告書に記録する。
+
+Repository Guards では `afternoon-data-quality-audit` ジョブを `exam-data-fallback-guard`、`standalone-bundle-data-check` と独立して実行する。standalone bundle の同梱確認はビルド成果物の検証、午後データ品質監査はローカル JSON の欠落・構造不備検出に限定し、役割を重複させない。
+
+CI では `npm run audit:afternoon-data:ci` を実行し、`scripts/audit-afternoon-data-quality.mjs --json --fail-on=blocking` と同等の条件で失敗させる。blocking finding は次のルールとする。
+
+- `answerMissing`: 解答欄に公式解答・模範解答相当の値がない
+- `explanationMissing`: 解答欄に解説・コメント相当の値がない
+- `underlineRefMissing`: 設問の下線参照番号が本文側に存在しない
+- `parentDirectWithChildren`: 子設問を持つ親設問が直接解答欄化される
+- `multipleLimits`: 1設問に複数の字数条件が混在する
+- `symbolNoStructuralChoices`: 記号回答なのに `choices` / `options` / `answerChoices` がない
+- `broadPromptNoLimit`: 広い回答要求に字数条件がない
+- `englishTextFragments`: 午後問題本文・解説に英語断片が混入している
+- `missingTargetCategory`: 標準確認対象区分に午後データが存在しない
+
+`underlineNoEvidence`、`shortAnswerNoLimit`、`sharedBroadChoiceGroup` は既存データの調査・改善用 finding として JSON には出力するが、直ちに CI を失敗させる blocking finding には含めない。
+
+例外が必要な場合は、公式PDF照合済みであること、恒久対応の Issue / PR があること、期限または見直し条件があることを PR 本文に記録する。機械的な例外は `scripts/audit-afternoon-data-quality.allowlist.json` または `--allowlist=<path>` で次の形式にする。`rule` と `reason` は必須で、通常の finding は `examId` または `file` も必須とする。`missingTargetCategory` だけは `category` を必須とする。`qNo`、`subQNo` は必要に応じて追加し、`rule` と `reason` だけで全件許可する allowlist は禁止する。
+
+```json
+{
+  "allowed": [
+    {
+      "rule": "broadPromptNoLimit",
+      "examId": "SA-2024-Spring-PM1",
+      "qNo": 1,
+      "subQNo": "設問1",
+      "reason": "公式PDFで論述設問として確認済み。後続PRで構造化予定。"
+    }
+  ]
+}
+```
+
+##### 7.2.0.1 公式PDF出典メタデータと照合証跡
+
+新規抽出・補正データでは、公式PDFまたは公式HTMLとの照合結果を問題データ内に保持する。付与先は、根拠の粒度に応じて大問、設問、解答欄のいずれかの `officialSource` とする。下位要素に個別の `officialSource` がない場合、監査では上位要素の `officialSource` を継承した照合済み扱いにする。
+
+`officialSource` は次のフィールドを必須とする。
+
+- `sourceUrl`: IPA公式PDFまたは公式HTMLのURL
+- `sourcePage` または `sourcePages`: PDFページ番号またはページ範囲。紙面上の表記差がある場合は文字列も許可する
+- `verifiedAt`: ISO 8601形式の照合日時
+- `verificationMethod`: `official-pdf-manual`、`official-pdf-ocr-review` など、照合方法を表す文字列
+
+例:
+
+```json
+{
+  "officialSource": {
+    "sourceUrl": "https://www.ipa.go.jp/shiken/mondai-kaiotu/2025r07.html",
+    "sourcePages": [3, 4],
+    "verifiedAt": "2026-05-18T00:00:00Z",
+    "verificationMethod": "official-pdf-manual",
+    "verifiedBy": "data-management-specialist",
+    "note": "問題PDFと解答PDFを照合済み"
+  }
+}
+```
+
+照合済み・未照合の一覧は、午後データ監査の `officialSource` セクションで確認する。
+
+```powershell
+npm run audit:afternoon-source
+npm run audit:afternoon-data -- --json --source-report=full
+```
+
+`source-report=summary` は未照合・不完全な項目を最大50件だけ出力し、`source-report=full` は全件を出力する。既存データへ一括付与するまでは、`officialSourceMissing` と `officialSourceIncomplete` は blocking finding に含めず、段階的な照合作業の棚卸しとして扱う。ただし、今後追加・補正する午後データでは、PR本文に公式PDF照合対象と `officialSource` 付与有無を記録する。
 
 #### 7.2.1 Gemini OCR Stage B 対象限定実行
 
