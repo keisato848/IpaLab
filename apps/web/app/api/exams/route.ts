@@ -24,7 +24,7 @@ async function getQuestionTotals(): Promise<Map<string, number>> {
             query: "SELECT c.examId, COUNT(1) AS total FROM c GROUP BY c.examId"
         }).fetchAll();
 
-        resources.forEach(({ examId, total }) => {
+        resources.forEach(({ examId, total }: { examId: string; total: number }) => {
             totals.set(examId, Number(total) || 0);
         });
     }

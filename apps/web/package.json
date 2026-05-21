@@ -10,7 +10,7 @@
         "start:standalone": "node server.js",
         "lint": "eslint app components hooks lib --ext .js,.jsx,.ts,.tsx",
         "test": "vitest",
-        "test:run": "vitest run",
+        "test:run": "node scripts/run-vitest-batches.mjs",
         "test:coverage": "vitest run --coverage",
         "test:e2e": "npx playwright test",
         "test:e2e:ui": "npx playwright test --ui"
@@ -59,6 +59,7 @@
         "@types/react": "^18.0.0",
         "@types/react-dom": "^18.0.0",
         "@vitejs/plugin-react": "^5.1.2",
+        "happy-dom": "^20.9.0",
         "jsdom": "^27.4.0",
         "typescript": "^5.0.0",
         "vitest": "^4.0.18"
