@@ -36,7 +36,7 @@ concurrency:
 
 permissions:
   contents: read
-  actions: read     # artifact ダウンロードでビルド成果物を取得するために必要
+  actions: write    # artifact の削除・ダウンロードに必要
   pull-requests: write  # Staging デプロイ完了後のPRコメント投稿に必要
 
 env:
@@ -143,6 +143,21 @@ jobs:
           ls -la .next/
           echo "=== .next/static check ==="
           ls -la .next/static/ 2>/dev/null || echo ".next/static not found!"
+
+      - name: Delete old artifacts to free quota
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 同名の古い artifact を削除して quota を解放する
+          ARTIFACTS=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts?name=webapp-artifact&per_page=100" | \
+            python3 -c "import sys,json; [print(a['id']) for a in json.load(sys.stdin).get('artifacts',[])]")
+          for id in $ARTIFACTS; do
+            curl -s -o /dev/null -X DELETE \
+              -H "Authorization: token $GH_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$id"
+            echo "Deleted artifact $id"
+          done
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v7
