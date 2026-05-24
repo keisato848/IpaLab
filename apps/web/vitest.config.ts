@@ -5,7 +5,10 @@ import path from 'path';
 export default defineConfig({
     plugins: [react()],
     test: {
-        environment: 'happy-dom',
+        // API/ユーティリティテストはデフォルト node 環境
+        // DOM が必要なコンポーネント/hooks/app テストには各ファイルに
+        // // @vitest-environment happy-dom を記載すること
+        environment: 'node',
         globals: true,
         setupFiles: ['./vitest.setup.ts'],
         testTimeout: 30000, // API の動的インポート（CosmosDB SDK 等）が重い場合の対応
@@ -28,6 +31,9 @@ export default defineConfig({
         alias: {
             '@': path.resolve(__dirname, './'),
             '@ipa-lab/shared': path.resolve(__dirname, '../../packages/shared/src'),
+            // next/server の CJS require が Node.js イベントループに残存ハンドルを作り
+            // vitest ワーカーが起動タイムアウトになる問題を回避するため mock にリダイレクト
+            'next/server': path.resolve(__dirname, './__mocks__/next/server.ts'),
         },
     },
 });

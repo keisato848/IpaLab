@@ -394,12 +394,15 @@ describe('API_BASE 定数', () => {
     });
 
     it('クライアント側では環境変数より相対パスを優先する', async () => {
-        process.env.NEXT_PUBLIC_API_BASE = 'http://localhost:3000/api';
-        vi.resetModules();
+        const { resolveApiBaseForRuntime } = await import('@/lib/api');
 
-        const { API_BASE } = await import('@/lib/api');
+        // node テスト環境では window が存在しないため isClient=false になる。
+        // クライアント側の挙動は resolveApiBaseForRuntime(true) で直接検証する。
+        const apiBase = resolveApiBaseForRuntime(true, {
+            NEXT_PUBLIC_API_BASE: 'http://localhost:3000/api',
+        } as NodeJS.ProcessEnv);
 
-        expect(API_BASE).toBe('/api');
+        expect(apiBase).toBe('/api');
     });
 
     it('サーバー側では WEBSITE_HOSTNAME から API ベースURLを構築する', async () => {

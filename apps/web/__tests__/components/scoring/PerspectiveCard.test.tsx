@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { PerspectiveCard } from "@/components/features/scoring/PerspectiveCard";
