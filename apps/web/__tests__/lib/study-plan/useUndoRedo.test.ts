@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useUndoRedo, MAX_HISTORY } from '@/lib/study-plan/useUndoRedo';
