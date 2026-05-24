@@ -35,6 +35,10 @@ export class NextResponse extends Response {
             headers: { location: url.toString() },
         });
     }
+
+    static next(): NextResponse {
+        return new NextResponse(null, { status: 200 });
+    }
 }
 
 /** その他のエクスポート（使用しないがコンパイルエラー回避のためスタブ化） */
