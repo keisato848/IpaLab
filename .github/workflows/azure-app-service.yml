@@ -36,7 +36,6 @@ concurrency:
 
 permissions:
   contents: read
-  actions: write    # artifact の削除・ダウンロードに必要
   pull-requests: write  # Staging デプロイ完了後のPRコメント投稿に必要
 
 env:
@@ -89,156 +88,8 @@ jobs:
           # ビルド時に必要な環境変数
           NEXT_PUBLIC_APP_URL: https://app-pm-exam-dx-prod.azurewebsites.net
 
-      - name: Create deployment package
-        run: |
-          # Next.js standalone ビルドの構造:
-          # apps/web/.next/standalone/  - Node.js サーバー
-          # apps/web/.next/static/      - CSS/JS 静的ファイル（standalone外）
-          # apps/web/public/            - 公開ファイル
-
-          cd apps/web/.next/standalone
-          echo "=== Original standalone structure ==="
-          ls -la
-          ls -la apps/web/ || echo "apps/web directory check"
-
-          # apps/webの内容をルートにコピー（App Serviceが期待する構造）
-          cp -r apps/web/* .
-
-          # .next ディレクトリを作成
-          mkdir -p .next
-
-          # apps/web/.next 配下のファイルをコピー
-          cp -r apps/web/.next/* .next/ 2>/dev/null || true
-
-          # 重要: standalone 外の static ディレクトリをコピー
-          # Next.js standalone では static は standalone フォルダ外に出力される
-          echo "=== Copying .next/static from parent ==="
-          if [ -d "../static" ]; then
-            cp -r ../static .next/
-            echo "Copied .next/static successfully"
-            ls -la .next/static/ | head -20
-          else
-            echo "WARNING: ../static not found!"
-            echo "Checking parent structure:"
-            ls -la ../
-          fi
-
-          # public ディレクトリをコピー (apps/web/public -> standalone root)
-          echo "=== Copying public directory ==="
-          if [ -d "../../public" ]; then
-            cp -r ../../public .
-            echo "Copied public directory"
-          else
-            echo "No public directory found"
-          fi
-
-          # 不要なディレクトリを削除（apps/ のみ。node_modules/ は standalone 実行に必須）
-          rm -rf apps 2>/dev/null || true
-
-          echo "=== Final deployment structure ==="
-          ls -la
-          echo "=== node_modules check (must contain 'next') ==="
-          ls node_modules/next/package.json && echo "OK: next module found" || echo "ERROR: next module missing!"
-          echo "=== .next directory ==="
-          ls -la .next/
-          echo "=== .next/static check ==="
-          ls -la .next/static/ 2>/dev/null || echo ".next/static not found!"
-
-      - name: Delete completed old artifacts to free quota
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ARTIFACT_NAME: webapp-artifact
-        run: |
-          python3 <<'PY'
-          import json
-          import os
-          import urllib.error
-          import urllib.parse
-          import urllib.request
-
-          token = os.environ['GH_TOKEN']
-          repo = os.environ['GITHUB_REPOSITORY']
-          current_run_id = int(os.environ['GITHUB_RUN_ID'])
-          artifact_name = os.environ.get('ARTIFACT_NAME', 'webapp-artifact')
-          api_base = f'https://api.github.com/repos/{repo}'
-          headers = {
-            'Authorization': f'Bearer {token}',
-            'Accept': 'application/vnd.github+json',
-            'X-GitHub-Api-Version': '2022-11-28',
-          }
-
-          def request(method, url):
-            req = urllib.request.Request(url, headers=headers, method=method)
-            try:
-              return urllib.request.urlopen(req, timeout=30)
-            except urllib.error.HTTPError as error:
-              body = error.read().decode('utf-8', 'replace')
-              raise SystemExit(f'GitHub API {method} failed ({error.code}): {body}') from error
-
-          def get_json(url):
-            with request('GET', url) as response:
-              return json.load(response), response.headers
-
-          def delete(url):
-            with request('DELETE', url) as response:
-              if response.status != 204:
-                raise SystemExit(f'GitHub API DELETE returned unexpected status {response.status}: {url}')
-
-          def next_link(headers):
-            for link in headers.get('Link', '').split(','):
-              section = link.split(';')
-              if len(section) >= 2 and 'rel="next"' in section[1]:
-                return section[0].strip()[1:-1]
-            return None
-
-          query = urllib.parse.urlencode({'name': artifact_name, 'per_page': 100})
-          url = f'{api_base}/actions/artifacts?{query}'
-          run_status_by_id = {}
-          deleted = 0
-          skipped = 0
-
-          while url:
-            payload, response_headers = get_json(url)
-            for artifact in payload.get('artifacts', []):
-              artifact_id = artifact['id']
-              run_id = (artifact.get('workflow_run') or {}).get('id')
-              if run_id is None:
-                print(f'Skipped artifact {artifact_id}: workflow_run id is unavailable')
-                skipped += 1
-                continue
-
-              run_id = int(run_id)
-              if run_id == current_run_id:
-                print(f'Skipped artifact {artifact_id}: belongs to current run {run_id}')
-                skipped += 1
-                continue
-
-              if run_id not in run_status_by_id:
-                run, _ = get_json(f'{api_base}/actions/runs/{run_id}')
-                run_status_by_id[run_id] = run.get('status')
-
-              run_status = run_status_by_id[run_id]
-              if run_status != 'completed':
-                print(f'Skipped artifact {artifact_id}: workflow run {run_id} is {run_status}')
-                skipped += 1
-                continue
-
-              delete(f'{api_base}/actions/artifacts/{artifact_id}')
-              print(f'Deleted artifact {artifact_id} from completed workflow run {run_id}')
-              deleted += 1
-
-            url = next_link(response_headers)
-
-          print(f'Artifact cleanup complete: deleted={deleted}, skipped={skipped}')
-          PY
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v7
-        with:
-          name: webapp-artifact
-          path: apps/web/.next/standalone/
-          include-hidden-files: true
-          retention-days: 1
+      - name: Prepare deployment package
+        run: bash scripts/prepare-web-standalone-package.sh
 
   deploy:
     runs-on: ubuntu-latest
@@ -247,18 +98,32 @@ jobs:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v6
-        with:
-          name: webapp-artifact
-          path: ./deploy
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-      - name: Display structure of downloaded files
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build with Turbo (standalone mode)
+        run: npm run build:standalone
+        env:
+          NEXT_PUBLIC_APP_URL: https://app-pm-exam-dx-prod.azurewebsites.net
+
+      - name: Prepare deployment package
+        run: bash scripts/prepare-web-standalone-package.sh
+
+      - name: Display structure of deployment package
         run: |
-          echo "=== Deploy directory structure ==="
-          ls -la ./deploy
+          echo "=== Deployment package structure ==="
+          ls -la apps/web/.next/standalone
           echo "=== Looking for server.js ==="
-          find ./deploy -name "server.js" -type f
+          find apps/web/.next/standalone -name "server.js" -type f
 
       # Service Principal を使用して Azure にログイン（Microsoft推奨方式）
       - name: Azure Login
@@ -327,7 +192,7 @@ jobs:
       - name: Deploy to Azure Web App
         run: |
           rm -f deploy.zip
-          (cd deploy && zip -qr ../deploy.zip .)
+          (cd apps/web/.next/standalone && zip -qr "$GITHUB_WORKSPACE/deploy.zip" .)
           ls -lh deploy.zip
           az webapp deploy \
             --name ${{ env.AZURE_WEBAPP_NAME }} \
@@ -378,19 +243,37 @@ jobs:
             echo "configured=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Download artifact from build job
+      - name: Checkout repository
         if: steps.config-check.outputs.configured == 'true'
-        uses: actions/download-artifact@v6
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        if: steps.config-check.outputs.configured == 'true'
+        uses: actions/setup-node@v6
         with:
-          name: webapp-artifact
-          path: ./deploy
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        if: steps.config-check.outputs.configured == 'true'
+        run: npm ci
+
+      - name: Build with Turbo (standalone mode)
+        if: steps.config-check.outputs.configured == 'true'
+        run: npm run build:standalone
+        env:
+          NEXT_PUBLIC_APP_URL: https://${{ env.STAGING_APP_NAME }}.azurewebsites.net
+
+      - name: Prepare deployment package
+        if: steps.config-check.outputs.configured == 'true'
+        run: bash scripts/prepare-web-standalone-package.sh
 
       - name: Display deploy structure
         if: steps.config-check.outputs.configured == 'true'
         run: |
-          echo "=== Deploy directory ==="
-          ls -la ./deploy
-          find ./deploy -name "server.js" -type f
+          echo "=== Deployment package structure ==="
+          ls -la apps/web/.next/standalone
+          find apps/web/.next/standalone -name "server.js" -type f
 
       # 本番と同じ Service Principal を使用してログイン
       - name: Azure Login
@@ -464,7 +347,7 @@ jobs:
         if: steps.config-check.outputs.configured == 'true'
         run: |
           rm -f deploy.zip
-          (cd deploy && zip -qr ../deploy.zip .)
+          (cd apps/web/.next/standalone && zip -qr "$GITHUB_WORKSPACE/deploy.zip" .)
           ls -lh deploy.zip
           az webapp deploy \
             --name "$STAGING_APP_NAME" \

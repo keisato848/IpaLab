@@ -68,16 +68,16 @@
 ```
 PR 作成・更新
   → test ジョブ (Vitest)
-  → build ジョブ (standalone)
-  → deploy-staging ジョブ → Staging App Service
+    → build ジョブ (standalone / package 検証)
+    → deploy-staging ジョブ (standalone build / package / deploy) → Staging App Service
   → PR に「✅ Staging デプロイ完了」コメント投稿
   → 開発者が Staging URL で動作確認
   → レビュー・承認 → main へマージ
 
 main マージ
   → test ジョブ
-  → build ジョブ
-  → deploy ジョブ → 本番 App Service (shikaku-no.com)
+    → build ジョブ (standalone / package 検証)
+    → deploy ジョブ (standalone build / package / deploy) → 本番 App Service (shikaku-no.com)
 ```
 
 ## 4. ワークフロー設定
@@ -89,11 +89,11 @@ GitHub Actions ワークフロー: `.github/workflows/azure-app-service.yml`
 | ジョブ | トリガー | 内容 |
 |--------|---------|------|
 | `test` | push / PR / 手動 | Vitest ユニットテスト実行 |
-| `build` | push / PR / 手動 | Next.js standalone ビルド + Artifact作成 |
-| `deploy` | `main` push / 手動のみ | **本番**へデプロイ |
-| `deploy-staging` | PR のみ | **Staging**へデプロイ + PR にURLをコメント |
+| `build` | push / PR / 手動 | Next.js standalone ビルド + デプロイパッケージ検証 |
+| `deploy` | `main` push / 手動のみ | **本番**用の standalone build / package 作成 / デプロイ |
+| `deploy-staging` | PR のみ | **Staging**用の standalone build / package 作成 / デプロイ + PR にURLをコメント |
 
-Artifact の取得は `actions/download-artifact@v6` を使用する。`gh run download` は checkout していない deploy ジョブで `fatal: not a git repository` となるため使用しない。
+GitHub Actions の artifact storage は quota 使用量の再計算に 6〜12 時間かかり、quota 到達時に `actions/upload-artifact` が即時復旧できない。Azure App Service デプロイでは artifact upload/download を使わず、`deploy` / `deploy-staging` ジョブ内で checkout → build → package → deploy を完結させる。
 
 PR の `pull_request` トリガーは `opened` / `synchronize` / `reopened` / `ready_for_review` を対象とし、`paths` フィルタでは絞り込まない。これにより、追加コミットがドキュメント・フック・データ監査などアプリ外のファイルだけを変更する場合でも、PR 更新時に同じ成果物を再ビルドして Staging App Service へ再デプロイする。同一PRで古いワークフロー実行が後から完了して新しいデプロイを上書きしないよう、ワークフロー全体に PR 番号単位の `concurrency` と `cancel-in-progress: true` を設定する。PR コメントのコミット欄には、GitHub の一時 merge SHA ではなく `pull_request.head.sha` を表示し、レビュー対象ブランチのどの追加修正が Staging に反映されたかを追跡できるようにする。
 
@@ -216,7 +216,7 @@ export async function GET(req: NextRequest) {
 | `COSMOS_DB_CONNECTION_STAGING` Secret未登録 | 同上 |
 | Staging App Service がまだ作成されていない | Azure Portal で `app-pm-exam-dx-staging` の存在を確認 |
 | `AZURE_CREDENTIALS` の Service Principal に Staging App Service へのアクセス権がない | Staging リソースグループへの Contributor 権限を付与 |
-| Artifact 取得で `fatal: not a git repository` が出る | `.github/workflows/azure-app-service.yml` の deploy / deploy-staging が `actions/download-artifact@v6` を使用していることを確認 |
+| GitHub Actions artifact quota で upload が失敗する | `.github/workflows/azure-app-service.yml` が `actions/upload-artifact` / `actions/download-artifact` / `webapp-artifact` を使用していないことを確認。App Service デプロイは各 deploy ジョブ内で standalone package を作成する |
 
 ### 6.4 OAuth コールバックエラー（Staging）
 
@@ -238,6 +238,9 @@ export async function GET(req: NextRequest) {
 
 | 日付 | 変更内容 | 担当 |
 |------|---------|------|
+| 2026/05/24 | **GitHub Actions artifact storage 非依存化** | エージェント |
+| | - quota 再計算待ちによる `actions/upload-artifact` 失敗を避けるため、deploy / deploy-staging ジョブ内で standalone package を作成する構成へ変更 | |
+| | - 共通の package 作成処理を `scripts/prepare-web-standalone-package.sh` に切り出し | |
 | 2026/05/14 | **aiChat 署名認証設定の追加** | エージェント |
 | | - `AI_CHAT_FUNCTION_SECRET` を GitHub Secrets / App Service / AI Function App の必須設定として追加 | |
 | | - 未署名・不正署名リクエストを Gemini API 到達前に拒否する運用を追記 | |
