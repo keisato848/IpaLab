@@ -62,6 +62,9 @@ function runVitest(files, label, workers) {
             env: {
                 ...process.env,
                 VITEST_MAX_WORKERS: String(workers),
+                // CI=true で vitest のインタラクティブ TTY モードを無効化し
+                // テスト完了後にプロセスが正常終了するようにする
+                CI: 'true',
             },
             shell: useShell,
             stdio: 'inherit',
