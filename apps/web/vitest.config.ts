@@ -5,13 +5,10 @@ import path from 'path';
 export default defineConfig({
     plugins: [react()],
     test: {
+        // API/ユーティリティテストはデフォルト node 環境
+        // DOM が必要なコンポーネント/hooks/app テストには各ファイルに
+        // // @vitest-environment happy-dom を記載すること
         environment: 'node',
-        environmentMatchGlobs: [
-            // コンポーネント / hooks / app テストは DOM が必要なため happy-dom を使用
-            ['**/__tests__/components/**', 'happy-dom'],
-            ['**/__tests__/hooks/**', 'happy-dom'],
-            ['**/__tests__/app/**', 'happy-dom'],
-        ],
         globals: true,
         setupFiles: ['./vitest.setup.ts'],
         testTimeout: 30000, // API の動的インポート（CosmosDB SDK 等）が重い場合の対応

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Regression test for PR #173 / EXP03:
  *   remark-math 5 → 6 / rehype-katex 6 → 7 / rehypePlugins 順序 [rehypeRaw, rehypeKatex]
