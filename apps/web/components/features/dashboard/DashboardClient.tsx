@@ -205,13 +205,13 @@ export default function DashboardClient() {
                 await migrateLocalStudyPlansToServer(session.user.id);
                 const fromServer = await listStudyPlans();
                 if (cancelled) return;
-                if (fromServer) {
-                    // server が正本。localStorage はオフラインフォールバック用に同期更新
+                if (Array.isArray(fromServer)) {
+                    // server が正本（空配列含む）。localStorage はオフラインフォールバック用に同期更新
                     localStorage.setItem('studyPlans', JSON.stringify(fromServer));
                     hydrateFromPlans(fromServer);
                     return;
                 }
-                // server エラー → localStorage フォールバック
+                // server エラー（null 返却）→ localStorage フォールバック
             }
             // 2) 未認証 / フォールバック: localStorage 経路
             hydrateFromPlans(loadFromLocalStorage());

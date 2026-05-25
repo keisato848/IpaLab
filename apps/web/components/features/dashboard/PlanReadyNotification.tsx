@@ -18,36 +18,44 @@ export default function PlanReadyNotification({ job, onApply, onDismiss }: PlanR
 
     const handleApply = async () => {
         if (!job.resultData) return;
-        
+
         setIsApplying(true);
         try {
-            // 通知済みフラグを設定
-            await fetch(`/api/ai/jobs/${job.id}`, {
+            const res = await fetch(`/api/ai/jobs/${job.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ notifiedAt: new Date().toISOString() }),
             });
-            
+            if (!res.ok) {
+                console.error('Failed to mark plan as notified:', res.status, res.statusText);
+            }
+        } catch (e) {
+            console.error('Failed to mark plan as notified:', e);
+        } finally {
+            setIsApplying(false);
+        }
+        try {
             onApply(job.resultData);
         } catch (e) {
             console.error('Failed to apply plan:', e);
-        } finally {
-            setIsApplying(false);
+            onDismiss();
         }
     };
 
     const handleDismiss = async () => {
         try {
-            // 破棄フラグを設定
-            await fetch(`/api/ai/jobs/${job.id}`, {
+            const res = await fetch(`/api/ai/jobs/${job.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ dismissed: true }),
             });
+            if (!res.ok) {
+                console.error('Failed to dismiss job:', res.status, res.statusText);
+            }
         } catch (e) {
             console.error('Failed to dismiss job:', e);
         }
-        
+
         onDismiss();
     };
 
