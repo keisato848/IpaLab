@@ -61,7 +61,7 @@
     /* background set inline via conic-gradient */
 }
 
-/* Inner white circle to create donut shape */
+/* Inner circle to create donut shape (color follows --bg-secondary theme variable) */
 .scoreInner {
     width: 116px;
     height: 116px;
