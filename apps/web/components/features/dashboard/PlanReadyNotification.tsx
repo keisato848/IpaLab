@@ -18,22 +18,21 @@ export default function PlanReadyNotification({ job, onApply, onDismiss }: PlanR
 
     const handleApply = async () => {
         if (!job.resultData) return;
-        
+
         setIsApplying(true);
         try {
-            // 通知済みフラグを設定
+            // 通知済みフラグを設定（失敗しても計画は適用する）
             await fetch(`/api/ai/jobs/${job.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ notifiedAt: new Date().toISOString() }),
             });
-            
-            onApply(job.resultData);
         } catch (e) {
-            console.error('Failed to apply plan:', e);
+            console.error('Failed to mark plan as notified:', e);
         } finally {
             setIsApplying(false);
         }
+        onApply(job.resultData);
     };
 
     const handleDismiss = async () => {

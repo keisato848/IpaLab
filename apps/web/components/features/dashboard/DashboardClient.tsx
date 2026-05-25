@@ -205,7 +205,7 @@ export default function DashboardClient() {
                 await migrateLocalStudyPlansToServer(session.user.id);
                 const fromServer = await listStudyPlans();
                 if (cancelled) return;
-                if (fromServer) {
+                if (Array.isArray(fromServer) && fromServer.length > 0) {
                     // server が正本。localStorage はオフラインフォールバック用に同期更新
                     localStorage.setItem('studyPlans', JSON.stringify(fromServer));
                     hydrateFromPlans(fromServer);
