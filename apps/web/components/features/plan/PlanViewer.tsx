@@ -51,7 +51,8 @@ export default function PlanViewer() {
                 await migrateLocalStudyPlansToServer(session.user.id);
                 const fromServer = await listStudyPlans();
                 if (cancelled) return;
-                if (Array.isArray(fromServer) && fromServer.length > 0) {
+                if (Array.isArray(fromServer)) {
+                    // server が正本（空配列含む）。localStorage はオフラインフォールバック用に同期更新
                     localStorage.setItem('studyPlans', JSON.stringify(fromServer));
                     apply(fromServer);
                     return;
