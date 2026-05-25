@@ -139,9 +139,15 @@ export default function ExamResult({ questions, examId, year, type }: ExamResult
             </header>
 
             <div className={styles.summaryCard}>
-                <div className={styles.scoreCircle}>
-                    <span className={styles.scoreVal}>{scorePercentage}<span style={{ fontSize: '1.5rem' }}>%</span></span>
-                    <span className={styles.scoreLabel}>正答率</span>
+                <div
+                    className={styles.scoreCircle}
+                    style={{ background: `conic-gradient(var(--accent-color) ${scorePercentage}%, var(--bg-primary) 0%)` }}
+                    aria-label={`正答率 ${scorePercentage}%`}
+                >
+                    <div className={styles.scoreInner}>
+                        <span className={styles.scoreVal}>{scorePercentage}<span style={{ fontSize: '1.5rem' }}>%</span></span>
+                        <span className={styles.scoreLabel}>正答率</span>
+                    </div>
                 </div>
                 <div className={styles.stats}>
                     <div className={styles.statItem}>

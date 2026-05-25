@@ -49,18 +49,29 @@
     background: linear-gradient(90deg, #0070f3, #00c6ff);
 }
 
+/* Radial progress (conic-gradient donut) */
 .scoreCircle {
     position: relative;
-    width: 200px;
-    height: 200px;
+    width: 160px;
+    height: 160px;
     border-radius: 50%;
-    border: 10px solid var(--bg-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* background set inline via conic-gradient */
+}
+
+/* Inner circle to create donut shape (color follows --bg-secondary theme variable) */
+.scoreInner {
+    width: 116px;
+    height: 116px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: var(--bg-secondary);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .scoreVal {
@@ -156,6 +167,9 @@
     color: var(--text-primary);
     padding: 0 1.5rem;
     font-weight: 500;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .colStatus {
@@ -252,4 +266,49 @@
 .retryBtn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .summaryCard {
+        padding: 1.5rem 1rem;
+    }
+
+    .scoreCircle {
+        width: 120px;
+        height: 120px;
+    }
+
+    .scoreInner {
+        width: 86px;
+        height: 86px;
+    }
+
+    .scoreVal {
+        font-size: var(--fs-xl);
+    }
+
+    .header h1 {
+        font-size: var(--fs-lg);
+        word-break: break-word;
+    }
+
+    .listItem {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .colTitle {
+        padding: 0 0.5rem;
+        font-size: var(--fs-base);
+    }
+
+    .footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
