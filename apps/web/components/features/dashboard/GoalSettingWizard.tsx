@@ -237,6 +237,7 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
                 <label className={styles.label}>目標の試験区分</label>
                 <select
                     className={styles.select}
+                    aria-label="目標の試験区分"
                     value={targetExam}
                     onChange={(e) => setTargetExam(e.target.value)}
                 >
@@ -254,6 +255,7 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
                 <input
                     type="date"
                     required
+                    aria-label="受験予定日"
                     min={new Date().toISOString().split('T')[0]}
                     value={examDate}
                     onChange={(e) => setExamDate(e.target.value)}
@@ -295,6 +297,7 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
                             <input
                                 type="range"
                                 min="0" max="6" step="0.5"
+                                aria-label="平日の1日あたり学習時間"
                                 value={hoursWeekday}
                                 onChange={(e) => setHoursWeekday(Number(e.target.value))}
                                 className={styles.rangeInput}
@@ -306,6 +309,7 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
                             <input
                                 type="range"
                                 min="0" max="12" step="0.5"
+                                aria-label="休日の1日あたり学習時間"
                                 value={hoursWeekend}
                                 onChange={(e) => setHoursWeekend(Number(e.target.value))}
                                 className={styles.rangeInput}
@@ -374,6 +378,7 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
                             <input
                                 type="range"
                                 min="1" max="5"
+                                aria-label={item.label}
                                 value={scores[item.id]}
                                 onChange={(e) => handleScoreChange(item.id, Number(e.target.value))}
                                 className={styles.rangeInput}

@@ -107,6 +107,7 @@ export default function MonthlyGoalEditor({ goals, monthlyGoalText, onSave, onCl
                                 <div className={styles.goalInfo}>
                                     <select
                                         className={styles.typeSelect}
+                                        aria-label={`目標${idx + 1}のタイプ`}
                                         value={goal.type}
                                         onChange={e => {
                                             const opt = GOAL_TYPE_OPTIONS.find(o => o.type === e.target.value);
@@ -127,6 +128,7 @@ export default function MonthlyGoalEditor({ goals, monthlyGoalText, onSave, onCl
                                     <input
                                         type="number"
                                         className={styles.numberInput}
+                                        aria-label={`目標${idx + 1}の目標値`}
                                         value={goal.targetValue}
                                         min={1}
                                         max={goal.type === 'accuracy' ? 100 : 9999}
