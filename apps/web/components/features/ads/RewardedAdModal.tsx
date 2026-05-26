@@ -128,6 +128,7 @@ export default function RewardedAdModal({
                     <span className={styles.adLabel}>広告</span>
                     {canSkip && (
                         <button
+                            type="button"
                             className={styles.skipBtn}
                             onClick={handleSkip}
                             aria-label="広告をスキップ"
@@ -166,6 +167,7 @@ export default function RewardedAdModal({
                 <div className={styles.footer}>
                     {state === 'completed' ? (
                         <button
+                            type="button"
                             className={styles.startBtn}
                             onClick={handleComplete}
                             autoFocus

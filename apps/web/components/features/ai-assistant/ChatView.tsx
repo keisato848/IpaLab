@@ -189,6 +189,7 @@ export default function ChatView({
                     </div>
                 ) : (
                     <button
+                        type="button"
                         className={styles.menuButton}
                         onClick={onBackToMenu}
                         disabled={isStreaming}

@@ -49,6 +49,7 @@ export default function CategorySelector({ examContext, onSelect }: CategorySele
         <div className={styles.categoryContainer}>
             {visibleCategories.map((cat) => (
                 <button
+                    type="button"
                     key={cat.category}
                     className={styles.categoryCard}
                     onClick={() => onSelect(cat.category)}

@@ -11,12 +11,12 @@ interface InitialMenuProps {
 export default function InitialMenu({ currentPage, onBugReport, onQuestion }: InitialMenuProps) {
     return (
         <div className={styles.menuContainer}>
-            <button className={styles.menuButton} onClick={onBugReport}>
+            <button type="button" className={styles.menuButton} onClick={onBugReport}>
                 <span className={styles.menuIcon}>🐛</span>
                 <span className={styles.menuLabel}>障害を報告する</span>
             </button>
             {currentPage !== 'admin' && (
-                <button className={styles.menuButton} onClick={onQuestion}>
+                <button type="button" className={styles.menuButton} onClick={onQuestion}>
                     <span className={styles.menuIcon}>💡</span>
                     <span className={styles.menuLabel}>質問する</span>
                 </button>

@@ -98,12 +98,14 @@ export default function PlanReadyNotification({ job, onApply, onDismiss }: PlanR
                 
                 <div className={styles.actions}>
                     <button
+                        type="button"
                         onClick={handleDismiss}
                         className={`${styles.btn} ${styles.btnSecondary}`}
                     >
                         後で確認
                     </button>
                     <button
+                        type="button"
                         onClick={handleApply}
                         disabled={isApplying || !job.resultData}
                         className={`${styles.btn} ${styles.btnPrimary}`}

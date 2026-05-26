@@ -268,8 +268,9 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
             </div>
 
             <div className={styles.stepActions}>
-                <button onClick={onClose} className={`${styles.btn} ${styles.btnSecondary}`}>キャンセル</button>
+                <button type="button" onClick={onClose} className={`${styles.btn} ${styles.btnSecondary}`}>キャンセル</button>
                 <button
+                    type="button"
                     onClick={() => goToStep(2)}
                     disabled={!canProceedToStep2}
                     className={`${styles.btn} ${styles.btnPrimary}`}
@@ -346,8 +347,9 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
                 )}
 
                 <div className={styles.stepActions}>
-                    <button onClick={() => goToStep(1)} className={`${styles.btn} ${styles.btnSecondary}`}>← 戻る</button>
+                    <button type="button" onClick={() => goToStep(1)} className={`${styles.btn} ${styles.btnSecondary}`}>← 戻る</button>
                     <button
+                        type="button"
                         onClick={() => goToStep(3)}
                         disabled={!canProceedToStep3}
                         className={`${styles.btn} ${styles.btnPrimary}`}
@@ -383,8 +385,9 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
             </div>
 
             <div className={styles.stepActions}>
-                <button onClick={() => goToStep(2)} className={`${styles.btn} ${styles.btnSecondary}`}>← 戻る</button>
+                <button type="button" onClick={() => goToStep(2)} className={`${styles.btn} ${styles.btnSecondary}`}>← 戻る</button>
                 <button
+                    type="button"
                     onClick={handleGenerate}
                     disabled={loading}
                     className={`${styles.btn} ${styles.btnPrimary} ${styles.btnGenerate}`}
@@ -430,6 +433,7 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
                     💡 このウィンドウを閉じても、計画の生成は継続されます
                 </p>
                 <button
+                    type="button"
                     onClick={onClose}
                     className={`${styles.btn} ${styles.btnPrimary}`}
                     style={{ marginTop: '1.5rem' }}
@@ -446,7 +450,7 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
         }}>
             <div className={styles.modal} onClick={e => e.stopPropagation()}>
                 <header className={styles.modalHeader}>
-                    <button className={styles.closeBtn} onClick={onClose} aria-label="閉じる">×</button>
+                    <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="閉じる">×</button>
                     <h2 className={styles.modalTitle}>AI学習プランナー</h2>
                     {!loading && !asyncJobCreated && renderStepIndicator()}
                 </header>

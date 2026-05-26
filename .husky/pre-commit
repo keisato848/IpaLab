@@ -15,6 +15,18 @@ if [ $GUARD_EXIT -ne 0 ]; then
   exit 1
 fi
 
+# ESLint: button-has-type / アクセシビリティ違反を静的チェック
+echo "🔍 ESLint を実行中..."
+cd apps/web && npx eslint app components hooks lib --ext .ts,.tsx 2>&1
+ESLINT_EXIT=$?
+cd ../..
+
+if [ $ESLINT_EXIT -ne 0 ]; then
+  echo "❌ ESLint エラーが検出されました。コミットを中止します。"
+  exit 1
+fi
+echo "✅ ESLint OK"
+
 echo "🔎 self-inspect を実行中..."
 if ! command -v pwsh >/dev/null 2>&1; then
   echo "❌ pwsh が見つからないため self-inspect を実行できません。"

@@ -145,7 +145,7 @@ export default function ExamResult({ questions, examId, year, type }: ExamResult
                     aria-label={`正答率 ${scorePercentage}%`}
                 >
                     <div className={styles.scoreInner}>
-                        <span className={styles.scoreVal}>{scorePercentage}<span style={{ fontSize: '1.5rem' }}>%</span></span>
+                        <span className={styles.scoreVal}>{scorePercentage}<span className={styles.scoreUnit}>%</span></span>
                         <span className={styles.scoreLabel}>正答率</span>
                     </div>
                 </div>
@@ -189,6 +189,7 @@ export default function ExamResult({ questions, examId, year, type }: ExamResult
             <footer className={styles.footer}>
                 <Link href="/exam" className={styles.backBtn}>一覧に戻る</Link>
                 <button
+                    type="button"
                     onClick={() => handleNewSession('practice')}
                     className={styles.retryBtn}
                     disabled={isStarting}

@@ -92,6 +92,7 @@ export default function DiagramViewerModal({ svgHtml, onClose }: DiagramViewerMo
       <div className={styles.content} data-testid="diagram-viewer-content">
         <div className={styles.toolbar}>
           <button
+            type="button"
             className={styles.toolbarButton}
             data-testid="diagram-zoom-in"
             onClick={handleZoomIn}
@@ -100,6 +101,7 @@ export default function DiagramViewerModal({ svgHtml, onClose }: DiagramViewerMo
             +
           </button>
           <button
+            type="button"
             className={styles.toolbarButton}
             data-testid="diagram-zoom-out"
             onClick={handleZoomOut}
@@ -108,6 +110,7 @@ export default function DiagramViewerModal({ svgHtml, onClose }: DiagramViewerMo
             −
           </button>
           <button
+            type="button"
             className={styles.toolbarButton}
             data-testid="diagram-zoom-reset"
             onClick={handleZoomReset}
@@ -116,6 +119,7 @@ export default function DiagramViewerModal({ svgHtml, onClose }: DiagramViewerMo
             1:1
           </button>
           <button
+            type="button"
             className={styles.closeButton}
             data-testid="diagram-viewer-close"
             onClick={onClose}
