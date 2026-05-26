@@ -147,6 +147,7 @@ export default function PlanViewer() {
                     {plans.map(p => (
                         <li key={p.id}>
                             <button
+                                type="button"
                                 onClick={() => setSelectedPlanId(p.id)}
                                 style={{
                                     width: '100%',
@@ -219,6 +220,7 @@ export default function PlanViewer() {
                             </div>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 <button
+                                    type="button"
                                     onClick={() => setEditing(e => !e)}
                                     style={{
                                         padding: '0.5rem 1rem',
@@ -233,6 +235,7 @@ export default function PlanViewer() {
                                     {editing ? '編集モード解除' : '✏️ 計画を編集'}
                                 </button>
                                 <button
+                                    type="button"
                                     onClick={() => handleDelete(activePlan.id)}
                                     style={{
                                         padding: '0.5rem 1rem',
@@ -300,6 +303,7 @@ export default function PlanViewer() {
                                                                 </div>
                                                                 {isPast && !isMet && remaining > 0 && (
                                                                     <button
+                                                                        type="button"
                                                                         onClick={() => {
                                                                             if (!confirm(`${remaining}問を次の学習日に繰り越しますか？`)) return;
                                                                             const newPlan = JSON.parse(JSON.stringify(activePlan));
@@ -334,7 +338,7 @@ export default function PlanViewer() {
                                             <div style={{ textAlign: 'center', padding: '1rem', background: 'var(--bg-primary)', borderRadius: '8px', border: '1px dashed var(--border-color)' }}>
                                                 <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>詳細タスクは未生成です。</p>
                                                 {isTransitionWeek && (
-                                                    <button onClick={() => window.location.href = '/dashboard?action=replan'} style={{ marginTop: '0.5rem', padding: '0.5rem 1rem', background: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--primary-color)', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer' }}>
+                                                    <button type="button" onClick={() => window.location.href = '/dashboard?action=replan'} style={{ marginTop: '0.5rem', padding: '0.5rem 1rem', background: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--primary-color)', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer' }}>
                                                         続きを作成する
                                                     </button>
                                                 )}

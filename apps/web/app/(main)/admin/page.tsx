@@ -264,6 +264,7 @@ export default function AdminPage() {
                         const periodValue = `${days}d`;
                         return (
                             <button
+                                type="button"
                                 key={periodValue}
                                 className={`${styles.periodButton} ${analyticsPeriod === periodValue ? styles.periodButtonActive : ''}`}
                                 onClick={() => {

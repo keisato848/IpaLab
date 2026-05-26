@@ -205,6 +205,7 @@ export default function AIAnswerBox({
     return (
         <div className={`${styles.container} ${isExpanded ? styles.expanded : ''}`}>
             <button
+                type="button"
                 className={styles.expandBtn}
                 onClick={() => setIsExpanded(!isExpanded)}
                 title={isExpanded ? "元のサイズに戻す" : "入力欄を拡大する"}
@@ -273,6 +274,7 @@ export default function AIAnswerBox({
                     </div>
                 )}
                 <button
+                    type="button"
                     onClick={handleScore}
                     disabled={!answer.trim() || isLoading || isOverLimit}
                     className={styles.scoreBtn}

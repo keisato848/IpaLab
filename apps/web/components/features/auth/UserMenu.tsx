@@ -58,7 +58,7 @@ export function UserMenu() {
 
             <div className={styles.info}>
                 <div className={styles.name} data-user-identity>{session.user?.name || 'User'}</div>
-                <button className={styles.logout} onClick={handleSignOut}>
+                <button type="button" className={styles.logout} onClick={handleSignOut}>
                     <FaSignOutAlt /> ログアウト
                 </button>
             </div>
