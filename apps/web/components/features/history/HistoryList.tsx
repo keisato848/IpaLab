@@ -265,7 +265,7 @@ function SessionCard({ session: s, onFinish }: { session: LearningSessionInfo; o
                             <Link href={continueHref} className={styles.continueBtn}>
                                 続きから →
                             </Link>
-                            <button onClick={handleFinishSession} className={styles.finishBtn}>
+                            <button type="button" onClick={handleFinishSession} className={styles.finishBtn}>
                                 採点して終了
                             </button>
                         </>

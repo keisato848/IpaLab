@@ -232,6 +232,7 @@ export default function AdminPage() {
                         <label className={styles.toggleSwitch}>
                             <input
                                 type="checkbox"
+                                aria-label={`${flag.id}: ${flag.enabled ? '有効' : '無効'} — クリックで切り替え`}
                                 checked={flag.enabled}
                                 disabled={updating === flag.id}
                                 onChange={() => toggleFlag(flag.id, flag.enabled)}
@@ -264,6 +265,7 @@ export default function AdminPage() {
                         const periodValue = `${days}d`;
                         return (
                             <button
+                                type="button"
                                 key={periodValue}
                                 className={`${styles.periodButton} ${analyticsPeriod === periodValue ? styles.periodButtonActive : ''}`}
                                 onClick={() => {

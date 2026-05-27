@@ -784,9 +784,7 @@ export default function DashboardClient() {
                             <span>🏆 実績: {achievements.unlocked.length}/{achievementTotal}</span>
                         </div>
                     </div>
-                    {collapsedSections['level'] && <div id="section-body-level" hidden aria-hidden="true" />}
-                    {!collapsedSections['level'] && (
-                    <div id="section-body-level">
+                    <div id="section-body-level" hidden={!!collapsedSections['level']}>
                     <div className={styles.levelBar}>
                         <div
                             className={styles.levelFill}
@@ -840,7 +838,6 @@ export default function DashboardClient() {
                         💡 XPは「正解 +10 / 不正解 +3 / 連続日数ボーナス +5」で増加。レベルアップで称号と統計バッジが解放されます。
                     </div>
                     </div>
-                    )}
                 </section>
                 {/* 1. Goal Section (Hierarchical) - ゲーミフィケーション対応 */}
                 <section className={`${styles.card} ${styles.statusCard} ${styles.fullWidthCard} ${styles.collapsibleSection}`}>
@@ -850,6 +847,7 @@ export default function DashboardClient() {
                             <h3>学習目標</h3>
                             {allPlans.length > 0 && (
                                 <select
+                                    aria-label="学習計画を選択"
                                     className={styles.planSwitcher}
                                     value={studyPlan?.id || 'ALL'}
                                     onChange={(e) => {
@@ -879,9 +877,7 @@ export default function DashboardClient() {
                             ✏️
                         </button>
                     </div>
-                    {collapsedSections['goal'] && <div id="section-body-goal" hidden aria-hidden="true" />}
-                    {!collapsedSections['goal'] && (
-                    <div id="section-body-goal">
+                    <div id="section-body-goal" hidden={!!collapsedSections['goal']}>
                     {studyPlan ? (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: '100%' }}>
                             {/* Monthly Goal - 定量目標 + テキスト */}
@@ -892,6 +888,7 @@ export default function DashboardClient() {
                                             📊 今月の目標（{monthlyProgress.monthLabel}）
                                         </div>
                                         <button
+                                            type="button"
                                             onClick={() => setShowGoalEditor(true)}
                                             style={{
                                                 background: 'transparent',
@@ -974,6 +971,7 @@ export default function DashboardClient() {
                                         }}>
                                             定量目標が未設定です。
                                             <button
+                                                type="button"
                                                 onClick={() => setShowGoalEditor(true)}
                                                 style={{
                                                     background: 'none',
@@ -1101,6 +1099,7 @@ export default function DashboardClient() {
                             {/* ミッション問題一覧 */}
                             <div style={{ width: '100%', marginTop: '0.5rem' }}>
                                 <button
+                                    type="button"
                                     onClick={() => {
                                         const next = !showMissionQuestions;
                                         setShowMissionQuestions(next);
@@ -1232,6 +1231,7 @@ export default function DashboardClient() {
 
                             <div style={{ width: '100%', marginTop: '0.5rem' }}>
                                 <button
+                                    type="button"
                                     onClick={() => setShowWizard(true)}
                                     className={styles.quickStartBtn}
                                     style={{ width: 'auto', background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--border-color)', boxShadow: 'none', fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
@@ -1244,6 +1244,7 @@ export default function DashboardClient() {
                         <div style={{ textAlign: 'center', padding: '1rem' }}>
                             <p style={{ marginBottom: '1rem', opacity: 0.9 }}>まだ目標が設定されていません。<br />AIと一緒に最適な学習プランを作りましょう。</p>
                             <button
+                                type="button"
                                 onClick={() => setShowWizard(true)}
                                 className={styles.quickStartBtn}
                             >
@@ -1252,18 +1253,14 @@ export default function DashboardClient() {
                         </div>
                     )}
                     </div>
-                    )}
                 </section>
 
                 {/* 1.5 Monthly Progress Card - 今月の定量進捗 */}
                 <section className={`${styles.fullWidthCard} ${styles.collapsibleSection} ${styles.monthlyProgressWrapper}`}>
                     {renderCollapseToggle('monthly', '今月の進捗')}
-                    {collapsedSections['monthly'] && <div id="section-body-monthly" hidden aria-hidden="true" />}
-                    {!collapsedSections['monthly'] && (
-                    <div id="section-body-monthly">
+                    <div id="section-body-monthly" hidden={!!collapsedSections['monthly']}>
                         <MonthlyProgressCard stats={monthlyStats} />
                     </div>
-                    )}
                 </section>
 
                 {/* 2. Today's Status - ゲーミフィケーション対応 */}
@@ -1320,9 +1317,7 @@ export default function DashboardClient() {
                         <h3 style={{ color: 'white' }}>通算正答率 {isAllPlans ? '(全体)' : ''}</h3>
                         <span className={styles.cardIcon}>📊</span>
                     </div>
-                    {collapsedSections['accuracy'] && <div id="section-body-accuracy" hidden aria-hidden="true" />}
-                    {!collapsedSections['accuracy'] && (
-                    <div id="section-body-accuracy" className={styles.progressContainer} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2rem', padding: '0.5rem 0' }}>
+                    <div id="section-body-accuracy" className={styles.progressContainer} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2rem', padding: '0.5rem 0' }} hidden={!!collapsedSections['accuracy']}>
                         {/* Donut Chart - Compact Size */}
                         <div style={{ position: 'relative', width: '80px', height: '80px' }}>
                             <svg width="80" height="80" viewBox="0 0 100 100">
@@ -1359,18 +1354,14 @@ export default function DashboardClient() {
                             </div>
                         </div>
                     </div>
-                    )}
                 </section>
 
                 {/* 4. Heatmap Widget (Replaces placeholders) */}
                 <section className={`${styles.card} ${styles.heatmapCard} ${styles.collapsibleSection}`}>
                     {renderCollapseToggle('heatmap', '学習ヒートマップ')}
-                    {collapsedSections['heatmap'] && <div id="section-body-heatmap" hidden aria-hidden="true" />}
-                    {!collapsedSections['heatmap'] && (
-                    <div id="section-body-heatmap" className={styles.heatmapBody}>
+                    <div id="section-body-heatmap" className={styles.heatmapBody} hidden={!!collapsedSections['heatmap']}>
                         <HeatmapWidget records={records} />
                     </div>
-                    )}
                 </section>
 
                 {/* 5. Recent History */}
@@ -1380,9 +1371,7 @@ export default function DashboardClient() {
                         <h3>最近の活動</h3>
                         <Link href="/history" className={styles.viewAllBtn}>すべて見る</Link>
                     </div>
-                    {collapsedSections['history'] && <div id="section-body-history" hidden aria-hidden="true" />}
-                    {!collapsedSections['history'] && (
-                    <div id="section-body-history">
+                    <div id="section-body-history" hidden={!!collapsedSections['history']}>
                     {recentRecords.length === 0 ? (
                         <p className={styles.subtitle}>まだ学習履歴がありません。</p>
                     ) : (
@@ -1429,7 +1418,6 @@ export default function DashboardClient() {
                         </ul>
                     )}
                     </div>
-                    )}
                 </section>
             </div>
 
@@ -1450,7 +1438,7 @@ export default function DashboardClient() {
                         <div className={styles.missionTotal}>
                             合計: +{lastMissionReward.totalXpEarned} XP
                         </div>
-                        <button className={styles.missionButton} onClick={clearMissionReward}>次のミッションへ</button>
+                        <button type="button" className={styles.missionButton} onClick={clearMissionReward}>次のミッションへ</button>
                     </div>
                 </div>
             )}
@@ -1466,7 +1454,7 @@ export default function DashboardClient() {
                                 これまでの努力が実を結びました！この調子で合格を目指しましょう！
                             </p>
                         </div>
-                        <button className={styles.levelUpButton} onClick={clearLevelUp}>OK</button>
+                        <button type="button" className={styles.levelUpButton} onClick={clearLevelUp}>OK</button>
                     </div>
                 </div>
             )}

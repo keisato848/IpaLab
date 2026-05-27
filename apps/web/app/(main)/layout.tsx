@@ -46,7 +46,7 @@ export default function DashboardLayout({
     <div className={`${styles.container} ${isSidebarCollapsed ? styles.sidebarCollapsed : ''}`}>
       {/* Mobile Header */}
       <header className={styles.mobileHeader}>
-        <button className={styles.hamburger} onClick={toggleSidebar}>
+        <button type="button" className={styles.hamburger} onClick={toggleSidebar} aria-label="サイドナビを開く" aria-expanded={isSidebarOpen}>
           <span className={styles.hamburgerLine}></span>
           <span className={styles.hamburgerLine}></span>
           <span className={styles.hamburgerLine}></span>

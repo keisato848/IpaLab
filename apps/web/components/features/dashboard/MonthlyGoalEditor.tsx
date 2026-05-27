@@ -82,7 +82,7 @@ export default function MonthlyGoalEditor({ goals, monthlyGoalText, onSave, onCl
             <div className={styles.modal} onClick={e => e.stopPropagation()}>
                 <div className={styles.header}>
                     <h3>📊 今月の定量目標を設定</h3>
-                    <button className={styles.closeBtn} onClick={onClose}>×</button>
+                    <button type="button" className={styles.closeBtn} onClick={onClose}>×</button>
                 </div>
 
                 {/* テキスト目標 */}
@@ -107,6 +107,7 @@ export default function MonthlyGoalEditor({ goals, monthlyGoalText, onSave, onCl
                                 <div className={styles.goalInfo}>
                                     <select
                                         className={styles.typeSelect}
+                                        aria-label={`目標${idx + 1}のタイプ`}
                                         value={goal.type}
                                         onChange={e => {
                                             const opt = GOAL_TYPE_OPTIONS.find(o => o.type === e.target.value);
@@ -127,6 +128,7 @@ export default function MonthlyGoalEditor({ goals, monthlyGoalText, onSave, onCl
                                     <input
                                         type="number"
                                         className={styles.numberInput}
+                                        aria-label={`目標${idx + 1}の目標値`}
                                         value={goal.targetValue}
                                         min={1}
                                         max={goal.type === 'accuracy' ? 100 : 9999}
@@ -134,21 +136,21 @@ export default function MonthlyGoalEditor({ goals, monthlyGoalText, onSave, onCl
                                     />
                                     <span className={styles.goalUnit}>{goal.unit}</span>
                                 </div>
-                                <button className={styles.removeBtn} onClick={() => removeGoal(idx)}>🗑</button>
+                                <button type="button" className={styles.removeBtn} onClick={() => removeGoal(idx)}>🗑</button>
                             </div>
                         ))}
                     </div>
 
                     {editGoals.length < GOAL_TYPE_OPTIONS.length && (
-                        <button className={styles.addBtn} onClick={addGoal}>
+                        <button type="button" className={styles.addBtn} onClick={addGoal}>
                             + 目標を追加
                         </button>
                     )}
                 </div>
 
                 <div className={styles.footer}>
-                    <button className={styles.cancelBtn} onClick={onClose}>キャンセル</button>
-                    <button className={styles.saveBtn} onClick={handleSave}>保存</button>
+                    <button type="button" className={styles.cancelBtn} onClick={onClose}>キャンセル</button>
+                    <button type="button" className={styles.saveBtn} onClick={handleSave}>保存</button>
                 </div>
             </div>
         </div>

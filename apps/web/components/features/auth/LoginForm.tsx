@@ -94,6 +94,7 @@ export function LoginForm({ isStagingMode = false }: { isStagingMode?: boolean }
 
             <div className={styles.buttons}>
                 <button
+                    type="button"
                     className={`${styles.button} ${styles.google}`}
                     onClick={() => handleLogin('google')}
                     disabled={loading !== null}
@@ -107,6 +108,7 @@ export function LoginForm({ isStagingMode = false }: { isStagingMode?: boolean }
                 </button>
 
                 <button
+                    type="button"
                     className={`${styles.button} ${styles.github}`}
                     onClick={() => handleLogin('github')}
                     disabled={loading !== null}
@@ -144,6 +146,7 @@ export function LoginForm({ isStagingMode = false }: { isStagingMode?: boolean }
                         disabled={loading !== null}
                     />
                     <button
+                        type="button"
                         className={styles.stagingButton}
                         onClick={handleStagingLogin}
                         disabled={loading !== null || !stagingToken.trim()}
@@ -160,7 +163,7 @@ export function LoginForm({ isStagingMode = false }: { isStagingMode?: boolean }
 
             <div className={styles.guest}>
                 <p>まずは試してみたい方へ</p>
-                <button className={styles.guestButton} onClick={() => window.location.href = '/exam'}>
+                <button type="button" className={styles.guestButton} onClick={() => window.location.href = '/exam'}>
                     ゲストとして利用する
                 </button>
             </div>

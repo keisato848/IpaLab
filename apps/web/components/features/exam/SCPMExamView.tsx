@@ -346,6 +346,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, onChoi
             <div className={styles.layoutControls}>
                 <div className={styles.layoutToggleGroup}>
                     <button
+                        type="button"
                         onClick={() => { setLayoutMode('default'); setIsContextPaneCollapsed(false); }}
                         className={`${styles.layoutToggleBtn} ${layoutMode === 'default' ? styles.active : ''}`}
                         title="標準 (3カラム)"
@@ -353,6 +354,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, onChoi
                         標準
                     </button>
                     <button
+                        type="button"
                         onClick={() => setLayoutMode('focus')}
                         className={`${styles.layoutToggleBtn} ${layoutMode === 'focus' ? styles.active : ''}`}
                         title="集中 (ナビ非表示)"
@@ -360,6 +362,7 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, onChoi
                         集中
                     </button>
                     <button
+                        type="button"
                         onClick={() => { setLayoutMode('paper'); setIsContextPaneCollapsed(true); }}
                         className={`${styles.layoutToggleBtn} ${layoutMode === 'paper' ? styles.active : ''}`}
                         title="解答のみ (1カラム)"
@@ -371,18 +374,21 @@ export default function SCPMExamView({ question, onAnswerSubmit, onGrade, onChoi
             {/* Mobile Tab Navigation (Visible only on small screens) */}
             <div className={styles.mobileNav}>
                 <button
+                    type="button"
                     onClick={() => { setMobileLayout('tab'); setActiveTab('context'); }}
                     className={`${styles.mobileNavButton} ${mobileLayout === 'tab' && activeTab === 'context' ? styles.active : ''}`}
                 >
                     📖 問題文
                 </button>
                 <button
+                    type="button"
                     onClick={() => { setMobileLayout('stacked'); }}
                     className={`${styles.mobileNavButton} ${mobileLayout === 'stacked' ? styles.active : ''}`}
                 >
                     📄 分割
                 </button>
                 <button
+                    type="button"
                     onClick={() => { setMobileLayout('tab'); setActiveTab('answer'); }}
                     className={`${styles.mobileNavButton} ${mobileLayout === 'tab' && activeTab === 'answer' ? styles.active : ''}`}
                 >
@@ -594,6 +600,7 @@ function SubQuestionItem({ sq, sIdx, subCategory, answerFieldId, onGrade, onChoi
 
             <div className={styles.explanationToggle}>
                 <button
+                    type="button"
                     onClick={() => setShowExplanation(!showExplanation)}
                     className={styles.explanationButton}
                 >

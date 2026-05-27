@@ -237,6 +237,7 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
                 <label className={styles.label}>目標の試験区分</label>
                 <select
                     className={styles.select}
+                    aria-label="目標の試験区分"
                     value={targetExam}
                     onChange={(e) => setTargetExam(e.target.value)}
                 >
@@ -254,6 +255,7 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
                 <input
                     type="date"
                     required
+                    aria-label="受験予定日"
                     min={new Date().toISOString().split('T')[0]}
                     value={examDate}
                     onChange={(e) => setExamDate(e.target.value)}
@@ -268,8 +270,9 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
             </div>
 
             <div className={styles.stepActions}>
-                <button onClick={onClose} className={`${styles.btn} ${styles.btnSecondary}`}>キャンセル</button>
+                <button type="button" onClick={onClose} className={`${styles.btn} ${styles.btnSecondary}`}>キャンセル</button>
                 <button
+                    type="button"
                     onClick={() => goToStep(2)}
                     disabled={!canProceedToStep2}
                     className={`${styles.btn} ${styles.btnPrimary}`}
@@ -294,6 +297,7 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
                             <input
                                 type="range"
                                 min="0" max="6" step="0.5"
+                                aria-label="平日の1日あたり学習時間"
                                 value={hoursWeekday}
                                 onChange={(e) => setHoursWeekday(Number(e.target.value))}
                                 className={styles.rangeInput}
@@ -305,6 +309,7 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
                             <input
                                 type="range"
                                 min="0" max="12" step="0.5"
+                                aria-label="休日の1日あたり学習時間"
                                 value={hoursWeekend}
                                 onChange={(e) => setHoursWeekend(Number(e.target.value))}
                                 className={styles.rangeInput}
@@ -346,8 +351,9 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
                 )}
 
                 <div className={styles.stepActions}>
-                    <button onClick={() => goToStep(1)} className={`${styles.btn} ${styles.btnSecondary}`}>← 戻る</button>
+                    <button type="button" onClick={() => goToStep(1)} className={`${styles.btn} ${styles.btnSecondary}`}>← 戻る</button>
                     <button
+                        type="button"
                         onClick={() => goToStep(3)}
                         disabled={!canProceedToStep3}
                         className={`${styles.btn} ${styles.btnPrimary}`}
@@ -372,6 +378,7 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
                             <input
                                 type="range"
                                 min="1" max="5"
+                                aria-label={item.label}
                                 value={scores[item.id]}
                                 onChange={(e) => handleScoreChange(item.id, Number(e.target.value))}
                                 className={styles.rangeInput}
@@ -383,8 +390,9 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
             </div>
 
             <div className={styles.stepActions}>
-                <button onClick={() => goToStep(2)} className={`${styles.btn} ${styles.btnSecondary}`}>← 戻る</button>
+                <button type="button" onClick={() => goToStep(2)} className={`${styles.btn} ${styles.btnSecondary}`}>← 戻る</button>
                 <button
+                    type="button"
                     onClick={handleGenerate}
                     disabled={loading}
                     className={`${styles.btn} ${styles.btnPrimary} ${styles.btnGenerate}`}
@@ -430,6 +438,7 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
                     💡 このウィンドウを閉じても、計画の生成は継続されます
                 </p>
                 <button
+                    type="button"
                     onClick={onClose}
                     className={`${styles.btn} ${styles.btnPrimary}`}
                     style={{ marginTop: '1.5rem' }}
@@ -446,7 +455,7 @@ export default function GoalSettingWizard({ onClose, onSave, onAsyncJobCreated, 
         }}>
             <div className={styles.modal} onClick={e => e.stopPropagation()}>
                 <header className={styles.modalHeader}>
-                    <button className={styles.closeBtn} onClick={onClose} aria-label="閉じる">×</button>
+                    <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="閉じる">×</button>
                     <h2 className={styles.modalTitle}>AI学習プランナー</h2>
                     {!loading && !asyncJobCreated && renderStepIndicator()}
                 </header>

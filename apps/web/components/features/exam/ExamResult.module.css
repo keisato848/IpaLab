@@ -81,6 +81,10 @@
     line-height: 1;
 }
 
+.scoreUnit {
+    font-size: 1.5rem;
+}
+
 .scoreLabel {
     font-size: var(--fs-md);
     color: var(--text-secondary);

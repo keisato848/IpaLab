@@ -792,6 +792,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     </div>
                     <div className={styles.pmHeaderActions}>
                         <button
+                            type="button"
                             onClick={() => router.push(`/exam/${year}/${type}`)}
                             className={styles.pmExitButton}
                         >
@@ -836,7 +837,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                 {showGuestWarning && !session?.user && (
                     <div className={`${styles.guestWarning} ${styles.guestWarningFramed}`}>
                         ⚠️ ゲストモード：履歴はブラウザに保存され、キャッシュクリア等で消失します。<Link href="/login" className={styles.guestWarningLink}>ログイン</Link>してデータを守りましょう。
-                        <button onClick={() => setShowGuestWarning(false)} className={styles.guestWarningClose} aria-label="ゲストモード警告を閉じる">✕</button>
+                        <button type="button" onClick={() => setShowGuestWarning(false)} className={styles.guestWarningClose} aria-label="ゲストモード警告を閉じる">✕</button>
                     </div>
                 )}
 
@@ -893,6 +894,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
                 <footer className={`${styles.footer} ${styles.pmFooter}`}>
                     <button
+                        type="button"
                         className={styles.navBtn}
                         onClick={handleSubPrev}
                         disabled={currentSubQIndex === 0}
@@ -903,6 +905,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                         {currentSubQIndex + 1} / {subQs.length}
                     </span>
                     <button
+                        type="button"
                         className={styles.navBtn}
                         onClick={handleSubNext}
                         disabled={currentSubQIndex === subQs.length - 1}
@@ -936,6 +939,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                     {/* Controls: Flag, Bookmark */}
                     <div className={styles.headerControls}>
                         <button
+                            type="button"
                             className={`${styles.bookmarkBtn} ${isFlagged ? styles.active : ''}`}
                             onClick={toggleFlag}
                             title="このセッションで見直す"
@@ -945,6 +949,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                         </button>
 
                         <button
+                            type="button"
                             className={`${styles.bookmarkBtn} ${isBookmarked ? styles.active : ''}`}
                             onClick={toggleBookmark}
                             title="永久ブックマーク"
@@ -996,13 +1001,15 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
                         {/* Desktop: Session action buttons */}
                         <div className={`${styles.sessionActions} ${styles.mobileHidden}`}>
-                            <button 
+                            <button
+                                type="button"
                                 className={`${styles.sessionActionBtn} ${styles.finish}`}
                                 onClick={handleFinishSession}
                             >
                                 採点終了
                             </button>
-                            <button 
+                            <button
+                                type="button"
                                 className={styles.sessionActionBtn}
                                 onClick={handleRestartSession}
                             >
@@ -1036,13 +1043,15 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
                                     </div>
                                 </div>
                                 <div className={styles.dropdownActions}>
-                                    <button 
+                                    <button
+                                        type="button"
                                         className={`${styles.dropdownBtn} ${styles.warning}`}
                                         onClick={handleFinishSession}
                                     >
                                         採点して終了
                                     </button>
-                                    <button 
+                                    <button
+                                        type="button"
                                         className={styles.dropdownBtn}
                                         onClick={handleRestartSession}
                                     >
@@ -1075,7 +1084,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
             {showGuestWarning && !session?.user && (
                 <div className={styles.guestWarning}>
                     ⚠️ ゲストモード：履歴はブラウザに保存され、キャッシュクリア等で消失します。<Link href="/login" className={styles.guestWarningLink}>ログイン</Link>してデータを守りましょう。
-                    <button onClick={() => setShowGuestWarning(false)} className={styles.guestWarningClose} aria-label="ゲストモード警告を閉じる">✕</button>
+                    <button type="button" onClick={() => setShowGuestWarning(false)} className={styles.guestWarningClose} aria-label="ゲストモード警告を閉じる">✕</button>
                 </div>
             )}
 
@@ -1139,6 +1148,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
                             return (
                                 <button
+                                    type="button"
                                     key={opt.id}
                                     className={optionClass}
                                     onClick={() => handleOptionClick(opt.id)}
@@ -1229,7 +1239,7 @@ export default function QuestionClient({ question, year, type, qNo, totalQuestio
 
             <footer className={styles.footer}>
                 <Link href={`/exam/${year}/${type}`} className={styles.navBtn}>中断して一覧へ</Link>
-                <button className={`${styles.navBtn} ${styles.primary}`} onClick={handleNext}>
+                <button type="button" className={`${styles.navBtn} ${styles.primary}`} onClick={handleNext}>
                     {isMock ? '回答して次へ' : '次の問題へ'}
                 </button>
             </footer>

@@ -291,6 +291,7 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
 
                 <div className={styles.actions}>
                     <button
+                        type="button"
                         onClick={() => startSession(nextQNo, 'practice')}
                         className={`${styles.btn} ${styles.btnPractice}`}
                         disabled={!isLoaded}
@@ -299,6 +300,7 @@ export default function ExamEntranceClient({ year, type, examId, examLabel, ques
                         <span className={styles.btnSub}>即座に解説を表示</span>
                     </button>
                     <button
+                        type="button"
                         onClick={() => startSession(getFirstQuestionNumber(questions), 'mock')}
                         className={`${styles.btn} ${styles.btnMock}`}
                     >

@@ -134,6 +134,7 @@ export default function AssistantPanel({
                 <div className={styles.panelTitle}>
                     {showBack && (
                         <button
+                            type="button"
                             className={styles.backButton}
                             onClick={handleBack}
                             aria-label="戻る"
@@ -148,6 +149,7 @@ export default function AssistantPanel({
                         <RateLimitBadge remaining={remainingQuota} limit={10} />
                     )}
                     <button
+                        type="button"
                         className={styles.closeButton}
                         onClick={onClose}
                         aria-label="閉じる"
@@ -198,7 +200,7 @@ export default function AssistantPanel({
                         <div className={styles.submittedIcon}>✅</div>
                         <div className={styles.submittedTitle}>報告ありがとうございます</div>
                         <p>内容を受け付けました。運営チームが確認いたします。</p>
-                        <button className={styles.menuButton} onClick={onGoToMenu}>
+                        <button type="button" className={styles.menuButton} onClick={onGoToMenu}>
                             <span className={styles.menuLabel}>メニューに戻る</span>
                         </button>
                     </div>
