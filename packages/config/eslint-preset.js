@@ -10,7 +10,8 @@ module.exports = {
         "@next/next/no-html-link-for-pages": "off",
         // button 要素には必ず type を明示する (submit/reset/button)
         "react/button-has-type": "error",
-        // select/input 等のフォームコントロールはアクセシブル名が必要
+        // select / カスタムコンポーネント等のフォームコントロールはアクセシブル名が必要
+        // (input/textarea は ignoreElements でデフォルト除外 — label-has-associated-control で別途検査)
         "jsx-a11y/control-has-associated-label": [
             "warn",
             {
