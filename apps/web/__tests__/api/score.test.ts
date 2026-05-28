@@ -339,6 +339,196 @@ describe('/api/score', () => {
             consoleError.mockRestore();
         });
 
+        it('コードフェンス付きJSONを採点結果として復旧できる', async () => {
+            process.env.GEMINI_API_KEY = 'test-api-key';
+
+            const mockResponse = {
+                score: 75,
+                radarChartData: [
+                    { subject: '設問適合性', A: 8, fullMark: 10 },
+                    { subject: '論理構成', A: 7, fullMark: 10 },
+                    { subject: '重要語句', A: 8, fullMark: 10 },
+                    { subject: '具体性', A: 6, fullMark: 10 },
+                ],
+                feedback: 'テストフィードバック',
+                mermaidDiagram: 'graph TD; A --> B',
+                improvedAnswer: '改善回答',
+            };
+
+            vi.doMock('@google/generative-ai', () => ({
+                GoogleGenerativeAI: class {
+                    constructor() {}
+                    getGenerativeModel() {
+                        return {
+                            generateContent: vi.fn().mockResolvedValue({
+                                response: {
+                                    text: () => `\`\`\`json\n${JSON.stringify(mockResponse)}\n\`\`\``,
+                                },
+                            }),
+                        };
+                    }
+                },
+                SchemaType: {},
+            }));
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: 'テスト問題', userAnswer: 'テスト回答' }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(200);
+            expect(data.score).toBe(75);
+        });
+
+        it('前後テキスト付きJSONを採点結果として復旧できる', async () => {
+            process.env.GEMINI_API_KEY = 'test-api-key';
+
+            const mockResponse = {
+                score: 70,
+                radarChartData: [
+                    { subject: '設問適合性', A: 7, fullMark: 10 },
+                    { subject: '論理構成', A: 7, fullMark: 10 },
+                    { subject: '重要語句', A: 7, fullMark: 10 },
+                    { subject: '具体性', A: 7, fullMark: 10 },
+                ],
+                feedback: 'テスト',
+                mermaidDiagram: 'graph TD; A --> B',
+                improvedAnswer: '改善回答',
+            };
+
+            vi.doMock('@google/generative-ai', () => ({
+                GoogleGenerativeAI: class {
+                    constructor() {}
+                    getGenerativeModel() {
+                        return {
+                            generateContent: vi.fn().mockResolvedValue({
+                                response: {
+                                    text: () =>
+                                        `採点結果を出力します。\n\n${JSON.stringify(mockResponse)}\n\n以上です。`,
+                                },
+                            }),
+                        };
+                    }
+                },
+                SchemaType: {},
+            }));
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: 'テスト問題', userAnswer: 'テスト回答' }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(200);
+            expect(data.score).toBe(70);
+        });
+
+        it('スキーマ不一致時に補正プロンプトで再試行して成功する', async () => {
+            process.env.GEMINI_API_KEY = 'test-api-key';
+
+            const validResponse = {
+                score: 80,
+                radarChartData: [
+                    { subject: '設問適合性', A: 9, fullMark: 10 },
+                    { subject: '論理構成', A: 8, fullMark: 10 },
+                    { subject: '重要語句', A: 8, fullMark: 10 },
+                    { subject: '具体性', A: 7, fullMark: 10 },
+                ],
+                feedback: 'リトライ成功',
+                mermaidDiagram: 'graph TD; A --> B',
+                improvedAnswer: '改善回答',
+            };
+
+            let callCount = 0;
+            const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            vi.doMock('@google/generative-ai', () => ({
+                GoogleGenerativeAI: class {
+                    constructor() {}
+                    getGenerativeModel() {
+                        return {
+                            generateContent: vi.fn().mockImplementation(() => {
+                                callCount++;
+                                return Promise.resolve({
+                                    response: {
+                                        text: () =>
+                                            callCount === 1
+                                                ? JSON.stringify({ score: 'invalid', missing: true })
+                                                : JSON.stringify(validResponse),
+                                    },
+                                });
+                            }),
+                        };
+                    }
+                },
+                SchemaType: {},
+            }));
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: 'テスト問題', userAnswer: 'テスト回答' }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(200);
+            expect(data.score).toBe(80);
+            expect(callCount).toBe(2);
+
+            consoleWarnSpy.mockRestore();
+        });
+
+        it('再試行後もスキーマ不一致の場合は500を返す', async () => {
+            process.env.GEMINI_API_KEY = 'test-api-key';
+
+            vi.doMock('@google/generative-ai', () => ({
+                GoogleGenerativeAI: class {
+                    constructor() {}
+                    getGenerativeModel() {
+                        return {
+                            generateContent: vi.fn().mockResolvedValue({
+                                response: {
+                                    text: () => JSON.stringify({ score: 'not-a-number', badSchema: true }),
+                                },
+                            }),
+                        };
+                    }
+                },
+                SchemaType: {},
+            }));
+
+            const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: 'テスト問題', userAnswer: 'テスト回答' }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(500);
+            expect(data.error).toBe('Failed to parse AI response');
+
+            consoleWarnSpy.mockRestore();
+            consoleErrorSpy.mockRestore();
+        });
+
         it('AI APIエラー時は500を返す', async () => {
             process.env.GEMINI_API_KEY = 'test-api-key';
 
