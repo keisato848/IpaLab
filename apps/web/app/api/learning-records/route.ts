@@ -4,6 +4,7 @@ import { getContainer } from '@/lib/cosmos';
 import { z } from 'zod';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -88,6 +89,23 @@ export async function POST(request: NextRequest) {
         const session = await getServerSession(authOptions);
         if (!session || !session.user?.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        // 学習記録の過剰書き込み防止
+        const rateLimitKey = `learning-records:user:${session.user.id}`;
+        const { allowed, retryAfter } = checkRateLimit(
+            rateLimitKey,
+            RATE_LIMITS.LEARNING_RECORDS.maxRequests,
+            RATE_LIMITS.LEARNING_RECORDS.windowMs,
+        );
+        if (!allowed) {
+            console.warn(
+                `[RateLimit] /api/learning-records blocked userId=${session.user.id} retryAfter=${retryAfter}s`,
+            );
+            return NextResponse.json(
+                { error: '学習記録の保存が上限に達しました。しばらく待ってから再試行してください。', retryAfter },
+                { status: 429, headers: { 'Retry-After': String(retryAfter) } },
+            );
         }
 
         const body = await request.json();

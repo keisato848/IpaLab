@@ -182,6 +182,14 @@ export default function AIAnswerBox({
 
             const data = await response.json();
 
+            if (response.status === 429) {
+                const retryAfter = data.retryAfter ?? 60;
+                const minutes = Math.ceil(retryAfter / 60);
+                throw new Error(
+                    `AI採点の利用上限に達しました。約${minutes}分後に再度お試しください。`,
+                );
+            }
+
             if (!response.ok) {
                 throw new Error(data.error || '採点中にエラーが発生しました');
             }
@@ -194,9 +202,10 @@ export default function AIAnswerBox({
                 onSave({ answer, result: data });
             }
 
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : '通信エラーが発生しました';
             console.error(err);
-            setError(err.message || '通信エラーが発生しました');
+            setError(message);
         } finally {
             setIsLoading(false);
         }
