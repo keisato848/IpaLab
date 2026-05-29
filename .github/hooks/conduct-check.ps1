@@ -4,7 +4,7 @@
 # copilot-instructions.md に定義された行動規範を、セッション終了時に確認する。
 #
 # チェック項目:
-#   C1. fix: コミットがあれば self-inspect.ps1 も同一コミット or セッション内で更新されているか
+#   C1. fix: コミットがあれば self-inspect/conduct-check 等の再発防止 guard も更新されているか
 #   C2. PR 作成が行われたか (gh pr merge の代わりに gh pr create になっているか)
 #   C3. APIルートを追加・変更した場合、console.error が catch 句に含まれているか (R2 再確認)
 #   C4. Active PR のレビューはすべて確認し、未解決 thread は修正 commit または返信で解消しているか
@@ -21,7 +21,7 @@ function Add-Violation {
 }
 
 # ---------------------------------------------------------------------------
-# C1: 現在ブランチの fix: コミットに self-inspect.ps1 更新が伴っているか
+# C1: 現在ブランチの fix: コミットに再発防止 guard 更新が伴っているか
 #     origin/main との差分コミットだけを対象にし、main 既存履歴のノイズを避ける
 # ---------------------------------------------------------------------------
 try {
@@ -36,10 +36,14 @@ try {
     foreach ($fc in $fixCommits) {
         $sha = ($fc -split ' ')[0]
         $changedFiles = git -C $RepoRoot diff-tree --no-commit-id -r --name-only $sha 2>$null
-        $hasInspect = $changedFiles | Where-Object { $_ -match 'self-inspect\.ps1' }
-        if (-not $hasInspect) {
-            Add-Violation -Rule 'C1-self-inspect-not-updated' `
-                -Detail "fix コミット '$fc' に self-inspect.ps1 の更新が含まれていません。再発防止ルールを追加しましたか？"
+        $hasGuardUpdate = $changedFiles | Where-Object {
+            $_ -match '(^|/)self-inspect\.ps1$' -or
+            $_ -match '(^|/)conduct-check\.ps1$' -or
+            $_ -match '(^|/)guard-.+\.mjs$'
+        }
+        if (-not $hasGuardUpdate) {
+            Add-Violation -Rule 'C1-guard-not-updated' `
+                -Detail "fix コミット '$fc' に self-inspect / conduct-check / guard script の更新が含まれていません。再発防止ルールを追加しましたか？"
         }
     }
 } catch {}
