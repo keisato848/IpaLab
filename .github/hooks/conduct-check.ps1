@@ -7,6 +7,7 @@
 #   C1. fix: コミットがあれば self-inspect.ps1 も同一コミット or セッション内で更新されているか
 #   C2. PR 作成が行われたか (gh pr merge の代わりに gh pr create になっているか)
 #   C3. APIルートを追加・変更した場合、console.error が catch 句に含まれているか (R2 再確認)
+#   C4. Active PR のレビューはすべて確認し、未解決 thread は修正 commit または返信で解消しているか
 # =============================================================================
 
 $ErrorActionPreference = 'SilentlyContinue'
@@ -20,11 +21,16 @@ function Add-Violation {
 }
 
 # ---------------------------------------------------------------------------
-# C1: 直近セッション内の fix: コミットに self-inspect.ps1 更新が伴っているか
-#     (git log で HEAD~10 以内の fix: コミットを対象)
+# C1: 現在ブランチの fix: コミットに self-inspect.ps1 更新が伴っているか
+#     origin/main との差分コミットだけを対象にし、main 既存履歴のノイズを避ける
 # ---------------------------------------------------------------------------
 try {
-    $recentCommits = git -C $RepoRoot log --oneline -20 2>$null
+    $base = git -C $RepoRoot merge-base HEAD origin/main 2>$null
+    if ([string]::IsNullOrWhiteSpace($base)) {
+        $recentCommits = git -C $RepoRoot log --oneline -20 2>$null
+    } else {
+        $recentCommits = git -C $RepoRoot log --oneline "$base..HEAD" 2>$null
+    }
     $fixCommits = $recentCommits | Where-Object { $_ -match '^[0-9a-f]+ fix' }
 
     foreach ($fc in $fixCommits) {
@@ -49,6 +55,69 @@ try {
         Add-Violation -Rule 'C2-unauthorized-merge' `
             -Detail "エージェントによる可能性があるマージコミットが検出されました: $m"
     }
+} catch {}
+
+# ---------------------------------------------------------------------------
+# C4: Active PR の未解決レビュー thread / Changes requested を検出
+#     ルール: PRレビューはすべて確認し、各指摘に対して修正 commit または返信を行う。
+#     GitHub 上で未解決 thread が残っている場合、作業完了扱いにしない。
+# ---------------------------------------------------------------------------
+try {
+        $null = Get-Command gh -ErrorAction Stop
+        $prJson = gh pr view --json number,url,reviewDecision 2>$null
+        if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($prJson)) {
+                $pr = $prJson | ConvertFrom-Json
+                if ($pr.reviewDecision -eq 'CHANGES_REQUESTED') {
+                        Add-Violation -Rule 'C4-pr-review-changes-requested' `
+                                -Detail "PR #$($pr.number) は Changes requested 状態です。すべてのレビューを確認し、修正 commit または返信で対応してください: $($pr.url)"
+                }
+
+                $repoJson = gh repo view --json nameWithOwner 2>$null
+                if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($repoJson)) {
+                        $repo = $repoJson | ConvertFrom-Json
+                        $parts = @($repo.nameWithOwner -split '/', 2)
+                        if ($parts.Count -eq 2) {
+                                $query = @'
+query($owner:String!, $name:String!, $number:Int!) {
+    repository(owner:$owner, name:$name) {
+        pullRequest(number:$number) {
+            reviewThreads(first:100) {
+                nodes {
+                    isResolved
+                    isOutdated
+                    path
+                    line
+                    comments(first:1) {
+                        nodes {
+                            url
+                            author { login }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+'@
+                                $threadsJson = gh api graphql `
+                                        -f "owner=$($parts[0])" `
+                                        -f "name=$($parts[1])" `
+                                        -F "number=$($pr.number)" `
+                                        -f "query=$query" 2>$null
+                                if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($threadsJson)) {
+                                        $threadsData = $threadsJson | ConvertFrom-Json
+                                        $threads = @($threadsData.data.repository.pullRequest.reviewThreads.nodes)
+                                        foreach ($thread in ($threads | Where-Object { -not $_.isResolved -and -not $_.isOutdated })) {
+                                                $firstComment = @($thread.comments.nodes) | Select-Object -First 1
+                                                $location = $thread.path
+                                                if ($null -ne $thread.line) { $location = "${location}:$($thread.line)" }
+                                                Add-Violation -Rule 'C4-pr-review-unresolved-thread' `
+                                                        -Detail "PR #$($pr.number) の未解決レビュー thread が残っています ($location)。修正 commit または返信後に解消してください: $($firstComment.url)"
+                                        }
+                                }
+                        }
+                }
+        }
 } catch {}
 
 # ---------------------------------------------------------------------------

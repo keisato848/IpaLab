@@ -8,7 +8,7 @@ export const runtime = 'nodejs';
 // --- Zod スキーマ定義 ---
 const RadarDataSchema = z.object({
     subject: z.string(),
-    A: z.number().min(0).max(10),
+    A: z.number().transform(value => Math.max(0, Math.min(10, value))),
     fullMark: z.number(),
 });
 
@@ -17,10 +17,11 @@ const ScoringResultSchema = z.object({
     radarChartData: z.array(RadarDataSchema).min(1),
     feedback: z.string(),
     mermaidDiagram: z.string().optional().default(''),
-    improvedAnswer: z.string(),
+    improvedAnswer: z.string().optional().default(''),
 });
 
 type ScoringResult = z.infer<typeof ScoringResultSchema>;
+type StructuredAiError = Error & { httpStatus?: number; isConfig?: boolean };
 
 /**
  * AI レスポンステキストから JSON 部分を安全に抽出する。
@@ -48,6 +49,14 @@ function parseAndValidate(rawText: string): ScoringResult {
     const cleaned = extractJson(rawText);
     const parsed = JSON.parse(cleaned);
     return ScoringResultSchema.parse(parsed);
+}
+
+function buildStructuredAiErrorResponse(err: unknown): NextResponse | null {
+    const e = err as StructuredAiError;
+    if (typeof e.httpStatus === 'number') {
+        return NextResponse.json({ error: e.message }, { status: e.httpStatus });
+    }
+    return null;
 }
 
 /**
@@ -190,16 +199,9 @@ export async function POST(req: NextRequest) {
         try {
             responseText = await callAi(prompt);
         } catch (err: unknown) {
-            const e = err as Error & { httpStatus?: number; isConfig?: boolean };
-            if (e.httpStatus && e.httpStatus !== 500) {
-                console.error('Scoring API Error:', err);
-                return NextResponse.json({ error: e.message }, { status: e.httpStatus });
-            }
-            if (e.httpStatus === 500 && e.isConfig) {
-                console.error('Scoring API Error:', err);
-                return NextResponse.json({ error: e.message }, { status: 500 });
-            }
             console.error('Scoring API Error:', err);
+            const structuredErrorResponse = buildStructuredAiErrorResponse(err);
+            if (structuredErrorResponse) return structuredErrorResponse;
             return NextResponse.json({ error: 'Scoring failed' }, { status: 500 });
         }
 
@@ -213,8 +215,10 @@ export async function POST(req: NextRequest) {
             let retryText: string;
             try {
                 retryText = await callAi(buildCorrectionPrompt(responseText, errMsg));
-            } catch {
-                console.error('JSON Parse Error:', responseText);
+            } catch (retryErr: unknown) {
+                console.error('Scoring API Retry Error:', retryErr);
+                const structuredErrorResponse = buildStructuredAiErrorResponse(retryErr);
+                if (structuredErrorResponse) return structuredErrorResponse;
                 return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 500 });
             }
             try {

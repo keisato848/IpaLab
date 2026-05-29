@@ -432,6 +432,94 @@ describe('/api/score', () => {
             expect(data.score).toBe(70);
         });
 
+        it('improvedAnswerが欠落していても既存契約どおり空文字で補完できる', async () => {
+            process.env.GEMINI_API_KEY = 'test-api-key';
+
+            const mockResponse = {
+                score: 72,
+                radarChartData: [
+                    { subject: '設問適合性', A: 7, fullMark: 10 },
+                    { subject: '論理構成', A: 7, fullMark: 10 },
+                    { subject: '重要語句', A: 8, fullMark: 10 },
+                    { subject: '具体性', A: 7, fullMark: 10 },
+                ],
+                feedback: '改善回答なしの旧形式レスポンス',
+                mermaidDiagram: 'graph TD; A --> B',
+            };
+
+            vi.doMock('@google/generative-ai', () => ({
+                GoogleGenerativeAI: class {
+                    constructor() {}
+                    getGenerativeModel() {
+                        return {
+                            generateContent: vi.fn().mockResolvedValue({
+                                response: { text: () => JSON.stringify(mockResponse) },
+                            }),
+                        };
+                    }
+                },
+                SchemaType: {},
+            }));
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: 'テスト問題', userAnswer: 'テスト回答' }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(200);
+            expect(data.improvedAnswer).toBe('');
+        });
+
+        it('レーダーチャート値が範囲外でも0〜10に丸めて復旧できる', async () => {
+            process.env.GEMINI_API_KEY = 'test-api-key';
+
+            const mockResponse = {
+                score: 78,
+                radarChartData: [
+                    { subject: '設問適合性', A: 12, fullMark: 10 },
+                    { subject: '論理構成', A: -2, fullMark: 10 },
+                    { subject: '重要語句', A: 8, fullMark: 10 },
+                    { subject: '具体性', A: 7, fullMark: 10 },
+                ],
+                feedback: '範囲外レーダー値を含むレスポンス',
+                mermaidDiagram: 'graph TD; A --> B',
+                improvedAnswer: '改善回答',
+            };
+
+            vi.doMock('@google/generative-ai', () => ({
+                GoogleGenerativeAI: class {
+                    constructor() {}
+                    getGenerativeModel() {
+                        return {
+                            generateContent: vi.fn().mockResolvedValue({
+                                response: { text: () => JSON.stringify(mockResponse) },
+                            }),
+                        };
+                    }
+                },
+                SchemaType: {},
+            }));
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: 'テスト問題', userAnswer: 'テスト回答' }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(200);
+            expect(data.radarChartData[0].A).toBe(10);
+            expect(data.radarChartData[1].A).toBe(0);
+        });
+
         it('スキーマ不一致時に補正プロンプトで再試行して成功する', async () => {
             process.env.GEMINI_API_KEY = 'test-api-key';
 
@@ -524,6 +612,54 @@ describe('/api/score', () => {
 
             expect(response.status).toBe(500);
             expect(data.error).toBe('Failed to parse AI response');
+
+            consoleWarnSpy.mockRestore();
+            consoleErrorSpy.mockRestore();
+        });
+
+        it('補正リトライ時の構造化AIエラーはステータスとメッセージを維持する', async () => {
+            process.env.GEMINI_API_KEY = 'test-api-key';
+
+            let callCount = 0;
+            const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            vi.doMock('@google/generative-ai', () => ({
+                GoogleGenerativeAI: class {
+                    constructor() {}
+                    getGenerativeModel() {
+                        return {
+                            generateContent: vi.fn().mockImplementation(() => {
+                                callCount++;
+                                if (callCount === 1) {
+                                    return Promise.resolve({
+                                        response: { text: () => JSON.stringify({ score: 'invalid' }) },
+                                    });
+                                }
+                                return Promise.reject(Object.assign(
+                                    new Error('AI proxy is not configured'),
+                                    { httpStatus: 503 },
+                                ));
+                            }),
+                        };
+                    }
+                },
+                SchemaType: {},
+            }));
+
+            const { POST } = await import('@/app/api/score/route');
+            const request = new NextRequest('http://localhost:3000/api/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: 'テスト問題', userAnswer: 'テスト回答' }),
+            });
+
+            const response = await POST(request);
+            const data = await response.json();
+
+            expect(response.status).toBe(503);
+            expect(data.error).toBe('AI proxy is not configured');
+            expect(callCount).toBe(2);
 
             consoleWarnSpy.mockRestore();
             consoleErrorSpy.mockRestore();
