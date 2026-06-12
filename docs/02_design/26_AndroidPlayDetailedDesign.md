@@ -104,6 +104,7 @@ Provider tokenは端末へ返さない。任意redirectは禁止し、環境別a
 - 401時のrefreshはsingle-flightで1回だけ実行する。
 - Refresh Token再利用時はtoken familyを全失効する。
 - Provider secret、JWT秘密鍵、NextAuth secretは共有しない。
+- セッション解決: Refresh Tokenは`{sessionId}.{secret}`の自己完結形式とする。サーバーは`sessionId`でMobileSessions（PK `/userId`はJWT`sub`または保存済みuid部から解決）をpoint readし、`secret`部はハッシュ照合する。Tokenからの逆引き全件検索は行わない。
 
 ### 5.3 ゲスト統合
 
@@ -255,3 +256,4 @@ apps/mobile/e2e/
 | 日付 | 版 | 内容 |
 |---|---|---|
 | 2026-06-11 | 1.0 | Phase 3初版 |
+| 2026-06-12 | 1.1 | レビュー指摘反映: §5.2へRefresh Token提示時のMobileSessions解決方式を補記 |
