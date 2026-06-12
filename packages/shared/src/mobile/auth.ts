@@ -37,6 +37,18 @@ export const tokenPairSchema = z.object({
 });
 export type TokenPair = z.infer<typeof tokenPairSchema>;
 
+/** POST /api/mobile/v1/auth/exchange 応答（bridge code交換後のセッション確立） */
+export const exchangeResponseSchema = z.object({
+    tokens: tokenPairSchema,
+    user: z.object({
+        userId: z.string().min(1),
+        provider: oauthProviderSchema,
+        displayName: z.string().optional(),
+        avatarUrl: z.string().url().optional(),
+    }),
+});
+export type ExchangeResponse = z.infer<typeof exchangeResponseSchema>;
+
 /** POST /api/mobile/v1/auth/refresh 要求 */
 export const refreshRequestSchema = z.object({
     refreshToken: z.string().min(1),
