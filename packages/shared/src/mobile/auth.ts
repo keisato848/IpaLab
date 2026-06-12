@@ -48,6 +48,8 @@ export const guestCredentialResponseSchema = z.object({
     guestId: z.string().uuid(),
     guestSecret: z.string().min(1),
     issuedAt: z.string().datetime(),
+    /** ゲストもAPI呼出にはBearerを用いる（role=guest） */
+    tokens: tokenPairSchema,
 });
 export type GuestCredentialResponse = z.infer<typeof guestCredentialResponseSchema>;
 
