@@ -132,6 +132,10 @@ Provider tokenは端末へ返さない。任意redirectは禁止し、環境別a
 
 共通ヘッダーはBearer token、`X-Correlation-Id`、ハッシュ化した`X-Device-Id`、`X-App-Version`とする。入力DTOは`packages/shared/src/mobile/`へZod schemaとして配置する。入力の`userId`は認可判断に使わず、JWTの`sub`を正本とする。
 
+### 6.1 流用APIの認証方式（U-01確定）
+
+モバイルからの流用API（AI採点、AIアシスタント、学習計画生成等）は**BFFプロキシ方式**とする。アプリは`/api/mobile/v1/*`のみを呼び、BFF（apps/web）がMobile JWTを検証したうえで既存内部API（`apps/api-ai`等）へ転送する。`apps/api-ai`側へのJWT検証実装は行わない。SSE採点はBFFがストリームを中継する。これによりJWKS検証・認可・rate limitをBFFの1箇所へ集約し、既存APIは無改修とする。
+
 同期結果はイベントごとに `applied / duplicate / conflict / rejected / retryable_error` を返す。エラーは `code`, `message`, `retryable`, `correlationId` を共通項目とする。
 
 ## 7. SQLite
@@ -257,3 +261,4 @@ apps/mobile/e2e/
 |---|---|---|
 | 2026-06-11 | 1.0 | Phase 3初版 |
 | 2026-06-12 | 1.1 | レビュー指摘反映: §5.2へRefresh Token提示時のMobileSessions解決方式を補記 |
+| 2026-06-12 | 1.2 | U-01確定: 流用APIはBFFプロキシ方式（§6.1新設） |
