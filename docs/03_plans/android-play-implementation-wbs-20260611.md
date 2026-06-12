@@ -199,7 +199,7 @@ apps/mobile/e2e/evidence/YYYYMMDD_BUILD/
 - [ ] Compact版基本設計書を正式版として承認する。
 - [ ] Access Token 15分、同期バッチ50件を承認する。
 - [ ] 新規Cosmosコンテナ3種の採否とパーティションキーを承認する。
-- [ ] Google/GitHubのstaging/production OAuth Appを準備する。
+- [ ] Google/GitHubの環境別OAuth App（dev/staging/production）を準備する。
 - [ ] `com.shikakuno.app`等のAndroid package名を確定する。
 - [ ] Sentry採用とData Safety上の送信項目を承認する。
 
@@ -210,3 +210,4 @@ apps/mobile/e2e/evidence/YYYYMMDD_BUILD/
 | 日付 | 版 | 内容 |
 |---|---|---|
 | 2026-06-11 | 1.0 | Phase 3初版 |
+| 2026-06-12 | 1.1 | レビュー指摘反映: OAuth App環境表記をdev/staging/productionへ統一 |
