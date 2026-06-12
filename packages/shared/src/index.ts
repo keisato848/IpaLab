@@ -1,3 +1,6 @@
+// Mobile API DTO (Android Play版)
+export * as Mobile from './mobile';
+
 // Export Models
 export * from './types/models';
 
