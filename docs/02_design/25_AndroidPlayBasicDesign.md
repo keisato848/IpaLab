@@ -2,12 +2,15 @@
 
 ## 文書情報
 
+> **本文書はArchivedです。** 正式版は `25_AndroidPlayBasicDesign_Compact.md`（v0.2.0以降）を参照すること。本文書中のAccess Token TTL等の数値は最新ではない。
+
+
 | 項目 | 値 |
 |---|---|
 | 文書ID | 25_AndroidPlayBasicDesign |
 | owner | documentation-steward / frontend-learning-engineer |
-| status | Draft |
-| version | 0.1.0 |
+| status | Archived（正式版は `25_AndroidPlayBasicDesign_Compact.md`） |
+| version | 0.1.1 |
 | source | ユーザー要件 (2026-06-11)、既存設計書、現行実装構成 |
 | updated_at | 2026-06-11 |
 | approval_status | PM未承認 |
