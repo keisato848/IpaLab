@@ -5,10 +5,10 @@
 |---|---|
 | 文書ID | 25_AndroidPlayBasicDesign |
 | owner | documentation-steward / frontend-learning-engineer |
-| status | Draft |
-| version | 0.1.0 |
+| status | Draft（本Compact版が正式版。`25_AndroidPlayBasicDesign.md` はArchived） |
+| version | 0.2.0 |
 | source | ユーザー要件(2026-06-11)、既存設計書、現行実装構成 |
-| updated_at | 2026-06-11 |
+| updated_at | 2026-06-12 |
 | approval_status | PM未承認 |
 
 ## 1. 背景・目的
@@ -121,10 +121,13 @@ packages/shared/
   - サーバー側でモバイルトークン交換 API を提供。
 
 ### 4.2 セッション
-- Access Token TTL: 60分。
-- Refresh Token TTL: 30日。
-- 401 応答時は1回のみ自動 refresh。
+- Access Token TTL: 15分（メモリ保持、SecureStore へ保存しない）。
+- Refresh Token TTL: 絶対30日・無操作14日（SecureStore 保持）。
+- Refresh Token はローテーションし、再利用検知時は token family を全失効する。
+- 401 応答時は1回のみ自動 refresh（single-flight）。
 - refresh 失敗時はログイン画面へ遷移。
+
+> Token 仕様の詳細は `26_AndroidPlayDetailedDesign.md` §5.2 を正とする。
 
 ### 4.3 ゲスト統合
 - ゲスト時は `guest_id` を端末保存。
@@ -244,7 +247,7 @@ packages/shared/
 - クローズドβで段階公開。
 - 一般公開ゲート:
   - Crash-free 99.5%以上
-  - 同期成功率 99%以上
+  - 同期成功率 99.5%以上
   - 重大障害ゼロを2週間継続
 
 ## 10. フェーズ計画と品質ゲート
@@ -339,13 +342,4 @@ packages/shared/
 - [ ] OAuth/Guest 設計が実装可能。
 - [ ] オフライン同期の競合解決が妥当。
 - [ ] API 流用/新設境界が妥当。
-- [ ] 非機能 KPI が測定可能。
-- [ ] β→一般公開ゲートが明確。
-- [ ] Top10 リスクに未対策高リスクがない。
-- [ ] 将来 iOS を阻害しない設計である。
-- [ ] 1名運用の保守コストに収まる。
-
-## 14. 変更履歴
-| 日付 | version | 変更内容 | 作成者 |
-|---|---|---|---|
-| 2026-06-11 | 0.1.0 | 初版作成 | documentation-steward |
+- [ ] 非機�
