@@ -206,6 +206,16 @@ pending → processing → completed
                     ↘ failed
 ```
 
+### 2.x モバイル用コンテナ（Android Play版、26_AndroidPlayDetailedDesign.md §13）
+
+| コンテナ | PK | 用途 |
+|---|---|---|
+| `MobileSessions` | `/userId` | モバイルセッション（refresh token family・rotation・reuse検知）とguest credential。Tokenはハッシュのみ保存 |
+| `MobileSyncEvents` | `/userId` | オフライン学習イベントの同期受信（event_id冪等、WP-2.5で使用） |
+| `MobileGuestMerges` | `/userId` | ゲスト→正式アカウント統合の冪等管理（固定mergeId） |
+
+セッション解決はRefresh Token `{sessionId}.{secret}` のsessionId部によるidクエリで行い、secret部はSHA-256ハッシュ照合とする。
+
 ## 3. ER図 (Concept Mapping)
 
 NoSQLですが、論理的なリレーションシップを可視化します。
@@ -301,6 +311,8 @@ erDiagram
 - **LearningSessions**: 1ユーザー年間500セッション × 200B = 100KB/ユーザー
 
 ## 変更履歴
+
+- **2026-06-13**: Android Play版向けに MobileSessions / MobileSyncEvents / MobileGuestMerges を追加（PK /userId）
 
 - **2026-04-07**: リバースエンジニアリングによる大幅更新
   - Question モデルの拡張（PM試験対応、transcription、qNo フィールド）
