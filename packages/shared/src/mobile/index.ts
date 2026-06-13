@@ -6,3 +6,4 @@ export * from './common';
 export * from './auth';
 export * from './sync';
 export * from './content';
+export * from './study-plans';
