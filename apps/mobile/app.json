@@ -1,26 +1,29 @@
 {
-    "expo": {
-        "name": "シカクノ",
-        "slug": "shikakuno",
-        "version": "0.1.0",
-        "orientation": "portrait",
-        "scheme": "shikakuno",
-        "userInterfaceStyle": "automatic",
-        "newArchEnabled": true,
-        "android": {
-            "package": "com.shikakuno.app",
-            "adaptiveIcon": {
-                "backgroundColor": "#ffffff"
-            },
-            "usesCleartextTraffic": false
-        },
-        "plugins": [
-            "expo-router",
-            "expo-secure-store",
-            "expo-sqlite"
-        ],
-        "experiments": {
-            "typedRoutes": true
-        }
+  "expo": {
+    "name": "シカクノ",
+    "slug": "shikakuno",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "shikakuno",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "android": {
+      "package": "com.shikakuno.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "usesCleartextTraffic": false
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-sqlite"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "APP_ENV": "dev"
     }
+  }
 }
