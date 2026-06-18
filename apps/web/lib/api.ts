@@ -501,11 +501,11 @@ export async function deleteStudyPlan(id: string): Promise<boolean> {
 export async function migrateLocalStudyPlansToServer(userId: string): Promise<number> {
     if (typeof window === 'undefined') return -1;
     const flagKey = `studyPlans:migratedFor:${userId}`;
-    if (localStorage.getItem(flagKey)) return -1;
 
     const raw = localStorage.getItem('studyPlans');
     if (!raw) {
-        localStorage.setItem(flagKey, new Date().toISOString());
+        if (localStorage.getItem(flagKey) === 'empty') return -1;
+        localStorage.setItem(flagKey, 'empty');
         return 0;
     }
 
@@ -516,7 +516,8 @@ export async function migrateLocalStudyPlansToServer(userId: string): Promise<nu
         return -1;
     }
     if (!Array.isArray(plans) || plans.length === 0) {
-        localStorage.setItem(flagKey, new Date().toISOString());
+        if (localStorage.getItem(flagKey) === 'empty') return -1;
+        localStorage.setItem(flagKey, 'empty');
         return 0;
     }
 
@@ -524,6 +525,8 @@ export async function migrateLocalStudyPlansToServer(userId: string): Promise<nu
     const normalized = plans.map((p) =>
         p.id ? p : { ...p, id: typeof crypto !== 'undefined' ? crypto.randomUUID() : `legacy-${Date.now()}` },
     );
+    const signature = getStudyPlanMigrationSignature(normalized);
+    if (localStorage.getItem(flagKey) === signature) return -1;
 
     try {
         const res = await fetch(`${API_BASE}/study-plan`, {
@@ -533,10 +536,14 @@ export async function migrateLocalStudyPlansToServer(userId: string): Promise<nu
         });
         if (!res.ok) throw new Error(`migrate POST failed: ${res.status}`);
         const data = await res.json();
-        localStorage.setItem(flagKey, new Date().toISOString());
+        localStorage.setItem(flagKey, signature);
         return typeof data?.count === 'number' ? data.count : normalized.length;
     } catch (e) {
         console.warn('migrateLocalStudyPlansToServer failed:', e);
         return -1;
     }
+}
+
+function getStudyPlanMigrationSignature(plans: StudyPlan[]): string {
+    return JSON.stringify([...plans].sort((a, b) => a.id.localeCompare(b.id)));
 }
