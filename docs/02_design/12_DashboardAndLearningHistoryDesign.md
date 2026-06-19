@@ -259,6 +259,7 @@ sequenceDiagram
 2. なければ旧形式 `studyPlan` を移行する
 3. `monthlyGoals` が欠落しているプランには `createDefaultMonthlyGoals()` を自動付与する
 4. もっとも近い将来の試験日を持つ計画をアクティブ計画とする
+5. 認証済みユーザーは `studyPlans` を `/api/study-plan` へ best-effort で同期する。移行スキップ判定は単純な実行済みフラグではなく、localStorage 内の計画セット署名で行い、初回空状態でフラグが立った後に作成された未同期計画も再移行対象にする。
 
 ---
 
@@ -268,7 +269,8 @@ sequenceDiagram
 
 - 学習記録は Cosmos DB を正本とする
 - 履歴画面では `LearningSessions` を優先し、`LearningRecords` はフォールバックとする
-- 学習計画とゲーミフィケーション状態は現状 localStorage に残る
+- 学習計画は Cosmos DB の `StudyPlan` を正本とし、localStorage の `studyPlans` はゲスト利用・初回移行・オフラインフォールバック用のキャッシュとして扱う
+- ゲーミフィケーション状態は現状 localStorage に残る
 
 ### 11.2 ゲストユーザー
 
