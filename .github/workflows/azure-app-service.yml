@@ -41,7 +41,7 @@ permissions:
 env:
   AZURE_WEBAPP_NAME: app-pm-exam-dx-prod
   AZURE_WEBAPP_PACKAGE_PATH: './apps/web/.next/standalone'
-  NODE_VERSION: '24.x'
+  NODE_VERSION: '22.x'
 
 jobs:
   test:

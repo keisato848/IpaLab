@@ -25,7 +25,7 @@ env:
   AZURE_FUNCTIONAPP_NAME: func-pm-exam-dx-ai-us
   AZURE_FUNCTIONAPP_PACKAGE_PATH: 'apps/api-ai'
   AZURE_RESOURCE_GROUP: rg-pm-exam-dx-ai-us
-  NODE_VERSION: '24.x'
+  NODE_VERSION: '22.x'
 
 jobs:
   build-and-deploy:

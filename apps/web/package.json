@@ -16,7 +16,7 @@
         "test:e2e:ui": "npx playwright test --ui"
     },
     "engines": {
-        "node": ">=20 <25"
+        "node": ">=22 <25"
     },
     "dependencies": {
         "@azure/cosmos": "^4.9.0",
@@ -33,7 +33,7 @@
         "html2canvas": "^1.4.1",
         "katex": "0.16.28",
         "mermaid": "10.9.5",
-        "next": "^16.2.4",
+        "next": "^16.2.6",
         "next-auth": "^4.24.14",
         "octokit": "^5.0.5",
         "react": "18.3.1",
