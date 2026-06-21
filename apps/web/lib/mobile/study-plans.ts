@@ -9,7 +9,9 @@
  * - version 不一致時は 409 を返し、現在のドキュメントを含める。
  */
 import { ensureContainer } from '@/lib/cosmos';
-import type { MobileStudyPlan } from '@ipa-lab/shared';
+import type { Mobile } from '@ipa-lab/shared';
+
+type MobileStudyPlan = Mobile.MobileStudyPlan;
 
 interface StoredMobilePlan extends MobileStudyPlan {
     userId: string;
