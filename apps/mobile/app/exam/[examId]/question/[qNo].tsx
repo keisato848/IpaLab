@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
+import { Mobile } from '@ipa-lab/shared';
 import { useAuthStore } from '../../../../src/store/auth-store';
 import { useExamSessionStore } from '../../../../src/store/exam-session-store';
 import { fetchExamContent } from '../../../../src/infrastructure/api/content-api';
@@ -28,6 +29,12 @@ import {
 
 type AnswerState = { selected: number | null; submitted: boolean };
 
+/** correctAnswer ('a'-'d') を選択肢インデックス(0-3)へ変換する。未知値は -1。 */
+function correctAnswerToIndex(correctAnswer: string | undefined): number {
+    if (!correctAnswer) return -1;
+    return 'abcd'.indexOf(correctAnswer.trim().toLowerCase());
+}
+
 export default function QuestionScreen() {
     const { examId, qNo } = useLocalSearchParams<{ examId: string; qNo: string }>();
     const router = useRouter();
@@ -37,7 +44,7 @@ export default function QuestionScreen() {
 
     const currentQNo = parseInt(qNo ?? '1', 10);
 
-    const { data } = useQuery({
+    const { data } = useQuery<Mobile.ExamContentResponse | null>({
         queryKey: queryKeys.examContent(userId, examId ?? ''),
         queryFn: () => fetchExamContent(examId ?? ''),
         enabled: !!userId && !!examId,
@@ -46,7 +53,7 @@ export default function QuestionScreen() {
 
     const question = useMemo(() => {
         if (!data) return null;
-        return data.questions.find((q) => q.questionNumber === currentQNo) ?? null;
+        return data.questions.find((q) => q.qNo === currentQNo) ?? null;
     }, [data, currentQNo]);
 
     const totalQuestions = data?.questions.length ?? 0;
@@ -91,7 +98,7 @@ export default function QuestionScreen() {
             return;
         }
 
-        const correctIdx = question.correctAnswerIndex ?? -1;
+        const correctIdx = correctAnswerToIndex(question.correctAnswer);
         const isCorrect = answerState.selected === correctIdx;
         const now = new Date().toISOString();
 
@@ -148,7 +155,7 @@ export default function QuestionScreen() {
     }
 
     const choices = question.choices ?? [];
-    const correctIdx = question.correctAnswerIndex ?? -1;
+    const correctIdx = correctAnswerToIndex(question.correctAnswer);
     const isCorrect = answerState.selected === correctIdx;
 
     return (
