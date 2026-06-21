@@ -1,0 +1,44 @@
+name: Mobile CI
+
+# apps/mobile (Expo/React Native) の型チェック・Lint・ユニットテストを検証する。
+# これまで mobile ワークスペースは CI 未接続で、lockfile 同期漏れや型エラーが
+# 検知されなかった。本ジョブで apps/mobile / packages/shared 変更時にゲートする。
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/shared/**'
+      - 'package-lock.json'
+      - '.github/workflows/mobile-ci.yml'
+
+env:
+  NODE_VERSION: '22.x'
+
+jobs:
+  mobile:
+    runs-on: ubuntu-latest
+    name: Mobile type-check / lint / test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check (tsc --noEmit)
+        run: npm run --workspace @ipa-lab/mobile type-check
+
+      - name: Lint
+        run: npm run --workspace @ipa-lab/mobile lint
+
+      - name: Unit tests (Jest)
+        run: npm run --workspace @ipa-lab/mobile test
