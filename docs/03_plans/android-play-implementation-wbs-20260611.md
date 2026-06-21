@@ -196,12 +196,15 @@ apps/mobile/e2e/evidence/YYYYMMDD_BUILD/
 
 実装着手前に次を確定する。
 
-- [ ] Compact版基本設計書を正式版として承認する。
-- [ ] Access Token 15分、同期バッチ50件を承認する。
-- [ ] 新規Cosmosコンテナ3種の採否とパーティションキーを承認する。
-- [ ] Google/GitHubの環境別OAuth App（dev/staging/production）を準備する。
-- [ ] `com.shikakuno.app`等のAndroid package名を確定する。
-- [ ] Sentry採用とData Safety上の送信項目を承認する。
+> **2026-06-21 更新**: 設計判断は [設計確定記録 v1.1](../02_design/27_MobileDesignBaseline.md) で全て確定・凍結。以下は実態に更新済み。
+
+- [x] Compact版基本設計書を正式版として承認する。 → 設計確定記録 v1.1 で凍結。
+- [x] Access Token 15分、同期バッチ50件を承認する。 → 詳細設計§1で確定済。
+- [x] 新規Cosmosコンテナ3種の採否とパーティションキーを承認する。 → `/userId`×3で確定（詳細設計§13）。
+- [x] `com.shikakuno.app` を Android package名として確定する。
+- [x] Sentry採用とData Safety上の送信項目を承認する。 → 採用（PIIスクラブ前提）。
+- [ ] Google/GitHubの環境別OAuth App（dev/staging/production）を準備する。【運用準備・残】
+- [ ] Cosmos 3コンテナの実プロビジョニングと Play Console / Sentry セットアップ。【運用準備・残】
 
 条件確定後、最初の実装単位はWP-0とWP-2.1/2.2とする。
 
