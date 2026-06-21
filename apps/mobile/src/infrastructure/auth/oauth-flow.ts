@@ -11,7 +11,6 @@
  * Provider token は端末へ返さない（BFF 方式）。
  * 任意 redirect は禁止（環境別 allowlist から解決）。
  */
-import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { generatePkce, generateState } from './pkce';
 import { authorizeTransaction, exchangeBridgeCode } from '../api/auth-api';
@@ -53,7 +52,7 @@ export async function startOAuthFlow(
             return { success: false, error: { type: 'server', message: 'Failed to start auth transaction' } };
         }
 
-        const result = await AuthSession.openAuthSessionAsync(
+        const result = await WebBrowser.openAuthSessionAsync(
             authResp.authorizationUrl,
             OAUTH_REDIRECT_URI,
         );

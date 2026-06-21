@@ -67,7 +67,7 @@ describe('syncOutbox（詳細設計§8）', () => {
         };
         const result = await syncOutbox(outbox, api);
         expect(result.deadLetters).toBe(1);
-        expect(transitions[0].nextState).toBe('dead_letter');
+        expect(transitions[0]?.nextState).toBe('dead_letter');
     });
 
     it('応答に含まれないイベントは送達不明として再試行する', async () => {
