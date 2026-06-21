@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=20 <25"
+    "node": ">=22 <25"
   },
   "scripts": {
     "build": "turbo run build",
@@ -31,7 +31,7 @@
     "@playwright/test": "^1.58.2",
     "@types/node": "^24.0.0",
     "husky": "^9.1.7",
-    "next": "16.2.4",
+    "next": "16.2.6",
     "prettier": "^3.2.5",
     "turbo": "^2.7.4",
     "typescript": "^5.4.5"
@@ -39,6 +39,11 @@
   "overrides": {
     "fast-xml-parser": "^5.7.2",
     "postcss": "^8.5.13",
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.0",
+    "axios": "^1.15.2",
+    "form-data": "^4.0.6",
+    "@grpc/grpc-js": "^1.14.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   }
 }
