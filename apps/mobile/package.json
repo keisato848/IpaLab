@@ -29,6 +29,7 @@
         "zustand": "^5.0.0"
     },
     "devDependencies": {
+        "@testing-library/react-native": "^12.9.0",
         "@types/jest": "^29.5.12",
         "@types/react": "~18.3.12",
         "drizzle-kit": "^0.30.0",
