@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createAiChatAuthHeaders } from '@/lib/ai-chat-auth';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/auth';
+import { checkRateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
@@ -52,6 +55,30 @@ function isAzureHostedRuntime(): boolean {
 
 export async function POST(req: NextRequest) {
     try {
+        // レート制限チェック（認証ユーザーは userId、ゲストは IP でキーを生成）
+        const session = await getServerSession(authOptions);
+        const userId = session?.user?.id;
+        const ip = getClientIp(req.headers);
+        const rateLimitKey = userId ? `score:user:${userId}` : `score:ip:${ip}`;
+        const limit = userId ? RATE_LIMITS.SCORE_AUTH : RATE_LIMITS.SCORE_GUEST;
+        const { allowed, remaining, retryAfter } = checkRateLimit(rateLimitKey, limit.maxRequests, limit.windowMs);
+
+        if (!allowed) {
+            console.warn(
+                `[RateLimit] /api/score blocked key=${rateLimitKey} retryAfter=${retryAfter}s`,
+            );
+            return NextResponse.json(
+                { error: '短時間にリクエストが集中しています。しばらく待ってから再試行してください。', retryAfter },
+                {
+                    status: 429,
+                    headers: {
+                        'Retry-After': String(retryAfter),
+                        'X-RateLimit-Remaining': '0',
+                    },
+                },
+            );
+        }
+
         const body = await req.json();
         const { question, userAnswer, modelAnswer } = body;
 

@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
+// getServerSession は常にゲスト（null）を返すようモック
+vi.mock('next-auth', () => ({ getServerSession: vi.fn().mockResolvedValue(null) }));
+vi.mock('@/auth', () => ({ authOptions: {} }));
+
 describe('/api/score', () => {
     const originalEnv = process.env;
 
