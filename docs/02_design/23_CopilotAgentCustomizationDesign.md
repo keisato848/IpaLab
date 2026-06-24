@@ -8,6 +8,7 @@
 | 2026-04-29 | 1.1 | Git 履歴に基づく Scrum Team Custom Agents とルーティングを追加 |
 | 2026-04-29 | 1.2 | PM 一元受付と SIer 型フェーズゲート、PM 用 Prompt Files を追加 |
 | 2026-05-02 | 1.3 | VS Code hooks 公式イベント `SessionStart` / `SubagentStart` / `SubagentStop` に基づく agent activity logging、データ管理 Skill、データ管理/セキュリティ specialist agent を追加 |
+| 2026-05-29 | 1.4 | Stop hook の `conduct-check.ps1` に Active PR の未解決レビュー thread / Changes requested 検出を追加 |
 
 ---
 
@@ -208,6 +209,15 @@ Git 履歴（v0.24〜v0.29 系）では、ダッシュボード UI デグレ、�
 - prompt、tool input、接続文字列、キー、トークンを除外した hook 入力フィールド名
 
 hook は監査ログ用途であり、失敗しても通常の agent 作業をブロックしない。ただし、secret 出力が疑われる変更は `security-agent` のレビュー対象とする。
+
+### 5.4 PR レビュー確認 Conduct Check
+
+`.github/hooks/conduct-check.ps1` は `Stop` hook で実行し、Active PR に対するレビューが未対応のまま残っていないかを確認する。エージェントは PR 作成後または PR 更新後に、GitHub 上のレビュー thread をすべて確認し、各指摘に対して以下のいずれかを必ず実施する。
+
+- コード・テスト・ドキュメントを修正して追加 commit / push する
+- 修正不要と判断した理由を review thread へ返信する
+
+`reviewDecision = CHANGES_REQUESTED` または未解決かつ outdated ではない review thread が残っている場合、`C4-pr-review-*` として検出し、作業完了扱いにしない。`conduct-check.ps1` は `origin/main` との差分コミットだけを対象に C1 を評価し、main 既存履歴の古い `fix:` コミットを誤検出しない。
 
 ---
 
