@@ -57,7 +57,7 @@ export default function ExamsScreen() {
     if (isLoading) {
         return (
             <View style={styles.center}>
-                <ActivityIndicator color="#C9A16A" size="large" />
+                <ActivityIndicator color="#0070F3" size="large" />
             </View>
         );
     }
@@ -83,7 +83,7 @@ export default function ExamsScreen() {
                     <RefreshControl
                         refreshing={isRefetching}
                         onRefresh={refetch}
-                        tintColor="#C9A16A"
+                        tintColor="#0070F3"
                     />
                 }
                 renderItem={({ item }) => (
@@ -112,12 +112,12 @@ export default function ExamsScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#0A0805' },
+    container: { flex: 1, backgroundColor: '#0F1117' },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     emptyContainer: { flex: 1 },
     title: {
         fontSize: 24,
-        color: '#DCC9A8',
+        color: '#CBD5E0',
         fontWeight: '600',
         padding: 20,
         paddingBottom: 12,
@@ -125,27 +125,27 @@ const styles = StyleSheet.create({
     examCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#1A1208',
+        backgroundColor: '#0F1117',
         marginHorizontal: 16,
         marginVertical: 4,
         borderRadius: 8,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#2E2418',
+        borderColor: '#1A202C',
         minHeight: 64,
     },
     cardContent: { flex: 1 },
-    examTitle: { fontSize: 15, color: '#DCC9A8', fontWeight: '500' },
-    examMeta: { fontSize: 12, color: '#C9A16A', marginTop: 4 },
-    arrow: { fontSize: 20, color: '#C9A16A', marginLeft: 8 },
-    errorText: { color: '#E57373', fontSize: 14, marginBottom: 12 },
+    examTitle: { fontSize: 15, color: '#CBD5E0', fontWeight: '500' },
+    examMeta: { fontSize: 12, color: '#0070F3', marginTop: 4 },
+    arrow: { fontSize: 20, color: '#0070F3', marginLeft: 8 },
+    errorText: { color: '#F87171', fontSize: 14, marginBottom: 12 },
     retryButton: {
         paddingHorizontal: 24,
         paddingVertical: 10,
         borderRadius: 6,
         borderWidth: 1,
-        borderColor: '#C9A16A',
+        borderColor: '#0070F3',
     },
-    retryText: { color: '#C9A16A', fontSize: 14 },
-    emptyText: { color: '#DCC9A8', opacity: 0.5, fontSize: 14 },
+    retryText: { color: '#0070F3', fontSize: 14 },
+    emptyText: { color: '#CBD5E0', opacity: 0.5, fontSize: 14 },
 });

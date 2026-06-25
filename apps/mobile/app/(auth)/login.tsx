@@ -13,9 +13,9 @@ import {
     ActivityIndicator,
     StyleSheet,
     Alert,
-    Platform,
 } from 'react-native';
 import { loginWithOAuth, loginAsGuest } from '../../src/application/usecases/auth';
+import { colors } from '../../src/constants/theme';
 
 type LoadingState = 'idle' | 'google' | 'github' | 'guest';
 
@@ -53,10 +53,9 @@ export default function LoginScreen() {
 
     return (
         <View style={styles.container}>
-            {/* ロゴ */}
-            <Text style={styles.logo}>臺所</Text>
-            <Text style={styles.subtitle}>シカクノ</Text>
-            <Text style={styles.tagline}>IPA 試験対策アプリ</Text>
+            {/* ロゴ（shikakuno ブランド） */}
+            <Text style={styles.logo}>シカクノ</Text>
+            <Text style={styles.tagline}>情報処理技術者試験 学習プラットフォーム</Text>
 
             <View style={styles.buttonGroup}>
                 {/* Google */}
@@ -98,7 +97,7 @@ export default function LoginScreen() {
                     accessibilityRole="button"
                 >
                     {loading === 'guest' ? (
-                        <ActivityIndicator color="#C9A16A" />
+                        <ActivityIndicator color={colors.accent} />
                     ) : (
                         <Text style={[styles.buttonText, styles.guestText]}>
                             ゲストとして利用する
@@ -118,27 +117,22 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0A0805',
+        backgroundColor: colors.bgPrimary,
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 32,
     },
     logo: {
-        fontSize: 48,
-        color: '#C9A16A',
-        fontWeight: '300',
-        marginBottom: 4,
-    },
-    subtitle: {
-        fontSize: 20,
-        color: '#DCC9A8',
-        letterSpacing: 4,
+        fontSize: 44,
+        color: colors.accent,
+        fontWeight: '700',
+        letterSpacing: 2,
         marginBottom: 8,
     },
     tagline: {
         fontSize: 13,
-        color: '#DCC9A8',
-        opacity: 0.6,
+        color: colors.textSecondary,
+        opacity: 0.8,
         marginBottom: 48,
     },
     buttonGroup: {
@@ -153,29 +147,28 @@ const styles = StyleSheet.create({
         minHeight: 48, // A11y: 48dp タップ領域
     },
     googleButton: {
-        backgroundColor: '#4285F4',
+        backgroundColor: colors.google,
     },
     githubButton: {
-        backgroundColor: '#24292F',
+        backgroundColor: colors.github,
     },
     guestButton: {
         backgroundColor: 'transparent',
         borderWidth: 1,
-        borderColor: '#C9A16A',
+        borderColor: colors.accent,
     },
     buttonText: {
-        color: '#fff',
+        color: colors.white,
         fontSize: 16,
         fontWeight: '600',
     },
     guestText: {
-        color: '#C9A16A',
+        color: colors.accent,
     },
     note: {
         marginTop: 32,
         fontSize: 12,
-        color: '#DCC9A8',
-        opacity: 0.5,
+        color: colors.textTertiary,
         textAlign: 'center',
         lineHeight: 18,
     },

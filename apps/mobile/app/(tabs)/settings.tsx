@@ -85,7 +85,7 @@ export default function SettingsScreen() {
                     accessibilityRole="button"
                 >
                     {loggingOut ? (
-                        <ActivityIndicator color="#E57373" />
+                        <ActivityIndicator color="#F87171" />
                     ) : (
                         <Text style={styles.logoutText}>ログアウト</Text>
                     )}
@@ -96,18 +96,18 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#0A0805' },
+    container: { flex: 1, backgroundColor: '#0F1117' },
     content: { padding: 20 },
-    title: { fontSize: 24, color: '#DCC9A8', fontWeight: '600', marginBottom: 24 },
+    title: { fontSize: 24, color: '#CBD5E0', fontWeight: '600', marginBottom: 24 },
     section: {
         marginBottom: 24,
         borderBottomWidth: 1,
-        borderBottomColor: '#2E2418',
+        borderBottomColor: '#1A202C',
         paddingBottom: 16,
     },
     sectionTitle: {
         fontSize: 12,
-        color: '#C9A16A',
+        color: '#0070F3',
         letterSpacing: 1,
         marginBottom: 12,
         textTransform: 'uppercase',
@@ -119,16 +119,16 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         minHeight: 48,
     },
-    label: { fontSize: 15, color: '#DCC9A8' },
-    value: { fontSize: 15, color: '#DCC9A8', opacity: 0.7 },
-    hint: { fontSize: 12, color: '#DCC9A8', opacity: 0.5, marginTop: 4 },
+    label: { fontSize: 15, color: '#CBD5E0' },
+    value: { fontSize: 15, color: '#CBD5E0', opacity: 0.7 },
+    hint: { fontSize: 12, color: '#CBD5E0', opacity: 0.5, marginTop: 4 },
     disabledRow: { opacity: 0.4 },
     disabledText: {},
     badge: {
         fontSize: 11,
-        color: '#C9A16A',
+        color: '#0070F3',
         borderWidth: 1,
-        borderColor: '#C9A16A',
+        borderColor: '#0070F3',
         paddingHorizontal: 8,
         paddingVertical: 2,
         borderRadius: 4,
@@ -139,8 +139,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#E57373',
+        borderColor: '#F87171',
         minHeight: 48,
     },
-    logoutText: { color: '#E57373', fontSize: 16, fontWeight: '600' },
+    logoutText: { color: '#F87171', fontSize: 16, fontWeight: '600' },
 });

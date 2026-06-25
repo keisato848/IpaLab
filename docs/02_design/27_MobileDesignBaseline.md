@@ -54,6 +54,20 @@ Web版ダッシュボードは過去のUX分析（`IpaLab-dashboard-ux-analysis`
 - ドメイン `shikaku-no.com` に整合する逆ドメイン。
 - OAuth リダイレクト（Android App Links / カスタムスキーム）、Play 登録、`app.json` の `android.package` をこの値で確定。
 
+### 3.5 UI/UX とアーキテクチャの出自原則（重要）
+
+本アプリは **shikakuno（IPA 試験対策）のモバイル版**である。daidoko（家族のレシピ手帳アプリ）とは別プロダクトであり、両者の責務を明確に分離する。
+
+- **UI/UX = shikakuno Web 版（`apps/web`）に準拠する。**
+  - ブランド表記は「**シカクノ**」。daidoko のロゴ「臺所（台所）」は使用しない。
+  - カラーは shikakuno Web の `globals.css` を正とし、モバイルは `apps/mobile/src/constants/theme.ts` のトークンを参照する（アクセント = 青 `#0070F3`、ダーク背景 `#0F1117`/`#1A202C`、テキスト `#F7FAFC` 系）。daidoko の和風・金茶パレットは使用しない。
+  - タグラインは「情報処理技術者試験 学習プラットフォーム」。
+- **アーキテクチャ = daidoko の設計パターンを参考にする。**
+  - クリーンアーキテクチャ（`domain` / `application` / `infrastructure` / `store` 層）、Outbox による同期、SQLite を端末正本とする方針、エージェント運用スクリプトの考え方など、daidoko で確立された構造を踏襲する。
+  - ただし参考にするのは**構造・設計手法のみ**であり、ブランド・文言・データ（DB名は `shikakuno.db`）は shikakuno 固有とする。
+
+> 背景: 初期実装で daidoko のテンプレートを土台にしたため、ロゴ「臺所」・金茶カラー・`daidoko.db` 等の **daidoko 由来のビジュアル/識別子が混入**していた。2026-06 にこれらを shikakuno 基準へ全面的に是正済み。
+
 ## 4. WBS「要承認」チェックリストの解決状況
 
 | WBS項目 | 状態 | 根拠 |

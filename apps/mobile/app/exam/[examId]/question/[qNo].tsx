@@ -191,10 +191,10 @@ export default function QuestionScreen() {
                     {choices.map((choice, idx) => {
                         const isSelected = answerState.selected === idx;
                         const isSubmitted = answerState.submitted;
-                        let borderColor = '#2E2418';
-                        if (isSelected && !isSubmitted) borderColor = '#C9A16A';
-                        if (isSubmitted && idx === correctIdx) borderColor = '#66BB6A';
-                        if (isSubmitted && isSelected && !isCorrect) borderColor = '#E57373';
+                        let borderColor = '#1A202C';
+                        if (isSelected && !isSubmitted) borderColor = '#0070F3';
+                        if (isSubmitted && idx === correctIdx) borderColor = '#34D399';
+                        if (isSubmitted && isSelected && !isCorrect) borderColor = '#F87171';
 
                         return (
                             <TouchableOpacity
@@ -260,12 +260,12 @@ export default function QuestionScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#0A0805' },
+    container: { flex: 1, backgroundColor: '#0F1117' },
     center: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#0A0805',
+        backgroundColor: '#0F1117',
     },
     navBar: {
         flexDirection: 'row',
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#2E2418',
+        borderBottomColor: '#1A202C',
     },
     navBtn: {
         padding: 8,
@@ -284,13 +284,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     navBtnDisabled: { opacity: 0.3 },
-    navText: { fontSize: 24, color: '#C9A16A' },
-    progress: { fontSize: 14, color: '#DCC9A8' },
+    navText: { fontSize: 24, color: '#0070F3' },
+    progress: { fontSize: 14, color: '#CBD5E0' },
     scroll: { flex: 1 },
     scrollContent: { padding: 20, paddingBottom: 40 },
     questionText: {
         fontSize: 15,
-        color: '#DCC9A8',
+        color: '#CBD5E0',
         lineHeight: 24,
         marginBottom: 24,
     },
@@ -301,44 +301,44 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 8,
         padding: 14,
-        backgroundColor: '#1A1208',
+        backgroundColor: '#0F1117',
         minHeight: 52,
     },
     choiceLabel: {
         fontSize: 14,
-        color: '#C9A16A',
+        color: '#0070F3',
         fontWeight: '600',
         marginRight: 10,
         width: 20,
     },
-    choiceText: { flex: 1, fontSize: 14, color: '#DCC9A8', lineHeight: 21 },
+    choiceText: { flex: 1, fontSize: 14, color: '#CBD5E0', lineHeight: 21 },
     result: {
         marginTop: 24,
         padding: 16,
-        backgroundColor: '#1A1208',
+        backgroundColor: '#0F1117',
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: '#2E2418',
+        borderColor: '#1A202C',
     },
     resultLabel: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
-    correct: { color: '#66BB6A' },
-    wrong: { color: '#E57373' },
-    explanation: { fontSize: 13, color: '#DCC9A8', lineHeight: 20 },
+    correct: { color: '#34D399' },
+    wrong: { color: '#F87171' },
+    explanation: { fontSize: 13, color: '#CBD5E0', lineHeight: 20 },
     footer: {
         padding: 16,
         borderTopWidth: 1,
-        borderTopColor: '#2E2418',
+        borderTopColor: '#1A202C',
     },
     actionBtn: {
         height: 52,
-        backgroundColor: '#C9A16A',
+        backgroundColor: '#0070F3',
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: 48,
     },
-    actionBtnDisabled: { backgroundColor: '#2E2418' },
-    actionText: { fontSize: 16, fontWeight: '600', color: '#0A0805' },
-    errorText: { color: '#E57373', fontSize: 14, marginBottom: 16 },
-    linkText: { color: '#C9A16A', fontSize: 14 },
+    actionBtnDisabled: { backgroundColor: '#1A202C' },
+    actionText: { fontSize: 16, fontWeight: '600', color: '#0F1117' },
+    errorText: { color: '#F87171', fontSize: 14, marginBottom: 16 },
+    linkText: { color: '#0070F3', fontSize: 14 },
 });

@@ -11,7 +11,7 @@ import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 export default function OAuthResultScreen() {
     return (
         <View style={styles.container}>
-            <ActivityIndicator color="#C9A16A" size="large" />
+            <ActivityIndicator color="#0070F3" size="large" />
             <Text style={styles.text}>認証中...</Text>
         </View>
     );
@@ -20,13 +20,13 @@ export default function OAuthResultScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0A0805',
+        backgroundColor: '#0F1117',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 16,
     },
     text: {
-        color: '#DCC9A8',
+        color: '#CBD5E0',
         fontSize: 14,
     },
 });

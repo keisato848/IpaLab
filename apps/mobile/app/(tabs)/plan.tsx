@@ -23,8 +23,7 @@ import {
     selectTodayTask,
     daysUntilExam,
 } from '../../src/application/usecases/plan-selectors';
-
-const GOLD = '#C9A16A';
+import { colors } from '../../src/constants/theme';
 
 export default function PlanScreen() {
     const { session } = useAuthStore();
@@ -62,7 +61,7 @@ export default function PlanScreen() {
     if (loading) {
         return (
             <View style={styles.center}>
-                <ActivityIndicator color={GOLD} />
+                <ActivityIndicator color={colors.accent} />
             </View>
         );
     }
@@ -98,7 +97,11 @@ export default function PlanScreen() {
             style={styles.container}
             contentContainerStyle={styles.content}
             refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={GOLD} />
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    tintColor={colors.accent}
+                />
             }
         >
             {source === 'cache' ? (
@@ -169,7 +172,7 @@ export default function PlanScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#1A140D' },
+    container: { flex: 1, backgroundColor: colors.bgPrimary },
     content: { padding: 16, gap: 12 },
     center: {
         flex: 1,
@@ -177,36 +180,36 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 24,
         gap: 10,
-        backgroundColor: '#1A140D',
+        backgroundColor: colors.bgPrimary,
     },
-    offlineBadge: { color: '#D6B98A', fontSize: 12 },
-    title: { color: '#F5ECDD', fontSize: 22, fontWeight: '700' },
-    examDate: { color: '#D6B98A', fontSize: 14 },
+    offlineBadge: { color: colors.textMuted, fontSize: 12 },
+    title: { color: colors.textPrimary, fontSize: 22, fontWeight: '700' },
+    examDate: { color: colors.textMuted, fontSize: 14 },
     todayCard: {
-        backgroundColor: '#2E2418',
-        borderColor: GOLD,
+        backgroundColor: colors.bgSecondary,
+        borderColor: colors.accent,
         borderWidth: 1,
         borderRadius: 12,
         padding: 16,
         gap: 6,
     },
-    sectionLabel: { color: GOLD, fontSize: 13, fontWeight: '700' },
-    todayGoal: { color: '#F5ECDD', fontSize: 18, fontWeight: '600' },
-    todayMeta: { color: '#D6B98A', fontSize: 13 },
-    todayEmpty: { color: '#B9A88E', fontSize: 14 },
+    sectionLabel: { color: colors.accent, fontSize: 13, fontWeight: '700' },
+    todayGoal: { color: colors.textPrimary, fontSize: 18, fontWeight: '600' },
+    todayMeta: { color: colors.textMuted, fontSize: 13 },
+    todayEmpty: { color: colors.textTertiary, fontSize: 14 },
     section: { gap: 8, marginTop: 4 },
-    goalRow: { color: '#E7DAC6', fontSize: 14 },
+    goalRow: { color: colors.textSecondary, fontSize: 14 },
     weekRow: {
-        backgroundColor: '#241B11',
+        backgroundColor: colors.bgSecondary,
         borderRadius: 10,
         padding: 12,
         gap: 4,
     },
-    weekTitle: { color: '#F5ECDD', fontSize: 15, fontWeight: '600' },
-    weekGoal: { color: '#E7DAC6', fontSize: 13 },
-    weekDates: { color: '#9C8B72', fontSize: 12 },
-    errorText: { color: '#E8B4A0', fontSize: 15 },
-    link: { color: GOLD, fontSize: 15, fontWeight: '600' },
-    emptyTitle: { color: '#F5ECDD', fontSize: 18, fontWeight: '600' },
-    emptyBody: { color: '#B9A88E', fontSize: 14, textAlign: 'center' },
+    weekTitle: { color: colors.textPrimary, fontSize: 15, fontWeight: '600' },
+    weekGoal: { color: colors.textSecondary, fontSize: 13 },
+    weekDates: { color: colors.textTertiary, fontSize: 12 },
+    errorText: { color: colors.error, fontSize: 15 },
+    link: { color: colors.accent, fontSize: 15, fontWeight: '600' },
+    emptyTitle: { color: colors.textPrimary, fontSize: 18, fontWeight: '600' },
+    emptyBody: { color: colors.textTertiary, fontSize: 14, textAlign: 'center' },
 });

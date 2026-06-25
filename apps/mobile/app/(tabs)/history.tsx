@@ -79,7 +79,7 @@ export default function HistoryScreen() {
     if (loading) {
         return (
             <View style={styles.center}>
-                <ActivityIndicator color="#C9A16A" size="large" />
+                <ActivityIndicator color="#0070F3" size="large" />
             </View>
         );
     }
@@ -105,7 +105,7 @@ export default function HistoryScreen() {
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        tintColor="#C9A16A"
+                        tintColor="#0070F3"
                     />
                 }
                 contentContainerStyle={
@@ -189,11 +189,11 @@ export default function HistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#0A0805' },
-    center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#0A0805' },
+    container: { flex: 1, backgroundColor: '#0F1117' },
+    center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#0F1117' },
     heading: {
         fontSize: 20,
-        color: '#DCC9A8',
+        color: '#CBD5E0',
         fontWeight: '700',
         padding: 20,
         paddingBottom: 8,
@@ -202,58 +202,58 @@ const styles = StyleSheet.create({
     emptyContainer: { flex: 1 },
     emptyInner: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 80 },
     emptyIcon: { fontSize: 48, marginBottom: 16 },
-    emptyText: { fontSize: 16, color: '#DCC9A8', marginBottom: 8 },
-    emptyHint: { fontSize: 13, color: '#DCC9A8', opacity: 0.5, textAlign: 'center' },
+    emptyText: { fontSize: 16, color: '#CBD5E0', marginBottom: 8 },
+    emptyHint: { fontSize: 13, color: '#CBD5E0', opacity: 0.5, textAlign: 'center' },
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#1A1208',
+        backgroundColor: '#0F1117',
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: '#2E2418',
+        borderColor: '#1A202C',
         padding: 14,
         marginBottom: 10,
     },
     cardLeft: { flex: 1 },
     cardDateRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
-    cardDate: { fontSize: 12, color: '#C9A16A' },
-    cardTime: { fontSize: 12, color: '#DCC9A8', opacity: 0.6 },
-    cardExamId: { fontSize: 15, color: '#DCC9A8', fontWeight: '600', marginBottom: 6 },
+    cardDate: { fontSize: 12, color: '#0070F3' },
+    cardTime: { fontSize: 12, color: '#CBD5E0', opacity: 0.6 },
+    cardExamId: { fontSize: 15, color: '#CBD5E0', fontWeight: '600', marginBottom: 6 },
     cardStatusRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     statusBadge: {
         paddingHorizontal: 8,
         paddingVertical: 2,
         borderRadius: 4,
     },
-    statusCompleted: { backgroundColor: '#1B3A1F' },
-    statusInProgress: { backgroundColor: '#3A2E10' },
-    statusText: { fontSize: 11, color: '#DCC9A8', fontWeight: '600' },
-    progressText: { fontSize: 12, color: '#DCC9A8', opacity: 0.6 },
+    statusCompleted: { backgroundColor: '#064E3B' },
+    statusInProgress: { backgroundColor: '#2D3748' },
+    statusText: { fontSize: 11, color: '#CBD5E0', fontWeight: '600' },
+    progressText: { fontSize: 12, color: '#CBD5E0', opacity: 0.6 },
     cardRight: { marginLeft: 12 },
     resumeBtn: {
         paddingHorizontal: 16,
         height: 36,
-        backgroundColor: '#C9A16A',
+        backgroundColor: '#0070F3',
         borderRadius: 6,
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: 44,
         minWidth: 56,
     },
-    resumeText: { fontSize: 13, fontWeight: '600', color: '#0A0805' },
+    resumeText: { fontSize: 13, fontWeight: '600', color: '#0F1117' },
     viewBtn: {
         paddingHorizontal: 16,
         height: 36,
         borderWidth: 1,
-        borderColor: '#2E2418',
+        borderColor: '#1A202C',
         borderRadius: 6,
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: 44,
         minWidth: 56,
     },
-    viewText: { fontSize: 13, color: '#DCC9A8' },
-    errorText: { color: '#E57373', fontSize: 14, marginBottom: 16 },
+    viewText: { fontSize: 13, color: '#CBD5E0' },
+    errorText: { color: '#F87171', fontSize: 14, marginBottom: 16 },
     retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
-    retryText: { color: '#C9A16A', fontSize: 14 },
+    retryText: { color: '#0070F3', fontSize: 14 },
 });

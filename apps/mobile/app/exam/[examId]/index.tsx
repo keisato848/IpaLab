@@ -37,7 +37,7 @@ export default function ExamEntryScreen() {
     if (isLoading) {
         return (
             <View style={styles.center}>
-                <ActivityIndicator color="#C9A16A" size="large" />
+                <ActivityIndicator color="#0070F3" size="large" />
             </View>
         );
     }
@@ -95,38 +95,38 @@ export default function ExamEntryScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#0A0805' },
+    container: { flex: 1, backgroundColor: '#0F1117' },
     content: { padding: 20 },
-    center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#0A0805' },
+    center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#0F1117' },
     backRow: { marginBottom: 24 },
-    backText: { color: '#C9A16A', fontSize: 14 },
+    backText: { color: '#0070F3', fontSize: 14 },
     header: { marginBottom: 16 },
-    examId: { fontSize: 22, color: '#DCC9A8', fontWeight: '600' },
-    meta: { fontSize: 14, color: '#C9A16A', marginTop: 4 },
+    examId: { fontSize: 22, color: '#CBD5E0', fontWeight: '600' },
+    meta: { fontSize: 14, color: '#0070F3', marginTop: 4 },
     badgeRow: { flexDirection: 'row', gap: 8, marginBottom: 32 },
     badge: {
         paddingHorizontal: 12,
         paddingVertical: 4,
         borderRadius: 4,
         borderWidth: 1,
-        borderColor: '#C9A16A',
+        borderColor: '#0070F3',
     },
-    badgeText: { fontSize: 12, color: '#C9A16A' },
+    badgeText: { fontSize: 12, color: '#0070F3' },
     actions: { gap: 12, marginBottom: 24 },
     startButton: {
         height: 52,
-        backgroundColor: '#C9A16A',
+        backgroundColor: '#0070F3',
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: 48,
     },
-    startText: { fontSize: 16, color: '#0A0805', fontWeight: '700' },
-    errorText: { color: '#E57373', fontSize: 14, marginBottom: 16 },
+    startText: { fontSize: 16, color: '#0F1117', fontWeight: '700' },
+    errorText: { color: '#F87171', fontSize: 14, marginBottom: 16 },
     backButton: { paddingHorizontal: 20, paddingVertical: 10 },
     note: {
         fontSize: 12,
-        color: '#DCC9A8',
+        color: '#CBD5E0',
         opacity: 0.5,
         textAlign: 'center',
         lineHeight: 18,

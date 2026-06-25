@@ -53,7 +53,7 @@ export default function ResultScreen() {
               : '基礎から着実に積み上げよう';
 
     const scoreColor =
-        percentage >= 80 ? '#66BB6A' : percentage >= 60 ? '#C9A16A' : '#E57373';
+        percentage >= 80 ? '#34D399' : percentage >= 60 ? '#0070F3' : '#F87171';
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -84,14 +84,14 @@ export default function ResultScreen() {
                                     key={qNo}
                                     style={[
                                         styles.qCell,
-                                        { borderColor: answer.isCorrect ? '#66BB6A' : '#E57373' },
+                                        { borderColor: answer.isCorrect ? '#34D399' : '#F87171' },
                                     ]}
                                 >
                                     <Text style={styles.qCellNo}>Q{qNo}</Text>
                                     <Text
                                         style={[
                                             styles.qCellIcon,
-                                            { color: answer.isCorrect ? '#66BB6A' : '#E57373' },
+                                            { color: answer.isCorrect ? '#34D399' : '#F87171' },
                                         ]}
                                     >
                                         {answer.isCorrect ? '○' : '✗'}
@@ -124,17 +124,17 @@ export default function ResultScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#0A0805' },
+    container: { flex: 1, backgroundColor: '#0F1117' },
     content: { padding: 24, alignItems: 'center' },
     title: {
         fontSize: 24,
-        color: '#DCC9A8',
+        color: '#CBD5E0',
         fontWeight: '700',
         marginBottom: 4,
     },
     examId: {
         fontSize: 14,
-        color: '#C9A16A',
+        color: '#0070F3',
         marginBottom: 40,
     },
     scoreCircle: {
@@ -142,11 +142,11 @@ const styles = StyleSheet.create({
         height: 180,
         borderRadius: 90,
         borderWidth: 3,
-        borderColor: '#2E2418',
+        borderColor: '#1A202C',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 24,
-        backgroundColor: '#1A1208',
+        backgroundColor: '#0F1117',
     },
     scorePercent: {
         fontSize: 52,
@@ -155,12 +155,12 @@ const styles = StyleSheet.create({
     },
     scoreDetail: {
         fontSize: 14,
-        color: '#DCC9A8',
+        color: '#CBD5E0',
         marginTop: 4,
     },
     message: {
         fontSize: 15,
-        color: '#DCC9A8',
+        color: '#CBD5E0',
         textAlign: 'center',
         marginBottom: 36,
         lineHeight: 22,
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     breakdown: { width: '100%', marginBottom: 36 },
     breakdownTitle: {
         fontSize: 13,
-        color: '#C9A16A',
+        color: '#0070F3',
         marginBottom: 12,
         textTransform: 'uppercase',
         letterSpacing: 1,
@@ -183,30 +183,30 @@ const styles = StyleSheet.create({
         height: 52,
         borderWidth: 1,
         borderRadius: 6,
-        backgroundColor: '#1A1208',
+        backgroundColor: '#0F1117',
         alignItems: 'center',
         justifyContent: 'center',
     },
-    qCellNo: { fontSize: 10, color: '#DCC9A8', marginBottom: 2 },
+    qCellNo: { fontSize: 10, color: '#CBD5E0', marginBottom: 2 },
     qCellIcon: { fontSize: 16, fontWeight: '700' },
     actions: { width: '100%', gap: 12 },
     primaryBtn: {
         height: 52,
-        backgroundColor: '#C9A16A',
+        backgroundColor: '#0070F3',
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: 48,
     },
-    primaryText: { fontSize: 16, fontWeight: '600', color: '#0A0805' },
+    primaryText: { fontSize: 16, fontWeight: '600', color: '#0F1117' },
     secondaryBtn: {
         height: 52,
         borderWidth: 1,
-        borderColor: '#C9A16A',
+        borderColor: '#0070F3',
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: 48,
     },
-    secondaryText: { fontSize: 16, color: '#C9A16A' },
+    secondaryText: { fontSize: 16, color: '#0070F3' },
 });

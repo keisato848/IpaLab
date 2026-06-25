@@ -11,7 +11,7 @@ let _db: ExpoSQLiteDatabase<typeof schema> | null = null;
 
 export function getDb(): ExpoSQLiteDatabase<typeof schema> {
     if (_db) return _db;
-    const sqlite = SQLite.openDatabaseSync('daidoko.db');
+    const sqlite = SQLite.openDatabaseSync('shikakuno.db');
     _db = drizzle(sqlite, { schema });
     return _db;
 }
