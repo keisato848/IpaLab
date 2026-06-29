@@ -21,6 +21,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../../src/store/auth-store';
 import { fetchContentManifest } from '../../src/infrastructure/api/content-api';
 import { queryKeys } from '../../src/query/query-keys';
+import { ScreenContainer } from '../../src/components/ScreenContainer';
 
 interface ExamItem {
     examId: string;
@@ -74,7 +75,7 @@ export default function ExamsScreen() {
     }
 
     return (
-        <View style={styles.container}>
+        <ScreenContainer>
             <Text style={styles.title}>試験一覧</Text>
             <FlatList
                 data={exams}
@@ -107,7 +108,7 @@ export default function ExamsScreen() {
                 }
                 contentContainerStyle={exams.length === 0 ? styles.emptyContainer : undefined}
             />
-        </View>
+        </ScreenContainer>
     );
 }
 

@@ -24,6 +24,7 @@ import {
     daysUntilExam,
 } from '../../src/application/usecases/plan-selectors';
 import { colors } from '../../src/constants/theme';
+import { ScreenContainer } from '../../src/components/ScreenContainer';
 
 export default function PlanScreen() {
     const { session } = useAuthStore();
@@ -93,6 +94,7 @@ export default function PlanScreen() {
     const remaining = daysUntilExam(plan.examDate, todayISO);
 
     return (
+        <ScreenContainer>
         <ScrollView
             style={styles.container}
             contentContainerStyle={styles.content}
@@ -168,6 +170,7 @@ export default function PlanScreen() {
                 ))}
             </View>
         </ScrollView>
+        </ScreenContainer>
     );
 }
 

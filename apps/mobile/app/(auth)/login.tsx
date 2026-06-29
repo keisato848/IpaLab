@@ -15,7 +15,7 @@ import {
     Alert,
 } from 'react-native';
 import { loginWithOAuth, loginAsGuest } from '../../src/application/usecases/auth';
-import { colors } from '../../src/constants/theme';
+import { colors, layout } from '../../src/constants/theme';
 
 type LoadingState = 'idle' | 'google' | 'github' | 'guest';
 
@@ -137,6 +137,7 @@ const styles = StyleSheet.create({
     },
     buttonGroup: {
         width: '100%',
+        maxWidth: layout.formMaxWidth,
         gap: 12,
     },
     button: {

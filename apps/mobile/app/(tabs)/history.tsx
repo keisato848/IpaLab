@@ -19,6 +19,7 @@ import { useAuthStore } from '../../src/store/auth-store';
 import {
     listRecentSessions,
 } from '../../src/application/usecases/learning-session';
+import { ScreenContainer } from '../../src/components/ScreenContainer';
 
 interface SessionRow {
     id: string;
@@ -96,7 +97,7 @@ export default function HistoryScreen() {
     }
 
     return (
-        <View style={styles.container}>
+        <ScreenContainer>
             <Text style={styles.heading}>学習履歴</Text>
             <FlatList
                 data={sessions}
@@ -184,7 +185,7 @@ export default function HistoryScreen() {
                     );
                 }}
             />
-        </View>
+        </ScreenContainer>
     );
 }
 

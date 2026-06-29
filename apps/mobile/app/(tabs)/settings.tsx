@@ -24,6 +24,7 @@ import {
     updateStudyPlan,
 } from '../../src/infrastructure/api/study-plans-api';
 import { queryKeys } from '../../src/query/query-keys';
+import { ScreenContainer } from '../../src/components/ScreenContainer';
 import type { Mobile } from '@ipa-lab/shared';
 
 interface StudyPlanForm {
@@ -263,7 +264,8 @@ export default function SettingsScreen() {
     }, []);
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <ScreenContainer>
+            <ScrollView style={styles.container} contentContainerStyle={styles.content}>
             <Text style={styles.title}>設定</Text>
 
             {/* アカウント情報 */}
@@ -311,6 +313,7 @@ export default function SettingsScreen() {
                 </TouchableOpacity>
             </View>
         </ScrollView>
+        </ScreenContainer>
     );
 }
 

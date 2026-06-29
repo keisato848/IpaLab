@@ -43,3 +43,16 @@ export const colors = {
 } as const;
 
 export type AppColors = typeof colors;
+
+/**
+ * レイアウト・トークン（レスポンシブ）
+ * - 横長画面（タブレット）でコンテンツが間延びしないよう中央寄せの最大幅を定める。
+ */
+export const layout = {
+    /** 最小辺がこの dp 以上ならタブレット扱い（Android sw600dp 相当）。 */
+    tabletBreakpoint: 600,
+    /** 一般コンテンツ（リスト・設定など）の中央寄せ最大幅。 */
+    contentMaxWidth: 720,
+    /** フォーム（ログイン等）の中央寄せ最大幅。 */
+    formMaxWidth: 440,
+} as const;
