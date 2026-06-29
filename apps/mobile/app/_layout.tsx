@@ -8,12 +8,18 @@
 import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { bootstrapAuth, restoreSession } from '../src/application/usecases/auth';
 import { applyAdaptiveOrientation } from '../src/infrastructure/orientation';
 import { useAuthStore } from '../src/store/auth-store';
 
 // 起動時に一度だけ auth 基盤を初期化
 bootstrapAuth();
+
+// React Query クライアント（アプリ全体で共有）
+const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: 1, staleTime: 5 * 60 * 1000 } },
+});
 
 export default function RootLayout() {
     const router = useRouter();
@@ -43,24 +49,24 @@ export default function RootLayout() {
         }
     }, [status, segments]);
 
-    if (status === 'initializing') {
-        return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#0F1117' }}>
-                <ActivityIndicator color="#0070F3" size="large" />
-            </View>
-        );
-    }
-
     return (
-        <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="exam" />
-            <Stack.Screen name="scoring" />
-            <Stack.Screen name="history" />
-            <Stack.Screen name="plan" />
-            <Stack.Screen name="sync-status" />
-        </Stack>
+        <QueryClientProvider client={queryClient}>
+            {status === 'initializing' ? (
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#0F1117' }}>
+                    <ActivityIndicator color="#0070F3" size="large" />
+                </View>
+            ) : (
+                <Stack screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="index" />
+                    <Stack.Screen name="(auth)" />
+                    <Stack.Screen name="(tabs)" />
+                    <Stack.Screen name="exam" />
+                    <Stack.Screen name="scoring" />
+                    <Stack.Screen name="history" />
+                    <Stack.Screen name="plan" />
+                    <Stack.Screen name="sync-status" />
+                </Stack>
+            )}
+        </QueryClientProvider>
     );
 }
