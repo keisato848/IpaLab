@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { bootstrapAuth, restoreSession } from '../src/application/usecases/auth';
+import { applyAdaptiveOrientation } from '../src/infrastructure/orientation';
 import { useAuthStore } from '../src/store/auth-store';
 
 // 起動時に一度だけ auth 基盤を初期化
@@ -22,6 +23,11 @@ export default function RootLayout() {
     // セッション復元
     useEffect(() => {
         restoreSession();
+    }, []);
+
+    // 端末種別に応じた画面の向き制御（スマホ=縦固定 / タブレット=回転許可）
+    useEffect(() => {
+        applyAdaptiveOrientation();
     }, []);
 
     // status 変化に応じてルーティング
