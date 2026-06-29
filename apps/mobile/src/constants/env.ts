@@ -8,8 +8,8 @@ const ENV = (Constants.expoConfig?.extra?.APP_ENV as string | undefined) ?? 'dev
 
 const API_BASES: Record<string, string> = {
     dev: 'http://localhost:3000',
-    beta: 'https://staging.shikakuno.app',
-    prod: 'https://shikakuno.app',
+    beta: 'https://staging.shikaku-no.com',
+    prod: 'https://shikaku-no.com',
 };
 
 export const API_BASE_URL = API_BASES[ENV] ?? API_BASES['dev'];
@@ -20,5 +20,5 @@ export const APP_SCHEME = 'shikakuno';
 /** OAuth リダイレクト URI（開発: custom scheme、本番: App Links） */
 export const OAUTH_REDIRECT_URI =
     ENV === 'prod'
-        ? 'https://shikakuno.app/auth/callback'
+        ? 'https://shikaku-no.com/auth/callback'
         : `${APP_SCHEME}://auth/oauth-result`;
