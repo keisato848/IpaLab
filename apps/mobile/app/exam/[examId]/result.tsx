@@ -15,6 +15,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useExamSessionStore } from '../../../src/store/exam-session-store';
 import { completeLearningSession } from '../../../src/application/usecases/learning-session';
+import { ScreenContainer } from '../../../src/components/ScreenContainer';
 
 export default function ResultScreen() {
     const { examId } = useLocalSearchParams<{ examId: string }>();
@@ -56,6 +57,7 @@ export default function ResultScreen() {
         percentage >= 80 ? '#34D399' : percentage >= 60 ? '#0070F3' : '#F87171';
 
     return (
+        <ScreenContainer>
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
             {/* タイトル */}
             <Text style={styles.title}>試験結果</Text>
@@ -120,6 +122,7 @@ export default function ResultScreen() {
                 </TouchableOpacity>
             </View>
         </ScrollView>
+        </ScreenContainer>
     );
 }
 

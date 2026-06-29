@@ -16,6 +16,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../../../src/store/auth-store';
 import { fetchExamContent } from '../../../src/infrastructure/api/content-api';
 import { queryKeys } from '../../../src/query/query-keys';
+import { ScreenContainer } from '../../../src/components/ScreenContainer';
 
 export default function ExamEntryScreen() {
     const { examId } = useLocalSearchParams<{ examId: string }>();
@@ -56,6 +57,7 @@ export default function ExamEntryScreen() {
     const totalQuestions = data.questions.length;
 
     return (
+        <ScreenContainer>
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
             {/* ヘッダー */}
             <TouchableOpacity onPress={() => router.back()} style={styles.backRow}>
@@ -91,6 +93,7 @@ export default function ExamEntryScreen() {
                 再接続後に自動同期されます。
             </Text>
         </ScrollView>
+        </ScreenContainer>
     );
 }
 

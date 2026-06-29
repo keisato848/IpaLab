@@ -26,6 +26,7 @@ import {
     createLearningSession,
     saveAnswer,
 } from '../../../../src/application/usecases/learning-session';
+import { ScreenContainer } from '../../../../src/components/ScreenContainer';
 
 type AnswerState = { selected: number | null; submitted: boolean };
 
@@ -159,7 +160,7 @@ export default function QuestionScreen() {
     const isCorrect = answerState.selected === correctIdx;
 
     return (
-        <View style={styles.container}>
+        <ScreenContainer>
             {/* ナビゲーションバー */}
             <View style={styles.navBar}>
                 <TouchableOpacity
@@ -255,7 +256,7 @@ export default function QuestionScreen() {
                     </TouchableOpacity>
                 )}
             </View>
-        </View>
+        </ScreenContainer>
     );
 }
 
