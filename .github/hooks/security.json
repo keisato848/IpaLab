@@ -23,6 +23,13 @@
 				"command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/skills/github-customization-check/scripts/validate-github-customizations.ps1\" -Mode hook -FailOnFinding",
 				"windows": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/skills/github-customization-check/scripts/validate-github-customizations.ps1\" -Mode hook -FailOnFinding",
 				"timeout": 30
+			},
+			{
+				"type": "command",
+				"description": "PRレビュー確認: 未解決レビューはすべて修正 commit または返信で対応する",
+				"command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/conduct-check.ps1\"",
+				"windows": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/.github/hooks/conduct-check.ps1\"",
+				"timeout": 30
 			}
 		]
 	}

@@ -20,6 +20,10 @@ const CONTAINER_PARTITION_KEYS: Record<string, string> = {
     PageViews: "/date",
     AiAssistantUsage: "/userId",
     BugReports: "/userId",
+    // Mobile (Android Play版, 26_AndroidPlayDetailedDesign.md §13)
+    MobileSessions: "/userId",
+    MobileSyncEvents: "/userId",
+    MobileGuestMerges: "/userId",
 };
 
 // Singleton instance
