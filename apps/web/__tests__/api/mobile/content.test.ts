@@ -123,6 +123,35 @@ describe('GET /api/mobile/v1/content/exams/{examId}', () => {
         expect(body.questions[0].questionText).toBe('問題文1');
     });
 
+    it('options[{id,text}]/correctOption 形式を choices/correctAnswer に変換する（実データ互換）', async () => {
+        const optionQuestions = [
+            {
+                id: 'q1',
+                examId: 'AP-2024-Spring-AM',
+                qNo: 1,
+                category: 'ストラテジ',
+                text: '問題文1',
+                options: [
+                    { id: 'a', text: 'DFFT' },
+                    { id: 'b', text: 'ESG' },
+                    { id: 'c', text: 'GEIT' },
+                    { id: 'd', text: 'SCM' },
+                ],
+                correctOption: 'a',
+                explanation: '解説',
+                _ts: 1750000000,
+            },
+        ];
+        await setupContainers(optionQuestions);
+        const { GET } = await import('@/app/api/mobile/v1/content/exams/[examId]/route');
+        const req = new NextRequest('http://localhost/api/mobile/v1/content/exams/AP-2024-Spring-AM');
+        const res = await GET(req, { params: Promise.resolve({ examId: 'AP-2024-Spring-AM' }) });
+        expect(res.status).toBe(200);
+        const body = await res.json();
+        expect(body.questions[0].choices).toEqual(['DFFT', 'ESG', 'GEIT', 'SCM']);
+        expect(body.questions[0].correctAnswer).toBe('a');
+    });
+
     it('0件の試験は404を返す（0件防壁）', async () => {
         await setupContainers([]);
         const { GET } = await import('@/app/api/mobile/v1/content/exams/[examId]/route');

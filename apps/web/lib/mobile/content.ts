@@ -84,7 +84,9 @@ interface QuestionDoc {
     category?: string;
     question?: string;
     text?: string;
+    options?: Array<{ id?: string; text: string }>;
     choices?: string[] | Record<string, string>;
+    correctOption?: string;
     answer?: string;
     correctAnswer?: string;
     explanation?: string;
@@ -120,8 +122,14 @@ export async function getExamContent(examId: string): Promise<Mobile.ExamContent
             qNo: q.qNo,
             category: q.category ?? examId.split('-')[0] ?? '',
             questionText: q.question ?? q.text ?? '',
-            choices: Array.isArray(q.choices) ? q.choices : q.choices ? Object.values(q.choices) : undefined,
-            correctAnswer: q.correctAnswer ?? q.answer,
+            choices: Array.isArray(q.options)
+                ? q.options.map((o) => o.text)
+                : Array.isArray(q.choices)
+                  ? q.choices
+                  : q.choices
+                    ? Object.values(q.choices)
+                    : undefined,
+            correctAnswer: q.correctOption ?? q.correctAnswer ?? q.answer,
             explanation: q.explanation,
         })),
     });
