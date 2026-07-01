@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
+import Markdown from 'react-native-markdown-display';
 import { Mobile } from '@ipa-lab/shared';
 import { useAuthStore } from '../../../../src/store/auth-store';
 import { useExamSessionStore } from '../../../../src/store/exam-session-store';
@@ -224,7 +225,9 @@ export default function QuestionScreen() {
                             {isCorrect ? '✓ 正解' : '✗ 不正解'}
                         </Text>
                         {question.explanation ? (
-                            <Text style={styles.explanation}>{question.explanation}</Text>
+                            <Markdown style={markdownStyles}>
+                                {question.explanation}
+                            </Markdown>
                         ) : null}
                     </View>
                 )}
@@ -324,7 +327,6 @@ const styles = StyleSheet.create({
     resultLabel: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
     correct: { color: '#34D399' },
     wrong: { color: '#F87171' },
-    explanation: { fontSize: 13, color: '#CBD5E0', lineHeight: 20 },
     footer: {
         padding: 16,
         borderTopWidth: 1,
@@ -343,3 +345,48 @@ const styles = StyleSheet.create({
     errorText: { color: '#F87171', fontSize: 14, marginBottom: 16 },
     linkText: { color: '#0070F3', fontSize: 14 },
 });
+
+/**
+ * 解説の Markdown 描画スタイル（ダークテーマ）。
+ * 注: LaTeX 数式（$...$）は本コンポーネントでは未対応で生表示のまま。完全対応は issue #286 で追う。
+ */
+const markdownStyles = {
+    body: { color: '#CBD5E0', fontSize: 13, lineHeight: 20 },
+    strong: { fontWeight: '700' as const, color: '#FFFFFF' },
+    em: { fontStyle: 'italic' as const },
+    heading1: { color: '#FFFFFF', fontWeight: '700' as const, fontSize: 18, marginTop: 10, marginBottom: 6 },
+    heading2: { color: '#FFFFFF', fontWeight: '700' as const, fontSize: 16, marginTop: 10, marginBottom: 6 },
+    heading3: { color: '#FFFFFF', fontWeight: '700' as const, fontSize: 14, marginTop: 8, marginBottom: 4 },
+    bullet_list: { marginVertical: 4 },
+    ordered_list: { marginVertical: 4 },
+    list_item: { marginVertical: 2 },
+    code_inline: {
+        backgroundColor: '#1A202C',
+        color: '#E2E8F0',
+        fontFamily: 'monospace',
+        paddingHorizontal: 4,
+        borderRadius: 4,
+    },
+    fence: {
+        backgroundColor: '#1A202C',
+        color: '#E2E8F0',
+        fontFamily: 'monospace',
+        padding: 10,
+        borderRadius: 6,
+    },
+    code_block: {
+        backgroundColor: '#1A202C',
+        color: '#E2E8F0',
+        fontFamily: 'monospace',
+        padding: 10,
+        borderRadius: 6,
+    },
+    link: { color: '#0070F3' },
+    blockquote: {
+        backgroundColor: '#111827',
+        borderLeftColor: '#0070F3',
+        borderLeftWidth: 3,
+        paddingHorizontal: 10,
+    },
+    hr: { backgroundColor: '#1A202C', height: 1 },
+};
